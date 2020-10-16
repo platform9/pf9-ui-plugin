@@ -142,7 +142,6 @@ export const routes = {
     }),
   },
   dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
-<<<<<<< HEAD
   apiAccess: {
     api: Route.register({ url: `${k8sPrefix}/api-access#api`, name: 'ApiAccess:API' }),
     kubeConfig: Route.register({
@@ -174,13 +173,6 @@ export const routes = {
       name: 'ApiHelper:Resmgr',
     }),
   },
-=======
-  apiAccess: Route.register({ url: `${k8sPrefix}/api_access`, name: 'APIAccess' }),
-  apiDetails: Route.register({
-    url: `${k8sPrefix}/api_access/apiHelper`,
-    name: 'ApiHelper',
-  }),
->>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
   nodes: {
     list: Route.register({ url: `${k8sPrefix}/infrastructure#nodes`, name: 'Nodes:List' }),
     detail: Route.register({ url: `${k8sPrefix}/infrastructure/nodes/:id`, name: 'Nodes:Details' }),

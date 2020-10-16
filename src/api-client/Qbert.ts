@@ -31,7 +31,6 @@ import {
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
-import { MethodMetadata } from './model'
 
 type AlertManagerRaw = Omit<Omit<AlertManagerAlert, 'clusterId'>, 'id'>
 
@@ -66,11 +65,7 @@ class Qbert extends ApiService {
     return 'qbert'
   }
 
-<<<<<<< HEAD
   static apiMethodsMetadata = []
-=======
-  static apiMethodsMetadata: MethodMetadata[] = []
->>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 
   // cachedEndpoint = ''
 
