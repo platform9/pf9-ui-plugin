@@ -1,11 +1,13 @@
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import React, { useEffect } from 'react'
+import useReactRouter from 'use-react-router'
 import PicklistDefault from 'core/components/Picklist'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 import SearchBar from './SearchBar'
 import { assocPath } from 'ramda'
 import { allKey } from 'app/constants'
+import { Route } from 'core/utils/routes'
 
 interface Props {
   data: Array<String>
@@ -43,10 +45,39 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
   const [searchTerm, setSearchTerm] = React.useState('')
   const [filterProperties, setFilterProperties] = React.useState({})
 
+  const { history, location } = useReactRouter()
+  const url = Route.getCurrentRoute().url
+  const route = new Route({ url, name: 'Filter' })
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const searchTerm = searchParams.get('search')
+    if (searchTerm) {
+      setSearchTerm(searchTerm)
+    }
+
+    filters.map((filter) => {
+      const param = searchParams.get(filter.target)
+      if (param) {
+        setFilterProperties(assocPath([filter.target], param))
+      }
+    })
+  }, [data])
+
   useEffect(() => {
     const filteredData = filterByProperty(filterBySearch(data))
     setFilteredData(filteredData)
+    updateUrlWithParams()
   }, [searchTerm, filterProperties])
+
+  const updateUrlWithParams = () => {
+    const params = Object.assign({}, filterProperties)
+    if (!!searchTerm) {
+      params['search'] = searchTerm
+    }
+    const urlWithQueryParams = route.path(params)
+    history.push(urlWithQueryParams)
+  }
 
   const filterBySearch = (data) => {
     return data.filter((data) => data[searchTarget].match(new RegExp(searchTerm, 'i')) !== null)

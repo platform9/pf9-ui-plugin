@@ -1,13 +1,13 @@
 import React from 'react'
 import ExternalLink from 'core/components/ExternalLink'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { makeStyles } from '@material-ui/core/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { konformGithubLink, terraformHelpLink } from 'k8s/links'
+import { konformGithubLink } from 'k8s/links'
 import Text from 'core/elements/text'
 import BulletList from 'core/components/BulletList'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { Button } from '@material-ui/core'
+import CloudProviderCard from '../common/CloudProviderCard'
+import { CloudProviders } from '../infrastructure/cloudProviders/model'
 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
@@ -50,14 +50,6 @@ const useStyles = makeStyles((theme) => ({
 
 const requirements = ['Go v1.13+ and', 'Terraform']
 
-const iconSizes = { small: '', medium: '@2x', large: '@3x' }
-const iconSize = iconSizes.small
-const rootPath = '/ui/images/icon-cloudproviders'
-const icons = {
-  aws: `${rootPath}/cloudaws-default${iconSize}.png`,
-  azure: `${rootPath}/cloudazure-default${iconSize}.png`,
-}
-
 const TerraformListPage = () => {
   const classes = useStyles()
   return (
@@ -87,8 +79,8 @@ const TerraformListPage = () => {
           <b>Supported Clouds</b>
         </Text>
         <div className={classes.cloudTypes}>
-          <img alt={'AWS'} src={icons['aws']} />
-          <img alt={'Azure'} src={icons['azure']} />
+          <CloudProviderCard type={CloudProviders.Aws} active={false} />
+          <CloudProviderCard type={CloudProviders.Azure} active={false} />
         </div>
       </div>
       <div className={classes.buttonContainer}>

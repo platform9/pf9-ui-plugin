@@ -134,11 +134,15 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
 
   useEffect(() => {
     setApiResponse('')
-    ;(async () => {
+
+    const setUrl = async () => {
       const serviceEndpoint = await getServiceEndpoint(api, apiClient)
       const endpoint = replaceTextBetweenCurlyBraces(metadata.url, params)
-      setRequestUrl(pathJoin(serviceEndpoint, endpoint))
-    })()
+      const url = pathJoin(serviceEndpoint, endpoint)
+      setRequestUrl(url)
+    }
+
+    setUrl()
   }, [metadata, params])
 
   const makeApiRequest = async (url, endpoint, body = '') => {

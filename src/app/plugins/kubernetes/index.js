@@ -220,12 +220,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'API Access',
-      link: { path: '/api_access', exact: true },
+      link: { path: '/api-access', exact: true },
       component: ApiAccessPage,
     },
     {
-      name: 'API Endpoint Details',
-      link: { path: '/api_access/apiHelper', exact: true },
+      name: 'API Helper',
+      link: { path: '/api-access/api-helper', exact: true },
       component: ApiServicesPage,
     },
     {
@@ -406,7 +406,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     { name: 'Namespaces', icon: 'object-group', ...clarityLink('/kubernetes/namespaces') },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
-    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
+    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api-access') },
     {
       name: 'Tenants & Users',
       icon: 'user',
@@ -475,7 +475,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac' },
     },
-    { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
+    { name: 'API Access', icon: 'key', link: { path: '/api-access' } },
     {
       name: 'Tenants & Users',
       link: { path: '/user_management' },

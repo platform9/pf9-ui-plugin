@@ -142,11 +142,37 @@ export const routes = {
     }),
   },
   dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
-  apiAccess: Route.register({ url: `${k8sPrefix}/api_access`, name: 'APIAccess' }),
-  apiDetails: Route.register({
-    url: `${k8sPrefix}/api_access/apiHelper`,
-    name: 'ApiHelper',
-  }),
+  apiAccess: {
+    api: Route.register({ url: `${k8sPrefix}/api-access#api`, name: 'ApiAccess:API' }),
+    kubeConfig: Route.register({
+      url: `${k8sPrefix}/api-access#kubeconfig`,
+      name: 'ApiAccess:KubeConfig',
+    }),
+    terraform: Route.register({
+      url: `${k8sPrefix}/api-access#terraform`,
+      name: 'ApiAccess:Terraform',
+    }),
+    apiDetails: Route.register({
+      url: `${k8sPrefix}/api-access/api-helper`,
+      name: 'ApiAccess:ApiHelper',
+    }),
+    appbert: Route.register({
+      url: `${k8sPrefix}/api-access/api-helper#appbert`,
+      name: 'ApiHelper:Appbert',
+    }),
+    keystone: Route.register({
+      url: `${k8sPrefix}/api-access/api-helper#keystone`,
+      name: 'ApiHelper:Keystone',
+    }),
+    qbert: Route.register({
+      url: `${k8sPrefix}/api-access/api-helper#qbert`,
+      name: 'ApiHelper:Qbert',
+    }),
+    resmgr: Route.register({
+      url: `${k8sPrefix}/api-access/api-helper#resmgr`,
+      name: 'ApiHelper:Resmgr',
+    }),
+  },
   nodes: {
     list: Route.register({ url: `${k8sPrefix}/infrastructure#nodes`, name: 'Nodes:List' }),
     detail: Route.register({ url: `${k8sPrefix}/infrastructure/nodes/:id`, name: 'Nodes:Details' }),
