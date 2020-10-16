@@ -5,7 +5,7 @@ import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProvide
 import { ActionDataKeys } from 'k8s/DataKeys'
 import AwsCloudProviderVerification from './AwsCloudProviderVerification'
 import AzureCloudProviderVerification from './AzureCloudProviderVerification'
-import { objSwitchCase } from 'utils/fp'
+import { objSwitchCase, onlyDefinedValues } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
@@ -18,6 +18,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { CloudProviders, ICloudProvidersSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import WizardMeta from 'core/components/wizard/WizardMeta'
+import { pick } from 'ramda'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -49,21 +50,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const formCpBody = (data) => {
+  // Do not accept empty strings for these properties
+  // User may type and then delete the input before submitting
   if (data.type === CloudProviders.Aws) {
-    return {
-      name: data.name,
-      key: data.awsAccessKey,
-      secret: data.awsSecretKey,
-    }
+    return pick(['key', 'secret'], onlyDefinedValues(data))
   } else if (data.type === CloudProviders.Azure) {
-    return {
-      type: data.type,
-      name: data.name,
-      clientId: data.clientId,
-      clientSecret: data.clientSecret,
-      tenantId: data.tenantId,
-      subscriptionId: data.subscriptionId,
-    }
+    return pick(['clientId', 'clientSecret', 'tenantId', 'subscriptionId'], onlyDefinedValues(data))
   }
   return {}
 }
@@ -132,6 +124,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                           setWizardContext={setWizardContext}
                           toggleIamPolicy
                           showSubmitInCard
+                          updateWizard
                         />
                       </FormFieldCard>
                       <VerificationFields

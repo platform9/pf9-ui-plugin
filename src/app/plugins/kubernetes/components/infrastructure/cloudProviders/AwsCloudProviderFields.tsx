@@ -11,6 +11,7 @@ import downloadFile from 'core/utils/downloadFile'
 import { iamPolicyLink } from 'k8s/links'
 import Alert from 'core/components/Alert'
 import Text from 'core/elements/text'
+import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 
 const useStyles = makeStyles((theme: Theme) => ({
   bullets: {
@@ -43,6 +44,8 @@ interface Props {
   setWizardContext: any
   toggleIamPolicy: boolean
   showSubmitInCard: boolean
+  updateWizard: boolean
+  errorMessage: string
 }
 
 const downloadIAMPolicy = async (setState) => {
@@ -64,6 +67,8 @@ const AwsCloudProviderFields = ({
   setWizardContext,
   toggleIamPolicy = false,
   showSubmitInCard = false,
+  updateWizard = false,
+  errorMessage = '',
 }: Props) => {
   const { bullets, bullet, bulletText, downloadIcon, iamInfo, inCardSubmit } = useStyles({})
   const [downloadState, setDownloadState] = useState({ status: '', message: '' })
@@ -120,25 +125,27 @@ const AwsCloudProviderFields = ({
         onChange={(value) => setWizardContext({ name: value })}
         value={wizardContext.name}
         info="Name for Cloud Provider"
+        disabled={updateWizard}
         required
       />
       <TextField
-        id="awsAccessKey"
+        id="key"
         label="Access Key ID"
-        onChange={(value) => setWizardContext({ awsAccessKey: value })}
-        value={wizardContext.awsAccessKey}
+        onChange={(value) => setWizardContext({ key: value })}
+        value={wizardContext.key}
         info="AWS IAM Access Key"
         required
       />
       <TextField
-        id="awsSecretKey"
+        id="secret"
         label="Secret Access Key"
-        onChange={(value) => setWizardContext({ awsSecretKey: value })}
-        value={wizardContext.awsSecretKey}
+        onChange={(value) => setWizardContext({ secret: value })}
+        value={wizardContext.secret}
         info="IAM User Secret Key"
         type="password"
         required
       />
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {showSubmitInCard && (
         <div className={inCardSubmit}>
           <Button type="submit">Update Cloud Provider</Button>
