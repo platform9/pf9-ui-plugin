@@ -52,7 +52,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   apiDetails: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 50%)',
+    gridTemplateColumns: 'repeat(3, 1fr)',
     marginTop: theme.spacing(3),
   },
   requestHelper: {
@@ -114,13 +114,13 @@ const ApiServicesPage = () => {
       </div>
       <div className={classes.apiDetails}>
         <div>
-          <Filter
-            data={apiMethods}
-            setFilteredData={setApiMethods}
-            filters={filters}
-            searchTarget={searchTarget}
-          />
           <FormFieldCard title="Request Methods" className={classes.formFieldCard}>
+            <Filter
+              data={apiMethods}
+              setFilteredData={setApiMethods}
+              filters={filters}
+              searchTarget={searchTarget}
+            />
             <div className={classes.methods}>
               {apiMethods.map((method) => (
                 <Card
