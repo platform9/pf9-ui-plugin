@@ -50,6 +50,7 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import OnboardingBanner from './components/onboarding/OnboardingBanner'
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
+import ApiServicesPage from './components/apiAccess/ApiServicesPage'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -219,7 +220,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'API Access',
-      link: { path: '/api_access', exact: true },
+      link: { path: '/api-access', exact: true },
       component: ApiAccessPage,
     },
     {
@@ -400,7 +401,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     { name: 'Namespaces', icon: 'object-group', ...clarityLink('/kubernetes/namespaces') },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
-    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
+    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api-access') },
     {
       name: 'Tenants & Users',
       icon: 'user',
@@ -469,7 +470,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac' },
     },
-    { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
+    { name: 'API Access', icon: 'key', link: { path: '/api-access' } },
     {
       name: 'Tenants & Users',
       link: { path: '/user_management' },

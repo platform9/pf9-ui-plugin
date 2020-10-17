@@ -1,6 +1,8 @@
 import config from '../../config'
 import ApiClient from './ApiClient'
 import { emptyArr } from 'utils/fp'
+import { MethodMetadata } from './model'
+import { propOr } from 'ramda'
 
 const defaultTestTenant = 'Development Team Tenant'
 
@@ -74,4 +76,19 @@ export const normalizeResponse = <T>(response): T extends ResponseWithData ? T['
   const data = response && response.hasOwnProperty('data') ? response.data : response
   // Fix nested data.data issue
   return (data && data.hasOwnProperty('data') ? data.data : data) || emptyArr
+}
+
+export const trackApiMethodMetadata = (metadata: MethodMetadata) => (
+  target: any,
+  methodName: string,
+) => {
+  target.constructor.apiMethodsMetadata.push({
+    name: methodName,
+    params: propOr([], 'params', metadata),
+    ...metadata,
+  })
+}
+
+export const replaceTextBetweenCurlyBraces = (str, replacements) => {
+  return str.replace(/{(.+?)}/g, (_, s) => replacements[s] || `{${s}}`)
 }

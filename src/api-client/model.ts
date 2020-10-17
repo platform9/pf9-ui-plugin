@@ -1,5 +1,18 @@
 import { AxiosRequestConfig } from 'axios'
 
+export enum ApiServices {
+  appbert = 'Appbert',
+  cinder = 'Cinder',
+  clemency = 'Clemency',
+  glance = 'Glance',
+  keystone = 'Keystone',
+  murano = 'Murano',
+  neturon = 'Neutron',
+  nova = 'Nova',
+  qbert = 'Qbert',
+  resmgr = 'ResMgr',
+}
+
 export interface CustomerMetadata {
   [key: string]: any
 }
@@ -32,6 +45,12 @@ export interface IBasicRequestPostParams {
   endpoint?: string
   config?: AxiosRequestConfig
   options: IRequestOptions
+}
+
+export interface MethodMetadata {
+  url: string
+  type: string
+  params?: string[]
 }
 
 // import { AxiosResponse, AxiosRequestConfig } from 'axios'

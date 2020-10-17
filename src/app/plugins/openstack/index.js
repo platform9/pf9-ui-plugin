@@ -263,35 +263,35 @@ OpenStack.registerPlugin = (pluginManager) => {
     // Comment out the nav items since first UI release will be K8s only
     {
       name: 'Dashboard',
-      link: { path: '/' }
+      link: { path: '/' },
     },
     {
       name: 'Tenants',
-      link: { path: '/tenants' }
+      link: { path: '/tenants' },
     },
     {
       name: 'Users',
-      link: { path: '/users' }
+      link: { path: '/users' },
     },
     {
       name: 'Flavors',
-      link: { path: '/flavors' }
+      link: { path: '/flavors' },
     },
     {
       name: 'Instances',
-      link: { path: '/instances' }
+      link: { path: '/instances' },
     },
     {
       name: 'Networks',
-      link: { path: '/networks' }
+      link: { path: '/networks' },
     },
     {
       name: 'Routers',
-      link: { path: '/routers' }
+      link: { path: '/routers' },
     },
     {
       name: 'Floating IPs',
-      link: { path: '/floatingips' }
+      link: { path: '/floatingips' },
     },
     {
       name: 'API Access',
@@ -303,20 +303,20 @@ OpenStack.registerPlugin = (pluginManager) => {
     },
     {
       name: 'Images',
-      link: { path: '/images' }
+      link: { path: '/images' },
     },
     {
       name: 'Applications',
-      link: { path: '/applications' }
+      link: { path: '/applications' },
     },
     {
       name: 'SSH Keys',
-      link: { path: '/sshkeys' }
+      link: { path: '/sshkeys' },
     },
     {
       name: 'Hosts',
-      link: { path: '/hosts' }
-    }
+      link: { path: '/hosts' },
+    },
   ])
 }
 
