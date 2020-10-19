@@ -5,7 +5,6 @@ import useReactRouter from 'use-react-router'
 import PicklistDefault from 'core/components/Picklist'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 import SearchBar from './SearchBar'
-// import { assocPath, filter } from 'ramda'
 import { allKey } from 'app/constants'
 import { Route } from 'core/utils/routes'
 
