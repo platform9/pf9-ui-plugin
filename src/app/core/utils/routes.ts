@@ -144,7 +144,10 @@ export const routes = {
   dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
   apiAccess: {
     api: Route.register({ url: `${k8sPrefix}/api-access`, name: 'ApiAccess:API' }),
-    apiHelper: Route.register({ url: `${k8sPrefix}/api-access#api`, name: 'ApiAccess:APIHelper' }),
+    apiServices: Route.register({
+      url: `${k8sPrefix}/api-access#api-services`,
+      name: 'ApiAccess:APIServices',
+    }),
     kubeConfig: Route.register({
       url: `${k8sPrefix}/api-access#kubeconfig`,
       name: 'ApiAccess:KubeConfig',

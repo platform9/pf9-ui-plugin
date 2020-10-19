@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 import { pluck } from 'ramda'
@@ -14,6 +15,7 @@ import Card from 'core/components/Card'
 import Text from 'core/elements/text'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ApiRequestHelper from './ApiRequestHelper'
+import { Route } from 'core/utils/routes'
 
 const searchTarget = 'name'
 const requestVerbs = ['GET', 'PATCH', 'PUT', 'POST', 'DELETE']
@@ -73,9 +75,13 @@ const apiServices = {
 
 const ApiServicesPage = () => {
   const classes = useStyles()
-  const [activeApi, setActiveApi] = useState('appbert')
+  const [activeApi, setActiveApi] = useState('')
   const [apiMethods, setApiMethods] = useState([])
   const [activeMethod, setActiveMethod] = useState({})
+
+  const { history, location } = useReactRouter()
+  const route = Route.getCurrentRoute()
+  const urlParams = new URLSearchParams(location.search)
 
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
   const [serviceCatalog] = useDataLoader(loadServiceCatalog)
@@ -91,14 +97,45 @@ const ApiServicesPage = () => {
   const serviceNames = pluck('name', services).sort()
 
   useEffect(() => {
-    const methods = apiServices[activeApi].apiMethodsMetadata
-    setApiMethods(methods)
+    const apiName = urlParams.get('api')
+    if (!!apiName) {
+      setActiveApi(urlParams.get('api'))
+    } else {
+      if (serviceNames.length > 0) {
+        setActiveApi(serviceNames[0])
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!!activeApi) {
+      const methods = apiServices[activeApi].apiMethodsMetadata
+      setApiMethods(methods)
+      setActiveMethod({})
+      updateUrlWithParams()
+    }
   }, [activeApi])
 
-  const getServiceUrl = (name) => {
-    const service = services.find((service) => service.name === name)
-    return service.url
+  const updateUrlWithParams = () => {
+    const params = { api: activeApi }
+    // Add in all other params in the URL
+    urlParams.forEach((value, key, parent) => {
+      if (key !== 'api') params[key] = value
+    })
+    const urlWithQueryParams = route.path(params)
+    history.push(urlWithQueryParams)
   }
+
+  const getServiceUrl = (name) => {
+    return services.find((service) => service.name === name).url
+  }
+
+  const getAllApiMethods = useCallback(() => {
+    if (!activeApi) {
+      return []
+    }
+    return apiServices[activeApi].apiMethodsMetadata
+  }, [activeApi])
 
   return (
     <div className={classes.apiServicesPage}>
@@ -116,7 +153,7 @@ const ApiServicesPage = () => {
         <div>
           <FormFieldCard title="Request Methods" className={classes.formFieldCard}>
             <Filter
-              data={apiMethods}
+              data={getAllApiMethods()}
               setFilteredData={setApiMethods}
               filters={filters}
               searchTarget={searchTarget}

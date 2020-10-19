@@ -5,7 +5,7 @@ import useReactRouter from 'use-react-router'
 import PicklistDefault from 'core/components/Picklist'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 import SearchBar from './SearchBar'
-import { assocPath } from 'ramda'
+// import { assocPath, filter } from 'ramda'
 import { allKey } from 'app/constants'
 import { Route } from 'core/utils/routes'
 
@@ -46,41 +46,54 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
   const [filterProperties, setFilterProperties] = React.useState({})
 
   const { history, location } = useReactRouter()
-  const url = Route.getCurrentRoute().url
-  const route = new Route({ url, name: 'Filter' })
+  const route = Route.getCurrentRoute()
+  const urlParams = new URLSearchParams(location.search)
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search)
-    const searchTerm = searchParams.get('search')
+    const searchTerm = urlParams.get('search')
     if (searchTerm) {
       setSearchTerm(searchTerm)
     }
 
     filters.map((filter) => {
-      const param = searchParams.get(filter.target)
+      const param = urlParams.get(filter.target)
       if (param) {
-        setFilterProperties(assocPath([filter.target], param))
+        filterProperties[filter.target] = param
+        setFilterProperties(Object.assign({}, filterProperties))
       }
     })
   }, [data])
 
   useEffect(() => {
-    const filteredData = filterByProperty(filterBySearch(data))
-    setFilteredData(filteredData)
+    setFilteredData(getFilteredData(data))
     updateUrlWithParams()
   }, [searchTerm, filterProperties])
 
+  const getFilteredData = (data) => {
+    return filterByProperty(filterBySearch(data))
+  }
+
   const updateUrlWithParams = () => {
-    const params = Object.assign({}, filterProperties)
+    const params = {}
+    // Add in all other params in the URL
+    const hasFilterProperties = Object.entries(filterProperties).length > 0
+    urlParams.forEach((value, key) => {
+      if (key !== 'search' && hasFilterProperties && !filterProperties.hasOwnProperty(key)) {
+        params[key] = value
+      }
+    })
+
+    Object.assign(params, filterProperties)
     if (!!searchTerm) {
       params['search'] = searchTerm
     }
+
     const urlWithQueryParams = route.path(params)
     history.push(urlWithQueryParams)
   }
 
-  const filterBySearch = (data) => {
-    return data.filter((data) => data[searchTarget].match(new RegExp(searchTerm, 'i')) !== null)
+  const filterBySearch = (items) => {
+    return items.filter((item) => item[searchTarget].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
   const filterByProperty = (data) => {
@@ -95,10 +108,11 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
 
   const handleFilterUpdate = (target) => (selectedValue) => {
     if (selectedValue === allKey) {
-      setFilterProperties(delete filterProperties[target])
+      delete filterProperties[target]
     } else {
-      setFilterProperties(assocPath([target], selectedValue))
+      filterProperties[target] = selectedValue
     }
+    setFilterProperties(Object.assign({}, filterProperties))
   }
 
   return (

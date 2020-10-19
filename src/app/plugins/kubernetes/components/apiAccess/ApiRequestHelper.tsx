@@ -17,8 +17,7 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import ClusterPicklist from '../common/ClusterPicklist'
 import useParams from 'core/hooks/useParams'
 import CloudProviderPicklist from '../common/CloudProviderPicklist'
-import { useToast } from 'core/providers/ToastProvider'
-import { MessageTypes } from 'core/components/notifications/model'
+import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 
 const methodsWithBody = ['POST', 'PUT', 'PATCH']
 
@@ -111,35 +110,31 @@ const renderParamField = ({ classes, paramName, params, getParamsUpdater }) => {
   }
 }
 
-const getServiceEndpoint = async (service, apiClient) => {
-  if (service === 'keystone') {
-    return apiClient.options.keystoneEndpoint
-  } else if (service === 'qbert') {
-    return await apiClient.qbert.getApiEndpoint()
-  } else if (service === 'resmgr') {
-    const endpoint = await apiClient.keystone.getServiceEndpoint('resmgr', 'internal')
-    return `${endpoint}/v1`
-  } else {
-    const serviceCatalog = await loadServiceCatalog()
-    const catalogMap = arrToObjByKey('name', serviceCatalog)
-    return catalogMap[service].url
-  }
-}
-
 const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
   const classes = useStyles()
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
   const { params, getParamsUpdater } = useParams()
   const [apiResponse, setApiResponse] = useState('')
   const [requestUrl, setRequestUrl] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const apiClient = ApiClient.getInstance()
-  const showToast = useToast()
+
+  const isGetRequest = !methodsWithBody.includes(metadata.type) && metadata.type !== 'DELETE'
+  const enableRequest = devEnabled || (!devEnabled && isGetRequest)
 
   useEffect(() => {
     setApiResponse('')
+    setErrorMessage('')
 
     const setUrl = async () => {
-      const serviceEndpoint = await getServiceEndpoint(api, apiClient)
+      let serviceEndpoint = ''
+      if (api === 'qbert') {
+        serviceEndpoint = await apiClient.qbert.getApiEndpoint()
+      } else {
+        const serviceCatalog = await loadServiceCatalog()
+        const catalogMap = arrToObjByKey('name', serviceCatalog)
+        serviceEndpoint = catalogMap[api].url
+      }
       const endpoint = replaceTextBetweenCurlyBraces(metadata.url, params)
       const url = pathJoin(serviceEndpoint, endpoint)
       setRequestUrl(url)
@@ -171,9 +166,7 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
 
       return response
     } catch (e) {
-      typeof e === 'object'
-        ? showToast(e.message, MessageTypes.error)
-        : showToast('Request failed', MessageTypes.error)
+      typeof e === 'object' ? setErrorMessage(e.message) : setErrorMessage('Request Failed')
       return null
     }
   }
@@ -183,8 +176,8 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
     if (metadata.params.length > 0) {
       url = replaceTextBetweenCurlyBraces(url, inputValues)
     }
-    const endpoint = await getServiceEndpoint(api, apiClient)
-    const response = await makeApiRequest(url, endpoint, body)
+
+    const response = await makeApiRequest(url, body)
     if (response) {
       setApiResponse(JSON.stringify(response, null, 2))
     }
@@ -224,12 +217,10 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
             {methodsWithBody.includes(metadata.type) && devEnabled && (
               <TextField className={classes.textField} id="body" label="Body" multiline rows={3} />
             )}
-            {(devEnabled ||
-              (!devEnabled &&
-                !methodsWithBody.includes(metadata.type) &&
-                metadata.type !== 'DELETE')) && (
+            {enableRequest && (
               <div className={classes.request}>
                 <SubmitButton className={classes.button}>Make API Request</SubmitButton>
+                {!!errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
                 <CodeMirror
                   id="jsonResponse"
                   label={
