@@ -1,4 +1,10 @@
-import { ConnectionStatus, HealthStatus, IClusterSelector, IClusterStatus, TransientStatus } from './model'
+import {
+  ConnectionStatus,
+  HealthStatus,
+  IClusterSelector,
+  IClusterStatus,
+  TransientStatus,
+} from './model'
 import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
 import { routes } from 'core/utils/routes'
 
@@ -57,12 +63,12 @@ export const connectionStatusFieldsTable: {
   [status in ConnectionStatus | 'converging']: ConnectionStatusFields
 } = {
   connected: {
-    message: 'All nodes in the cluster are conected to Platform9 management plane.',
+    message: 'All nodes in the cluster are connected to Platform9 management plane.',
     clusterStatus: 'ok',
     label: 'Connected',
   },
   disconnected: {
-    message: 'All nodes in the cluster are disconected from Platform9 management plane.',
+    message: 'All nodes in the cluster are disconnected from Platform9 management plane.',
     clusterStatus: 'fail',
     label: 'Disconnected',
   },
@@ -116,6 +122,10 @@ export function getHealthStatus(
   workerStatus: HealthStatus | TransientStatus,
   canUpgrade,
 ) {
+  if (connectionStatus === 'disconnected') {
+    return 'unknown'
+  }
+
   if (isTransientStatus(connectionStatus)) {
     return connectionStatus as TransientStatus
   }
@@ -293,6 +303,12 @@ export const hasConvergingNodes = (nodes: INodesSelector[]): boolean =>
 export const isSteadyState = (taskStatus: string, nodes: INodesSelector[]): boolean =>
   !hasConvergingNodes(nodes) && ['success', 'error'].includes(taskStatus)
 
+export const isHealthyStatus = (status: string): boolean =>
+  ['healthy', 'needs_upgrade'].includes(status)
+
+export const isUnhealthyStatus = (status: string): boolean =>
+  ['unhealthy', 'unknown'].includes(status)
+
 export const isTransientStatus = (status: string): boolean =>
   ['creating', 'deleting', 'updating', 'upgrading', 'converging'].includes(status)
 
@@ -312,7 +328,7 @@ export const clusterHealthStatusFields: {
     label: 'Unhealthy',
   },
   unknown: {
-    status: 'pause',
+    status: 'unknown',
     label: 'Unknown',
   },
   converging: {

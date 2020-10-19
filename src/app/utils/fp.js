@@ -16,6 +16,7 @@ import {
   path,
   pathEq,
   pathOr,
+  reject,
   remove,
   T,
   update,
@@ -306,3 +307,6 @@ export const switchCase = (defaultValue, ...cases) => (input) =>
  */
 export const objSwitchCase = (casesObj, defaultValue) => (input) =>
   casesObj.hasOwnProperty(input) ? casesObj[input] : defaultValue
+
+// Typically used for forms with optional fields to ensure empty string values etc are not passed
+export const onlyDefinedValues = (obj) => reject((val) => ['', undefined, null].includes(val))(obj)

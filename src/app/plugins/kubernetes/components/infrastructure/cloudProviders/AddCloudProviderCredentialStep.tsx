@@ -1,11 +1,9 @@
-import React, { useEffect, useCallback, useMemo, useRef } from 'react'
+import React, { useEffect, useCallback, useMemo, useRef, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import ExternalLink from 'core/components/ExternalLink'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
-import { useToast } from 'core/providers/ToastProvider'
-import { MessageTypes } from 'core/components/notifications/model'
 import AwsCloudProviderFields from './AwsCloudProviderFields'
 import AzureCloudProviderFields from './AzureCloudProviderFields'
 import { awsPrerequisitesLink, azurePrerequisitesLink } from 'k8s/links'
@@ -18,10 +16,11 @@ const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file don
 const useStyles = makeStyles((theme: Theme) => ({
   cloudProviderCards: {
     maxWidth: 800,
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-    display: 'flex',
-    flexFlow: 'row nowrap',
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, 242px)',
+    gridGap: theme.spacing(2),
   },
   title: {
     marginTop: theme.spacing(4),
@@ -54,8 +53,8 @@ const formCpBody = (wizardContext) => {
     return {
       type: wizardContext.provider,
       name: wizardContext.name,
-      key: wizardContext.awsAccessKey,
-      secret: wizardContext.awsSecretKey,
+      key: wizardContext.key,
+      secret: wizardContext.secret,
     }
   } else if (wizardContext.provider === CloudProviders.Azure) {
     return {
@@ -78,7 +77,7 @@ const AddCloudProviderCredentialStep = ({
   setSubmitting,
 }: Props) => {
   const classes = useStyles({})
-  const showToast = useToast()
+  const [errorMessage, setErrorMessage] = useState('')
 
   const validatorRef = useRef(null)
 
@@ -97,12 +96,14 @@ const AddCloudProviderCredentialStep = ({
       const body = formCpBody(wizardContext)
       const [success, newCp] = await cloudProviderActions.create(body)
       if (!success) {
+        // TODO: surface the real API response error to get exact failure reason
+        // Hopefully will be doable with Xan's error message changes
         throw 'Error creating cloud provider'
       }
       setWizardContext({ cloudProviderId: newCp.uuid })
     } catch (err) {
       setSubmitting(false)
-      showToast(err.message, MessageTypes.error)
+      setErrorMessage(err)
       return false
     }
     setSubmitting(false)
@@ -113,16 +114,12 @@ const AddCloudProviderCredentialStep = ({
     onNext(submitStep)
   }, [submitStep])
 
-  const ActiveForm = useMemo(
-    // Saw this in the original add cp page but what's the main benefit?
-    () => {
-      return objSwitchCaseAny({
-        [CloudProviders.Aws]: AwsCloudProviderFields,
-        [CloudProviders.Azure]: AzureCloudProviderFields,
-      })(wizardContext.provider)
-    },
-    [wizardContext.provider],
-  )
+  const ActiveForm = useMemo(() => {
+    return objSwitchCaseAny({
+      [CloudProviders.Aws]: AwsCloudProviderFields,
+      [CloudProviders.Azure]: AzureCloudProviderFields,
+    })(wizardContext.provider)
+  }, [wizardContext.provider])
 
   return (
     <>
@@ -150,7 +147,13 @@ const AddCloudProviderCredentialStep = ({
           link={links[wizardContext.provider]}
         >
           {({ setFieldValue, values }) => (
-            <ActiveForm wizardContext={wizardContext} setWizardContext={setWizardContext} />
+            <>
+              <ActiveForm
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                errorMessage={errorMessage}
+              />
+            </>
           )}
         </ValidatedForm>
       )}

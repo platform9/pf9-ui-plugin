@@ -149,22 +149,6 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
 
   const fields = getClusterHealthStatus(cluster)
 
-  if (cluster.connectionStatus === 'disconnected') {
-    return (
-      <div>
-        <ClusterStatusSpan
-          title={message || 'Unknown'}
-          status="unknown"
-          variant={variant}
-          {...rest}
-        >
-          {message || 'Unknown'}
-        </ClusterStatusSpan>
-        {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
-      </div>
-    )
-  }
-
   return (
     <div>
       {fields && (

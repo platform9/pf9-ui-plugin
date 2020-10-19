@@ -29,6 +29,11 @@ import Theme from 'core/themes/model'
 import { prop } from 'ramda'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
+import {
+  isHealthyStatus,
+  isTransientStatus,
+  isUnhealthyStatus,
+} from '../infrastructure/clusters/ClusterStatusUtils'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -89,7 +94,7 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
     pieData: [
       {
         name: 'healthy',
-        value: clusters.filter((cluster) => cluster.healthStatus === 'healthy').length,
+        value: clusters.filter((cluster) => isHealthyStatus(cluster.healthStatus)).length,
         color: 'green.main',
       },
       {
@@ -99,12 +104,12 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
       },
       {
         name: 'converging',
-        value: clusters.filter((cluster) => cluster.healthStatus === 'converging').length,
+        value: clusters.filter((cluster) => isTransientStatus(cluster.healthStatus)).length,
         color: 'orange.main',
       },
       {
         name: 'unhealthy',
-        value: clusters.filter((cluster) => cluster.healthStatus === 'unhealthy').length,
+        value: clusters.filter((cluster) => isUnhealthyStatus(cluster.healthStatus)).length,
         color: 'red.main',
       },
     ],
