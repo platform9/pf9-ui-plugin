@@ -116,6 +116,7 @@ module.exports = {
           new BugsnagSourceMapUploaderPlugin({
             apiKey: bugsnagKey,
             appVersion: version,
+            overwrite: true,
           }),
         ]),
     new webpack.DefinePlugin({
