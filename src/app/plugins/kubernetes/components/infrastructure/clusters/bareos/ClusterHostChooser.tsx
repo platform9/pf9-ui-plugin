@@ -36,7 +36,7 @@ interface Props extends IValidatedForm {
 // into this component.  Refactor this later on when we can convert
 // ValidatedForm.js to TypeScript.
 export interface IValidatedForm {
-  id: string
+  id?: string
   validations?: any[] // What's the best way to type this?
   required?: boolean
   initialValues?: any

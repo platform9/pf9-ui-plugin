@@ -15,7 +15,9 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/wizard/Wizard'
+import WizardMeta from 'core/components/wizard/WizardMeta'
 import WizardStep from 'core/components/wizard/WizardStep'
+import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
@@ -25,7 +27,7 @@ import { awsNetworkingConfigurationsLink, runtimePrivilegedLink } from 'k8s/link
 import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import CodeBlock from 'core/components/CodeBlock'
-import { CloudProviders } from '../../cloudProviders/model'
+import { CloudProviders, CloudProvidersMap } from '../../cloudProviders/model'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { cloudProviderActions } from '../../cloudProviders/actions'
 import { PromptToAddProvider } from '../../cloudProviders/PromptToAddProvider'
@@ -448,7 +450,10 @@ const AddAwsClusterPage = () => {
       >
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
-            <>
+            <WizardMeta
+              fields={wizardContext}
+              icon={<CloudProviderCard active type={CloudProvidersMap.Aws} />}
+            >
               <WizardStep stepId="config" label="Cluster Configuration" onNext={configOnNext}>
                 {loading ? null : hasAwsProvider ? (
                   <ValidatedForm
@@ -860,7 +865,7 @@ const AddAwsClusterPage = () => {
                   <AwsClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
               </WizardStep>
-            </>
+            </WizardMeta>
           )
         }}
       </Wizard>

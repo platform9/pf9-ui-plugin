@@ -9,6 +9,7 @@ export enum CloudProviders {
   PhysicalMachine = 'physical',
   VirtualMachine = 'virtual',
 }
+export const CloudProvidersMap = Object.fromEntries(Object.entries(CloudProviders))
 
 export enum CloudProvidersFriendlyName {
   aws = 'AWS',

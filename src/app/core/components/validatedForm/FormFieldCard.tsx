@@ -5,7 +5,7 @@ import Theme from 'core/themes/model'
 import clsx from 'clsx'
 
 interface ContainerProps {
-  title?: string
+  title?: string | JSX.Element
   link?: JSX.Element
   topContent?: JSX.Element
   className?: string

@@ -28,7 +28,7 @@ const FormWrapper = ({
   backUrl = undefined,
   children,
   title,
-  className,
+  className = undefined,
   isUpdateForm = false,
   ...rest
 }) => {

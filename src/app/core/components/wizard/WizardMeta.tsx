@@ -8,7 +8,7 @@ import clsx from 'clsx'
 interface Props<T extends {}> {
   fields: T
   calloutFields?: Array<keyof T>
-  children?: JSX.Element
+  children?: JSX.Element | JSX.Element[]
   icon?: JSX.Element
   className?: any
   renderLabels?: (labels) => JSX.Element

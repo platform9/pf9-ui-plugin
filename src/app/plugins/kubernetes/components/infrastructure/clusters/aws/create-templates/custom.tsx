@@ -1,7 +1,7 @@
 import React from 'react'
 
-const OneClickAwsCluster = () => {
-  return <></>
+const AdvancedAwsCluster = () => {
+  return <>{'AdvancedAwsCluster'}</>
 }
 
-export default OneClickAwsCluster
+export default AdvancedAwsCluster

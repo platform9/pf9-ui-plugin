@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+/* eslint-disable max-len */
+import React, { useEffect, useRef } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -41,12 +42,14 @@ import {
   pf9PmkArchitectureDigLink,
 } from 'k8s/links'
 import { trackEvent } from 'utils/tracking'
-import { loadNodes } from '../../nodes/actions'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@material-ui/core'
-import Text from 'core/elements/text'
+// import { loadNodes } from '../../nodes/actions'
+// import useDataLoader from 'core/hooks/useDataLoader'
+// import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@material-ui/core'
+// import Text from 'core/elements/text'
 import { hexToRGBA } from 'core/utils/colorHelpers'
-import PollingData from 'core/components/PollingData'
+// import PollingData from 'core/components/PollingData'
+import Theme from 'core/themes/model'
+import WizardMeta from 'core/components/wizard/WizardMeta'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -71,7 +74,7 @@ const calicoBlockSizeValidator = customValidator((value, formValues) => {
 }, 'Calico Block Size must be greater than 20, less than 32 and not conflict with the Container CIDR')
 
 const cidrBlockSizeValidator = customValidator((value) => {
-  const blockSize = `${value}`.split('/')[1]
+  const blockSize = parseInt(`${value}`.split('/')[1])
   return blockSize > 0 && blockSize < 32
 }, 'Block Size must be greater than 0 and less than 32')
 
@@ -144,7 +147,7 @@ const handleNetworkPluginChange = (option, wizardContext) => {
   return payload
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   inline: {
     display: 'grid',
   },
@@ -249,8 +252,8 @@ const canFinishAndReview = ({
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const [nodes, loading, reload] = useDataLoader(loadNodes)
-  const [showDialog, setShowDialog] = useState(false)
+  // const [nodes, loading, reload] = useDataLoader(loadNodes)
+  // const [showDialog, setShowDialog] = useState(false)
   const wizRef = useRef(null)
   const validatorRef = useRef(null)
 
@@ -275,30 +278,30 @@ const AddBareOsClusterPage = () => {
       ...data,
       clusterType: 'local',
     })
-  useEffect(() => {
-    wizRef.current && wizRef.current.onNext(handleHasNodesNextCheck)
-  }, [nodes, wizRef])
+  // useEffect(() => {
+  //   wizRef.current && wizRef.current.onNext(handleHasNodesNextCheck)
+  // }, [nodes, wizRef])
 
   const setupValidator = (onNext) => (validate) => {
     wizRef.current = { onNext }
     validatorRef.current = { validate }
   }
-  const handleHasNodesNextCheck = useCallback(() => {
-    const isValid = validatorRef.current.validate()
-    if (!isValid) {
-      // if the form isn't filled out make sure they do that first.
-      return false
-    }
-    if (nodes.filter(allPass([isConnected, isUnassignedNode])).length === 0) {
-      // if they dont have any nodes then tell them to set that up first before moving forward
-      setShowDialog(true)
-      return false
-    }
-    return true
-  }, [nodes])
+  // const handleHasNodesNextCheck = useCallback(() => {
+  //   const isValid = validatorRef.current.validate()
+  //   if (!isValid) {
+  //     // if the form isn't filled out make sure they do that first.
+  //     return false
+  //   }
+  //   if (nodes.filter(allPass([isConnected, isUnassignedNode])).length === 0) {
+  //     // if they dont have any nodes then tell them to set that up first before moving forward
+  //     setShowDialog(true)
+  //     return false
+  //   }
+  //   return true
+  // }, [nodes])
   return (
     <FormWrapper title="Create a Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
-      <Dialog open={showDialog}>
+      {/* <Dialog open={showDialog}>
         <DialogTitle>
           <Text variant="h5" component="span">
             No Nodes Ready
@@ -328,7 +331,7 @@ const AddBareOsClusterPage = () => {
             <Text variant="body1">Close</Text>
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
       <Wizard
         onComplete={handleSubmit}
         context={initialContext}
@@ -336,7 +339,7 @@ const AddBareOsClusterPage = () => {
         showFinishAndReviewButton={canFinishAndReview}
       >
         {({ wizardContext, setWizardContext, onNext }) => (
-          <>
+          <WizardMeta fields={wizardContext} calloutFields={[]}>
             <WizardStep stepId="basic" label="Initial Setup" onNext={basicOnNext}>
               <ValidatedForm
                 fullWidth
@@ -345,7 +348,7 @@ const AddBareOsClusterPage = () => {
                 triggerSubmit={setupValidator(onNext)}
                 elevated={false}
               >
-                <PollingData loading={loading} onReload={reload} hidden />
+                {/* <PollingData loading={loading} onReload={reload} hidden /> */}
                 {/* Cluster Name */}
                 <FormFieldCard title="Name your Kubernetes Cluster">
                   <TextField
@@ -496,7 +499,6 @@ const AddBareOsClusterPage = () => {
                   {/* <Text>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Text> */}
                   <div className={classes.innerWrapper}>
                     <ClusterHostChooser
-                      className={classes.hostChooser}
                       selection="multiple"
                       id="workerNodes"
                       filterFn={allPass([
@@ -754,7 +756,7 @@ const AddBareOsClusterPage = () => {
                 <BareOsClusterReviewTable data={wizardContext} />
               </ValidatedForm>
             </WizardStep>
-          </>
+          </WizardMeta>
         )}
       </Wizard>
     </FormWrapper>
