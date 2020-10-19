@@ -25,7 +25,7 @@ const Button = ({
   const { button, centerText } = useStyles({ variant, color })
   const spanTextVariant = textVariant || color === 'primary' ? 'buttonPrimary' : 'buttonSecondary'
   return (
-    <button className={clsx(button, className, { disabled })} {...rest}>
+    <button className={clsx(button, className, { disabled })} disabled={disabled} {...rest}>
       <Text className={centerText} component="span" variant={spanTextVariant}>
         {children}
       </Text>

@@ -9,13 +9,11 @@ import Progress from 'core/components/progress/Progress'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Text from 'core/elements/text'
 import { CloudProviders } from './model'
+import WizardMeta from 'core/components/wizard/WizardMeta'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    alignItems: 'flex-start',
+  wizardMeta: {
     marginTop: theme.spacing(4),
   },
   cpName: {
@@ -44,8 +42,11 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
 
   return (
     <Progress loading={!wizardContext.cloudProviderId}>
-      <div className={classes.root}>
-        <CloudProviderCard active={true} type={wizardContext.provider} />
+      <WizardMeta
+        fields={wizardContext}
+        icon={<CloudProviderCard active type={wizardContext.provider} />}
+        className={classes.wizardMeta}
+      >
         <div className={classes.form}>
           <ValidatedForm initialValues={wizardContext} elevated={false}>
             <Text variant="subtitle1" className={classes.cpName}>
@@ -54,7 +55,7 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
             <ActiveForm wizardContext={wizardContext} setWizardContext={setWizardContext} />
           </ValidatedForm>
         </div>
-      </div>
+      </WizardMeta>
     </Progress>
   )
 }
