@@ -54,6 +54,7 @@ import { ClusterCreateTypes } from '../model'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import { CloudProviders } from '../../cloudProviders/model'
 import DocumentMeta from 'core/components/DocumentMeta'
+import { getFormTitle } from '../helpers'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -253,13 +254,6 @@ const canFinishAndReview = ({
   )
 }
 
-const getFormTitle = (title, target) => {
-  if (target === ClusterCreateTypes.OneClick) {
-    return `${title} Cluster`
-  }
-  return `Create a ${title} Cluster`
-}
-
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history, match } = useReactRouter()
@@ -276,6 +270,7 @@ const AddBareOsClusterPage = () => {
     }
     loadFile(createType, providerType)
   }, [createType, providerType])
+
   // const [nodes, loading, reload] = useDataLoader(loadNodes)
   // const [showDialog, setShowDialog] = useState(false)
   const wizRef = useRef(null)
@@ -375,7 +370,7 @@ const AddBareOsClusterPage = () => {
             icon={<CloudProviderCard active type={providerType} />}
             calloutFields={['networkPlugin']}
           >
-            {ViewComponent && <ViewComponent name="test" />}
+            {ViewComponent && <ViewComponent wizardContext={wizardContext} />}
           </WizardMeta>
         )}
       </Wizard>
