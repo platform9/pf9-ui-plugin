@@ -10,6 +10,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import Info from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
+import { ClusterCreateTypes } from '../model'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
@@ -58,9 +59,12 @@ const AwsReqsRightSection = ['EC2 Instance Management', 'EBS Volume Management',
 
 const AwsClusterRequirements = ({ onComplete, provider }) => {
   const classes = useStyles({})
-  const handleClick = useCallback(() => {
-    onComplete(routes.cluster.addAws.path())
-  }, [onComplete])
+  const handleClick = useCallback(
+    (type: ClusterCreateTypes) => () => {
+      onComplete(routes.cluster.addAws[type].path())
+    },
+    [onComplete],
+  )
   return (
     <FormFieldCard
       className={classes.formCard}
@@ -88,11 +92,15 @@ const AwsClusterRequirements = ({ onComplete, provider }) => {
 
       <div className={classes.actionRow}>
         <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
-        <SubmitButton onClick={handleClick}>One-Click Cluster</SubmitButton>
+        <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
+          One-Click Cluster
+        </SubmitButton>
       </div>
       <div className={classes.actionRow}>
         <Text variant="caption1">For more customized cluster creation:</Text>
-        <SubmitButton onClick={handleClick}>Advanced Cluster Setup</SubmitButton>
+        <SubmitButton onClick={handleClick(ClusterCreateTypes.Custom)}>
+          Advanced Cluster Setup
+        </SubmitButton>
       </div>
     </FormFieldCard>
   )

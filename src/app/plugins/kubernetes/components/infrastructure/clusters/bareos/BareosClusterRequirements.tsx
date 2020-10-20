@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { FC, useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import BulletList from 'core/components/BulletList'
 import SubmitButton from 'core/components/buttons/SubmitButton'
@@ -11,6 +11,8 @@ import Text from 'core/elements/text'
 import Info from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
 import { capitalizeString } from 'utils/misc'
+import { ClusterCreateTypes } from '../model'
+import { CloudProviders } from '../../cloudProviders/model'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -99,11 +101,20 @@ const nodeServices = [
   'Multi-Master Virtual IP using VRRP (Optional)',
 ]
 
-const BareOSClusterRequirements = ({ onComplete, provider }) => {
+interface Props {
+  onComplete: (route: string) => void
+  provider: CloudProviders
+}
+
+const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
   const classes = useStyles({})
-  const handleClick = useCallback(() => {
-    onComplete(routes.cluster.addBareOs.path())
-  }, [onComplete])
+  const handleClick = useCallback(
+    (type: ClusterCreateTypes) => () => {
+      onComplete(routes.cluster.addBareOs[provider][type].path())
+    },
+    [onComplete, provider],
+  )
+
   return (
     <FormFieldCard
       className={classes.formCard}
@@ -136,12 +147,18 @@ const BareOSClusterRequirements = ({ onComplete, provider }) => {
       </Info>
       <div className={classes.actionRow}>
         <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
-        <SubmitButton onClick={handleClick}>One-Click Cluster</SubmitButton>
+        <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
+          One-Click Cluster
+        </SubmitButton>
       </div>
       <div className={classes.actionRow}>
         <Text variant="caption1">For more customized cluster creation:</Text>
-        <SubmitButton onClick={handleClick}>Single Master Cluster</SubmitButton>
-        <SubmitButton onClick={handleClick}>Multi-Master Cluster</SubmitButton>
+        <SubmitButton onClick={handleClick(ClusterCreateTypes.SingleMaster)}>
+          Single Master Cluster
+        </SubmitButton>
+        <SubmitButton onClick={handleClick(ClusterCreateTypes.MultiMaster)}>
+          Multi-Master Cluster
+        </SubmitButton>
       </div>
     </FormFieldCard>
   )

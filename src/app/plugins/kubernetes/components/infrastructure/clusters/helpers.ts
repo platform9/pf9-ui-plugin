@@ -5,8 +5,16 @@ import { compose, path, pick, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import { trackEvent } from 'utils/tracking'
+import { ClusterCreateTypes } from './model'
 
 const { qbert } = ApiClient.getInstance()
+
+export const getFormTitle = (title, target) => {
+  if (target === ClusterCreateTypes.OneClick) {
+    return `${title} Cluster`
+  }
+  return `Create a ${title} Cluster`
+}
 
 export const getProgressPercent = async (clusterId) => {
   try {

@@ -82,19 +82,19 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'Create AWS Cluster',
-      link: { path: '/infrastructure/clusters/addAws', exact: true },
+      link: { path: '/infrastructure/clusters/aws/add/:type', exact: true },
       requiredRoles: 'admin',
       component: AddAwsClusterPage,
     },
     {
       name: 'Create Azure Cluster',
-      link: { path: '/infrastructure/clusters/addAzure', exact: true },
+      link: { path: '/infrastructure/clusters/azure/add/:type', exact: true },
       requiredRoles: 'admin',
       component: AddAzureClusterPage,
     },
     {
       name: 'Create Bare OS Cluster',
-      link: { path: '/infrastructure/clusters/addBareOs', exact: true },
+      link: { path: '/infrastructure/clusters/bareos/add/:platform/:type', exact: true },
       requiredRoles: 'admin',
       component: AddBareOsClusterPage,
     },

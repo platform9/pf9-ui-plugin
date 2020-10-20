@@ -10,6 +10,7 @@ import BulletList from 'core/components/BulletList'
 import Text from 'core/elements/text'
 import Info from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
+import { ClusterCreateTypes } from '../model'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   alertTitle: {
@@ -53,9 +54,12 @@ const azureReqs = [
 
 const AzureClusterRequirements = ({ onComplete, provider }) => {
   const classes = useStyles({})
-  const handleClick = useCallback(() => {
-    onComplete(routes.cluster.addAzure.path())
-  }, [onComplete])
+  const handleClick = useCallback(
+    (type: ClusterCreateTypes) => () => {
+      onComplete(routes.cluster.addAzure[type].path())
+    },
+    [onComplete],
+  )
   return (
     <FormFieldCard
       className={classes.formCard}
@@ -78,11 +82,15 @@ const AzureClusterRequirements = ({ onComplete, provider }) => {
       </Info>
       <div className={classes.actionRow}>
         <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
-        <SubmitButton onClick={handleClick}>One-Click Cluster</SubmitButton>
+        <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
+          One-Click Cluster
+        </SubmitButton>
       </div>
       <div className={classes.actionRow}>
         <Text variant="caption1">For more customized cluster creation:</Text>
-        <SubmitButton onClick={handleClick}>Advanced Cluster Setup</SubmitButton>
+        <SubmitButton onClick={handleClick(ClusterCreateTypes.Custom)}>
+          Advanced Cluster Setup
+        </SubmitButton>
       </div>
     </FormFieldCard>
   )
