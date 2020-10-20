@@ -21,6 +21,7 @@ import {
   renderNetworkInterfaces,
 } from 'k8s/components/infrastructure/nodes/NodesListPage'
 import Theme from 'core/themes/model'
+import NoContentMessage from 'core/components/NoContentMessage'
 
 interface Props extends IValidatedForm {
   value?: string[]
@@ -127,47 +128,45 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
         {pollForNodes && (
           <PollingData loading={loading} onReload={loadMore} pause={!pollForNodes} />
         )}
-        <Table className={table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                {selection === 'multiple' && (
-                  <Checkbox checked={allSelected()} onChange={toggleAll} />
-                )}
-              </TableCell>
-              <TableCell>Hostname</TableCell>
-              <TableCell>IP Address</TableCell>
-              <TableCell>Operating System</TableCell>
-              <TableCell>Resource Utilization</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {selectableNodes.length === 0 && (
+        {selectableNodes.length === 0 && (
+          <NoContentMessage message="Waiting... Connect Nodes Using the PF9 CLI" variant="light" />
+        )}
+        {selectableNodes.length > 0 && (
+          <Table className={table}>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={5} align="center">
-                  <Text variant="body1">Waiting... Connect Nodes Using the PF9 CLI</Text>
-                </TableCell>
-              </TableRow>
-            )}
-            {selectableNodes.map((node = emptyNode) => (
-              <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
                 <TableCell>
-                  {selection === 'multiple' ? (
-                    <Checkbox checked={isSelected(node.uuid)} />
-                  ) : selection === 'single' ? (
-                    <Radio checked={isSelected(node.uuid)} />
-                  ) : null}
+                  {selection === 'multiple' && (
+                    <Checkbox checked={allSelected()} onChange={toggleAll} />
+                  )}
                 </TableCell>
-                <TableCell>{node.name}</TableCell>
-                <TableCell>{renderNetworkInterfaces(null, node, { wrapText: true })}</TableCell>
-                <TableCell>{node.combined?.osInfo}</TableCell>
-                <TableCell>
-                  {renderStats(node.combined?.usage || {}, usageContainerClass)}
-                </TableCell>
+                <TableCell>Hostname</TableCell>
+                <TableCell>IP Address</TableCell>
+                <TableCell>Operating System</TableCell>
+                <TableCell>Resource Utilization</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {selectableNodes.map((node = emptyNode) => (
+                <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
+                  <TableCell>
+                    {selection === 'multiple' ? (
+                      <Checkbox checked={isSelected(node.uuid)} />
+                    ) : selection === 'single' ? (
+                      <Radio checked={isSelected(node.uuid)} />
+                    ) : null}
+                  </TableCell>
+                  <TableCell>{node.name}</TableCell>
+                  <TableCell>{renderNetworkInterfaces(null, node, { wrapText: true })}</TableCell>
+                  <TableCell>{node.combined?.osInfo}</TableCell>
+                  <TableCell>
+                    {renderStats(node.combined?.usage || {}, usageContainerClass)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
         {hasError && <Warning>{errorMessage}</Warning>}
       </div>
     )
