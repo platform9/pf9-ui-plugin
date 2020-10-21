@@ -312,9 +312,11 @@ class Keystone extends ApiService {
     }
   }
 
-  renewScopedToken = async () => {
+  renewScopedToken = async (isSsoUser) => {
     const projectId = this.client.activeProjectId
-    const body = constructAuthFromToken(this.client.unscopedToken, projectId)
+    const body = isSsoUser
+      ? constructAuthFromSaml(this.client.unscopedToken, projectId)
+      : constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
       const response = await this.client.rawPost(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']

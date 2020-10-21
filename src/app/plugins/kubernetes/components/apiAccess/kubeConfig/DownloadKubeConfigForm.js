@@ -7,6 +7,7 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import Alert from 'core/components/Alert'
 import { generateKubeConfig } from 'k8s/components/infrastructure/clusters/kubeconfig'
 import downloadFile from 'core/utils/downloadFile'
+import { getStorage } from 'core/utils/pf9Storage'
 
 const useStyles = makeStyles((theme) => ({
   radioGroup: {
@@ -32,15 +33,22 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
   const [authMethod, setAuthMethod] = useState('token')
   const [errorMessage, setErrorMessage] = useState()
   const [submitting, setSubmitting] = useState(false)
+  const tokens = getStorage('tokens')
+  const isSsoUser = Boolean(tokens && tokens.ssoToken)
 
   const handleSubmit = async (params) => {
     setErrorMessage(null)
     setSubmitting(true)
     const { username, password } = params
-    const { error, kubeconfig } = await generateKubeConfig(cluster.uuid, authMethod, {
-      username,
-      password,
-    })
+    const { error, kubeconfig } = await generateKubeConfig(
+      cluster.uuid,
+      authMethod,
+      {
+        username,
+        password,
+      },
+      isSsoUser,
+    )
 
     if (error) {
       setSubmitting(false)
