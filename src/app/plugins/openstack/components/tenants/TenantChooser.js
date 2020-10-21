@@ -20,6 +20,7 @@ const TenantChooser = (props) => {
   const [currentTenantName, setCurrentTenantName] = useState(propOr('', 'name', currentTenant))
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants] = useDataLoader(loadUserTenants)
+  const { ssoToken } = getStorage('tokens')
 
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
@@ -30,7 +31,7 @@ const TenantChooser = (props) => {
       return
     }
 
-    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
+    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id, ssoToken)
     // Update localStorage scopedToken upon changing project scope
     const existingTokens = getStorage('tokens')
     setStorage('tokens', { ...existingTokens, currentToken: scopedToken })

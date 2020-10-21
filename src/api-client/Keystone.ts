@@ -16,6 +16,24 @@ const constructAuthFromToken = (token: string, projectId?: string) => {
   }
 }
 
+const constructAuthFromSaml = (token: string, projectId?: string) => {
+  return {
+    auth: {
+      identity: {
+        methods: ['saml2'],
+        saml2: {
+          id: token,
+        },
+      },
+      scope: {
+        project: {
+          id: projectId,
+        },
+      },
+    },
+  }
+}
+
 const constructAuthFromCredentials = (username, password) => {
   return {
     auth: {
@@ -212,8 +230,10 @@ class Keystone extends ApiService {
     }
   }
 
-  changeProjectScope = async (projectId) => {
-    const body = constructAuthFromToken(this.client.unscopedToken, projectId)
+  changeProjectScope = async (projectId, isSsoUser) => {
+    const body = isSsoUser
+      ? constructAuthFromSaml(this.client.unscopedToken, projectId)
+      : constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
       const response = await this.client.rawPost(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
