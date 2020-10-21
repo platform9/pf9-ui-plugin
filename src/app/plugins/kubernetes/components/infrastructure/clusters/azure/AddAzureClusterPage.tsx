@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
-import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
 import AzureClusterReviewTable from './AzureClusterReviewTable'
+import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
+import AzureVnetPicklist from './AzureVnetPicklist'
 import AzureSkuPicklist from './AzureSkuPicklist'
 import AzureSubnetPicklist from './AzureSubnetPicklist'
-import AzureVnetPicklist from './AzureVnetPicklist'
 import AzureResourceGroupPicklist from './AzureResourceGroupPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'

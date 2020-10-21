@@ -6,7 +6,7 @@ import AppAndContainerSettings from './app-container-settings'
 import ManagedAddOnsCheckboxes from './managed-add-ons'
 import { Divider } from '@material-ui/core'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import kubernetesVersionPicklist from './kubernetesVersionPicklist'
+import kubernetesVersionPicklist from './kubernetes-version'
 import clsx from 'clsx'
 
 const useStyles = makeStyles((theme: Theme) => ({

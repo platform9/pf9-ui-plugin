@@ -1,9 +1,15 @@
 import React, { forwardRef } from 'react'
-import PropTypes from 'prop-types'
-import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import MultiSelect from 'core/components/MultiSelect'
 
-const AzureAvailabilityZoneChooser = forwardRef(({ onChange, ...rest }, ref) => {
+interface Props {
+  id: string
+  initialValue?: string | number
+  info?: string
+  required?: boolean
+  onChange: (value: any) => any
+}
+
+const AzureAvailabilityZoneChooser = forwardRef(({ onChange, ...rest }: Props, ref) => {
   const [values, setValues] = React.useState([])
 
   const handleValuesChange = (values) => {
@@ -27,12 +33,5 @@ const AzureAvailabilityZoneChooser = forwardRef(({ onChange, ...rest }, ref) => 
     />
   )
 })
-
-AzureAvailabilityZoneChooser.propTypes = {
-  id: PropTypes.string.isRequired,
-  initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onChange: PropTypes.func,
-  ...ValidatedFormInputPropTypes,
-}
 
 export default AzureAvailabilityZoneChooser
