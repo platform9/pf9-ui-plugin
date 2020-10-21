@@ -47,7 +47,6 @@ import { ClusterCreateTypes } from '../model'
 import { getFormTitle } from '../helpers'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Text from 'core/elements/text'
-import ClusterSettingsCard from '../form-components/ClusterSettingsCard'
 import Theme from 'core/themes/model'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
@@ -492,7 +491,10 @@ const AddAwsClusterPage = () => {
               fields={wizardContext}
               icon={<CloudProviderCard active type={CloudProviders.Aws} />}
             >
-              {ViewComponent && <ViewComponent />}
+              {ViewComponent && (
+                <ViewComponent wizardContext createWizardContext params getParamsUpdater />
+              )}
+
               {!!false && (
                 <div className={classes.form}>
                   <WizardStep stepId="config" label="Cluster Configuration" onNext={configOnNext}>
@@ -677,11 +679,6 @@ const AddAwsClusterPage = () => {
                                 </>
                               )}
                             </FormFieldCard>
-                            <ClusterSettingsCard
-                              className={classes.field}
-                              wizardContext={wizardContext}
-                              setWizardContext={setWizardContext}
-                            />
                           </>
                         )}
                       </ValidatedForm>
