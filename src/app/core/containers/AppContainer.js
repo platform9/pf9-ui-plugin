@@ -56,7 +56,7 @@ const AppContainer = () => {
     destroySession,
     getContext,
     setContext,
-    userDetails: { id: userId, name, displayName },
+    userDetails, // userDetails isn't always defined, nested destructuring caused crash
   } = useContext(AppContext)
 
   useEffect(() => {
@@ -73,7 +73,9 @@ const AppContainer = () => {
   }, [])
 
   useEffect(() => {
-    Bugsnag.setUser(userId, name, displayName)
+    if (userDetails) {
+      Bugsnag.setUser(userDetails.id, userDetails.name, userDetails.displayName)
+    }
     if (!isEmpty(session)) {
       const id = setInterval(() => {
         // Check if session has expired
@@ -91,7 +93,7 @@ const AppContainer = () => {
         clearInterval(id)
       }
     }
-  }, [session])
+  }, [session, userDetails])
 
   const restoreSession = async () => {
     // When trying to login with cookie with pmkft
@@ -122,6 +124,8 @@ const AppContainer = () => {
     const user = getStorage('user') || {}
     const { name: username } = user
     const currUnscopedToken = tokens && tokens.unscopedToken
+    const isSsoUser = tokens && tokens.ssoToken
+
     if (username && currUnscopedToken) {
       // We need to make sure the token has not expired.
       const response = await keystone.renewToken(currUnscopedToken)
@@ -133,7 +137,7 @@ const AppContainer = () => {
       const { unscopedToken, expiresAt, issuedAt } = response
 
       if (unscopedToken && user) {
-        return setupSession({ username, unscopedToken, expiresAt, issuedAt })
+        return setupSession({ username, unscopedToken, expiresAt, issuedAt, isSsoUser })
       }
     }
     await setContext({ appLoaded: true })
@@ -154,7 +158,7 @@ const AppContainer = () => {
   }
 
   // Handler that gets invoked on successful authentication
-  const setupSession = async ({ username, unscopedToken, expiresAt, issuedAt }) => {
+  const setupSession = async ({ username, unscopedToken, expiresAt, issuedAt, isSsoUser }) => {
     await setContext({
       appLoaded: true,
       initialized: false,
@@ -183,7 +187,10 @@ const AppContainer = () => {
         setActiveRegion(lastRegion)
       }
 
-      const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
+      const { scopedToken, user, role } = await keystone.changeProjectScope(
+        activeTenant.id,
+        isSsoUser,
+      )
       await keystone.resetCookie()
       /* eslint-disable */
       // Check for sandbox flag, if false identify the user in Segment using Keystone ID
@@ -209,7 +216,7 @@ const AppContainer = () => {
       updatePrefs({ lastTenant: activeTenant })
       setStorage('userTenants', tenants)
       setStorage('user', user)
-      setStorage('tokens', { unscopedToken, currentToken: scopedToken })
+      setStorage('tokens', { unscopedToken, currentToken: scopedToken, ssoToken: isSsoUser })
 
       await setContext({
         initialized: true,
