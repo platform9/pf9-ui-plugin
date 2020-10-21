@@ -16,12 +16,11 @@ import { makeStyles } from '@material-ui/styles'
 import { identity } from 'ramda'
 import { INodesSelector, IUseDataLoader } from '../../nodes/model'
 import PollingData from 'core/components/PollingData'
-import {
-  UsageBar,
-  renderNetworkInterfaces,
-} from 'k8s/components/infrastructure/nodes/NodesListPage'
+import { renderNetworkInterfaces } from 'k8s/components/infrastructure/nodes/NodesListPage'
 import Theme from 'core/themes/model'
 import NoContentMessage from 'core/components/NoContentMessage'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import clsx from 'clsx'
 
 interface Props extends IValidatedForm {
   value?: string[]
@@ -45,9 +44,18 @@ export interface IValidatedForm {
 
 const useStyles = makeStyles<Theme, Partial<Props>>((theme) => ({
   table: {
-    border: '2px solid',
-    borderColor: ({ hasError }) =>
-      hasError ? theme.components.error.main : theme.palette.text.disabled,
+    border: 'none',
+    // borderColor: ({ hasError }) =>
+    //   hasError ? theme.components.error.main : theme.palette.text.disabled,
+    '& th.MuiTableCell-head': {
+      borderBottomColor: theme.palette.grey[700],
+    },
+  },
+  headerRow: {
+    color: theme.palette.grey[500],
+  },
+  bodyCell: {
+    padding: theme.spacing(2),
   },
   tableContainer: {
     margin: theme.spacing(2, 0),
@@ -55,11 +63,29 @@ const useStyles = makeStyles<Theme, Partial<Props>>((theme) => ({
   errorText: {
     color: theme.components.error.main,
   },
-  usageContainerClass: {
-    display: 'grid',
-    minHeight: '70px',
-    gridTemplateRows: 'repeat(3, 1fr)',
+  inlineText: {
+    display: 'flex',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  availableDiskIcon: {
+    width: theme.spacing(2),
+    height: theme.spacing(2),
+    color: theme.palette.grey['000'],
+    fontSize: 12,
+    borderRadius: 20,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 400,
+    marginRight: theme.spacing(0.5),
+
+    '&.success': {
+      backgroundColor: theme.palette.green.main,
+    },
+    '&.fail': {
+      backgroundColor: theme.palette.red.main,
+    },
   },
 }))
 
@@ -73,13 +99,33 @@ export const inCluster = (clusterUuid: string) => (node: INodesSelector) =>
   node.clusterUuid === clusterUuid
 
 const emptyNode: INodesSelector = {} as any
+const getAvailableSpace = (disk) => {
+  if (!disk) return 0
+  return disk.max - disk.current
+}
+const hasEnoughSpace = (disk) => {
+  const availableSpace = getAvailableSpace(disk)
+  return availableSpace >= 10 // 10gb free space
+}
 
-const renderStats = (usage, className) => {
+const AvailableDiskSpace = ({ disk }) => {
+  const classes = useStyles({})
+  const enoughSpace = hasEnoughSpace(disk)
+  const availableSpace = getAvailableSpace(disk)
+
   return (
-    <div className={className}>
-      {usage.compute && <UsageBar stat={usage.compute} />}
-      {usage.memory && <UsageBar stat={usage.memory} />}
-      {usage.disk && <UsageBar stat={usage.disk} />}
+    <div className={classes.inlineText}>
+      <FontAwesomeIcon
+        className={clsx(classes.availableDiskIcon, {
+          success: enoughSpace,
+          fail: !enoughSpace,
+        })}
+      >
+        {enoughSpace ? 'check' : 'times'}
+      </FontAwesomeIcon>
+      <Text variant="body2">
+        {availableSpace.toFixed(2)} GB {enoughSpace ? 'available' : '- Insufficient'}
+      </Text>
     </div>
   )
 }
@@ -96,7 +142,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
       pollForNodes = false,
       selection = 'single',
     } = props
-    const { table, tableContainer, errorText, usageContainerClass } = useStyles(props)
+    const { table, tableContainer, errorText, headerRow, bodyCell } = useStyles(props)
     const [nodes, loading, loadMore]: IUseDataLoader<INodesSelector> = useDataLoader(
       loadNodes,
     ) as any
@@ -140,10 +186,26 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
                     <Checkbox checked={allSelected()} onChange={toggleAll} />
                   )}
                 </TableCell>
-                <TableCell>Hostname</TableCell>
-                <TableCell>IP Address</TableCell>
-                <TableCell>Operating System</TableCell>
-                <TableCell>Resource Utilization</TableCell>
+                <TableCell>
+                  <Text variant="caption2" className={headerRow}>
+                    Hostname
+                  </Text>
+                </TableCell>
+                <TableCell>
+                  <Text variant="caption2" className={headerRow}>
+                    IP Address
+                  </Text>
+                </TableCell>
+                <TableCell>
+                  <Text variant="caption2" className={headerRow}>
+                    Operating System
+                  </Text>
+                </TableCell>
+                <TableCell>
+                  <Text variant="caption2" className={headerRow}>
+                    Resource Utilization
+                  </Text>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -156,11 +218,20 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
                       <Radio checked={isSelected(node.uuid)} />
                     ) : null}
                   </TableCell>
-                  <TableCell>{node.name}</TableCell>
-                  <TableCell>{renderNetworkInterfaces(null, node, { wrapText: true })}</TableCell>
-                  <TableCell>{node.combined?.osInfo}</TableCell>
-                  <TableCell>
-                    {renderStats(node.combined?.usage || {}, usageContainerClass)}
+                  <TableCell className={bodyCell}>
+                    <Text variant="body2">{node.name}</Text>
+                  </TableCell>
+                  <TableCell className={bodyCell}>
+                    <Text variant="body2">
+                      {renderNetworkInterfaces(null, node, { wrapText: true })}
+                    </Text>
+                  </TableCell>
+                  <TableCell className={bodyCell}>
+                    <Text variant="body2">{node.combined?.osInfo}</Text>
+                  </TableCell>
+                  <TableCell className={bodyCell}>
+                    <AvailableDiskSpace disk={node?.combined?.usage?.disk} />
+                    {/* {renderStats(node.combined?.usage || {}, usageContainerClass)} */}
                   </TableCell>
                 </TableRow>
               ))}

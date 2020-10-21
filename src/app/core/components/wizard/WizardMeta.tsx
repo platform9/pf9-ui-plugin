@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { RenderLabels } from 'k8s/components/pods/renderLabels'
 import { pick, pickBy } from 'ramda'
 import clsx from 'clsx'
+import { WizardContext } from './Wizard'
 
 interface Props<T extends {}> {
   fields: T
@@ -28,6 +29,10 @@ export default function WizardMeta<T>({
   className,
   renderLabels = (labels) => <RenderLabels labels={labels} inverse split />,
 }: Props<T>) {
+  const { setWizardCalloutFields } = useContext(WizardContext as any)
+  useEffect(() => {
+    setWizardCalloutFields(calloutFields)
+  }, [])
   const classes = useStyles({ icon: !!icon })
   const labels = pickBy(isNotUndefined, pick(calloutFields, fields))
   return (

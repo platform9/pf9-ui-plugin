@@ -56,11 +56,11 @@ const labels = {
 }
 
 const CloudProviderCard: FC<Props> = (props) => {
-  const { type, disabled, image = icons[type], label = labels[type], src, onClick } = props
+  const { type, disabled, image = icons[type], label = labels[type], src, onClick, active } = props
   const classes = useStyles(props)
   const { history } = useReactRouter()
   const handleClick = () => {
-    if (disabled) return
+    if (disabled || active) return
     if (onClick) return onClick(type)
     history.push(src)
   }

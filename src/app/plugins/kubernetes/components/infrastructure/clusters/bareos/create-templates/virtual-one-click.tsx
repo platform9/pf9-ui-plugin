@@ -11,51 +11,114 @@ import ClusterHostChooser, { isConnected, isUnassignedNode } from '../ClusterHos
 
 import { masterNodeLengthValidator } from 'core/utils/fieldValidators'
 import Theme from 'core/themes/model'
+import FormReviewTable from 'core/components/validatedForm/review-table'
+import { defaultEtcBackupPath } from 'app/constants'
+import { capitalizeString, castBoolToStr } from 'utils/misc'
+import WizardStep from 'core/components/wizard/WizardStep'
 
 export const templateTitle = 'One Click'
+
+export const initialContext = {
+  containersCidr: '10.20.0.0/16',
+  servicesCidr: '10.21.0.0/16',
+  networkPlugin: 'calico',
+  calicoIpIpMode: 'Always',
+  calicoNatOutgoing: true,
+  calicoV4BlockSize: '24',
+  runtimeConfigOption: 'default',
+  mtuSize: 1440,
+  privileged: true,
+  etcdBackup: true,
+  etcdStoragePath: defaultEtcBackupPath,
+  etcdBackupInterval: 1440,
+  prometheusMonitoringEnabled: true,
+  allowWorkloadsOnMaster: true,
+  tags: [],
+  appCatalogEnabled: false,
+}
+
+const columns = [
+  { id: 'containersCidr', label: 'Containers CIDR' },
+  { id: 'servicesCidr', label: 'Services CIDR' },
+  {
+    id: 'networkPlugin',
+    label: 'CNI',
+    render: (value) => capitalizeString(value),
+    insertDivider: true,
+  },
+  { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
+  { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
+  { id: 'calicoV4BlockSize', label: 'Block Size' },
+  { id: 'mtuSize', label: 'Block Size' },
+  {
+    id: 'privileged',
+    label: 'Privileged',
+    render: (value) => castBoolToStr()(value),
+    insertDivider: true,
+  },
+  {
+    id: 'allowWorkloadsOnMaster',
+    label: 'Enable workloads on master node',
+    render: (value) => castBoolToStr()(value),
+  },
+  {
+    id: 'etcdBackup',
+    label: 'ETCD Backup',
+    render: (value) => castBoolToStr()(value),
+    insertDivider: true,
+  },
+  { id: 'etcdStoragePath', label: 'Storage Path' },
+  { id: 'etcdBackupInterval', label: 'Backup Interval (minutes)' },
+]
 
 const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles({})
   return (
-    <ValidatedForm
-      classes={{ root: classes.validatedFormContainer }}
-      fullWidth
-      initialValues={wizardContext}
-      onSubmit={setWizardContext}
-      triggerSubmit={onNext}
-      elevated={false}
-    >
-      {/* <PollingData loading={loading} onReload={reload} hidden /> */}
-      {/* Cluster Name */}
-      <FormFieldCard
-        title={`${templateTitle} Single Node Cluster Setup`}
-        link={
-          <ExternalLink variant="caption2" url={pmkCliOverviewLink}>
-            Not Seeing Any Nodes?
-          </ExternalLink>
-        }
+    <WizardStep stepId="virtual-one-click" onNext={onNext}>
+      <ValidatedForm
+        classes={{ root: classes.validatedFormContainer }}
+        fullWidth
+        initialValues={wizardContext}
+        onSubmit={setWizardContext}
+        triggerSubmit={onNext}
+        elevated={false}
       >
-        <ClusterNameField setWizardContext={setWizardContext} />
-      </FormFieldCard>
+        {/* <PollingData loading={loading} onReload={reload} hidden /> */}
+        {/* Cluster Name */}
+        <FormFieldCard
+          title={`${templateTitle} Single Node Cluster Setup`}
+          link={
+            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
+              BareOS Cluster Help
+            </ExternalLink>
+          }
+        >
+          <ClusterNameField setWizardContext={setWizardContext} />
+        </FormFieldCard>
 
-      <FormFieldCard
-        title="Select a node"
-        link={
-          <ExternalLink variant="caption2" url={pmkCliOverviewLink}>
-            Not Seeing Any Nodes?
-          </ExternalLink>
-        }
-      >
-        <ClusterHostChooser
-          id="masterNodes"
-          selection="single"
-          filterFn={allPass([isConnected, isUnassignedNode])}
-          onChange={(value) => setWizardContext({ masterNodes: value })}
-          validations={[masterNodeLengthValidator]}
-          required
-        />
-      </FormFieldCard>
-    </ValidatedForm>
+        <FormFieldCard
+          title="Select a node"
+          link={
+            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
+              Not Seeing Any Nodes?
+            </ExternalLink>
+          }
+        >
+          <ClusterHostChooser
+            id="masterNodes"
+            selection="single"
+            filterFn={allPass([isConnected, isUnassignedNode])}
+            onChange={(value) => setWizardContext({ masterNodes: value })}
+            validations={[masterNodeLengthValidator]}
+            required
+          />
+        </FormFieldCard>
+
+        <FormFieldCard title="Default Settings for New Cluster">
+          <FormReviewTable data={wizardContext} columns={columns} />
+        </FormFieldCard>
+      </ValidatedForm>
+    </WizardStep>
   )
 }
 

@@ -112,6 +112,10 @@ class Wizard extends PureComponent {
     )
   }
 
+  setWizardCalloutFields = (fields) => {
+    this.setState((state) => ({ calloutFields: true }))
+  }
+
   setWizardContext = (newValues, cb) => {
     this.setState(
       (state) => ({ wizardContext: { ...state.wizardContext, ...newValues } }),
@@ -132,6 +136,8 @@ class Wizard extends PureComponent {
     activeStepId: null,
     wizardContext: this.props.context || {},
     setWizardContext: this.setWizardContext,
+    setWizardCalloutFields: this.setWizardCalloutFields,
+    calloutFields: false,
   }
 
   render() {
@@ -153,7 +159,7 @@ class Wizard extends PureComponent {
 
     return (
       <WizardContext.Provider value={this.state}>
-        {showSteps && <WizardStepper steps={steps} activeStep={activeStep} />}
+        {showSteps && steps.length > 1 && <WizardStepper steps={steps} activeStep={activeStep} />}
         {renderStepsContent({
           wizardContext,
           setWizardContext,
@@ -161,7 +167,7 @@ class Wizard extends PureComponent {
           handleNext: this.handleNext,
         })}
         {!hideAllButtons && (
-          <WizardButtons>
+          <WizardButtons hasCalloutFields={this.state.calloutFields}>
             {onCancel && <CancelButton onClick={onCancel} />}
             {this.hasBack() && <PrevButton onClick={this.handleBack} />}
             {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}

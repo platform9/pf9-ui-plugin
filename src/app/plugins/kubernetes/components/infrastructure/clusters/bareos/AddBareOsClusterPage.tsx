@@ -58,18 +58,18 @@ import { getFormTitle } from '../helpers'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const initialContext = {
-  containersCidr: '10.20.0.0/16',
-  servicesCidr: '10.21.0.0/16',
-  networkPlugin: 'flannel',
-  runtimeConfigOption: 'default',
-  mtuSize: 1440,
-  etcdStoragePath: defaultEtcBackupPath,
-  etcdBackupInterval: 60 * 24,
-  prometheusMonitoringEnabled: true,
-  tags: [],
-  appCatalogEnabled: false,
-}
+// const initialContext = {
+//   containersCidr: '10.20.0.0/16',
+//   servicesCidr: '10.21.0.0/16',
+//   networkPlugin: 'flannel',
+//   runtimeConfigOption: 'default',
+//   mtuSize: 1440,
+//   etcdStoragePath: defaultEtcBackupPath,
+//   etcdBackupInterval: 60 * 24,
+//   prometheusMonitoringEnabled: true,
+//   tags: [],
+//   appCatalogEnabled: false,
+// }
 // IP and Block Size validator
 // /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/(0?[1-9]|[12][0-9]|3[01])$/
 
@@ -261,12 +261,14 @@ const AddBareOsClusterPage = () => {
   const providerType = match?.params?.platform || CloudProviders.VirtualMachine
   const [activeView, setActiveView] = useState<{ ViewComponent: FC<any> }>(null)
   const [formTitle, setFormTitle] = useState<string>('')
+  const [initialContext, setInitialContext] = useState(null)
 
   useEffect(() => {
     async function loadFile(name, provider) {
       const view = await import(`./create-templates/${provider}-${name}`)
       setActiveView({ ViewComponent: view.default })
       setFormTitle(view.templateTitle)
+      setInitialContext(view.initialContext)
     }
     loadFile(createType, providerType)
   }, [createType, providerType])
@@ -358,22 +360,30 @@ const AddBareOsClusterPage = () => {
           </Button>
         </DialogActions>
       </Dialog> */}
-      <Wizard
-        onComplete={handleSubmit}
-        context={initialContext}
-        originPath={routes.cluster.add.path()}
-        showFinishAndReviewButton={canFinishAndReview}
-      >
-        {({ wizardContext, setWizardContext, onNext }) => (
-          <WizardMeta
-            fields={wizardContext}
-            icon={<CloudProviderCard active type={providerType} />}
-            calloutFields={['networkPlugin']}
-          >
-            {ViewComponent && <ViewComponent wizardContext={wizardContext} />}
-          </WizardMeta>
-        )}
-      </Wizard>
+      {!!initialContext && (
+        <Wizard
+          onComplete={handleSubmit}
+          context={initialContext}
+          originPath={routes.cluster.add.path({ type: providerType })}
+          showFinishAndReviewButton={canFinishAndReview}
+        >
+          {({ wizardContext, setWizardContext, onNext }) => (
+            <WizardMeta
+              fields={wizardContext}
+              icon={<CloudProviderCard active type={providerType} />}
+              calloutFields={['networkPlugin']}
+            >
+              {ViewComponent && (
+                <ViewComponent
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onNext={onNext}
+                />
+              )}
+            </WizardMeta>
+          )}
+        </Wizard>
+      )}
     </FormWrapper>
   )
 }
