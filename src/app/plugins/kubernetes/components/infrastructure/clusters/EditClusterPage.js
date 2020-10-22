@@ -14,7 +14,8 @@ import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
-import EtcdBackupFields from './EtcdBackupFields'
+import EtcdBackupFields from './form-components/etcd-backup'
+import Name from './form-components/name'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -82,27 +83,11 @@ const EditClusterPage = () => {
         initialValues={initialValues}
         onSubmit={handleSubmit}
       >
-        {/* Cluster Name */}
-        <TextField id="name" label="Name" info="Name of the cluster" required />
+        <Name setWizardContext={setWizardContext} />
 
-        {/* Etcd Backup */}
-        <CheckboxField
-          id="etcdBackup"
-          label="Enable Etcd Backup"
-          info="Enable automated etcd backups on this cluster"
-          onChange={getParamsUpdater('etcdBackup')}
-          value={params.etcdBackup}
-        />
+        <EtcdBackupFields values={params} />
 
-        {params.etcdBackup && <EtcdBackupFields />}
-
-        {/* Tags */}
-        <KeyValuesField
-          id="tags"
-          label="Tags"
-          info="Edit tag metadata on this cluster"
-          blacklistedTags={tagsToOmit}
-        />
+        <Tags info="Edit tag metadata on this cluster" blacklistedTags={tagsToOmit} />
       </ValidatedForm>
     </FormWrapper>
   )

@@ -1,24 +1,76 @@
 import React from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import PicklistField from 'core/components/validatedForm/PicklistField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { routes } from 'core/utils/routes'
-import AwsAvailabilityZoneChooser from 'k8s/components/infrastructure/cloudProviders/AwsAvailabilityZoneChooser'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { PromptToAddProvider } from 'k8s/components/infrastructure/cloudProviders/PromptToAddProvider'
 import { awsPrerequisitesLink } from 'k8s/links'
-import Text from 'core/elements/text'
-import CloudProvider from '../../form-components/cloud-provider'
-import Name from '../../form-components/name'
+import ClusterNameField from '../../form-components/name'
 import AwsClusterSshKeyPickList from '../AwsClusterSshKeyPicklist'
-import ClusterDomainPicklist from '../../ClusterDomainPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
+import WizardStep from 'core/components/wizard/WizardStep'
+import FormReviewTable from 'core/components/validatedForm/review-table'
+import { castBoolToStr } from 'utils/misc'
+import { defaultEtcBackupPath } from 'app/constants'
+import { makeStyles } from '@material-ui/core/styles'
+import Theme from 'core/themes/model'
+import CloudProviderRegionField from '../../form-components/cloud-provider-region'
+import CloudProviderField from '../../form-components/cloud-provider'
+import SshKeyField from '../../form-components/ssh-key-picklist'
+import ClusterDomainField from '../../form-components/cluster-domain'
+import AwsAvailabilityZoneField from '../aws-availability-zone'
 
 export const templateTitle = 'One Click'
 
-const OneClickAwsCluster = ({ wizardContext, setWizardContext, params, getParamsUpdater }) => {
+export const initialContext = {
+  network: 'newPublic',
+  numMasters: 1,
+  numWorkers: 1,
+  allowWorkloadsOnMaster: true,
+  masterFlavor: 't2.medium',
+  workerFlavor: 't2.medium',
+  ami: 'ubuntu',
+  calicoIpIpMode: 'Always',
+  calicoNatOutgoing: true,
+  calicoV4BlockSize: '24',
+  mtuSize: 1440,
+  etcdStoragePath: defaultEtcBackupPath,
+  etcdBackupInterval: 60 * 24,
+  prometheusMonitoringEnabled: true,
+}
+
+const columns = [
+  { id: 'network', label: 'Network' },
+  { id: 'numMasters', label: 'Master nodes' },
+  { id: 'numWorkers', label: 'Worker nodes' },
+  { id: 'allowWorkloadsOnMaster', label: 'Enable workloads on all master nodes' },
+  { id: 'masterSku', label: 'Master Node SKU' },
+  { id: 'workerSku', label: 'Worker Node SKU' },
+  { id: 'ami', label: 'Operating System' },
+  { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
+  { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
+  { id: 'calicoV4BlockSize', label: 'Block Size' },
+  { id: 'mtuSize', label: 'Block Size' },
+  {
+    id: 'etcdBackup',
+    label: 'ETCD Backup',
+    render: (value) => castBoolToStr()(value),
+  },
+  { id: 'etcdStoragePath', label: 'Storage Path' },
+  { id: 'etcdBackupInterval', label: 'Backup Interval (minutes)' },
+  { id: 'prometheusMonitoringEnabled', label: 'Enable monitoring with prometheus' },
+]
+
+const OneClickAwsCluster = ({
+  wizardContext,
+  setWizardContext,
+  params,
+  getParamsUpdater,
+  onNext,
+}) => {
+  const classes = useStyles({})
   const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
   const hasAwsProvider = !!cloudProviders.some((provider) => provider.type === CloudProviders.Aws)
 
@@ -34,76 +86,72 @@ const OneClickAwsCluster = ({ wizardContext, setWizardContext, params, getParams
     setWizardContext({ serviceFdqn: service })
   }
 
+  const handleRegionChange = (region) =>
+    setWizardContext({ azs: [], cloudProviderRegionId: region })
+
   const handleClusterDomainUpdate = (values, setFieldValues) => updateFqdns(values, setFieldValues)
 
   return (
-    <>
+    <WizardStep stepId="one-click" onNext={onNext}>
       {loading ? null : hasAwsProvider ? (
         <ValidatedForm
+          classes={{ root: classes.validatedFormContainer }}
+          fullWidth
           initialValues={wizardContext}
           onSubmit={setWizardContext}
-          // triggerSubmit={onNext}
-          title="Configure Your Cluster"
+          triggerSubmit={onNext}
+          elevated={false}
         >
           {({ setFieldValue, values }) => (
             <>
               <FormFieldCard
                 title="Cluster Configuration"
                 link={
-                  <ExternalLink url={awsPrerequisitesLink}>
-                    <Text variant="caption2">AWS Cluster Help</Text>
+                  <ExternalLink textVariant="caption2" url={awsPrerequisitesLink}>
+                    AWS Cluster Help
                   </ExternalLink>
                 }
               >
-                <Name setWizardContext={setWizardContext} />
+                <ClusterNameField setWizardContext={setWizardContext} />
 
-                {/* Cloud Provider and Region */}
-                <CloudProvider
-                  wizardContext
-                  setWizardContext
-                  params
-                  getParamsUpdater
+                <CloudProviderField
                   cloudProviderType={CloudProviders.Aws}
+                  onChange={getParamsUpdater('cloudProviderId')}
                 />
 
-                {/* AWS Availability Zone */}
+                <CloudProviderRegionField
+                  providerType={CloudProviders.Aws}
+                  cloudProviderId={params.cloudProviderId}
+                  onChange={handleRegionChange}
+                  //value={wizardContext.cloudProviderRegionId}
+                />
+
                 {values.region && (
-                  <AwsAvailabilityZoneChooser
-                    id="azs"
-                    info="Select from the Availability Zones for the specified region"
+                  <AwsAvailabilityZoneField
                     cloudProviderId={params.cloudProviderId}
-                    cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-                    onChange={(value) => setWizardContext({ azs: value })}
-                    values={wizardContext.azs}
-                    type="aws"
-                    required
+                    cloudProviderRegionId={params.cloudProviderRegionId}
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
                   />
                 )}
 
-                {/* SSH Key */}
-                <PicklistField
-                  DropdownComponent={AwsClusterSshKeyPickList}
-                  disabled={!(params.cloudProviderId && wizardContext.cloudProviderRegionId)}
-                  id="sshKey"
-                  label="SSH Key"
+                <SshKeyField
+                  sshKeyPicklist={AwsClusterSshKeyPickList}
                   cloudProviderId={params.cloudProviderId}
-                  cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-                  info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
-                  required
+                  cloudProviderRegionId={params.cloudProviderRegionId}
                 />
 
-                {/* Domain */}
-                <PicklistField
-                  DropdownComponent={ClusterDomainPicklist}
-                  id="domainId"
-                  label="Domain"
-                  onChange={handleClusterDomainUpdate(values, setFieldValue)}
+                <ClusterDomainField
                   cloudProviderId={params.cloudProviderId}
-                  cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-                  info="Select the base domain name to be used for the API and service FQDNs"
+                  cloudProviderRegionId={params.cloudProviderRegionId}
+                  onChange={handleClusterDomainUpdate(values, setFieldValue)}
                   required={!values.usePf9Domain}
                   disabled={values.usePf9Domain}
                 />
+              </FormFieldCard>
+
+              <FormFieldCard title="Default Settings for New Cluster">
+                <FormReviewTable data={wizardContext} columns={columns} />
               </FormFieldCard>
             </>
           )}
@@ -116,8 +164,15 @@ const OneClickAwsCluster = ({ wizardContext, setWizardContext, params, getParams
           />
         </FormFieldCard>
       )}
-    </>
+    </WizardStep>
   )
 }
 
 export default OneClickAwsCluster
+
+const useStyles = makeStyles<Theme>((theme) => ({
+  validatedFormContainer: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+}))
