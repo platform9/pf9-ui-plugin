@@ -19,7 +19,7 @@ type KubeConfigResponse = KubeConfigError | KubeConfigSuccess
 
 const { keystone } = ApiClient.getInstance()
 
-const tokenAuth = () => keystone.renewScopedToken()
+const tokenAuth = (isSsoToken) => keystone.renewScopedToken(isSsoToken)
 
 const passwordAuth = async (username, password) => {
   if (username && password) {
@@ -42,11 +42,12 @@ export const generateKubeConfig = async (
   clusterUuid: string,
   authMethod: AuthMethod,
   userCreds?: UserCreds,
+  isSsoToken?: boolean,
 ): Promise<KubeConfigResponse> => {
   try {
     const token =
       authMethod === 'token'
-        ? await tokenAuth()
+        ? await tokenAuth(isSsoToken)
         : await passwordAuth(userCreds.username, userCreds.password)
 
     if (!token) return { error: 'Invalid Credentials' }
