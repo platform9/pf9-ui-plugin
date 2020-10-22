@@ -35,7 +35,7 @@ export const onboardingAccessSetup = 'onboarding/api-access'
 export const onboardingMonitoringSetup = 'onboarding/monitoring-enabled'
 export const onboardingPodSetup = 'onboarding/pod-setup'
 
-export const defaultEtcBackupPath = '/var/opt/pf9/kube/etcd/data' // '/etc/pf9/etcd-backup'
+export const defaultEtcBackupPath = '/etc/pf9/etcd-backup'
 
 // Errors
 export const addError = 'ERR_ADD'

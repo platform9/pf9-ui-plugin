@@ -5,9 +5,8 @@ import Theme from 'core/themes/model'
 import AppAndContainerSettings from './app-container-settings'
 import ManagedAddOnsCheckboxes from './managed-add-ons'
 import { Divider } from '@material-ui/core'
-import PicklistField from 'core/components/validatedForm/PicklistField'
-import kubernetesVersionPicklist from './kubernetes-version'
 import clsx from 'clsx'
+import KubernetesVersion from './kubernetes-version'
 
 const useStyles = makeStyles((theme: Theme) => ({
   clusterSettingsCard: {
@@ -33,16 +32,7 @@ const ClusterSettingsCard = ({ className, wizardContext, setWizardContext }: Pro
       title="Cluster Settings"
       className={clsx(classes.clusterSettingsCard, className)}
     >
-      <PicklistField
-        DropdownComponent={kubernetesVersionPicklist}
-        id="kubernetesVersion"
-        label="Kubernetes Version"
-        onChange={(value) => setWizardContext({ kubernetesVersion: value })}
-        value={wizardContext.kubernetesVersion}
-        info=""
-        disabled={false}
-        required
-      />
+      <KubernetesVersion wizardContext={wizardContext} setWizardContext={setWizardContext} />
       <Divider className={classes.divider} />
       <AppAndContainerSettings />
       <Divider className={classes.divider} />

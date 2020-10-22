@@ -1,20 +1,23 @@
+import React from 'react'
+import { allPass } from 'ramda'
+import { makeStyles } from '@material-ui/styles'
+
+import { pmkCliOverviewLink } from 'k8s/links'
+import { defaultEtcBackupPath } from 'app/constants'
+import { capitalizeString, castBoolToStr } from 'utils/misc'
+
 import ExternalLink from 'core/components/ExternalLink'
+import { masterNodeLengthValidator } from 'core/utils/fieldValidators'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { pmkCliOverviewLink } from 'k8s/links'
-import { allPass } from 'ramda'
-import React from 'react'
-import { makeStyles } from '@material-ui/styles'
+import FormReviewTable from 'core/components/validatedForm/review-table'
+import WizardStep from 'core/components/wizard/WizardStep'
 
 import ClusterNameField from '../../form-components/name'
 import ClusterHostChooser, { isConnected, isUnassignedNode } from '../ClusterHostChooser'
+import KubernetesVersion from '../../form-components/kubernetes-version'
 
-import { masterNodeLengthValidator } from 'core/utils/fieldValidators'
 import Theme from 'core/themes/model'
-import FormReviewTable from 'core/components/validatedForm/review-table'
-import { defaultEtcBackupPath } from 'app/constants'
-import { capitalizeString, castBoolToStr } from 'utils/misc'
-import WizardStep from 'core/components/wizard/WizardStep'
 
 export const templateTitle = 'One Click'
 
@@ -35,6 +38,7 @@ export const initialContext = {
   allowWorkloadsOnMaster: true,
   tags: [],
   appCatalogEnabled: false,
+  kubernetesVersion: 'v1.19',
 }
 
 const columns = [
@@ -94,6 +98,7 @@ const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext
           }
         >
           <ClusterNameField setWizardContext={setWizardContext} />
+          <KubernetesVersion wizardContext={wizardContext} setWizardContext={setWizardContext} />
         </FormFieldCard>
 
         <FormFieldCard
