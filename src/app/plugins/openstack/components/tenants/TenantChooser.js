@@ -5,10 +5,11 @@ import { propEq, prop, pipe, head, find, isEmpty } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { cacheActions } from 'core/caching/cacheReducers'
-import { sessionActions } from 'core/session/sessionReducers'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { updateClarityStore } from 'utils/clarityHelper'
 
 const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
@@ -18,6 +19,9 @@ const TenantChooser = (props) => {
   const [selectedTenantName, setSelectedTenantName] = useState()
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants, reloadTenants] = useDataLoader(loadUserTenants)
+  const selectSessionState = prop(sessionStoreKey)
+  const session = useSelector(selectSessionState)
+  const { isSsoToken } = session
   const dispatch = useDispatch()
   const curTenantName = useMemo(() => {
     if (selectedTenantName) {
@@ -45,7 +49,7 @@ const TenantChooser = (props) => {
       return
     }
 
-    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
+    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id, isSsoToken)
     dispatch(
       sessionActions.updateSession({
         userDetails: { ...user, role },
@@ -64,6 +68,7 @@ const TenantChooser = (props) => {
   const handleTenantSelect = useCallback(
     async (currentTenant) => {
       const fullTenantObj = tenants.find(propEq('name', currentTenant))
+      updateClarityStore('tenantObj', fullTenantObj)
       updatePrefs({ currentTenant: fullTenantObj.id })
       await updateCurrentTenant(currentTenant)
     },

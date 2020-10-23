@@ -8,6 +8,7 @@ export interface SessionState {
   expiresAt: string
   userDetails: { [key: string]: any }
   features: { [key: string]: any }
+  isSsoToken: boolean
 }
 
 export const initialState: SessionState = {
@@ -17,6 +18,7 @@ export const initialState: SessionState = {
   expiresAt: null,
   userDetails: {},
   features: {},
+  isSsoToken: false,
 }
 
 const { name: sessionStoreKey, reducer: sessionReducers, actions: sessionActions } = createSlice({
