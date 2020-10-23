@@ -17,10 +17,6 @@ import Text from 'core/elements/text'
 import { getIcon, getIconClass, RegionAvailability } from './helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
-  field: {
-    marginTop: theme.spacing(2),
-    maxWidth: 'none',
-  },
   spaceRight: {
     marginRight: theme.spacing(4),
   },
@@ -118,7 +114,6 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
             <Text variant="caption2">AWS Help</Text>
           </ExternalLink>
         }
-        className={classes.field}
       >
         <Text variant="body2">
           Platform9 deploys Kubernetes clusters into specified AWS Regions.
@@ -146,7 +141,6 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
             <Text variant="caption2">AWS Help</Text>
           </ExternalLink>
         }
-        className={classes.field}
       >
         <Text variant="body2">
           Platform9 utilizes Route53 Domains to route traffic to clusters under management.
@@ -185,7 +179,6 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
             <Text variant="caption2">AWS Help</Text>
           </ExternalLink>
         }
-        className={classes.field}
       >
         <Text variant="body2">SSH Keys are required for access to manage EC2 Instances.</Text>
         <PicklistField

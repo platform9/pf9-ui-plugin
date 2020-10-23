@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   cpName: {
     color: theme.palette.grey['700'],
     paddingTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
   form: {
     maxWidth: '800px',

@@ -15,6 +15,7 @@ import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import EtcdBackupFields from './EtcdBackupFields'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -70,41 +71,44 @@ const EditClusterPage = () => {
   )
 
   return (
-    <FormWrapper
-      title={`Edit Cluster ${initialValues.name || ''}`}
-      loading={loadingClusters || updating}
-      message={updating ? 'Submitting form...' : 'Loading Cluster...'}
-      backUrl={listUrl}
-    >
-      <ValidatedForm
-        title="Basic Details"
-        formActions={<SubmitButton>Update Cluster</SubmitButton>}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
+    <>
+      <DocumentMeta title="Edit Cluster" bodyClasses={['form-view']} />
+      <FormWrapper
+        title={`Edit Cluster ${initialValues.name || ''}`}
+        loading={loadingClusters || updating}
+        message={updating ? 'Submitting form...' : 'Loading Cluster...'}
+        backUrl={listUrl}
       >
-        {/* Cluster Name */}
-        <TextField id="name" label="Name" info="Name of the cluster" required />
+        <ValidatedForm
+          title="Basic Details"
+          formActions={<SubmitButton>Update Cluster</SubmitButton>}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+        >
+          {/* Cluster Name */}
+          <TextField id="name" label="Name" info="Name of the cluster" required />
 
-        {/* Etcd Backup */}
-        <CheckboxField
-          id="etcdBackup"
-          label="Enable Etcd Backup"
-          info="Enable automated etcd backups on this cluster"
-          onChange={getParamsUpdater('etcdBackup')}
-          value={params.etcdBackup}
-        />
+          {/* Etcd Backup */}
+          <CheckboxField
+            id="etcdBackup"
+            label="Enable Etcd Backup"
+            info="Enable automated etcd backups on this cluster"
+            onChange={getParamsUpdater('etcdBackup')}
+            value={params.etcdBackup}
+          />
 
-        {params.etcdBackup && <EtcdBackupFields />}
+          {params.etcdBackup && <EtcdBackupFields />}
 
-        {/* Tags */}
-        <KeyValuesField
-          id="tags"
-          label="Tags"
-          info="Edit tag metadata on this cluster"
-          blacklistedTags={tagsToOmit}
-        />
-      </ValidatedForm>
-    </FormWrapper>
+          {/* Tags */}
+          <KeyValuesField
+            id="tags"
+            label="Tags"
+            info="Edit tag metadata on this cluster"
+            blacklistedTags={tagsToOmit}
+          />
+        </ValidatedForm>
+      </FormWrapper>
+    </>
   )
 }
 

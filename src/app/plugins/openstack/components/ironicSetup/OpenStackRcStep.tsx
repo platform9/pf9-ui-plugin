@@ -10,6 +10,10 @@ import { useSelector } from 'react-redux'
 import { RootState } from 'app/store'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { regionActions } from 'k8s/components/infrastructure/common/actions'
+import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -38,20 +42,12 @@ export OS_PROJECT_DOMAIN_ID=\${OS_PROJECT_DOMAIN_ID:-“default”}`
 const OpenStackRcStep = (): JSX.Element => {
   const { text, bold, paper } = useStyles({})
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
-  const {
-    username,
-    userDetails: {
-      Tenants: {
-        lastTenant: { name: projectName },
-      },
-      RegionChooser: {
-        lastRegion: {
-          id: region,
-          links: { self: link },
-        },
-      },
-    },
-  } = session
+  const [{ currentTenant, currentRegion: region }] = useScopedPreferences()
+  const [tenants] = useDataLoader(mngmTenantActions.list)
+  const [regions] = useDataLoader(regionActions.list)
+  const projectName = tenants.find((tenant) => tenant.id === currentTenant)?.name
+  const link = regions.find((r) => r.id === region)?.links?.self
+  const { username } = session
   const keystoneLink = link.split('/regions')[0]
 
   return (

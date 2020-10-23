@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontWeight: 600,
     color: theme.palette.grey['700'],
     paddingTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
   form: {
     maxWidth: '800px',
@@ -42,10 +43,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.grey['700'],
     display: 'flex',
     flexFlow: 'column wrap',
-  },
-  field: {
-    margin: theme.spacing(2, 0, 1),
-    maxWidth: 'none',
   },
 }))
 
@@ -118,7 +115,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                       <Text variant="subtitle1" className={classes.cpName}>
                         {wizardContext.name}
                       </Text>
-                      <FormFieldCard className={classes.field}>
+                      <FormFieldCard>
                         <UpdateForm
                           wizardContext={wizardContext}
                           setWizardContext={setWizardContext}

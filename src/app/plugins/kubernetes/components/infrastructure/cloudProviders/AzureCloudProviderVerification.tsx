@@ -12,10 +12,6 @@ import Text from 'core/elements/text'
 import { RegionAvailability } from './helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
-  field: {
-    marginTop: theme.spacing(2),
-    maxWidth: 'none',
-  },
   spaceRight: {
     marginRight: theme.spacing(4),
   },
@@ -57,7 +53,6 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
             <Text variant="caption2">Azure Help</Text>
           </ExternalLink>
         }
-        className={classes.field}
       >
         <Text variant="body2">
           Platform9 deploys Kubernetes clusters into specified Azure Regions.
