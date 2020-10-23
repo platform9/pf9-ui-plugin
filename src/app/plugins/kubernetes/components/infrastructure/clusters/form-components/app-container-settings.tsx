@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-export default () => {
+const AppAndContainerSettingsFields = () => {
   const classes = useStyles()
   return (
     <div className={classes.appAndContainerSettingsCheckboxes}>
@@ -23,3 +23,5 @@ export default () => {
     </div>
   )
 }
+
+export default AppAndContainerSettingsFields

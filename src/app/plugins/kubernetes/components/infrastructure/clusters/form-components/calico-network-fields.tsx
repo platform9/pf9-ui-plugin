@@ -22,11 +22,11 @@ const calicoIpIpOptions = [
   { label: 'Never', value: 'Never' },
 ]
 
-const CalicoNetworkFields = ({ calicoIpIpMode, wizardContext, setWizardContext }) => (
+const CalicoNetworkFields = ({ wizardContext, setWizardContext }) => (
   <>
     <PicklistField
       id="calicoIpIpMode"
-      value={calicoIpIpMode}
+      value={wizardContext.calicoIpIpMode}
       label="IP in IP Encapsulation Mode"
       onChange={(value) => setWizardContext({ calicoIpIpMode: value })}
       options={calicoIpIpOptions}

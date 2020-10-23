@@ -2,15 +2,16 @@ import Alert from 'core/components/Alert'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import React from 'react'
 
-export default ({ values }) => (
+const PrometheusMonitoringField = ({ wizardContext, setWizardContext }) => (
   <>
     <CheckboxField
       id="prometheusMonitoringEnabled"
       label="Enable monitoring with prometheus"
       info="This deploys an instance of prometheus on the cluster."
+      onChange={(value) => setWizardContext({ prometheusMonitoringEnabled: value })}
     />
 
-    {!values.prometheusMonitoringEnabled && (
+    {!wizardContext.prometheusMonitoringEnabled && (
       <Alert
         small
         variant="error"
@@ -19,3 +20,5 @@ export default ({ values }) => (
     )}
   </>
 )
+
+export default PrometheusMonitoringField

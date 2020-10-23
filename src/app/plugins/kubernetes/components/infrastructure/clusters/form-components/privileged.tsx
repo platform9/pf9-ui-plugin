@@ -3,11 +3,11 @@ import ExternalLink from 'core/components/ExternalLink'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import { runtimePrivilegedLink } from 'k8s/links'
 
-export default ({ networkPlugin }) => (
+export default ({ wizardContext }) => (
   <CheckboxField
     id="privileged"
     label="Privileged"
-    disabled={['calico', 'canal', 'weave'].includes(networkPlugin)}
+    disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
     info={
       <div>
         Allows this cluster to run privileged containers. Read{' '}

@@ -8,18 +8,21 @@ const runtimeConfigOptions = [
   { label: 'Custom', value: 'custom' },
 ]
 
-export default ({ values, required = true }) => (
+const AdvancedApiConfigFields = ({ wizardContext, setWizardContext }) => (
   <>
     <PicklistField
       id="runtimeConfigOption"
       label="Advanced API Configuration"
       options={runtimeConfigOptions}
       info="Make sure you are familiar with the Kubernetes API configuration documentation before enabling this option."
-      required={required}
+      onChange={(value) => setWizardContext({ runtimeConfigOption: value })}
+      required
     />
 
-    {values.runtimeConfigOption === 'custom' && (
+    {wizardContext.runtimeConfigOption === 'custom' && (
       <TextField id="customRuntimeConfig" label="Custom API Configuration" info="" />
     )}
   </>
 )
+
+export default AdvancedApiConfigFields

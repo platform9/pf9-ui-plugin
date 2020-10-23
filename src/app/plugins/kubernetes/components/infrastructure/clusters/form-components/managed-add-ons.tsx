@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-export default () => {
+const ManagedAddOnsField = () => {
   const classes = useStyles()
   return (
     <div className={classes.managedAddOnsCheckboxes}>
@@ -20,3 +20,5 @@ export default () => {
     </div>
   )
 }
+
+export default ManagedAddOnsField

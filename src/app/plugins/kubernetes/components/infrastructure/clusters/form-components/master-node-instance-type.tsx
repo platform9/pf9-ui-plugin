@@ -2,14 +2,14 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import React from 'react'
 import AwsRegionFlavorPicklist from '../aws/AwsRegionFlavorPicklist'
 
-const MasterNodeInstanceTypeField = ({ cloudProviderId, cloudProviderRegionId }) => (
+const MasterNodeInstanceTypeField = ({ wizardContext }) => (
   <PicklistField
     DropdownComponent={AwsRegionFlavorPicklist}
-    disabled={!(cloudProviderId && cloudProviderRegionId)}
+    disabled={!(wizardContext.cloudProviderId && wizardContext.cloudProviderRegionId)}
     id="masterFlavor"
     label="Master Node Instance Type"
-    cloudProviderId={cloudProviderId}
-    cloudProviderRegionId={cloudProviderRegionId}
+    cloudProviderId={wizardContext.cloudProviderId}
+    cloudProviderRegionId={wizardContext.cloudProviderRegionId}
     info="Choose an instance type used by master nodes."
     required
   />

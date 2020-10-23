@@ -1,7 +1,13 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 
-const handleNetworkPluginChange = (option, wizardContext) => {
+const networkBackendOptions = [
+  { label: 'Flannel', value: 'flannel' },
+  { label: 'Calico', value: 'calico' },
+  // { label: 'Canal (experimental)', value: 'canal' },
+]
+
+const handleNetworkBackendChange = (option, wizardContext) => {
   const payload = {
     networkPlugin: option,
     privileged: option === 'calico' ? true : wizardContext.privileged,
@@ -12,15 +18,19 @@ const handleNetworkPluginChange = (option, wizardContext) => {
   return payload
 }
 
-const NetworkPluginField = ({ networkPluginOptions, wizardContext, setWizardContext }) => (
+const NetworkBackendField = ({
+  options = networkBackendOptions,
+  wizardContext,
+  setWizardContext,
+}) => (
   <PicklistField
     id="networkPlugin"
     label="Network backend"
-    onChange={(value) => setWizardContext(handleNetworkPluginChange(value, wizardContext))}
-    options={networkPluginOptions}
+    onChange={(value) => setWizardContext(handleNetworkBackendChange(value, wizardContext))}
+    options={options}
     info=""
     required
   />
 )
 
-export default NetworkPluginField
+export default NetworkBackendField
