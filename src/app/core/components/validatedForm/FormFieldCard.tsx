@@ -26,7 +26,6 @@ export const useStyles = makeStyles<Theme, ContainerProps>((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'stretch',
     color: theme.palette.grey[700],
-    marginBottom: theme.spacing(2),
   },
   inputWidth: {
     maxWidth: ({ maxWidth = defaultMaxWidth, inputsWidth = maxWidth / 2 }) => inputsWidth,
