@@ -44,10 +44,10 @@ import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
 import FormReviewTable from 'core/components/validatedForm/review-table'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import CodeBlock from 'core/components/CodeBlock'
-import KubernetesVersionField from '../../form-components/kubernetes-version'
 import ManagedAddOnsField from '../../form-components/managed-add-ons'
 import AppAndContainerSettingsFields from '../../form-components/app-container-settings'
 import { Divider } from '@material-ui/core'
+import KubernetesVersion from '../../form-components/kubernetes-version'
 
 export const templateTitle = 'Custom'
 
@@ -347,7 +347,7 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 </FormFieldCard>
 
                 <FormFieldCard title="Cluster Settings">
-                  <KubernetesVersionField
+                  <KubernetesVersion
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
                   />
