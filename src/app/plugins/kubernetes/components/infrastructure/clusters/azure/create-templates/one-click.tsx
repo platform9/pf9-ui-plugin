@@ -56,17 +56,10 @@ const sshKeyValidator = customValidator((value) => {
   return isKeyValid(value)
 }, 'You must enter a valid SSH key')
 
-const OneClickAzureCluster = ({
-  wizardContext,
-  setWizardContext,
-  params,
-  updateParams,
-  getParamsUpdater,
-  onNext,
-}) => {
+const OneClickAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
   const [cloudProviderDetails] = useDataLoader(loadCloudProviderDetails, {
-    cloudProviderId: params.cloudProviderId,
+    cloudProviderId: wizardContext.cloudProviderId,
   })
 
   const mapRegionName = useCallback(
@@ -79,7 +72,7 @@ const OneClickAzureCluster = ({
   const handleRegionChange = useCallback(
     (displayName) => {
       const regionName = mapRegionName(displayName)
-      updateParams({ cloudProviderRegionId: regionName })
+      setWizardContext({ cloudProviderRegionId: regionName })
     },
     [cloudProviderDetails],
   )
@@ -106,13 +99,13 @@ const OneClickAzureCluster = ({
 
           <CloudProviderField
             cloudProviderType={CloudProviders.Azure}
-            onChange={getParamsUpdater('cloudProviderId')}
+            setWizardContext={setWizardContext}
           />
 
           <CloudProviderRegionField
             id="location"
-            providerType={CloudProviders.Azure}
-            cloudProviderId={params.cloudProviderId}
+            cloudProviderType={CloudProviders.Azure}
+            wizardContext={wizardContext}
             onChange={handleRegionChange}
           />
 

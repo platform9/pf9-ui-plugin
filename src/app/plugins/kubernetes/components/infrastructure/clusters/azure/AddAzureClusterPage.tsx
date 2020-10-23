@@ -7,7 +7,7 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
-import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
+import { k8sPrefix } from 'app/constants'
 import { CloudProviders } from '../../cloudProviders/model'
 
 import { routes } from 'core/utils/routes'
@@ -68,27 +68,27 @@ const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 //   })
 // }
 
-const initialContext = {
-  template: 'small',
-  masterSku: 'Standard_A1_v2',
-  workerSku: 'Standard_A1_v2',
-  numMasters: 1,
-  numWorkers: 1,
-  enableCAS: false,
-  usePf9Domain: true,
-  network: 'newNetwork',
-  containersCidr: '10.20.0.0/16',
-  servicesCidr: '10.21.0.0/16',
-  networkPlugin: 'flannel',
-  runtimeConfigOption: 'default',
-  useAllAvailabilityZones: true,
-  assignPublicIps: false,
-  etcdStoragePath: defaultEtcBackupPath,
-  etcdBackupInterval: 60 * 24,
-  prometheusMonitoringEnabled: true,
-  tags: [],
-  appCatalogEnabled: false,
-}
+// const initialContext = {
+//   template: 'small',
+//   masterSku: 'Standard_A1_v2',
+//   workerSku: 'Standard_A1_v2',
+//   numMasters: 1,
+//   numWorkers: 1,
+//   enableCAS: false,
+//   usePf9Domain: true,
+//   network: 'newNetwork',
+//   containersCidr: '10.20.0.0/16',
+//   servicesCidr: '10.21.0.0/16',
+//   networkPlugin: 'flannel',
+//   runtimeConfigOption: 'default',
+//   useAllAvailabilityZones: true,
+//   assignPublicIps: false,
+//   etcdStoragePath: defaultEtcBackupPath,
+//   etcdBackupInterval: 60 * 24,
+//   prometheusMonitoringEnabled: true,
+//   tags: [],
+//   appCatalogEnabled: false,
+// }
 
 // const templateOptions = [
 //   { label: 'Sm - Single Node Master & Worker (Standard_A1_v2)', value: 'small' },
@@ -157,12 +157,14 @@ const AddAzureClusterPage = () => {
   const createType = match?.params?.type || ClusterCreateTypes.Custom
   const [activeView, setActiveView] = useState<{ ViewComponent: FC<any> }>(null)
   const [formTitle, setFormTitle] = useState<string>('')
+  const [initialContext, setInitialContext] = useState(null)
 
   useEffect(() => {
     async function loadFile(name) {
       const view = await import(`./create-templates/${name}`)
       setActiveView({ ViewComponent: view.default })
       setFormTitle(view.templateTitle)
+      setInitialContext(view.initialContext)
     }
     loadFile(createType)
   }, [createType])

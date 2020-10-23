@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const HttpProxy = ({}) => {
+const HttpProxyField = ({}) => {
   const classes = useStyles()
   return (
     <TextField
@@ -30,4 +30,4 @@ const HttpProxy = ({}) => {
   )
 }
 
-export default HttpProxy
+export default HttpProxyField

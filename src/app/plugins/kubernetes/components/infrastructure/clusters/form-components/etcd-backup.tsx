@@ -2,16 +2,17 @@ import React from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 
-const EtcdBackupFields = ({ values }) => {
+const EtcdBackupFields = ({ wizardContext, setWizardContext }) => {
   return (
     <>
       <CheckboxField
         id="etcdBackup"
         label="Enable etcd Backup"
         info="Enable automated etcd backups on this cluster"
+        onChange={(value) => setWizardContext({ etcdBackup: value })}
       />
 
-      {values.etcdBackup && (
+      {wizardContext.etcdBackup && (
         <>
           <TextField
             id="etcdStoragePath"

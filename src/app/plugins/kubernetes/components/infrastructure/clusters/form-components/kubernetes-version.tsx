@@ -10,8 +10,6 @@ export default function KubernetesVersion({ wizardContext, setWizardContext }) {
       label="Kubernetes Version"
       onChange={(value) => setWizardContext({ kubernetesVersion: value })}
       value={wizardContext.kubernetesVersion}
-      info=""
-      disabled={false}
       required
     />
   )

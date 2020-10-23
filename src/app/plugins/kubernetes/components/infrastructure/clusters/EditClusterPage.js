@@ -83,9 +83,9 @@ const EditClusterPage = () => {
         initialValues={initialValues}
         onSubmit={handleSubmit}
       >
-        <Name setWizardContext={setWizardContext} />
+        <Name setWizardContext={getParamsUpdater} />
 
-        <EtcdBackupFields values={params} />
+        <EtcdBackupFields wizardContext={params} setWizardContext={getParamsUpdater} />
 
         <Tags info="Edit tag metadata on this cluster" blacklistedTags={tagsToOmit} />
       </ValidatedForm>
