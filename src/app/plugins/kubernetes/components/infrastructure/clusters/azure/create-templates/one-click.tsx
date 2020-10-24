@@ -2,8 +2,6 @@ import React, { useCallback } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import ClusterNameField from '../../form-components/name'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
-import { customValidator } from 'core/utils/fieldValidators'
-import { isKeyValid } from 'ssh-pub-key-validation'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { azurePrerequisitesLink } from 'k8s/links'
 import Text from 'core/elements/text'
@@ -31,10 +29,11 @@ export const initialContext = {
   numMasters: 1,
   numWorkers: 0,
   allowWorkloadsOnMaster: true,
-  masterFlavor: 'Standard_A1_v2',
-  workerFlavor: 'Standard_A1_v2',
+  masterSku: 'Standard_A1_v2',
+  workerSku: 'Standard_A1_v2',
   ami: 'ubuntu',
   networkPlugin: 'flannel',
+  etcdBackup: true,
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
@@ -60,6 +59,7 @@ const columns = [
     id: 'etcdBackup',
     label: 'ETCD Backup',
     render: (value) => castBoolToStr()(value),
+    insertDivider: true,
   },
   { id: 'etcdStoragePath', label: 'Storage Path' },
   { id: 'etcdBackupInterval', label: 'Backup Interval (minutes)' },
@@ -69,10 +69,6 @@ const columns = [
     render: (value) => castBoolToStr()(value),
   },
 ]
-
-const sshKeyValidator = customValidator((value) => {
-  return isKeyValid(value)
-}, 'You must enter a valid SSH key')
 
 const useStyles = makeStyles<Theme>((theme) => ({
   validatedFormContainer: {
@@ -145,7 +141,7 @@ const OneClickAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
             />
 
             {/* SSH Key */}
-            <SshKeyTextField validations={[sshKeyValidator]} />
+            <SshKeyTextField />
           </FormFieldCard>
 
           <FormFieldCard title="Default Settings for New Cluster">

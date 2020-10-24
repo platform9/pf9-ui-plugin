@@ -46,10 +46,8 @@ export const initialContext = {
 const columns = [
   { id: 'numMasters', label: 'Master nodes' },
   { id: 'numWorkers', label: 'Worker nodes' },
-  { id: 'masterFlavor', label: 'Master flavor' },
-  { id: 'workerFlavor', label: 'Worker flavor' },
-  { id: 'masterSku', label: 'Master Node SKU' },
-  { id: 'workerSku', label: 'Worker Node SKU' },
+  { id: 'masterFlavor', label: 'Master node instance type' },
+  { id: 'workerFlavor', label: 'Worker node instance type' },
   {
     id: 'allowWorkloadsOnMaster',
     label: 'Enable workloads on all master nodes',
@@ -142,10 +140,11 @@ const OneClickAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 />
 
                 {/* AWS Availability Zone */}
-                {wizardContext.region && (
+                {wizardContext.cloudProviderRegionId && (
                   <AwsAvailabilityZoneField
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
+                    isSingleSelect={true}
                   />
                 )}
 

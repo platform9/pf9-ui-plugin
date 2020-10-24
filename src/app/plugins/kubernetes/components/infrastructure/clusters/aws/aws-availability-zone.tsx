@@ -2,7 +2,7 @@ import React from 'react'
 import AwsAvailabilityZoneChooser from '../../cloudProviders/AwsAvailabilityZoneChooser'
 import { CloudProviders } from '../../cloudProviders/model'
 
-const AwsAvailabilityZoneField = ({ wizardContext, setWizardContext }) => (
+const AwsAvailabilityZoneField = ({ wizardContext, setWizardContext, isSingleSelect = false }) => (
   <AwsAvailabilityZoneChooser
     id="azs"
     info="Select from the Availability Zones for the specified region"
