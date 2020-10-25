@@ -10,6 +10,7 @@ import ApiClient from 'api-client/ApiClient'
 import { appUrlRoot } from 'app/constants'
 import { useDispatch } from 'react-redux'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { updateClarityStore } from 'utils/clarityHelper'
 
 const currentSectionRegex = new RegExp(`^${appUrlRoot}/[^/]+/?[^/]*`, 'i')
 
@@ -49,6 +50,10 @@ const RegionChooser = (props) => {
       setActiveRegion(regionId)
       await keystone.resetCookie()
 
+      updateClarityStore(
+        'regionObj',
+        regions.find((r) => regionId === r.id),
+      )
       updatePrefs({ currentRegion: regionId })
       // Clearing the cache will cause all the current loaders to reload its data
       await dispatch(cacheActions.clearCache())
@@ -70,6 +75,10 @@ const RegionChooser = (props) => {
     if (!curRegionId || !regions.length) {
       return
     }
+    updateClarityStore(
+      'regionObj',
+      regions.find((r) => curRegionId === r.id),
+    )
     updatePrefs({ currentRegion: curRegionId })
     setActiveRegion(curRegionId)
   }, [curRegionId, regions])

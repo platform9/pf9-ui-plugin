@@ -43,9 +43,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexFlow: 'column wrap',
   },
-  field: {
-    margin: theme.spacing(2, 0, 1),
-    maxWidth: 'none',
+  validatedFormContainer: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
   },
 }))
 
@@ -111,6 +111,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                 <WizardStep stepId="step1" label="Update Cloud Provider">
                   <div className={classes.form}>
                     <ValidatedForm
+                      classes={{ root: classes.validatedFormContainer }}
                       initialValues={wizardContext}
                       elevated={false}
                       onSubmit={handleNext}
@@ -118,7 +119,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                       <Text variant="subtitle1" className={classes.cpName}>
                         {wizardContext.name}
                       </Text>
-                      <FormFieldCard className={classes.field}>
+                      <FormFieldCard>
                         <UpdateForm
                           wizardContext={wizardContext}
                           setWizardContext={setWizardContext}

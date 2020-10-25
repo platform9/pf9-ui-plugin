@@ -7,6 +7,9 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import Alert from 'core/components/Alert'
 import { generateKubeConfig } from 'k8s/components/infrastructure/clusters/kubeconfig'
 import downloadFile from 'core/utils/downloadFile'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
+import { prop } from 'ramda'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   radioGroup: {
@@ -32,15 +35,23 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
   const [authMethod, setAuthMethod] = useState('token')
   const [errorMessage, setErrorMessage] = useState()
   const [submitting, setSubmitting] = useState(false)
+  const selectSessionState = prop(sessionStoreKey)
+  const session = useSelector(selectSessionState)
+  const { isSsoToken } = session
 
   const handleSubmit = async (params) => {
     setErrorMessage(null)
     setSubmitting(true)
     const { username, password } = params
-    const { error, kubeconfig } = await generateKubeConfig(cluster.uuid, authMethod, {
-      username,
-      password,
-    })
+    const { error, kubeconfig } = await generateKubeConfig(
+      cluster.uuid,
+      authMethod,
+      {
+        username,
+        password,
+      },
+      isSsoToken,
+    )
 
     if (error) {
       setSubmitting(false)

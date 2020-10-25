@@ -24,6 +24,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: '800px',
     flexGrow: 1,
   },
+  validatedFormContainer: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
 }))
 
 interface Props {
@@ -48,7 +52,11 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
         className={classes.wizardMeta}
       >
         <div className={classes.form}>
-          <ValidatedForm initialValues={wizardContext} elevated={false}>
+          <ValidatedForm
+            classes={{ root: classes.validatedFormContainer }}
+            initialValues={wizardContext}
+            elevated={false}
+          >
             <Text variant="subtitle1" className={classes.cpName}>
               {wizardContext.name}
             </Text>
