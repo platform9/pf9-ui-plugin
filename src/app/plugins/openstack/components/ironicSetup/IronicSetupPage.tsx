@@ -21,6 +21,7 @@ import FormWrapperDefault from 'core/components/FormWrapper'
 import { IPf9IronicInspector, IPf9NeutronOvsAgent, IPf9GlanceRole } from './model'
 import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
 import { Host } from 'api-client/resmgr.model'
+import DocumentMeta from 'core/components/DocumentMeta'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const getProvisioningNetwork = (networks) =>
@@ -183,89 +184,92 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
   }
 
   return (
-    <Wizard
-      onComplete={submitLastStep}
-      context={initialContext}
-      startingStep={startingStep}
-      hideBack
-    >
-      {/* Hide back button, currently not fully supported */}
-      {({ wizardContext, setWizardContext, onNext }) => {
-        return (
-          <>
-            {/*
-              keepContentMounted={false} is required due to the useEffects
-              used in the step components that call onNext. If kept true,
-              the onEffect will trigger again on other steps and things
-              start breaking.
-            */}
+    <>
+      <DocumentMeta title="Ironic Setup Wizard" bodyClasses={['form-view']} />
+      <Wizard
+        onComplete={submitLastStep}
+        context={initialContext}
+        startingStep={startingStep}
+        hideBack
+      >
+        {/* Hide back button, currently not fully supported */}
+        {({ wizardContext, setWizardContext, onNext }) => {
+          return (
+            <>
+              {/*
+                keepContentMounted={false} is required due to the useEffects
+                used in the step components that call onNext. If kept true,
+                the onEffect will trigger again on other steps and things
+                start breaking.
+              */}
 
-            <WizardStep
-              stepId="step1"
-              label="Configure Provisioning Network"
-              keepContentMounted={false}
-            >
-              <BareMetalNetworkStep
-                wizardContext={wizardContext}
-                setWizardContext={setWizardContext}
-                onNext={onNext}
-                title="Configure Provisioning Network"
-                setSubmitting={setSubmittingStep}
-              />
-            </WizardStep>
-            <WizardStep stepId="step2" label="Install Host Agent">
-              <div>
-                Install the Platform9 Host Agent on the node that will become the controller for
-                Bare Metal.
-              </div>
-              <DownloadHostAgentWalkthrough />
-            </WizardStep>
-            <WizardStep stepId="step3" label="Authorize Host Agent" keepContentMounted={false}>
-              <AuthorizeHostStep
-                wizardContext={wizardContext}
-                setWizardContext={setWizardContext}
-                onNext={onNext}
-                title="Authorize Host Agent"
-                setSubmitting={setSubmittingStep}
-              />
-            </WizardStep>
-            <WizardStep stepId="step4" label="Controller Networking Configuration">
-              <ControllerNetworkingStep
-                wizardContext={wizardContext}
-                setWizardContext={setWizardContext}
-                onNext={onNext}
-                title="Controller Networking Configuration"
-              />
-            </WizardStep>
+              <WizardStep
+                stepId="step1"
+                label="Configure Provisioning Network"
+                keepContentMounted={false}
+              >
+                <BareMetalNetworkStep
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onNext={onNext}
+                  title="Configure Provisioning Network"
+                  setSubmitting={setSubmittingStep}
+                />
+              </WizardStep>
+              <WizardStep stepId="step2" label="Install Host Agent">
+                <div>
+                  Install the Platform9 Host Agent on the node that will become the controller for
+                  Bare Metal.
+                </div>
+                <DownloadHostAgentWalkthrough />
+              </WizardStep>
+              <WizardStep stepId="step3" label="Authorize Host Agent" keepContentMounted={false}>
+                <AuthorizeHostStep
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onNext={onNext}
+                  title="Authorize Host Agent"
+                  setSubmitting={setSubmittingStep}
+                />
+              </WizardStep>
+              <WizardStep stepId="step4" label="Controller Networking Configuration">
+                <ControllerNetworkingStep
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onNext={onNext}
+                  title="Controller Networking Configuration"
+                />
+              </WizardStep>
 
-            <WizardStep stepId="step5" label="Configure Controller" keepContentMounted={false}>
-              <ControllerConfigStep
-                wizardContext={wizardContext}
-                setWizardContext={setWizardContext}
-                onNext={onNext}
-                title="Configure Controller"
-                setSubmitting={setSubmittingStep}
-              />
-            </WizardStep>
-            <WizardStep stepId="step6" label="Bare Metal Subnet" keepContentMounted={false}>
-              <BareMetalSubnetStep
-                wizardContext={wizardContext}
-                setWizardContext={setWizardContext}
-                onNext={onNext}
-                title="Bare Metal Subnet"
-                setSubmitting={setSubmittingStep}
-              />
-            </WizardStep>
-            <WizardStep stepId="step7" label="Configure Bare Metal">
-              <OpenStackRcStep />
-            </WizardStep>
-            <WizardStep stepId="step8" label="Summary">
-              <SummaryStep wizardContext={wizardContext} />
-            </WizardStep>
-          </>
-        )
-      }}
-    </Wizard>
+              <WizardStep stepId="step5" label="Configure Controller" keepContentMounted={false}>
+                <ControllerConfigStep
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onNext={onNext}
+                  title="Configure Controller"
+                  setSubmitting={setSubmittingStep}
+                />
+              </WizardStep>
+              <WizardStep stepId="step6" label="Bare Metal Subnet" keepContentMounted={false}>
+                <BareMetalSubnetStep
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onNext={onNext}
+                  title="Bare Metal Subnet"
+                  setSubmitting={setSubmittingStep}
+                />
+              </WizardStep>
+              <WizardStep stepId="step7" label="Configure Bare Metal">
+                <OpenStackRcStep />
+              </WizardStep>
+              <WizardStep stepId="step8" label="Summary">
+                <SummaryStep wizardContext={wizardContext} />
+              </WizardStep>
+            </>
+          )
+        }}
+      </Wizard>
+    </>
   )
 }
 

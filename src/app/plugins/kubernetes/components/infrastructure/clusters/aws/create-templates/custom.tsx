@@ -44,10 +44,10 @@ import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
 import FormReviewTable from 'core/components/validatedForm/review-table'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import CodeBlock from 'core/components/CodeBlock'
-import KubernetesVersionField from '../../form-components/kubernetes-version'
-import ManagedAddOnsField from '../../form-components/managed-add-ons'
-import AppAndContainerSettingsFields from '../../form-components/app-container-settings'
 import { Divider } from '@material-ui/core'
+import KubernetesVersion from '../../form-components/kubernetes-version'
+import Text from 'core/elements/text'
+import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-master-nodes-master-and-worker'
 
 export const templateTitle = 'Custom'
 
@@ -75,16 +75,28 @@ export const initialContext = {
   appCatalogEnabled: false,
 }
 
-const renderNumWorkersCellValue = (data) => {
+const renderNumWorkersCellValue = (data) => (cellValue) => {
   return data.enableCAS ? `Min ${data.numWorkers} - Max ${data.numMaxWorkers}` : data.numWorkers
 }
 
-const renderTags = (key, value) => (
-  <>
-    <CodeBlock>{key}</CodeBlock>
-    <CodeBlock>{value}</CodeBlock>
-  </>
+const renderTagRow = ({ key, value }) => (
+  <tr>
+    <td>
+      <CodeBlock>{key}</CodeBlock>
+    </td>
+    <td>
+      <CodeBlock>{value}</CodeBlock>
+    </td>
+  </tr>
 )
+
+const renderTags = (keyValuePairs) => {
+  return (
+    <table>
+      <tbody>{keyValuePairs.map((pair) => renderTagRow(pair))}</tbody>
+    </table>
+  )
+}
 
 const getReviewTableColumns = (data) => {
   return [
@@ -124,7 +136,7 @@ const getReviewTableColumns = (data) => {
     {
       id: 'tags',
       label: 'Tags',
-      render: (values) => values.map(({ key, value }) => renderTags(key, value)),
+      render: (keyValuePairs) => renderTags(keyValuePairs),
     },
   ]
 }
@@ -335,7 +347,10 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                       <NumWorkerNodesField />
 
                       {/* Workloads on masters */}
-                      <AllowWorkloadsonMasterField />
+                      <AllowWorkloadsonMasterField
+                        wizardContext={wizardContext}
+                        setWizardContext={setWizardContext}
+                      />
 
                       {/* Enable Auto Scaling Checkbox + Max Num Worker Nodes Field */}
                       <AutoScalingFields
@@ -347,14 +362,34 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 </FormFieldCard>
 
                 <FormFieldCard title="Cluster Settings">
-                  <KubernetesVersionField
+                  {/* Kubernetes Version */}
+                  <KubernetesVersion
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
                   />
                   <Divider className={classes.divider} />
-                  <AppAndContainerSettingsFields />
+
+                  {/* App & Container Settings */}
+                  <Text variant="subtitle2">Application & Container Settings</Text>
+                  <MakeMasterNodesMasterAndWorkerField />
+                  <PrivilegedField wizardContext={wizardContext} />
+
                   <Divider className={classes.divider} />
-                  <ManagedAddOnsField />
+
+                  {/* Managed Add-Ons */}
+                  <Text variant="subtitle2">Managed Add-Ons</Text>
+                  <EtcdBackupFields
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
+                  />
+                  <PrometheusMonitoringField
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
+                  />
+                  <AutoScalingFields
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
+                  />
                 </FormFieldCard>
               </>
             )}
@@ -369,7 +404,7 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
         )}
       </WizardStep>
 
-      {/* Step 2 0 - Network Info */}
+      {/* Step 2 - Network Info */}
       <WizardStep stepId="network" label="Network Info" onNext={networkOnNext}>
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
@@ -456,15 +491,6 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
           {({ setFieldValue, values }) => (
             <>
               <FormFieldCard title="Advanced Configuration">
-                {/* Privileged */}
-                <PrivilegedField wizardContext={setWizardContext} />
-
-                {/* Etcd Backup */}
-                <EtcdBackupFields />
-
-                {/* Prometheus monitoring */}
-                <PrometheusMonitoringField wizardContext={wizardContext} />
-
                 {/* Advanced API Configuration */}
                 <AdvancedApiConfigFields
                   wizardContext={wizardContext}
@@ -500,7 +526,7 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
           triggerSubmit={onNext}
           elevated={false}
         >
-          <FormFieldCard title="Default Settings for New Cluster">
+          <FormFieldCard title="Finalize & Review">
             <FormReviewTable data={wizardContext} columns={getReviewTableColumns(wizardContext)} />
           </FormFieldCard>
         </ValidatedForm>

@@ -30,6 +30,7 @@ import moment from 'moment'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import axios from 'axios'
+import { updateClarityStore } from 'utils/clarityHelper'
 
 const { keystone, setActiveRegion } = ApiClient.getInstance()
 
@@ -70,6 +71,7 @@ const restoreSession = async (
     // for standard login page
     return keystone.getUnscopedTokenWithToken(scopedToken)
   }
+
   // Attempt to restore the session
   const { username, unscopedToken: currUnscopedToken } = session
   if (username && currUnscopedToken) {
@@ -79,8 +81,8 @@ const restoreSession = async (
   return {}
 }
 
-const getUserDetails = async (activeTenant) => {
-  const { user, role } = await keystone.changeProjectScope(activeTenant.id)
+const getUserDetails = async (activeTenant, isSsoToken) => {
+  const { user, role, scopedToken } = await keystone.changeProjectScope(activeTenant.id, isSsoToken)
   await keystone.resetCookie()
 
   /* eslint-disable */
@@ -108,8 +110,11 @@ const getUserDetails = async (activeTenant) => {
   }
 
   return {
-    ...user,
-    role,
+    userDetails: {
+      ...user,
+      role,
+    },
+    scopedToken,
   }
 }
 
@@ -125,6 +130,7 @@ const AppContainer = () => {
   const [sessionChecked, setSessionChecked] = useState(false)
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
+  const { isSsoToken } = session
   const [, updatePrefs, getUserPrefs] = useScopedPreferences()
   const dispatch = useDispatch()
 
@@ -151,7 +157,7 @@ const AppContainer = () => {
       } = await restoreSession(pathname, session, history)
 
       if (unscopedToken) {
-        await setupSession({ username, unscopedToken, expiresAt, issuedAt })
+        await setupSession({ username, unscopedToken, expiresAt, issuedAt, isSsoToken })
       } else {
         // Order matters
         setSessionChecked(true)
@@ -170,37 +176,43 @@ const AppContainer = () => {
     return unlisten
   }, [])
 
-  const setupSession = useCallback(async ({ username, unscopedToken, expiresAt, issuedAt }) => {
-    const timeDiff = moment(expiresAt).diff(issuedAt)
-    const localExpiresAt = moment()
-      .add(timeDiff)
-      .format()
+  const setupSession = useCallback(
+    async ({ username, unscopedToken, expiresAt, issuedAt, isSsoToken }) => {
+      const timeDiff = moment(expiresAt).diff(issuedAt)
+      const localExpiresAt = moment()
+        .add(timeDiff)
+        .format()
 
-    const { currentTenant, currentRegion } = getUserPrefs(username)
-    const tenants = await loadUserTenants()
-    if (isNilOrEmpty(tenants)) {
-      throw new Error('No tenants found, please contact support')
-    }
-    const activeTenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
-    if (!currentTenant && activeTenant) {
-      updatePrefs({ currentTenant: activeTenant.id })
-    }
-    if (currentRegion) {
-      setActiveRegion(currentRegion)
-    }
-    const userDetails = await getUserDetails(activeTenant)
+      const { currentTenant, currentRegion } = getUserPrefs(username)
+      const tenants = await loadUserTenants()
+      if (isNilOrEmpty(tenants)) {
+        throw new Error('No tenants found, please contact support')
+      }
+      const activeTenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
+      if (!currentTenant && activeTenant) {
+        updateClarityStore('tenantObj', activeTenant)
+        updatePrefs({ currentTenant: activeTenant.id })
+      }
+      if (currentRegion) {
+        setActiveRegion(currentRegion)
+      }
+      const { scopedToken, userDetails } = await getUserDetails(activeTenant, isSsoToken)
 
-    // Order matters
-    setSessionChecked(true)
-    dispatch(
-      sessionActions.updateSession({
-        username,
-        unscopedToken,
-        expiresAt: localExpiresAt,
-        userDetails,
-      }),
-    )
-  }, [])
+      // Order matters
+      setSessionChecked(true)
+      dispatch(
+        sessionActions.updateSession({
+          username,
+          unscopedToken,
+          scopedToken,
+          expiresAt: localExpiresAt,
+          userDetails,
+          isSsoToken,
+        }),
+      )
+    },
+    [],
+  )
 
   const authContent =
     isNilOrEmpty(session) || !session.username ? (

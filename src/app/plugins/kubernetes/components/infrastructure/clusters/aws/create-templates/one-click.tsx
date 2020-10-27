@@ -12,7 +12,6 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import WizardStep from 'core/components/wizard/WizardStep'
 import FormReviewTable from 'core/components/validatedForm/review-table'
-import { castBoolToStr } from 'utils/misc'
 import { defaultEtcBackupPath } from 'app/constants'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
@@ -21,13 +20,16 @@ import CloudProviderField from '../../form-components/cloud-provider'
 import SshKeyField from '../../form-components/ssh-key-picklist'
 import ClusterDomainField from '../../form-components/cluster-domain'
 import AwsAvailabilityZoneField from '../aws-availability-zone'
+import { castBoolToStr } from 'utils/misc'
 
 export const templateTitle = 'One Click'
 
 export const initialContext = {
   network: 'newPublic',
   numMasters: 1,
-  numWorkers: 1,
+  numWorkers: 0,
+  masterFlavor: 't2.medium',
+  workerFlavor: 't2.medium',
   allowWorkloadsOnMaster: true,
   ami: 'ubuntu',
   calicoIpIpMode: 'Always',
@@ -42,17 +44,17 @@ export const initialContext = {
 }
 
 const columns = [
-  { id: 'network', label: 'Network' },
   { id: 'numMasters', label: 'Master nodes' },
   { id: 'numWorkers', label: 'Worker nodes' },
+  { id: 'masterFlavor', label: 'Master node instance type' },
+  { id: 'workerFlavor', label: 'Worker node instance type' },
   {
     id: 'allowWorkloadsOnMaster',
     label: 'Enable workloads on all master nodes',
     render: (value) => castBoolToStr()(value),
   },
-  { id: 'masterSku', label: 'Master Node SKU' },
-  { id: 'workerSku', label: 'Worker Node SKU' },
-  { id: 'ami', label: 'Operating System' },
+  { id: 'ami', label: 'Operating System', insertDivider: true },
+  { id: 'network', label: 'Network' },
   { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
   { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
   { id: 'calicoV4BlockSize', label: 'Block Size' },
@@ -61,6 +63,7 @@ const columns = [
     id: 'etcdBackup',
     label: 'ETCD Backup',
     render: (value) => castBoolToStr()(value),
+    insertDivider: true,
   },
   { id: 'etcdStoragePath', label: 'Storage Path' },
   { id: 'etcdBackupInterval', label: 'Backup Interval (minutes)' },
@@ -137,10 +140,11 @@ const OneClickAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 />
 
                 {/* AWS Availability Zone */}
-                {wizardContext.region && (
+                {wizardContext.cloudProviderRegionId && (
                   <AwsAvailabilityZoneField
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
+                    isSingleSelect={true}
                   />
                 )}
 

@@ -8,7 +8,7 @@ const EtcdBackupFields = () => {
     <>
       <CheckboxField
         id="etcdBackup"
-        label="Enable etcd Backup"
+        label="Enable ETCD Backup"
         info="Enable automated etcd backups on this cluster"
       />
 

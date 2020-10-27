@@ -22,7 +22,7 @@ const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 const useStyles = makeStyles((theme: Theme) => ({
   addAwsClusterPage: {
-    marginTop: 24,
+    marginTop: theme.spacing(3),
   },
 }))
 
@@ -59,7 +59,8 @@ const AddAwsClusterPage = () => {
     clusterActions.create,
     onComplete,
   )
-  const handleSubmit = (data) => createAwsClusterAction({ ...data, clusterType: '' })
+  const handleSubmit = (data) =>
+    createAwsClusterAction({ ...data, clusterType: CloudProviders.Aws })
 
   const ViewComponent = activeView?.ViewComponent
   return (

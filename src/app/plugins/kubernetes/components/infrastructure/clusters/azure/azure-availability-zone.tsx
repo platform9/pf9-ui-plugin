@@ -14,26 +14,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const AzureAvailabilityZoneFields = ({
-  cloudProviderRegionId,
-  values,
-  wizardContext,
-  setWizardContext,
-}) => {
+const AzureAvailabilityZoneFields = ({ wizardContext, setWizardContext }) => {
   const classes = useStyles()
   return (
     <>
+      {/* Use All Availability Zone Checkbox */}
       <CheckboxField
         id="useAllAvailabilityZones"
         label="Use all availability zones"
         onChange={(value) => setWizardContext({ useAllAvailabilityZones: value, zones: [] })}
-        value={!cloudProviderRegionId ? false : wizardContext.useAllAvailabilityZones}
+        value={!wizardContext.cloudProviderRegionId ? false : wizardContext.useAllAvailabilityZones}
         info=""
-        disabled={!cloudProviderRegionId}
+        disabled={!wizardContext.cloudProviderRegionId}
       />
 
       {/* Azure Availability Zone */}
-      {!cloudProviderRegionId || values.useAllAvailabilityZones || (
+      {!wizardContext.cloudProviderRegionId || wizardContext.useAllAvailabilityZones || (
         <div className={classes.availability}>
           <AzureAvailabilityZoneChooser
             id="zones"

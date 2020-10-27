@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Text from 'core/elements/text'
 import BulletList from 'core/components/BulletList'
@@ -11,6 +11,10 @@ import ExternalLink from 'core/components/ExternalLink'
 import Info from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
 import { ClusterCreateTypes } from '../model'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { cloudProviderActions } from '../../cloudProviders/actions'
+import { CloudProviders } from '../../cloudProviders/model'
+import AwsCloudProviderRequirementDialog from './AwsCloudProviderRequirementDialog'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
@@ -59,50 +63,65 @@ const AwsReqsRightSection = ['EC2 Instance Management', 'EBS Volume Management',
 
 const AwsClusterRequirements = ({ onComplete, provider }) => {
   const classes = useStyles({})
+  const [showDialog, setShowDialog] = useState(false)
+  const [cloudProviders] = useDataLoader(cloudProviderActions.list)
+
   const handleClick = useCallback(
     (type: ClusterCreateTypes) => () => {
-      onComplete(routes.cluster.addAws[type].path())
+      const hasAwsProvider = !!cloudProviders.some(
+        (provider) => provider.type === CloudProviders.Aws,
+      )
+      if (!hasAwsProvider) {
+        setShowDialog(true)
+      } else {
+        onComplete(routes.cluster.addAws[type].path())
+      }
     },
-    [onComplete],
+    [onComplete, cloudProviders],
   )
   return (
-    <FormFieldCard
-      className={classes.formCard}
-      title="Amazon AWS Deployment"
-      link={
-        <ExternalLink textVariant="caption2" url={gettingStartedHelpLink}>
-          AWS Cluster Help
-        </ExternalLink>
-      }
-    >
-      <Text variant="body2" className={classes.text}>
-        Build a Kubernetes Cluster using AWS EC2 Instances
-      </Text>
-
-      <Info className={classes.infoContainer}>
-        <Text className={classes.alertTitle} variant="body2">
-          <FontAwesomeIcon>info-circle</FontAwesomeIcon> The following permissions are required to
-          deploy fully automated Managed Kubernetes clusters:
+    <>
+      {showDialog && (
+        <AwsCloudProviderRequirementDialog showDialog={showDialog} setShowDialog={setShowDialog} />
+      )}
+      <FormFieldCard
+        className={classes.formCard}
+        title="Amazon AWS Deployment"
+        link={
+          <ExternalLink textVariant="caption2" url={gettingStartedHelpLink}>
+            AWS Cluster Help
+          </ExternalLink>
+        }
+      >
+        <Text variant="body2" className={classes.text}>
+          Build a Kubernetes Cluster using AWS EC2 Instances
         </Text>
-        <div className={classes.requirements}>
-          <BulletList className={classes.bulletList} items={AwsReqsLeftSection} />
-          <BulletList className={classes.bulletList} items={AwsReqsRightSection} />
-        </div>
-      </Info>
 
-      <div className={classes.actionRow}>
-        <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
-        <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
-          One-Click Cluster
-        </SubmitButton>
-      </div>
-      <div className={classes.actionRow}>
-        <Text variant="caption1">For more customized cluster creation:</Text>
-        <SubmitButton onClick={handleClick(ClusterCreateTypes.Custom)}>
-          Advanced Cluster Setup
-        </SubmitButton>
-      </div>
-    </FormFieldCard>
+        <Info className={classes.infoContainer}>
+          <Text className={classes.alertTitle} variant="body2">
+            <FontAwesomeIcon>info-circle</FontAwesomeIcon> The following permissions are required to
+            deploy fully automated Managed Kubernetes clusters:
+          </Text>
+          <div className={classes.requirements}>
+            <BulletList className={classes.bulletList} items={AwsReqsLeftSection} />
+            <BulletList className={classes.bulletList} items={AwsReqsRightSection} />
+          </div>
+        </Info>
+
+        <div className={classes.actionRow}>
+          <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
+          <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
+            One-Click Cluster
+          </SubmitButton>
+        </div>
+        <div className={classes.actionRow}>
+          <Text variant="caption1">For more customized cluster creation:</Text>
+          <SubmitButton onClick={handleClick(ClusterCreateTypes.Custom)}>
+            Advanced Cluster Setup
+          </SubmitButton>
+        </div>
+      </FormFieldCard>
+    </>
   )
 }
 export default AwsClusterRequirements

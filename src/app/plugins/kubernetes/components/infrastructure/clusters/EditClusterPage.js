@@ -6,16 +6,15 @@ import { emptyObj, objToKeyValueArr, keyValueArrToObj } from 'utils/fp'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import TextField from 'core/components/validatedForm/TextField'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix, defaultEtcBackupPath } from 'app/constants'
 import { clusterActions } from './actions'
-import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
-import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import EtcdBackupFields from './form-components/etcd-backup'
 import Name from './form-components/name'
+import TagsField from './form-components/tags'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -71,25 +70,32 @@ const EditClusterPage = () => {
   )
 
   return (
-    <FormWrapper
-      title={`Edit Cluster ${initialValues.name || ''}`}
-      loading={loadingClusters || updating}
-      message={updating ? 'Submitting form...' : 'Loading Cluster...'}
-      backUrl={listUrl}
-    >
-      <ValidatedForm
-        title="Basic Details"
-        formActions={<SubmitButton>Update Cluster</SubmitButton>}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
+    <>
+      <DocumentMeta title="Edit Cluster" bodyClasses={['form-view']} />
+      <FormWrapper
+        title={`Edit Cluster ${initialValues.name || ''}`}
+        loading={loadingClusters || updating}
+        message={updating ? 'Submitting form...' : 'Loading Cluster...'}
+        backUrl={listUrl}
       >
-        <Name setWizardContext={getParamsUpdater} />
+        <ValidatedForm
+          title="Basic Details"
+          formActions={<SubmitButton>Update Cluster</SubmitButton>}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+        >
+          {/* Cluster Name */}
+           <Name setWizardContext={getParamsUpdater} />
 
-        <EtcdBackupFields wizardContext={params} setWizardContext={getParamsUpdater} />
+          {/* Etcd Backup */}
+           <EtcdBackupFields wizardContext={params} setWizardContext={getParamsUpdater} />
 
-        <Tags info="Edit tag metadata on this cluster" blacklistedTags={tagsToOmit} />
-      </ValidatedForm>
-    </FormWrapper>
+          {/* Tags */}
+           <Tags info="Edit tag metadata on this cluster" blacklistedTags={tagsToOmit} />
+
+        </ValidatedForm>
+      </FormWrapper>
+    </>
   )
 }
 

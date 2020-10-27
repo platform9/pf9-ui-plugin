@@ -2,7 +2,7 @@ import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 
-export const CloudProviderRegionField = ({
+const CloudProviderRegionField = ({
   cloudProviderType,
   wizardContext,
   onChange,

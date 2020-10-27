@@ -1,11 +1,12 @@
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import React from 'react'
 
-const NetworksField = ({ networkOptions }) => (
+const NetworksField = ({ options, setWizardContext }) => (
   <PicklistField
     id="network"
-    options={networkOptions}
+    options={options}
     label="Network"
+    onChange={(value) => setWizardContext(value)}
     info="Select existing networking resources or automatically create and assign new networking resources."
     required
   />
