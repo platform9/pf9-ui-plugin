@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -11,6 +11,10 @@ import Text from 'core/elements/text'
 import Info from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
 import { ClusterCreateTypes } from '../model'
+import AzureCloudProviderRequirementDialog from './AzureCloudProviderRequirementDialog'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { CloudProviders } from '../../cloudProviders/model'
+import { cloudProviderActions } from '../../cloudProviders/actions'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   alertTitle: {
@@ -54,45 +58,63 @@ const azureReqs = [
 
 const AzureClusterRequirements = ({ onComplete, provider }) => {
   const classes = useStyles({})
+  const [showDialog, setShowDialog] = useState(false)
+  const [cloudProviders] = useDataLoader(cloudProviderActions.list)
+
   const handleClick = useCallback(
     (type: ClusterCreateTypes) => () => {
-      onComplete(routes.cluster.addAzure[type].path())
+      const hasAzureProvider = !!cloudProviders.some(
+        (provider) => provider.type === CloudProviders.Azure,
+      )
+      if (!hasAzureProvider) {
+        setShowDialog(true)
+      } else {
+        onComplete(routes.cluster.addAzure[type].path())
+      }
     },
-    [onComplete],
+    [onComplete, cloudProviders],
   )
   return (
-    <FormFieldCard
-      className={classes.formCard}
-      title="Microsoft Azure Deployment"
-      link={
-        <ExternalLink textVariant="caption2" url={gettingStartedHelpLink}>
-          Azure Cluster Help
-        </ExternalLink>
-      }
-    >
-      <Text variant="body2" className={classes.text}>
-        Build a Kubernetes Cluster using Azure VMs Instances
-      </Text>
-      <Info className={classes.infoContainer}>
-        <Text className={classes.alertTitle} variant="body2">
-          <FontAwesomeIcon>info-circle</FontAwesomeIcon> The following permissions are required to
-          deploy fully automated Managed Kubernetes clusters:
+    <>
+      {showDialog && (
+        <AzureCloudProviderRequirementDialog
+          showDialog={showDialog}
+          setShowDialog={setShowDialog}
+        />
+      )}
+      <FormFieldCard
+        className={classes.formCard}
+        title="Microsoft Azure Deployment"
+        link={
+          <ExternalLink textVariant="caption2" url={gettingStartedHelpLink}>
+            Azure Cluster Help
+          </ExternalLink>
+        }
+      >
+        <Text variant="body2" className={classes.text}>
+          Build a Kubernetes Cluster using Azure VMs Instances
         </Text>
-        <BulletList className={classes.bulletList} items={azureReqs} />
-      </Info>
-      <div className={classes.actionRow}>
-        <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
-        <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
-          One-Click Cluster
-        </SubmitButton>
-      </div>
-      <div className={classes.actionRow}>
-        <Text variant="caption1">For more customized cluster creation:</Text>
-        <SubmitButton onClick={handleClick(ClusterCreateTypes.Custom)}>
-          Advanced Cluster Setup
-        </SubmitButton>
-      </div>
-    </FormFieldCard>
+        <Info className={classes.infoContainer}>
+          <Text className={classes.alertTitle} variant="body2">
+            <FontAwesomeIcon>info-circle</FontAwesomeIcon> The following permissions are required to
+            deploy fully automated Managed Kubernetes clusters:
+          </Text>
+          <BulletList className={classes.bulletList} items={azureReqs} />
+        </Info>
+        <div className={classes.actionRow}>
+          <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
+          <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
+            One-Click Cluster
+          </SubmitButton>
+        </div>
+        <div className={classes.actionRow}>
+          <Text variant="caption1">For more customized cluster creation:</Text>
+          <SubmitButton onClick={handleClick(ClusterCreateTypes.Custom)}>
+            Advanced Cluster Setup
+          </SubmitButton>
+        </div>
+      </FormFieldCard>
+    </>
   )
 }
 export default AzureClusterRequirements
