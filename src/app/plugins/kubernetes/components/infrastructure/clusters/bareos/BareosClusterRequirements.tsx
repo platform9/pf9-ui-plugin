@@ -8,7 +8,7 @@ import { gettingStartedHelpLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import Text from 'core/elements/text'
-import Info from 'core/components/validatedForm/Info'
+import { IconInfo } from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
 import { capitalizeString } from 'utils/misc'
 import { ClusterCreateTypes } from '../model'
@@ -37,17 +37,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'grid',
     alignItems: 'center',
     gridTemplateColumns: 'repeat(auto-fill, 200px)',
-    margin: theme.spacing(4, 4, 1, 4),
-  },
-  alertTitle: {
-    display: 'flex',
-    alignItems: 'center',
-
-    '& i': {
-      color: theme.palette.blue[500],
-      fontSize: 22,
-      marginRight: 4,
-    },
+    margin: theme.spacing(2, 4, 1, 4),
   },
   text: {
     marginTop: theme.spacing(0.5),
@@ -90,9 +80,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: theme.spacing(2),
-  },
-  infoContainer: {
-    margin: '60px 0 40px 0',
   },
   formCard: {
     color: theme.palette.grey[700],
@@ -164,16 +151,14 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
           Cluster comes built in with:
         </Text>
         <BulletList className={classes.bulletList} items={nodeServices} />
-        <Info className={classes.infoContainer}>
-          <Text className={classes.alertTitle} variant="body2">
-            <FontAwesomeIcon>info-circle</FontAwesomeIcon> Minimum Hardware Requirements:
-          </Text>
+        <IconInfo icon="info-circle" title="Minimum Hardware Requirements:">
           <div className={classes.requirements}>
             <HardwareSpec title="2 VCPUs" icon="microchip" />
             <HardwareSpec title="5GB RAM" icon="memory" />
             <HardwareSpec title="20GB HDD" icon="hdd" />
           </div>
-        </Info>
+        </IconInfo>
+
         <div className={classes.actionRow}>
           <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
           <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>

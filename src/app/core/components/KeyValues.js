@@ -98,6 +98,7 @@ const useStyles = makeStyles((theme) => ({
     border: 'none',
     display: 'flex',
     alignItems: 'center',
+    cursor: 'pointer',
   },
   plus: {
     color: theme.palette.primary.main,

@@ -2,6 +2,7 @@ import React from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { IconInfo } from 'core/components/validatedForm/Info'
 
 const EtcdBackupFields = () => {
   return (
@@ -38,6 +39,11 @@ const EtcdBackupFields = () => {
 
 export const EdcdBackupAddonFields = () => (
   <FormFieldCard title="ETCD Backup Configuration">
+    <IconInfo
+      icon="info-circle"
+      title="ETCD Backup will backup your ETCD database at a set interval to the location provided."
+      spacer={false}
+    />
     <TextField
       id="etcdStoragePath"
       label="Storage Path"

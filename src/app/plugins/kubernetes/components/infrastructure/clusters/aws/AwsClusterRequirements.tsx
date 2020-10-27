@@ -6,9 +6,8 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import { gettingStartedHelpLink } from 'k8s/links'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
-import Info from 'core/components/validatedForm/Info'
+import { IconInfo } from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
 import { ClusterCreateTypes } from '../model'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -21,17 +20,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'flex',
     flexFlow: 'row nowrap',
     justifyContent: 'space-between',
-    margin: theme.spacing(4, 4, 1, 4),
-  },
-  alertTitle: {
-    display: 'flex',
-    alignItems: 'center',
-
-    '& i': {
-      color: theme.palette.blue[500],
-      fontSize: 22,
-      marginRight: 4,
-    },
+    margin: theme.spacing(2, 4, 1, 4),
   },
   text: {
     marginTop: theme.spacing(0.5),
@@ -46,9 +35,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: theme.spacing(2),
-  },
-  infoContainer: {
-    margin: '60px 0 40px 0',
   },
   formCard: {
     color: theme.palette.grey[700],
@@ -97,16 +83,15 @@ const AwsClusterRequirements = ({ onComplete, provider }) => {
           Build a Kubernetes Cluster using AWS EC2 Instances
         </Text>
 
-        <Info className={classes.infoContainer}>
-          <Text className={classes.alertTitle} variant="body2">
-            <FontAwesomeIcon>info-circle</FontAwesomeIcon> The following permissions are required to
-            deploy fully automated Managed Kubernetes clusters:
-          </Text>
+        <IconInfo
+          icon="info-circle"
+          title="The following permissions are required to deploy fully automated Managed Kubernetes clusters:"
+        >
           <div className={classes.requirements}>
             <BulletList className={classes.bulletList} items={AwsReqsLeftSection} />
             <BulletList className={classes.bulletList} items={AwsReqsRightSection} />
           </div>
-        </Info>
+        </IconInfo>
 
         <div className={classes.actionRow}>
           <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
