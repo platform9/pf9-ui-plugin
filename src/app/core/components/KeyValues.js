@@ -1,37 +1,46 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import AutocompleteBase from 'core/components/AutocompleteBase'
-import IconButton from '@material-ui/core/IconButton'
-import DeleteIcon from '@material-ui/icons/Delete'
 import uuid from 'uuid'
 import { assoc } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
-import { Button } from '@material-ui/core'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import Text from 'core/elements/text'
 
 const useKeyValueStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    width: '100%',
-    justifyContent: 'space-between',
+    display: 'grid',
+    gridTemplateColumns: '200px 6px 200px 32px',
+    gridTemplateRows: '55px',
+    gridGap: '12px',
+    justifyItems: 'start',
     alignItems: 'center',
   },
   autocomplete: {
-    flexGrow: 1,
-    marginRight: theme.spacing(0.5),
+    width: 200,
+
     '& .MuiFormControl-root': {
-      marginTop: theme.spacing(0.5),
+      marginTop: 0,
       marginBottom: 0,
+      width: '100%',
     },
   },
-  deleteButton: {
-    flexGrow: 0,
-    padding: 0,
+  minus: {
+    fontWeight: 900,
+    color: theme.palette.blue.main,
+    justifySelf: 'end',
   },
 }))
 
-const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions }) => {
+const KeyValue = ({
+  entry = {},
+  onChange,
+  onDelete,
+  keySuggestions,
+  valueSuggestions,
+  keyLabel = 'Key',
+  valueLabel = 'Value',
+}) => {
   const classes = useKeyValueStyles()
   const [state, setState] = useState({
     id: entry.id || uuid.v4(),
@@ -50,25 +59,25 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
       <AutocompleteBase
         inputProps={{ size: 14 }}
         fullWidth
-        label="Key"
+        label={keyLabel}
         value={state.key}
         onChange={handleChange('key')}
         suggestions={keySuggestions}
         className={classes.autocomplete}
       />
-      &nbsp;
+      <Text variant="body2">-</Text>
       <AutocompleteBase
         inputProps={{ size: 14 }}
         fullWidth
-        label="Value"
+        label={valueLabel}
         value={state.value}
         onChange={handleChange('value')}
         suggestions={valueSuggestions}
         className={classes.autocomplete}
       />
-      <IconButton className={classes.deleteButton} onClick={onDelete}>
-        <DeleteIcon />
-      </IconButton>
+      <FontAwesomeIcon className={classes.minus} onClick={onDelete}>
+        minus-circle
+      </FontAwesomeIcon>
     </div>
   )
 }
@@ -81,11 +90,19 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: '100%',
   },
   addButton: {
-    marginTop: theme.spacing(0.5),
-    color: theme.palette.primary.main,
+    marginTop: theme.spacing(2),
+    color: theme.palette.grey[700],
+    outline: 0,
+    padding: 0,
+    background: 'transparent',
+    border: 'none',
+    display: 'flex',
+    alignItems: 'center',
   },
   plus: {
-    marginRight: theme.spacing(.25),
+    color: theme.palette.primary.main,
+    marginRight: theme.spacing(2),
+    fontWeight: 900,
   },
 }))
 
@@ -98,7 +115,16 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 // filter it out before submitting. :(
 const addId = (entry) => ({ ...entry, id: uuid.v4() })
 
-const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions, blacklistedTags }) => {
+const KeyValues = ({
+  entries: _entries,
+  onChange,
+  keySuggestions,
+  valueSuggestions,
+  blacklistedTags,
+  addLabel,
+  keyLabel,
+  valueLabel,
+}) => {
   const classes = useStyles()
   const entriesWithId = [...(_entries || []).map(addId), newEntry()]
   const [entries, setEntries] = useState(entriesWithId)
@@ -115,7 +141,7 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
     onChange && onChange(sanitized)
   }, [entries])
 
-  const filteredEntries = entries.filter(entry => !blacklistedTags.includes(entry.key))
+  const filteredEntries = entries.filter((entry) => !blacklistedTags.includes(entry.key))
 
   return (
     <div className={classes.root}>
@@ -127,12 +153,14 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
           entry={entry}
           onChange={handleChange}
           onDelete={deleteEntry(entry.id)}
+          keyLabel={keyLabel}
+          valueLabel={valueLabel}
         />
       ))}
-      <Button className={classes.addButton} variant="text" onClick={addBlankEntry}>
+      <button className={classes.addButton} onClick={addBlankEntry}>
         <FontAwesomeIcon className={classes.plus}>plus-circle</FontAwesomeIcon>
-        <span>Add key / value pair</span>
-      </Button>
+        <Text variant="body2">{addLabel}</Text>
+      </button>
     </div>
   )
 }

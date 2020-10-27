@@ -460,16 +460,10 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 <PrivilegedField wizardContext={setWizardContext} />
 
                 {/* Etcd Backup */}
-                <EtcdBackupFields
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                />
+                <EtcdBackupFields />
 
                 {/* Prometheus monitoring */}
-                <PrometheusMonitoringField
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                />
+                <PrometheusMonitoringField wizardContext={wizardContext} />
 
                 {/* Advanced API Configuration */}
                 <AdvancedApiConfigFields

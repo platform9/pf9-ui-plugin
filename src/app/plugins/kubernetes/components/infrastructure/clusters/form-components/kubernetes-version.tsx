@@ -1,11 +1,11 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import kubernetesVersionPicklist from '../../../common/kubernetes-version-picklist'
+import KubernetesVersionPicklist from 'k8s/components/common/kubernetes-version-picklist'
 
 export default function KubernetesVersion({ wizardContext, setWizardContext }) {
   return (
     <PicklistField
-      DropdownComponent={kubernetesVersionPicklist}
+      DropdownComponent={KubernetesVersionPicklist}
       id="kubernetesVersion"
       label="Kubernetes Version"
       onChange={(value) => setWizardContext({ kubernetesVersion: value })}

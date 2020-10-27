@@ -1,4 +1,4 @@
-export interface IValidatedForm {
+export interface ValidatedFormProps {
   id: string
   validations?: any[]
   required?: boolean

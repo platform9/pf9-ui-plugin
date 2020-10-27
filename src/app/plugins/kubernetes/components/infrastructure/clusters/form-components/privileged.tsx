@@ -3,10 +3,10 @@ import ExternalLink from 'core/components/ExternalLink'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import { runtimePrivilegedLink } from 'k8s/links'
 
-export default ({ wizardContext }) => (
+const PrivilegedContainers = ({ wizardContext }) => (
   <CheckboxField
     id="privileged"
-    label="Privileged"
+    label="Privileged Containers"
     disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
     info={
       <div>
@@ -17,3 +17,5 @@ export default ({ wizardContext }) => (
     }
   />
 )
+
+export default PrivilegedContainers

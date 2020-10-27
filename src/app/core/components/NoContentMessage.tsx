@@ -7,7 +7,7 @@ import Text from 'core/elements/text'
 interface Props {
   message?: string
   defaultHeight?: number
-  variant: 'dark' | 'light'
+  variant?: 'dark' | 'light'
 }
 
 const useStyles = makeStyles<Theme, Props>((theme) => ({
