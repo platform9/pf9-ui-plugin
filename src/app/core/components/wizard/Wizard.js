@@ -37,6 +37,10 @@ class Wizard extends PureComponent {
     }
   }
 
+  setActiveStep = (stepId) => {
+    this.setState({ activeStepId: stepId })
+  }
+
   getActiveStepId = ({ steps }, activeStep) =>
     steps[activeStep] ? { activeStepId: steps[activeStep].stepId } : {}
 
@@ -132,6 +136,7 @@ class Wizard extends PureComponent {
     handleNext: this.handleNext,
     addStep: this.addStep,
     activeStep: this.props.startingStep || 0,
+    setActiveStep: this.setActiveStep,
     steps: [],
     activeStepId: null,
     wizardContext: this.props.context || {},

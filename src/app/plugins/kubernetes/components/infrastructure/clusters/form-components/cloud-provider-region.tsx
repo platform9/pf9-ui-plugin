@@ -2,20 +2,15 @@ import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 
-const CloudProviderRegionField = ({
-  cloudProviderType,
-  wizardContext,
-  onChange,
-  id = 'region',
-}) => (
+const CloudProviderRegionField = ({ cloudProviderType, onChange, values }) => (
   <PicklistField
-    id={id}
+    id="region"
     label="Region"
     DropdownComponent={CloudProviderRegionPicklist}
     type={cloudProviderType}
-    cloudProviderId={wizardContext.cloudProviderId}
+    cloudProviderId={values.cloudProviderId}
     onChange={onChange}
-    disabled={!wizardContext.cloudProviderId}
+    disabled={!values.cloudProviderId}
     required
   />
 )

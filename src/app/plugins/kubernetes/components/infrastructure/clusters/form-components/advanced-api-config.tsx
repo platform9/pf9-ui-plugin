@@ -8,7 +8,7 @@ const runtimeConfigOptions = [
   { label: 'Custom', value: 'custom' },
 ]
 
-const AdvancedApiConfigFields = ({ options = runtimeConfigOptions, wizardContext }) => (
+const AdvancedApiConfigFields = ({ options = runtimeConfigOptions, values }) => (
   <>
     <PicklistField
       id="runtimeConfigOption"
@@ -18,7 +18,7 @@ const AdvancedApiConfigFields = ({ options = runtimeConfigOptions, wizardContext
       required
     />
 
-    {wizardContext.runtimeConfigOption === 'custom' && (
+    {values.runtimeConfigOption === 'custom' && (
       <TextField id="customRuntimeConfig" label="Custom API Configuration" info="" />
     )}
   </>

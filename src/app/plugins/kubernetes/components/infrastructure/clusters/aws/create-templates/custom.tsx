@@ -1,16 +1,12 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { defaultEtcBackupPath } from 'app/constants'
 import WizardStep from 'core/components/wizard/WizardStep'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import { awsPrerequisitesLink } from 'k8s/links'
-import { PromptToAddProvider } from 'k8s/components/infrastructure/cloudProviders/PromptToAddProvider'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
-import { routes } from 'core/utils/routes'
 import ClusterNameField from '../../form-components/name'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { trackEvent } from 'utils/tracking'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
@@ -21,10 +17,8 @@ import OperatingSystemField from '../../form-components/operating-system'
 import MasterNodeInstanceTypeField from '../../form-components/master-node-instance-type'
 import NumMasterNodesField from '../../form-components/num-master-nodes'
 import NumWorkerNodesField from '../../form-components/num-worker-nodes'
-import WorkerNodeInstanceTypeField from '../../form-components/worker-node-instance-type'
 import AwsRegionFlavorPicklist from '../AwsRegionFlavorPicklist'
 import AllowWorkloadsonMasterField from '../../form-components/allow-workloads-on-master'
-import AutoScalingFields from '../../form-components/auto-scaling'
 import ClusterTemplatesField from '../../form-components/cluster-templates'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
@@ -36,8 +30,6 @@ import HttpProxyField from '../../form-components/http-proxy'
 import NetworkBackendField from '../../form-components/network-backend'
 import CalicoNetworkFields from '../../form-components/calico-network-fields'
 import PrivilegedField from '../../form-components/privileged'
-import EtcdBackupFields from '../../form-components/etcd-backup'
-import PrometheusMonitoringField from '../../form-components/prometheus-monitoring'
 import TagsField from '../../form-components/tags'
 import CustomAmiField from '../../form-components/custom-ami'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
@@ -48,6 +40,8 @@ import { Divider } from '@material-ui/core'
 import KubernetesVersion from '../../form-components/kubernetes-version'
 import Text from 'core/elements/text'
 import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-master-nodes-master-and-worker'
+import { AddonTogglers } from '../../form-components/cluster-addon-manager'
+import WorkerNodeInstanceTypeField from '../../form-components/worker-node-instance-type'
 
 export const templateTitle = 'Custom'
 
@@ -132,7 +126,11 @@ const getReviewTableColumns = (data) => {
       render: (value) => castBoolToStr()(value),
       insertDivider: true,
     },
-    { id: 'prometheusMonitoringEnabled', label: 'Prometheus monitoring' },
+    {
+      id: 'prometheusMonitoringEnabled',
+      label: 'Prometheus monitoring',
+      render: (value) => castBoolToStr()(value),
+    },
     {
       id: 'tags',
       label: 'Tags',
@@ -257,151 +255,123 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
+interface Props {
+  wizardContext: any
+  setWizardContext: any
+  onNext: any
+}
+
+const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
-  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
-  const hasAwsProvider = !!cloudProviders.some((provider) => provider.type === CloudProviders.Aws)
 
   return (
     <>
       {/* Step 1 - Cluster Configuration */}
       <WizardStep stepId="config" label="Network Configuration" onNext={configOnNext}>
-        {loading ? null : hasAwsProvider ? (
-          <ValidatedForm
-            classes={{ root: classes.validatedFormContainer }}
-            fullWidth
-            initialValues={wizardContext}
-            onSubmit={setWizardContext}
-            triggerSubmit={onNext}
-            elevated={false}
-          >
-            {({ setFieldValue, values }) => (
-              <>
-                <FormFieldCard
-                  title="Cluster Configuration"
-                  link={
-                    <ExternalLink textVariant="caption2" url={awsPrerequisitesLink}>
-                      AWS Cluster Help
-                    </ExternalLink>
-                  }
-                >
-                  {/* Cluster Name */}
-                  <ClusterNameField setWizardContext={setWizardContext} />
+        <ValidatedForm
+          fullWidth
+          classes={{ root: classes.validatedFormContainer }}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
+          triggerSubmit={onNext}
+          withAddonManager
+          elevated={false}
+        >
+          {({ setFieldValue, values }) => (
+            <>
+              <FormFieldCard
+                title="Cluster Configuration"
+                link={
+                  <ExternalLink textVariant="caption2" url={awsPrerequisitesLink}>
+                    AWS Cluster Help
+                  </ExternalLink>
+                }
+              >
+                {/* Cluster Name */}
+                <ClusterNameField />
 
-                  {/* Cloud Provider */}
-                  <CloudProviderField
-                    cloudProviderType={CloudProviders.Aws}
-                    setWizardContext={setWizardContext}
-                  />
+                {/* Cloud Provider */}
+                <CloudProviderField cloudProviderType={CloudProviders.Aws} />
 
-                  {/* AWS Region */}
-                  <CloudProviderRegionField
-                    cloudProviderType={CloudProviders.Aws}
+                {/* AWS Region */}
+                <CloudProviderRegionField
+                  cloudProviderType={CloudProviders.Aws}
+                  values={values}
+                  onChange={(region) => setWizardContext({ azs: [] })}
+                />
+
+                {/* AWS Availability Zone */}
+                {values.region && (
+                  <AwsAvailabilityZoneField
+                    values={values}
                     wizardContext={wizardContext}
-                    onChange={(region) =>
-                      setWizardContext({ azs: [], cloudProviderRegionId: region })
-                    }
+                    setWizardContext={setWizardContext}
+                    allowMultiSelect={true}
                   />
+                )}
 
-                  {/* AWS Availability Zone */}
-                  {wizardContext.region && (
-                    <AwsAvailabilityZoneField
-                      wizardContext={wizardContext}
-                      setWizardContext={setWizardContext}
+                {/* SSH Key */}
+                <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={values} />
+
+                {/* Template Chooser */}
+                <ClusterTemplatesField
+                  options={templateOptions}
+                  onChange={handleTemplateChoice({
+                    setWizardContext,
+                    setFieldValue,
+                  })}
+                />
+
+                {values.template === 'custom' && (
+                  <>
+                    {/* Operating System */}
+                    <OperatingSystemField />
+
+                    {/* Master node instance type */}
+                    <MasterNodeInstanceTypeField
+                      dropdownComponent={AwsRegionFlavorPicklist}
+                      values={values}
                     />
-                  )}
 
-                  {/* SSH Key */}
-                  <SshKeyField
-                    dropdownComponent={AwsClusterSshKeyPicklist}
-                    wizardContext={wizardContext}
-                  />
+                    {/* Num master nodes */}
+                    <NumMasterNodesField />
 
-                  {/* Template Chooser */}
-                  <ClusterTemplatesField
-                    options={templateOptions}
-                    onChange={handleTemplateChoice({
-                      setWizardContext,
-                      setFieldValue,
-                    })}
-                  />
+                    {/* Worker node instance type */}
+                    <WorkerNodeInstanceTypeField
+                      dropdownComponent={AwsRegionFlavorPicklist}
+                      values={values}
+                    />
 
-                  {wizardContext.template === 'custom' && (
-                    <>
-                      {/* Operating System */}
-                      <OperatingSystemField />
+                    {/* Num worker nodes */}
+                    <NumWorkerNodesField />
 
-                      {/* Master node instance type */}
-                      <MasterNodeInstanceTypeField wizardContext={wizardContext} />
+                    {/* Workloads on masters */}
+                    <AllowWorkloadsonMasterField />
+                  </>
+                )}
+              </FormFieldCard>
 
-                      {/* Num master nodes */}
-                      <NumMasterNodesField />
+              <FormFieldCard title="Cluster Settings">
+                {/* Kubernetes Version */}
+                <KubernetesVersion />
+                <Divider className={classes.divider} />
 
-                      {/* Worker node instance type */}
-                      <WorkerNodeInstanceTypeField
-                        dropdownComponent={AwsRegionFlavorPicklist}
-                        wizardContext={wizardContext}
-                      />
+                {/* App & Container Settings */}
+                <Text variant="caption1">Application & Container Settings</Text>
+                <MakeMasterNodesMasterAndWorkerField />
+                <PrivilegedField wizardContext={wizardContext} />
 
-                      {/* Num worker nodes */}
-                      <NumWorkerNodesField />
+                <Divider className={classes.divider} />
 
-                      {/* Workloads on masters */}
-                      <AllowWorkloadsonMasterField
-                        wizardContext={wizardContext}
-                        setWizardContext={setWizardContext}
-                      />
-
-                      {/* Enable Auto Scaling Checkbox + Max Num Worker Nodes Field */}
-                      <AutoScalingFields
-                        wizardContext={wizardContext}
-                        setWizardContext={setWizardContext}
-                      />
-                    </>
-                  )}
-                </FormFieldCard>
-
-                <FormFieldCard title="Cluster Settings">
-                  {/* Kubernetes Version */}
-                  <KubernetesVersion
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                  <Divider className={classes.divider} />
-
-                  {/* App & Container Settings */}
-                  <Text variant="subtitle2">Application & Container Settings</Text>
-                  <MakeMasterNodesMasterAndWorkerField />
-                  <PrivilegedField wizardContext={wizardContext} />
-
-                  <Divider className={classes.divider} />
-
-                  {/* Managed Add-Ons */}
-                  <Text variant="subtitle2">Managed Add-Ons</Text>
-                  <EtcdBackupFields
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                  <PrometheusMonitoringField
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                  <AutoScalingFields
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                </FormFieldCard>
-              </>
-            )}
-          </ValidatedForm>
-        ) : (
-          <FormFieldCard title="Configure Your Cluster">
-            <PromptToAddProvider
-              type={CloudProviders.Aws}
-              src={routes.cloudProviders.add.path({ type: CloudProviders.Aws })}
-            />
-          </FormFieldCard>
-        )}
+                {/* Managed Add-Ons */}
+                <Text variant="caption1">Managed Add-Ons</Text>
+                <AddonTogglers
+                  addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
+                />
+              </FormFieldCard>
+            </>
+          )}
+        </ValidatedForm>
       </WizardStep>
 
       {/* Step 2 - Network Info */}
@@ -429,7 +399,7 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 <AwsCustomNetworkingFields
                   setFieldValue={setFieldValue}
                   wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
+                  values={values}
                 />
 
                 {/* API FQDN */}
@@ -439,7 +409,10 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 />
 
                 {/* Services FQDN */}
-                <ServicesFqdnField required={!values.usePf9Domain} disabled={values.usePf9Domain} />
+                <ServicesFqdnField
+                  required={!wizardContext.usePf9Domain}
+                  disabled={wizardContext.usePf9Domain}
+                />
               </FormFieldCard>
 
               <FormFieldCard title="Cluster Networking Range & HTTP Proxy">
@@ -492,10 +465,7 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
             <>
               <FormFieldCard title="Advanced Configuration">
                 {/* Advanced API Configuration */}
-                <AdvancedApiConfigFields
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                />
+                <AdvancedApiConfigFields values={values} />
 
                 {/* Enable Application Catalog */}
                 {/* <CheckboxField

@@ -1,15 +1,11 @@
-import React from 'react'
+import React, { FC } from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { routes } from 'core/utils/routes'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
-import { PromptToAddProvider } from 'k8s/components/infrastructure/cloudProviders/PromptToAddProvider'
 import { awsPrerequisitesLink } from 'k8s/links'
 import ClusterNameField from '../../form-components/name'
 import AwsClusterSshKeyPickList from '../AwsClusterSshKeyPicklist'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import WizardStep from 'core/components/wizard/WizardStep'
 import FormReviewTable from 'core/components/validatedForm/review-table'
 import { defaultEtcBackupPath } from 'app/constants'
@@ -81,102 +77,88 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const OneClickAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
-  const classes = useStyles({})
-  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
-  const hasAwsProvider = !!cloudProviders.some((provider) => provider.type === CloudProviders.Aws)
+interface Props {
+  wizardContext: any
+  setWizardContext: any
+  onNext: any
+}
 
-  const updateFqdns = (values, setFieldValue) => (value, label) => {
+const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
+  const classes = useStyles({})
+
+  const updateFqdns = (values) => (value, label) => {
     const name = values.name || wizardContext.name
 
     const api = `${name}-api.${label}`
-    setFieldValue('externalDnsName')(api)
     setWizardContext({ externalDnsName: api })
 
     const service = `${name}-service.${label}`
-    setFieldValue('serviceFqdn')(service)
     setWizardContext({ serviceFdqn: service })
   }
 
-  const handleClusterDomainUpdate = (values, setFieldValues) => updateFqdns(values, setFieldValues)
+  const handleClusterDomainUpdate = (values, setFieldValues) => updateFqdns(values)
 
   return (
     <WizardStep stepId="one-click" onNext={onNext}>
-      {loading ? null : hasAwsProvider ? (
-        <ValidatedForm
-          classes={{ root: classes.validatedFormContainer }}
-          fullWidth
-          initialValues={wizardContext}
-          onSubmit={setWizardContext}
-          triggerSubmit={onNext}
-          elevated={false}
-        >
-          {({ setFieldValue, values }) => (
-            <>
-              <FormFieldCard
-                title="Cluster Configuration"
-                link={
-                  <ExternalLink textVariant="caption2" url={awsPrerequisitesLink}>
-                    AWS Cluster Help
-                  </ExternalLink>
-                }
-              >
-                {/* Cluster Name */}
-                <ClusterNameField />
+      <ValidatedForm
+        classes={{ root: classes.validatedFormContainer }}
+        fullWidth
+        initialValues={wizardContext}
+        onSubmit={setWizardContext}
+        triggerSubmit={onNext}
+        elevated={false}
+      >
+        {({ setFieldValue, values }) => (
+          <>
+            <FormFieldCard
+              title="Cluster Configuration"
+              link={
+                <ExternalLink textVariant="caption2" url={awsPrerequisitesLink}>
+                  AWS Cluster Help
+                </ExternalLink>
+              }
+            >
+              {/* Cluster Name */}
+              <ClusterNameField />
 
-                {/* Cloud Provider */}
-                <CloudProviderField
-                  cloudProviderType={CloudProviders.Aws}
+              {/* Cloud Provider */}
+              <CloudProviderField cloudProviderType={CloudProviders.Aws} />
+
+              {/* Cloud Provider Region */}
+              <CloudProviderRegionField
+                cloudProviderType={CloudProviders.Aws}
+                values={values}
+                onChange={(region) => setWizardContext({ azs: [] })}
+              />
+
+              {/* AWS Availability Zone */}
+              {values.region && (
+                <AwsAvailabilityZoneField
+                  values={values}
+                  wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
+                  allowMultiSelect={false}
                 />
+              )}
 
-                {/* Cloud Provider Region */}
-                <CloudProviderRegionField
-                  cloudProviderType={CloudProviders.Aws}
-                  wizardContext={wizardContext}
-                  onChange={(region) =>
-                    setWizardContext({ azs: [], cloudProviderRegionId: region })
-                  }
-                />
+              {/* SSH Key */}
+              <SshKeyField dropdownComponent={AwsClusterSshKeyPickList} values={values} />
 
-                {/* AWS Availability Zone */}
-                {wizardContext.cloudProviderRegionId && (
-                  <AwsAvailabilityZoneField
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                    isSingleSelect={true}
-                  />
-                )}
+              {/* Cluster Domain */}
+              <ClusterDomainField
+                values={values}
+                onChange={handleClusterDomainUpdate(values, setFieldValue)}
+                required={!wizardContext.usePf9Domain}
+                disabled={wizardContext.usePf9Domain}
+              />
+            </FormFieldCard>
 
-                {/* SSH Key */}
-                <SshKeyField
-                  dropdownComponent={AwsClusterSshKeyPickList}
-                  wizardContext={wizardContext}
-                />
-
-                {/* Cluster Domain */}
-                <ClusterDomainField
-                  wizardContext={wizardContext}
-                  onChange={handleClusterDomainUpdate(values, setFieldValue)}
-                  required={!wizardContext.usePf9Domain}
-                  disabled={wizardContext.usePf9Domain}
-                />
-              </FormFieldCard>
-
-              <FormFieldCard title="Default Settings for New Cluster">
-                <FormReviewTable data={wizardContext} columns={columns} />
-              </FormFieldCard>
-            </>
-          )}
-        </ValidatedForm>
-      ) : (
-        <FormFieldCard title="Configure Your Cluster">
-          <PromptToAddProvider
-            type={CloudProviders.Aws}
-            src={routes.cloudProviders.add.path({ type: CloudProviders.Aws })}
-          />
-        </FormFieldCard>
-      )}
+            <FormFieldCard title="Default Settings for New Cluster">
+              <FormReviewTable data={wizardContext} columns={columns} />
+            </FormFieldCard>
+          </>
+        )}
+      </ValidatedForm>
     </WizardStep>
   )
 }

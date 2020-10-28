@@ -1,4 +1,7 @@
+// @ts-nocheck
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-len */
+
 import React, { FC, useEffect, useRef, useState } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
@@ -321,45 +324,12 @@ const AddBareOsClusterPage = () => {
   //   return true
   // }, [nodes])
 
+  const title = getFormTitle(formTitle, createType)
+
   const ViewComponent = activeView?.ViewComponent
   return (
-    <FormWrapper
-      title={getFormTitle(formTitle, createType)}
-      backUrl={listUrl}
-      loading={creatingBareOSCluster}
-    >
-      <DocumentMeta title={formTitle} bodyClasses={['form-view']} />
-      {/* <Dialog open={showDialog}>
-        <DialogTitle>
-          <Text variant="h5" component="span">
-            No Nodes Ready
-          </Text>
-        </DialogTitle>
-        <DialogContent>
-          <Text variant="body1">
-            To build a BareOS cluster at least one node needs to be attached to the Management Plane
-            and not in use by an existing cluster.
-          </Text>
-          <br />
-          <Text variant="subtitle2">How do I attach a node?</Text>
-          <div className={classes.alert}>
-            <Text variant="subtitle2" className="no-wrap-text">
-              The Platform9 CLI
-            </Text>
-            <Text variant="body1">
-              The Platform9 CLI is used to prepare and attach nodes to the Management Plane. The CLI
-              should be run on each node using the ‘prep-node’ command. ‘prep-node’ authenticates
-              the node to the Management Plane and installs all of the required Kubernetes
-              prerequisites.
-            </Text>
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowDialog(false)} color="primary">
-            <Text variant="body1">Close</Text>
-          </Button>
-        </DialogActions>
-      </Dialog> */}
+    <FormWrapper title={title} backUrl={listUrl} loading={creatingBareOSCluster}>
+      <DocumentMeta title={title} bodyClasses={['form-view']} />
       {!!initialContext && (
         <Wizard
           onComplete={handleSubmit}

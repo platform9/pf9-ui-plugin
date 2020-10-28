@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import ApiClient from 'api-client/ApiClient'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
@@ -188,7 +190,7 @@ export const createBareOSCluster = async (data = {}) => {
 
   if (data.enableMetallb) {
     body.enableMetallb = data.enableMetallb
-    body.metallbCidr = data.metallbCidr
+    body.metallbCidr = getMetalLbCidr(data.metallbCidr)
   }
 
   // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
@@ -259,3 +261,6 @@ const createGenericCluster = async (body, data) => {
   // We need to perform a GET afterwards and return that to add to the cache.
   return qbert.getClusterDetails(uuid)
 }
+
+const getMetalLbCidr = (keyValueArr = []) =>
+  keyValueArr.map(({ key, value }) => `${key}-${value}`).join()
