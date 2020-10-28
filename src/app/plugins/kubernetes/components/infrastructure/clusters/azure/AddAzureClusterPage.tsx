@@ -60,8 +60,10 @@ const AddAzureClusterPage = () => {
     clusterActions.create,
     onComplete,
   )
-  const handleSubmit = (data) =>
-    createAzureClusterAction({ ...data, clusterType: CloudProviders.Azure })
+  const handleSubmit = (data) => {
+    console.log(data)
+    createAzureClusterAction({})
+  }
 
   const ViewComponent = activeView?.ViewComponent
   return (

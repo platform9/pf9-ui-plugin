@@ -20,6 +20,13 @@ const EdcdBackupAddonFields = React.lazy(async () =>
   import('./etcd-backup').then((module) => ({ default: module.EdcdBackupAddonFields })),
 )
 
+const AutoScalingField = React.lazy(async () => import('./auto-scaling'))
+const AutoScalingAddonFields = React.lazy(async () =>
+  import('./auto-scaling').then((module) => ({
+    default: module.AutoScalingAddonFields,
+  })),
+)
+
 const addonMap = {
   etcdBackup: {
     toggler: EtcdBackupFields,
@@ -32,6 +39,10 @@ const addonMap = {
   enableMetallb: {
     toggler: MetalLbField,
     details: { component: MetalLbAddonField },
+  },
+  enableCAS: {
+    toggler: AutoScalingField,
+    details: { component: AutoScalingAddonFields },
   },
 }
 
@@ -68,6 +79,7 @@ export const AddonDetailCards = ({ values }) => {
         if (!values[addon]) {
           return reverse ? <Addon key={addon} values={values} /> : null
         }
+
         return Addon && !reverse ? <Addon key={addon} values={values} /> : null
       })}
     </Suspense>

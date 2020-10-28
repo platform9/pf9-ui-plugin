@@ -5,10 +5,21 @@ import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withF
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 import MultiSelectDefault from 'core/components/MultiSelect'
+import SingleSelect from 'core/components/SingleSelect'
 const MultiSelect: any = MultiSelectDefault // types on forward ref .js file dont work well.
 
 const AwsAvailabilityZoneChooser = forwardRef(
-  ({ cloudProviderId, cloudProviderRegionId, ...rest }: Props, ref) => {
+  (
+    {
+      cloudProviderId,
+      cloudProviderRegionId,
+      singleSelect,
+      wizardContext,
+      setWizardContext,
+      ...rest
+    }: Props,
+    ref,
+  ) => {
     const [details] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,
@@ -17,14 +28,27 @@ const AwsAvailabilityZoneChooser = forwardRef(
     const azs = pathStrOr([], '0.azs', details)
     const regions = projectAs({ label: 'ZoneName', value: 'ZoneName' }, azs)
 
-    return (
-      <MultiSelect
-        className="validatedFormInput"
-        label="Availability Zones"
-        options={regions}
-        {...rest}
-      />
-    )
+    if (singleSelect) {
+      return (
+        <SingleSelect
+          className="validatedFormInput"
+          label="Availability Zones"
+          wizardContext={wizardContext}
+          setWizardContext={setWizardContext}
+          options={regions}
+          {...rest}
+        />
+      )
+    } else {
+      return (
+        <MultiSelect
+          className="validatedFormInput"
+          label="Availability Zones"
+          options={regions}
+          {...rest}
+        />
+      )
+    }
   },
 )
 
@@ -47,6 +71,9 @@ interface Props {
   type: string
   onChange: any
   required?: boolean
+  singleSelect: boolean
+  wizardContext: any
+  setWizardContext: any
 }
 AwsAvailabilityZoneChooser.displayName = 'AwsAvailabilityZoneChooser'
 

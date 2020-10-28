@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { FC, useCallback } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import ClusterNameField from '../../form-components/name'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
@@ -6,10 +6,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { azurePrerequisitesLink } from 'k8s/links'
 import Text from 'core/elements/text'
 import ExternalLink from 'core/components/ExternalLink'
-import {
-  cloudProviderActions,
-  loadCloudProviderDetails,
-} from 'k8s/components/infrastructure/cloudProviders/actions'
+import { loadCloudProviderDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { makeStyles } from '@material-ui/core/styles'
@@ -20,8 +17,6 @@ import { defaultEtcBackupPath } from 'app/constants'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
-import { PromptToAddProvider } from 'k8s/components/infrastructure/cloudProviders/PromptToAddProvider'
-import { routes } from 'core/utils/routes'
 
 export const templateTitle = 'One Click'
 
@@ -77,13 +72,14 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const OneClickAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
-  const classes = useStyles()
+interface Props {
+  wizardContext: any
+  setWizardContext: any
+  onNext: any
+}
 
-  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
-  const hasAzureProvider = !!cloudProviders.some(
-    (provider) => provider.type === CloudProviders.Azure,
-  )
+const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
+  const classes = useStyles()
 
   const [cloudProviderDetails] = useDataLoader(loadCloudProviderDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
@@ -99,63 +95,54 @@ const OneClickAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
   const handleRegionChange = useCallback(
     (displayName) => {
       const regionName = mapRegionName(displayName)
-      setWizardContext({ cloudProviderRegionId: regionName })
+      setWizardContext({ location: regionName })
     },
     [cloudProviderDetails],
   )
 
   return (
     <WizardStep stepId="one-click" onNext={onNext}>
-      {loading ? null : hasAzureProvider ? (
-        <ValidatedForm
-          classes={{ root: classes.validatedFormContainer }}
-          fullWidth
-          initialValues={wizardContext}
-          onSubmit={setWizardContext}
-          triggerSubmit={onNext}
-          elevated={false}
-        >
-          <FormFieldCard
-            title="Cluster Configuration"
-            link={
-              <ExternalLink url={azurePrerequisitesLink}>
-                <Text variant="caption2">Azure Cluster Help</Text>
-              </ExternalLink>
-            }
-          >
-            {/* Cluster Name */}
-            <ClusterNameField setWizardContext={setWizardContext} />
+      <ValidatedForm
+        classes={{ root: classes.validatedFormContainer }}
+        fullWidth
+        initialValues={wizardContext}
+        onSubmit={setWizardContext}
+        triggerSubmit={onNext}
+        elevated={false}
+      >
+        {({ setFieldValue, values }) => (
+          <>
+            <FormFieldCard
+              title="Cluster Configuration"
+              link={
+                <ExternalLink url={azurePrerequisitesLink}>
+                  <Text variant="caption2">Azure Cluster Help</Text>
+                </ExternalLink>
+              }
+            >
+              {/* Cluster Name */}
+              <ClusterNameField />
 
-            {/* Cloud Provider */}
-            <CloudProviderField
-              cloudProviderType={CloudProviders.Azure}
-              setWizardContext={setWizardContext}
-            />
+              {/* Cloud Provider */}
+              <CloudProviderField cloudProviderType={CloudProviders.Azure} />
 
-            {/* Cloud Provider Region */}
-            <CloudProviderRegionField
-              id="location"
-              cloudProviderType={CloudProviders.Azure}
-              wizardContext={wizardContext}
-              onChange={handleRegionChange}
-            />
+              {/* Cloud Provider Region */}
+              <CloudProviderRegionField
+                cloudProviderType={CloudProviders.Azure}
+                values={values}
+                onChange={handleRegionChange}
+              />
 
-            {/* SSH Key */}
-            <SshKeyTextField />
-          </FormFieldCard>
+              {/* SSH Key */}
+              <SshKeyTextField />
+            </FormFieldCard>
 
-          <FormFieldCard title="Default Settings for New Cluster">
-            <FormReviewTable data={wizardContext} columns={columns} />
-          </FormFieldCard>
-        </ValidatedForm>
-      ) : (
-        <FormFieldCard title="Configure Your Cluster">
-          <PromptToAddProvider
-            type={CloudProviders.Aws}
-            src={routes.cloudProviders.add.path({ type: CloudProviders.Aws })}
-          />
-        </FormFieldCard>
-      )}
+            <FormFieldCard title="Default Settings for New Cluster">
+              <FormReviewTable data={wizardContext} columns={columns} />
+            </FormFieldCard>
+          </>
+        )}
+      </ValidatedForm>
     </WizardStep>
   )
 }

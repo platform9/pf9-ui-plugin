@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { defaultEtcBackupPath } from 'app/constants'
 import WizardStep from 'core/components/wizard/WizardStep'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -24,7 +24,6 @@ import NumWorkerNodesField from '../../form-components/num-worker-nodes'
 import WorkerNodeInstanceTypeField from '../../form-components/worker-node-instance-type'
 import AwsRegionFlavorPicklist from '../AwsRegionFlavorPicklist'
 import AllowWorkloadsonMasterField from '../../form-components/allow-workloads-on-master'
-import AutoScalingFields from '../../form-components/auto-scaling'
 import ClusterTemplatesField from '../../form-components/cluster-templates'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
@@ -36,8 +35,6 @@ import HttpProxyField from '../../form-components/http-proxy'
 import NetworkBackendField from '../../form-components/network-backend'
 import CalicoNetworkFields from '../../form-components/calico-network-fields'
 import PrivilegedField from '../../form-components/privileged'
-import EtcdBackupFields from '../../form-components/etcd-backup'
-import PrometheusMonitoringField from '../../form-components/prometheus-monitoring'
 import TagsField from '../../form-components/tags'
 import CustomAmiField from '../../form-components/custom-ami'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
@@ -48,6 +45,7 @@ import { Divider } from '@material-ui/core'
 import KubernetesVersion from '../../form-components/kubernetes-version'
 import Text from 'core/elements/text'
 import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-master-nodes-master-and-worker'
+import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 
 export const templateTitle = 'Custom'
 
@@ -257,7 +255,13 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
+interface Props {
+  wizardContext: any
+  setWizardContext: any
+  onNext: any
+}
+
+const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
   const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
   const hasAwsProvider = !!cloudProviders.some((provider) => provider.type === CloudProviders.Aws)
@@ -268,11 +272,12 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
       <WizardStep stepId="config" label="Network Configuration" onNext={configOnNext}>
         {loading ? null : hasAwsProvider ? (
           <ValidatedForm
-            classes={{ root: classes.validatedFormContainer }}
             fullWidth
+            classes={{ root: classes.validatedFormContainer }}
             initialValues={wizardContext}
             onSubmit={setWizardContext}
             triggerSubmit={onNext}
+            withAddonManager
             elevated={false}
           >
             {({ setFieldValue, values }) => (
@@ -347,16 +352,7 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                       <NumWorkerNodesField />
 
                       {/* Workloads on masters */}
-                      <AllowWorkloadsonMasterField
-                        wizardContext={wizardContext}
-                        setWizardContext={setWizardContext}
-                      />
-
-                      {/* Enable Auto Scaling Checkbox + Max Num Worker Nodes Field */}
-                      <AutoScalingFields
-                        wizardContext={wizardContext}
-                        setWizardContext={setWizardContext}
-                      />
+                      <AllowWorkloadsonMasterField />
                     </>
                   )}
                 </FormFieldCard>
@@ -370,25 +366,16 @@ const AdvancedAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                   <Divider className={classes.divider} />
 
                   {/* App & Container Settings */}
-                  <Text variant="subtitle2">Application & Container Settings</Text>
+                  <Text variant="caption1">Application & Container Settings</Text>
                   <MakeMasterNodesMasterAndWorkerField />
                   <PrivilegedField wizardContext={wizardContext} />
 
                   <Divider className={classes.divider} />
 
                   {/* Managed Add-Ons */}
-                  <Text variant="subtitle2">Managed Add-Ons</Text>
-                  <EtcdBackupFields
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                  <PrometheusMonitoringField
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                  <AutoScalingFields
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
+                  <Text variant="caption1">Managed Add-Ons</Text>
+                  <AddonTogglers
+                    addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
                   />
                 </FormFieldCard>
               </>
