@@ -2,7 +2,7 @@ import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 
 export default ({ dropdownComponent, values }) => {
-  const cloudProviderRegionId = values.region !== undefined ? values.region : values.location // AWS uses region. Azure uses location.
+  const cloudProviderRegionId = values.region !== 'undefined' ? values.region : values.location // AWS uses region. Azure uses location
   return (
     <PicklistField
       DropdownComponent={dropdownComponent}

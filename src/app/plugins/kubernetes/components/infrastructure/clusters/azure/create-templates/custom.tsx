@@ -8,16 +8,13 @@ import FormReviewTable from 'core/components/validatedForm/review-table'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import WizardStep from 'core/components/wizard/WizardStep'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { routes } from 'core/utils/routes'
 import {
-  cloudProviderActions,
   loadCloudProviderDetails,
   loadCloudProviderRegionDetails,
 } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
-import { PromptToAddProvider } from 'k8s/components/infrastructure/cloudProviders/PromptToAddProvider'
 import { azurePrerequisitesLink } from 'k8s/links'
-import React, { useCallback } from 'react'
+import React, { FC, useCallback } from 'react'
 import { pathStrOr } from 'utils/fp'
 import { castBoolToStr } from 'utils/misc'
 import { trackEvent } from 'utils/tracking'
@@ -25,12 +22,10 @@ import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
 import AllowWorkloadsOnMasterField from '../../form-components/allow-workloads-on-master'
 import ApiFqdnField from '../../form-components/api-fqdn'
 import AssignPublicIpsField from '../../form-components/assign-public-ips'
-import AutoScalingFields from '../../form-components/auto-scaling'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
 import ClusterTemplatesField from '../../form-components/cluster-templates'
 import ContainerAndServicesCidrField from '../../form-components/container-and-services-cidr'
-import EtcdBackupFields from '../../form-components/etcd-backup'
 import ExistingNetworkField from '../../form-components/existing-network'
 import HttpProxyField from '../../form-components/http-proxy'
 import KubernetesVersion from '../../form-components/kubernetes-version'
@@ -41,7 +36,6 @@ import NetworksField from '../../form-components/networks'
 import NumMasterNodesField from '../../form-components/num-master-nodes'
 import NumWorkerNodesField from '../../form-components/num-worker-nodes'
 import PrivilegedField from '../../form-components/privileged'
-import PrometheusMonitoringField from '../../form-components/prometheus-monitoring'
 import ResourceGroupField from '../../form-components/resource-group'
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
 import TagsField from '../../form-components/tags'
@@ -54,6 +48,7 @@ import AzureSubnetPicklist from '../AzureSubnetPicklist'
 import AzureVnetPicklist from '../AzureVnetPicklist'
 import Text from 'core/elements/text'
 import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-master-nodes-master-and-worker'
+import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 
 export const templateTitle = 'Custom'
 
@@ -127,7 +122,7 @@ const getReviewTableColumns = (data) => {
     { id: 'servicesCidr', label: 'Services CIDR' },
     { id: 'privileged', label: 'Privileged', render: (value) => castBoolToStr()(value) },
     {
-      id: 'prometheusMonitoring',
+      id: 'prometheusMonitoringEnabled',
       label: 'Prometheus monitoring',
       render: (value) => castBoolToStr()(value),
       insertDivider: true,
@@ -254,17 +249,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
     gridGap: theme.spacing(2),
   },
   divider: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    margin: theme.spacing(3, 0),
   },
 }))
 
-const AdvancedAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
+interface Props {
+  wizardContext: any
+  setWizardContext: any
+  onNext: any
+}
+
+const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
-  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
-  const hasAzureProvider = !!cloudProviders.some(
-    (provider) => provider.type === CloudProviders.Azure,
-  )
 
   const [cloudProviderDetails] = useDataLoader(loadCloudProviderDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
@@ -286,7 +282,7 @@ const AdvancedAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
   const handleRegionChange = useCallback(
     (displayName) => {
       const regionName = mapRegionName(displayName)
-      setWizardContext({ cloudProviderRegionId: regionName })
+      setWizardContext({ location: regionName })
     },
     [cloudProviderDetails],
   )
@@ -295,143 +291,99 @@ const AdvancedAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
     <>
       {/* Step 1 - Cluster Configuration */}
       <WizardStep stepId="config" label="Cluster Configuration" onNext={configOnNext}>
-        {loading ? null : hasAzureProvider ? (
-          <ValidatedForm
-            classes={{ root: classes.validatedFormContainer }}
-            fullWidth
-            initialValues={wizardContext}
-            onSubmit={setWizardContext}
-            triggerSubmit={onNext}
-            elevated={false}
-          >
-            {({ setFieldValue, values }) => (
-              <>
-                <FormFieldCard
-                  title="Cluster Configuration"
-                  link={
-                    <ExternalLink textVariant="caption2" url={azurePrerequisitesLink}>
-                      Azure Cluster Help
-                    </ExternalLink>
-                  }
-                >
-                  {/* Cluster Name */}
-                  <ClusterNameField setWizardContext={setWizardContext} />
+        <ValidatedForm
+          fullWidth
+          classes={{ root: classes.validatedFormContainer }}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
+          triggerSubmit={onNext}
+          withAddonManager
+          elevated={false}
+        >
+          {({ setFieldValue, values }) => (
+            <>
+              <FormFieldCard
+                title="Cluster Configuration"
+                link={
+                  <ExternalLink textVariant="caption2" url={azurePrerequisitesLink}>
+                    Azure Cluster Help
+                  </ExternalLink>
+                }
+              >
+                {/* Cluster Name */}
+                <ClusterNameField />
 
-                  {/* Cloud Provider */}
-                  <CloudProviderField
-                    cloudProviderType={CloudProviders.Azure}
-                    setWizardContext={setWizardContext}
-                  />
+                {/* Cloud Provider */}
+                <CloudProviderField cloudProviderType={CloudProviders.Azure} />
 
-                  {/* Cloud Provider Region */}
-                  <CloudProviderRegionField
-                    id="location"
-                    cloudProviderType={CloudProviders.Azure}
-                    wizardContext={wizardContext}
-                    onChange={handleRegionChange}
-                  />
+                {/* Cloud Provider Region */}
+                <CloudProviderRegionField
+                  cloudProviderType={CloudProviders.Azure}
+                  values={values}
+                  onChange={handleRegionChange}
+                />
 
-                  {/* SSH Key */}
-                  <SshKeyTextField />
+                {/* SSH Key */}
+                <SshKeyTextField />
 
-                  {/* Template Chooser */}
-                  <ClusterTemplatesField
-                    options={templateOptions}
-                    onChange={handleTemplateChoice({
-                      setWizardContext,
-                      setFieldValue,
-                    })}
-                  />
+                {/* Template Chooser */}
+                <ClusterTemplatesField
+                  options={templateOptions}
+                  onChange={handleTemplateChoice({
+                    setWizardContext,
+                    setFieldValue,
+                  })}
+                />
 
-                  {wizardContext.template !== 'custom' && (
-                    <AllowWorkloadsOnMasterField
-                      wizardContext={wizardContext}
+                {wizardContext.template !== 'custom' && <AllowWorkloadsOnMasterField />}
+
+                {wizardContext.template === 'custom' && (
+                  <>
+                    {/* Use All Availability Zones Checkbox Field and Azure Availability Zone Chooser */}
+                    <AzureAvailabilityZoneFields
+                      values={values}
                       setWizardContext={setWizardContext}
                     />
-                  )}
 
-                  {wizardContext.template === 'custom' && (
-                    <>
-                      {/* Use All Availability Zones Checkbox Field and Azure Availability Zone Chooser */}
-                      <AzureAvailabilityZoneFields
-                        wizardContext={setWizardContext}
-                        setWizardContext={setWizardContext}
-                      />
+                    {/* Num master nodes */}
+                    <NumMasterNodesField />
 
-                      {/* Num master nodes */}
-                      <NumMasterNodesField />
+                    {/* Master node SKU */}
+                    <MasterNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
 
-                      {/* Master node SKU */}
-                      <MasterNodeSkuField
-                        dropdownComponent={AzureSkuPicklist}
-                        wizardContext={wizardContext}
-                      />
+                    {/* Num worker nodes */}
+                    <NumWorkerNodesField />
 
-                      {/* Num worker nodes */}
-                      <NumWorkerNodesField />
+                    {/* Worker node SKU */}
+                    <WorkerNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
 
-                      {/* Worker node SKU */}
-                      <WorkerNodeSkuField
-                        dropdownComponent={AzureSkuPicklist}
-                        wizardContext={wizardContext}
-                      />
+                    {/* Allow workloads on masters */}
+                    <AllowWorkloadsOnMasterField />
+                  </>
+                )}
+              </FormFieldCard>
+              <FormFieldCard title="Cluster Settings">
+                {/* Kubernetes Version */}
+                <KubernetesVersion />
 
-                      {/* Allow workloads on masters */}
-                      <AllowWorkloadsOnMasterField
-                        wizardContext={wizardContext}
-                        setWizardContext={setWizardContext}
-                      />
+                <Divider className={classes.divider} />
 
-                      {/* Enable Auto Scaling && Max Num Worker Nodes*/}
-                      <AutoScalingFields
-                        wizardContext={wizardContext}
-                        setWizardContext={setWizardContext}
-                      />
-                    </>
-                  )}
-                </FormFieldCard>
-                <FormFieldCard title="Cluster Settings">
-                  {/* Kubernetes Version */}
-                  <KubernetesVersion
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
+                {/* App & Container Settings */}
+                <Text variant="caption1">Application & Container Settings</Text>
+                <MakeMasterNodesMasterAndWorkerField />
+                <PrivilegedField wizardContext={wizardContext} />
 
-                  <Divider className={classes.divider} />
+                <Divider className={classes.divider} />
 
-                  {/* App & Container Settings */}
-                  <Text variant="subtitle2">Application & Container Settings</Text>
-                  <MakeMasterNodesMasterAndWorkerField />
-                  <PrivilegedField wizardContext={wizardContext} />
-
-                  <Divider className={classes.divider} />
-
-                  {/* Managed Add-Ons */}
-                  <Text variant="subtitle2">Managed Add-Ons</Text>
-                  <EtcdBackupFields
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                  <PrometheusMonitoringField
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                  <AutoScalingFields
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                </FormFieldCard>
-              </>
-            )}
-          </ValidatedForm>
-        ) : (
-          <FormFieldCard title="Create Azure Cloud Provider">
-            <PromptToAddProvider
-              type={CloudProviders.Azure}
-              src={routes.cloudProviders.add.path({ type: CloudProviders.Azure })}
-            />
-          </FormFieldCard>
-        )}
+                {/* Managed Add-Ons */}
+                <Text variant="caption1">Cluster Add-Ons</Text>
+                <AddonTogglers
+                  addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
+                />
+              </FormFieldCard>
+            </>
+          )}
+        </ValidatedForm>
       </WizardStep>
 
       {/* Step 2 - Network Info */}
@@ -451,7 +403,7 @@ const AdvancedAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 <AssignPublicIpsField />
 
                 {/* Network */}
-                <NetworksField options={networkOptions} setWizardContext={setWizardContext} />
+                <NetworksField options={networkOptions} />
 
                 {values.network === 'existing' && virtualNetworks.length > 0 && (
                   <>
@@ -459,12 +411,12 @@ const AdvancedAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
                     <ResourceGroupField
                       dropdownComponent={AzureResourceGroupPicklist}
                       wizardContext={wizardContext}
-                      setWizardContext={setWizardContext}
                     />
 
                     {/* Existing network.  I don't get the point of this field. */}
                     <ExistingNetworkField
                       dropdownComponent={AzureVnetPicklist}
+                      values={values}
                       wizardContext={setWizardContext}
                     />
 
@@ -472,12 +424,14 @@ const AdvancedAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
                     <MasterNodeSubnetField
                       dropdownComponent={AzureSubnetPicklist}
                       wizardContext={wizardContext}
+                      values={values}
                     />
 
                     {/* Worker node subnet */}
                     <WorkerNodeSubnetField
                       dropdownComponent={AzureSubnetPicklist}
                       wizardContext={wizardContext}
+                      values={values}
                     />
                   </>
                 )}
@@ -518,10 +472,7 @@ const AdvancedAzureCluster = ({ wizardContext, setWizardContext, onNext }) => {
             <>
               <FormFieldCard title="Advanced Configuration">
                 {/* Advanced API Configuration & Custom Runtime Config */}
-                <AdvancedApiConfigFields
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                />
+                <AdvancedApiConfigFields values={values} />
 
                 {/* Enable Application Catalog */}
                 {/* <CheckboxField

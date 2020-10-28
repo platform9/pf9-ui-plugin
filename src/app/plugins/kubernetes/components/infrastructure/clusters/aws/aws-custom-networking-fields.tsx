@@ -15,20 +15,18 @@ const networkOptions = [
 ]
 
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
-const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardContext }) => {
+const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => {
   const updateFqdns = (value, label) => {
     const name = wizardContext.name
 
     const api = `${name}-api.${label}`
     setFieldValue('externalDnsName')(api)
-    setWizardContext({ externalDnsName: api })
 
     const service = `${name}-service.${label}`
     setFieldValue('serviceFqdn')(service)
-    setWizardContext({ serviceFdqn: service })
   }
 
-  const renderNetworkFields = (wizardContext) => {
+  const renderNetworkFields = (wizardContext, values) => {
     switch (wizardContext.network) {
       case 'newPublic':
       case 'newPublicPrivate':
@@ -41,9 +39,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
-              onChange={(value) => setWizardContext({ vpcId: value })}
               cloudProviderId={wizardContext.cloudProviderId}
-              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.region}
               info=""
               required
               disabled={wizardContext.usePf9Domain}
@@ -52,9 +49,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
             <AwsZoneVpcMappings
               type="public"
               cloudProviderId={wizardContext.cloudProviderId}
-              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-              onChange={(value) => setWizardContext({ subnets: value })}
-              vpcId={wizardContext.vpcId}
+              cloudProviderRegionId={wizardContext.region}
+              vpcId={values.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -68,9 +64,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
-              onChange={(value) => setWizardContext({ vpcId: value })}
               cloudProviderId={wizardContext.cloudProviderId}
-              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.region}
               info=""
               required
               disabled={wizardContext.usePf9Domain}
@@ -79,9 +74,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
             <AwsZoneVpcMappings
               type="public"
               cloudProviderId={wizardContext.cloudProviderId}
-              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-              onChange={(value) => setWizardContext({ subnets: value })}
-              vpcId={wizardContext.vpcId}
+              cloudProviderRegionId={wizardContext.region}
+              vpcId={values.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -89,9 +83,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
             <AwsZoneVpcMappings
               type="private"
               cloudProviderId={wizardContext.cloudProviderId}
-              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-              onChange={(value) => setWizardContext({ privateSubnets: value })}
-              vpcId={wizardContext.vpcId}
+              cloudProviderRegionId={wizardContext.region}
+              vpcId={values.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -105,9 +98,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
-              onChange={(value) => setWizardContext({ vpcId: value })}
               cloudProviderId={wizardContext.cloudProviderId}
-              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.region}
               info=""
               required
               disabled={wizardContext.usePf9Domain}
@@ -116,9 +108,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
             <AwsZoneVpcMappings
               type="private"
               cloudProviderId={wizardContext.cloudProviderId}
-              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-              onChange={(value) => setWizardContext({ privateSubnets: value })}
-              vpcId={wizardContext.vpcId}
+              cloudProviderRegionId={wizardContext.region}
+              vpcId={values.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -137,7 +128,7 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
         label="Domain"
         onChange={updateFqdns}
         cloudProviderId={wizardContext.cloudProviderId}
-        cloudProviderRegionId={wizardContext.cloudProviderRegionId}
+        cloudProviderRegionId={wizardContext.region}
         info="Select the base domain name to be used for the API and service FQDNs"
         required={!wizardContext.usePf9Domain}
         disabled={wizardContext.usePf9Domain}
@@ -156,7 +147,7 @@ const AwsCustomNetworkingFields = ({ setFieldValue, setWizardContext, wizardCont
           </div>
         }
       />
-      {renderNetworkFields(wizardContext)}
+      {renderNetworkFields(wizardContext, values)}
     </>
   )
 }

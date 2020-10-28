@@ -137,6 +137,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                   values={values}
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
+                  allowMultiSelect={false}
                 />
               )}
 

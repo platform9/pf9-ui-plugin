@@ -13,7 +13,7 @@ const AwsAvailabilityZoneChooser = forwardRef(
     {
       cloudProviderId,
       cloudProviderRegionId,
-      singleSelect,
+      allowMultiSelect,
       wizardContext,
       setWizardContext,
       ...rest
@@ -28,22 +28,22 @@ const AwsAvailabilityZoneChooser = forwardRef(
     const azs = pathStrOr([], '0.azs', details)
     const regions = projectAs({ label: 'ZoneName', value: 'ZoneName' }, azs)
 
-    if (singleSelect) {
+    if (allowMultiSelect) {
       return (
-        <SingleSelect
+        <MultiSelect
           className="validatedFormInput"
           label="Availability Zones"
-          wizardContext={wizardContext}
-          setWizardContext={setWizardContext}
           options={regions}
           {...rest}
         />
       )
     } else {
       return (
-        <MultiSelect
+        <SingleSelect
           className="validatedFormInput"
           label="Availability Zones"
+          wizardContext={wizardContext}
+          setWizardContext={setWizardContext}
           options={regions}
           {...rest}
         />
@@ -71,7 +71,7 @@ interface Props {
   type: string
   onChange: any
   required?: boolean
-  singleSelect: boolean
+  allowMultiSelect: boolean
   wizardContext: any
   setWizardContext: any
 }

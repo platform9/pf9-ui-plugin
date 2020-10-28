@@ -59,11 +59,8 @@ const AddAwsClusterPage = () => {
     clusterActions.create,
     onComplete,
   )
-  const handleSubmit = (data) => {
-    console.log(data)
-    // createAwsClusterAction({ ...data, clusterType: CloudProviders.Aws })
-    createAwsClusterAction({})
-  }
+  const handleSubmit = (data) =>
+    createAwsClusterAction({ ...data, clusterType: CloudProviders.Aws })
 
   const ViewComponent = activeView?.ViewComponent
   return (

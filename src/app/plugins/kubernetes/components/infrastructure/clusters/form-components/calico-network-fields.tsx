@@ -26,17 +26,13 @@ const CalicoNetworkFields = ({ wizardContext, setWizardContext }) => (
   <>
     <PicklistField
       id="calicoIpIpMode"
-      value={wizardContext.calicoIpIpMode}
       label="IP in IP Encapsulation Mode"
-      onChange={(value) => setWizardContext({ calicoIpIpMode: value })}
       options={calicoIpIpOptions}
       info={calicoIpIPHelpText[wizardContext.calicoIpIpMode] || ''}
       required
     />
     <CheckboxField
       id="calicoNatOutgoing"
-      value={wizardContext.calicoNatOutgoing}
-      onChange={(value) => setWizardContext({ calicoNatOutgoing: value })}
       label="NAT Outgoing"
       info="Packets destined outside the POD network will be SNAT'd using the node's IP."
     />
