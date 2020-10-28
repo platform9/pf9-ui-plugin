@@ -12,6 +12,12 @@ import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
 import { prop } from 'ramda'
 import SubmitButton from 'core/components/buttons/SubmitButton'
+import { capitalizeString } from 'utils/misc'
+
+const downloadCliCommand =
+  'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
+const installCliCommand = 'bash ./cli-setup.sh'
+const runCliCommand = 'pf9ctl cluster prep-node'
 
 const useStyles = makeStyles((theme: Theme) => ({
   formCard: {
@@ -23,7 +29,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   nodesInfo: {
     display: 'grid',
-    // gridTemplateColumns: 'minmax(min-content, 20px) 1fr',
     gridTemplateColumns: 'minmax(min-content, 300px) 1fr',
     gridGap: theme.spacing(),
     margin: theme.spacing(2.5, 0, 0, 2),
@@ -54,15 +59,19 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const downloadCliCommand =
-  'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
-const installCliCommand = 'bash ./cli-setup.sh'
-const runCliCommand = 'pf9ctl cluster prep-node'
+const capitalizeHyphenatedWord = (word) => word.replace(/[a-z]+/g, (s) => capitalizeString(s))
 
-const InsufficientNodesNodesDialog = ({ availableNodes, showDialog, setShowDialog }) => {
+const InsufficientNodesNodesDialog = ({
+  clusterCreateType,
+  availableNodes,
+  requiredNodes,
+  showDialog,
+  setShowDialog,
+}) => {
   const classes = useStyles()
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
+  const createType = capitalizeHyphenatedWord(clusterCreateType)
 
   return (
     <Dialog fullWidth maxWidth="md" open={showDialog}>
@@ -71,7 +80,7 @@ const InsufficientNodesNodesDialog = ({ availableNodes, showDialog, setShowDialo
         title={
           <Text variant="body1" component="div">
             <FontAwesomeIcon className={classes.icon}>exclamation-circle</FontAwesomeIcon>
-            Insufficient Nodes for Multi-Master Cluster Configuration
+            {`Insufficient Nodes for ${createType} Cluster Configuration`}
           </Text>
         }
         link={
@@ -81,14 +90,14 @@ const InsufficientNodesNodesDialog = ({ availableNodes, showDialog, setShowDialo
         }
       >
         <Text variant="subtitle2" className={classes.text}>
-          The available number of connected nodes is insufficient for a Multi-Master Cluster. You
-          will need to connect additional BareOS Nodes prior to creating a Multi-Master Cluster.
+          {`The available number of connected nodes is insufficient for a ${createType} Cluster. You
+          will need to connect additional BareOS Nodes prior to creating a ${createType} Cluster.`}
         </Text>
         <div className={classes.nodesInfo}>
           <Text variant="body1">Number of available nodes:</Text>
           <Text variant="caption1">{availableNodes}</Text>
           <Text variant="body1">Number of required nodes:</Text>
-          <Text variant="caption1">3</Text>
+          <Text variant="caption1">{requiredNodes}</Text>
         </div>
       </FormFieldCard>
       <FormFieldCard

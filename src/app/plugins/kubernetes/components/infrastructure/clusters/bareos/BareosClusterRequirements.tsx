@@ -19,6 +19,8 @@ import { allPass } from 'ramda'
 import { isConnected, isUnassignedNode } from './ClusterHostChooser'
 import InsufficientNodesNodesDialog from './InsufficientNodesDialog'
 
+const requiredNodes = 2
+
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     borderRadius: 4,
@@ -101,6 +103,7 @@ interface Props {
 const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
   const classes = useStyles({})
   const [showDialog, setShowDialog] = useState(false)
+  const [clusterCreateType, setClusterCreateType] = useState('')
   const [availableNodes, setAvailableNodes] = useState(0)
   const [nodes, loading] = useDataLoader(loadNodes)
 
@@ -113,8 +116,9 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
 
   const handleClick = useCallback(
     (type: ClusterCreateTypes) => () => {
-      const hasAvailableNodes = availableNodes >= 1
-      if (type === ClusterCreateTypes.MultiMaster && !hasAvailableNodes) {
+      const hasAvailableNodes = availableNodes >= requiredNodes
+      if (!hasAvailableNodes) {
+        setClusterCreateType(type)
         setShowDialog(true)
       } else {
         onComplete(routes.cluster.addBareOs[provider][type].path())
@@ -127,7 +131,9 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
     <>
       {showDialog && (
         <InsufficientNodesNodesDialog
+          clusterCreateType={clusterCreateType}
           availableNodes={availableNodes}
+          requiredNodes={requiredNodes}
           showDialog={showDialog}
           setShowDialog={setShowDialog}
         />
