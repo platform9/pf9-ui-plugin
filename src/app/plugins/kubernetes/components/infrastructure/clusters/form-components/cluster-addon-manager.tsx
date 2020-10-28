@@ -14,6 +14,16 @@ const MetalLbAddonField = React.lazy(async () =>
     default: module.MetalLbAddonField,
   })),
 )
+const MetalLbLayer2Field = React.lazy(async () =>
+  import('./metal-lb').then((module) => ({
+    default: module.MetalLbLayer2Field,
+  })),
+)
+const MetalLbAddonLayer2Field = React.lazy(async () =>
+  import('./metal-lb').then((module) => ({
+    default: module.MetalLbAddonLayer2Field,
+  })),
+)
 
 const EtcdBackupFields = React.lazy(async () => import('./etcd-backup'))
 const EdcdBackupAddonFields = React.lazy(async () =>
@@ -32,6 +42,10 @@ const addonMap = {
   enableMetallb: {
     toggler: MetalLbField,
     details: { component: MetalLbAddonField },
+  },
+  enableMetallbLayer2: {
+    toggler: MetalLbLayer2Field,
+    details: { component: MetalLbAddonLayer2Field },
   },
 }
 

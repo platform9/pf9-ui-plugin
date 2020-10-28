@@ -1,9 +1,14 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 
+export enum NetworkBackendTypes {
+  Flannel = 'flannel',
+  Calico = 'calico',
+}
+
 const networkBackendOptions = [
-  { label: 'Flannel', value: 'flannel' },
-  { label: 'Calico', value: 'calico' },
+  { label: 'Flannel', value: NetworkBackendTypes.Flannel },
+  { label: 'Calico', value: NetworkBackendTypes.Calico },
   // { label: 'Canal (experimental)', value: 'canal' },
 ]
 

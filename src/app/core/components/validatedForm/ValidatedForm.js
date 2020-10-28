@@ -305,7 +305,7 @@ ValidatedForm.propTypes = {
 ValidatedForm.defaultProps = {
   clearOnSubmit: false,
   debug: false,
-  maxWidth: 715,
+  maxWidth: 800,
   elevated: true,
 }
 

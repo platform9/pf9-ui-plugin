@@ -24,7 +24,7 @@ const cidrBlockSizeValidator = customValidator((value) => {
   return blockSize > 0 && blockSize < 32
 }, 'Block Size must be greater than 0 and less than 32')
 
-export default () => (
+const ContainerAndServicesCIDRField = () => (
   <>
     {/* Containers CIDR */}
     <TextField
@@ -45,3 +45,5 @@ export default () => (
     />
   </>
 )
+
+export default ContainerAndServicesCIDRField

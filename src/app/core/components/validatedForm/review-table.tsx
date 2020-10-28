@@ -9,6 +9,7 @@ import clsx from 'clsx'
 const useStyles = makeStyles<Theme>((theme) => ({
   reviewTable: {
     borderSpacing: '8px',
+    tableLayout: 'fixed',
   },
   divider: {
     margin: theme.spacing(1, 0, 1, 0),
@@ -18,6 +19,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   rowValue: {
     color: theme.palette.grey[700],
+  },
+  rowLabel: {
+    width: 360,
   },
 }))
 
@@ -36,7 +40,13 @@ const DataRow = ({ label, value, render = identity }) => {
           className={clsx(classes.rowValue, value === 'Not Enabled' && classes.disabledText)}
           component="span"
         >
-          {render(value)}
+          {Array.isArray(value)
+            ? value.map((val, idx) => (
+                <Text key={idx} variant="caption1">
+                  {render(val || '-')}
+                </Text>
+              ))
+            : render(value || '-')}
         </Text>
       </td>
     </tr>

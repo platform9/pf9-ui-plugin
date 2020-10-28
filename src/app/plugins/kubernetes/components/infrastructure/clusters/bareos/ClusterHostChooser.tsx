@@ -183,7 +183,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
               <TableRow>
                 <TableCell>
                   {selection === 'multiple' && (
-                    <Checkbox checked={allSelected()} onChange={toggleAll} />
+                    <Checkbox color="primary" checked={allSelected()} onChange={toggleAll} />
                   )}
                 </TableCell>
                 <TableCell>
@@ -213,9 +213,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
                 <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
                   <TableCell>
                     {selection === 'multiple' ? (
-                      <Checkbox checked={isSelected(node.uuid)} />
+                      <Checkbox color="primary" checked={isSelected(node.uuid)} />
                     ) : selection === 'single' ? (
-                      <Radio checked={isSelected(node.uuid)} />
+                      <Radio color="primary" checked={isSelected(node.uuid)} />
                     ) : null}
                   </TableCell>
                   <TableCell className={bodyCell}>

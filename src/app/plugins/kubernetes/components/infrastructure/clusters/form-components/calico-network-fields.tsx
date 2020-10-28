@@ -22,29 +22,23 @@ const calicoIpIpOptions = [
   { label: 'Never', value: 'Never' },
 ]
 
-const CalicoNetworkFields = ({ wizardContext, setWizardContext }) => (
+const CalicoNetworkFields = ({ wizardContext }) => (
   <>
     <PicklistField
       id="calicoIpIpMode"
-      value={wizardContext.calicoIpIpMode}
       label="IP in IP Encapsulation Mode"
-      onChange={(value) => setWizardContext({ calicoIpIpMode: value })}
       options={calicoIpIpOptions}
       info={calicoIpIPHelpText[wizardContext.calicoIpIpMode] || ''}
       required
     />
     <CheckboxField
       id="calicoNatOutgoing"
-      value={wizardContext.calicoNatOutgoing}
-      onChange={(value) => setWizardContext({ calicoNatOutgoing: value })}
       label="NAT Outgoing"
       info="Packets destined outside the POD network will be SNAT'd using the node's IP."
     />
     <TextField
       id="calicoV4BlockSize"
-      value={wizardContext.calicoV4BlockSize}
       label="Block Size"
-      onChange={(value) => setWizardContext({ calicoV4BlockSize: value })}
       info="Block size determines how many Pod's can run per node vs total number of nodes per cluster. Example /22 enables 1024 IPs per node, and a maximum of 64 nodes. Block size must be greater than 20 and less than 32 and not conflict with the Contain CIDR"
       required
       validations={[calicoBlockSizeValidator]}

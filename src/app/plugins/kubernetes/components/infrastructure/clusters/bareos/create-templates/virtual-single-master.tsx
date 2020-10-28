@@ -26,7 +26,22 @@ import NetworkStack from '../../form-components/network-stack'
 import PrivilegedContainers from '../../form-components/privileged'
 import AllowWorkloadsOnMaster from '../../form-components/allow-workloads-on-master'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
-import EtcdBackupFields from '../../form-components/etcd-backup'
+import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
+import ClusterHostChooser, {
+  isConnected,
+  isUnassignedNode,
+  excludeNodes,
+} from '../ClusterHostChooser'
+import { allPass } from 'ramda'
+import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
+import ApiFQDNField from '../../form-components/external-dns-name'
+import ContainerAndServicesCIDRField from '../../form-components/container-and-services-cidr'
+import HttpProxyField from '../../form-components/http-proxy'
+import NetworkBackendField, { NetworkBackendTypes } from '../../form-components/network-backend'
+import CalicoNetworkFields from '../../form-components/calico-network-fields'
+import TagsField, { FormattedTags } from '../../form-components/tags'
+import { capitalizeString, castBoolToStr } from 'utils/misc'
+import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 
 export const templateTitle = 'Single Master'
 
@@ -57,12 +72,8 @@ interface Props {
   onNext: any
 }
 
-const fields = {
-  backup: EtcdBackupFields,
-}
-console.log(fields)
-
 const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
+  const { wizardContext, setWizardContext } = props
   const classes = useStyles({})
   return (
     <>
@@ -70,8 +81,8 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         <ValidatedForm
           fullWidth
           classes={{ root: classes.validatedFormContainer }}
-          initialValues={props.wizardContext}
-          onSubmit={props.setWizardContext}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
           triggerSubmit={onNext}
           withAddonManager
           elevated={false}
@@ -79,19 +90,19 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           {/* <PollingData loading={loading} onReload={reload} hidden /> */}
           {/* Cluster Name */}
           <FormFieldCard
-            title={`Name your${templateTitle} Cluster`}
+            title={`Name your ${templateTitle} Cluster`}
             link={
               <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
                 BareOS Cluster Help
               </ExternalLink>
             }
           >
-            <ClusterNameField {...props} />
+            <ClusterNameField />
           </FormFieldCard>
 
           {/* Cluster Settings */}
           <FormFieldCard title="Cluster Settings">
-            <KubernetesVersion {...props} />
+            <KubernetesVersion />
 
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Network Stack</Text>
@@ -110,318 +121,97 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           </FormFieldCard>
         </ValidatedForm>
       </WizardStep>
-      <WizardStep stepId="masters" label="Master Nodes" onNext={mastersOnNext}>
+      <WizardStep stepId="masters" label="Master Node" onNext={mastersOnNext}>
         <ValidatedForm
           fullWidth
-          initialValues={props.wizardContext}
-          onSubmit={props.setWizardContext}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
           triggerSubmit={onNext}
-          elevated={false}
+          title="Select a node to add as a Master Node"
+          link={
+            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
+              Not Seeing Any Nodes?
+            </ExternalLink>
+          }
         >
-          {({ values }) => (
-            <>
-              {/* <FormFieldCard
-                title={
-                  <span>
-                    Select nodes to add as <u>Master</u> nodes
-                  </span>
-                }
-                link={
-                  <div>
-                    <FontAwesomeIcon className={classes.blueIcon} size="md">
-                      file-alt
-                    </FontAwesomeIcon>{' '}
-                    <ExternalLink url={pmkCliOverviewLink}>Not Seeing Any Nodes?</ExternalLink>
-                  </div>
-                }
-              >
-                <div className={classes.innerWrapper}>
-                  <ClusterHostChooser
-                    selection="multiple"
-                    id="masterNodes"
-                    filterFn={allPass([isConnected, isUnassignedNode])}
-                    onChange={(value) => setWizardContext({ masterNodes: value })}
-                    validations={[masterNodeLengthValidator]}
-                    pollForNodes
-                    required
-                  />
-                </div>
-              </FormFieldCard>
-              <FormFieldCard title="Cluster Settings">
-                <CheckboxField
-                  id="allowWorkloadsOnMaster"
-                  onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
-                  label="Enable workloads on all master nodes"
-                  info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
-                />
-
-                <CheckboxField
-                  id="privileged"
-                  label="Privileged"
-                  onChange={(value) => setWizardContext({ privileged: value })}
-                  value={
-                    wizardContext.privileged ||
-                    ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)
-                  }
-                  disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
-                  infoPlacement="right-end"
-                  info={
-                    <div>
-                      Allows this cluster to run privileged containers. Read{' '}
-                      <ExternalLink url={runtimePrivilegedLink}>this article</ExternalLink> for more
-                      information. This is required for Calico CNI and CSI.
-                    </div>
-                  }
-                />
-              </FormFieldCard> */}
-            </>
-          )}
+          <ClusterHostChooser
+            selection="single"
+            id="masterNodes"
+            filterFn={allPass([isConnected, isUnassignedNode])}
+            validations={[masterNodeLengthValidator]}
+            pollForNodes
+            required
+          />
         </ValidatedForm>
       </WizardStep>
       <WizardStep stepId="workers" label="Worker Nodes" onNext={workersOnNext}>
         <ValidatedForm
           fullWidth
-          initialValues={props.wizardContext}
-          onSubmit={props.setWizardContext}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
           triggerSubmit={onNext}
-          elevated={false}
+          title="Select nodes to add as Worker Nodes"
+          link={
+            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
+              Not Seeing Any Nodes?
+            </ExternalLink>
+          }
         >
-          {/* <FormFieldCard
-            title={
-              <span>
-                Select nodes to add as <u>Worker</u> nodes
-              </span>
-            }
-            link={
-              <div>
-                <FontAwesomeIcon className={classes.blueIcon} size="md">
-                  file-alt
-                </FontAwesomeIcon>{' '}
-                <ExternalLink url={pmkCliOverviewLink}>Not Seeing Any Nodes?</ExternalLink>
-              </div>
-            }
-          >
-            <div className={classes.innerWrapper}>
-              <ClusterHostChooser
-                selection="multiple"
-                id="workerNodes"
-                filterFn={allPass([
-                  isUnassignedNode,
-                  isConnected,
-                  excludeNodes(wizardContext.masterNodes),
-                ])}
-                pollForNodes
-                onChange={(value) => setWizardContext({ workerNodes: value })}
-                validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
-              />
-            </div>
-          </FormFieldCard> */}
+          <ClusterHostChooser
+            selection="multiple"
+            id="workerNodes"
+            filterFn={allPass([
+              isUnassignedNode,
+              isConnected,
+              excludeNodes(wizardContext.masterNodes),
+            ])}
+            pollForNodes
+            validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
+          />
         </ValidatedForm>
       </WizardStep>
       <WizardStep stepId="network" label="Network" onNext={networkOnNext}>
         <ValidatedForm
-          initialValues={props.wizardContext}
-          onSubmit={props.setWizardContext}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
           triggerSubmit={onNext}
+          classes={{ root: classes.validatedFormContainer }}
           elevated={false}
         >
           {({ values }) => (
             <>
-              {/* <FormFieldCard title="Cluster Virtual IP Setup">
-                <TextField
-                  id="masterVipIpv4"
-                  label="Virtual IP address for cluster"
-                  info={
-                    <div>
-                      The virtual IP address to provide access to the API server endpoint for this
-                      cluster. A virtual IP must be specified to grow the number of masters in the
-                      future. Refer to{' '}
-                      <a href={pf9PmkArchitectureDigLink} target="_blank">
-                        this article
-                      </a>{' '}
-                      for help on VIP operations and configuration
-                    </div>
-                  }
-                  onChange={(value) => setWizardContext({ masterVipIpv4: value })}
-                  required={(wizardContext.masterNodes || []).length > 1}
-                />
-
-                <PicklistField
-                  DropdownComponent={VipInterfaceChooser}
-                  id="masterVipIface"
-                  label="Physical interface for virtual IP association"
-                  infoPlacement="right-end"
-                  info="The name of the network interface that the virtual IP will be bound. The virtual IP must be reachable from the network the interface connects to. All master nodes must use the same interface (eg: ens3)."
-                  masterNodes={wizardContext.masterNodes}
-                  onChange={(value) => setWizardContext({ masterVipIface: value })}
-                  required={(wizardContext.masterNodes || []).length > 1}
-                />
-
-
-                <TextField
-                  id="externalDnsName"
-                  label="API FQDN"
-                  infoPlacement="right-end"
-                  info="Fully Qualified Domain Name used to reference the cluster API. The API will be secured by including the FQDN in the API server certificate’s Subject Alt Names. Clusters in Public Cloud will automatically have the DNS records created and registered for the FQDN."
-                />
+              <FormFieldCard title="Cluster API FQDN">
+                <ApiFQDNField />
               </FormFieldCard>
 
               <FormFieldCard title="Cluster Networking Range & HTTP Proxy">
-
-                <TextField
-                  id="containersCidr"
-                  label="Containers CIDR"
-                  info="Network CIDR from which Kubernetes allocates IP addresses to containers. This CIDR shouldn't overlap with the VPC CIDR. A /16 CIDR enables 256 nodes."
-                  required
-                  validations={[IPValidator, cidrBlockSizeValidator]}
-                />
-
-
-                <TextField
-                  id="servicesCidr"
-                  label="Services CIDR"
-                  info="The network CIDR for Kubernetes virtual IP addresses for Services. This CIDR shouldn't overlap with the VPC CIDR."
-                  required
-                  validations={[
-                    IPValidator,
-                    containerAndServicesIPEqualsValidator,
-                    cidrBlockSizeValidator,
-                  ]}
-                />
-
-
-                <TextField
-                  id="httpProxy"
-                  label="HTTP Proxy"
-                  infoPlacement="right-end"
-                  info={
-                    <div className={classes.inline}>
-                      Specify the HTTP proxy for this cluster. Format{' '}
-                      <CodeBlock>
-                        <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
-                      </CodeBlock>{' '}
-                      username and password are optional.
-                    </div>
-                  }
-                />
+                <ContainerAndServicesCIDRField />
+                <HttpProxyField />
               </FormFieldCard>
 
               <FormFieldCard title="Cluster CNI">
-                <PicklistField
-                  id="networkPlugin"
-                  label="Network backend"
-                  onChange={(value) =>
-                    setWizardContext(handleNetworkPluginChange(value, wizardContext))
-                  }
-                  options={networkPluginOptions}
-                  info=""
-                  required
+                <NetworkBackendField
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
                 />
-                {values.networkPlugin === 'calico' && (
-                  <>
-                    <PicklistField
-                      id="calicoIpIpMode"
-                      value={wizardContext.calicoIpIpMode}
-                      label="IP in IP Encapsulation Mode"
-                      onChange={(value) => setWizardContext({ calicoIpIpMode: value })}
-                      options={calicoIpIpOptions}
-                      info={calicoIpIPHelpText[wizardContext.calicoIpIpMode] || ''}
-                      required
-                    />
-                    <CheckboxField
-                      id="calicoNatOutgoing"
-                      value={wizardContext.calicoNatOutgoing}
-                      onChange={(value) => setWizardContext({ calicoNatOutgoing: value })}
-                      label="NAT Outgoing"
-                      info="Packets destined outside the POD network will be SNAT'd using the node's IP."
-                    />
-                    <TextField
-                      id="calicoV4BlockSize"
-                      value={wizardContext.calicoV4BlockSize}
-                      label="Block Size"
-                      onChange={(value) => setWizardContext({ calicoV4BlockSize: value })}
-                      info="Block size determines how many Pod's can run per node vs total number of nodes per cluster. Example /22 enables 1024 IPs per node, and a maximum of 64 nodes. Block size must be greater than 20 and less than 32 and not conflict with the Contain CIDR"
-                      required
-                      validations={[calicoBlockSizeValidator]}
-                    />
-                    <TextField
-                      id="mtuSize"
-                      label="MTU Size"
-                      info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
-                      required
-                    />
-                  </>
+                {values.networkPlugin === NetworkBackendTypes.Calico && (
+                  <CalicoNetworkFields wizardContext={wizardContext} />
                 )}
               </FormFieldCard>
-
-              <FormFieldCard title="Cluster Load Balancer">
-
-                <CheckboxField
-                  id="enableMetallb"
-                  label="Enable MetalLB"
-                  infoPlacement="right-end"
-                  info="Platform9 uses MetalLB for bare metal service level load balancing. Enabling MetalLB will provide the ability to create services of type load-balancer."
-                />
-
-                {values.enableMetallb && (
-                  <TextField
-                    id="metallbCidr"
-                    label="Address pool range(s) for Metal LB"
-                    info="Specify the MetalLB start-end IP pool. Format: startIP1-endIP1,startIP2-endIP2"
-                    validations={[IPValidatorRange]}
-                    required
-                  />
-                )}
-              </FormFieldCard> */}
             </>
           )}
         </ValidatedForm>
       </WizardStep>
       <WizardStep stepId="advanced" label="Advanced" onNext={advancedOnNext}>
         <ValidatedForm
-          initialValues={props.wizardContext}
-          onSubmit={props.setWizardContext}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
           triggerSubmit={onNext}
-          title="Final Tweaks"
+          title="Advanced Configuration"
         >
           {({ values }) => (
             <>
-              {/* <CheckboxField
-                id="etcdBackup"
-                label="Enable etcd Backup"
-                info="Enable automated etcd backups on this cluster"
-              />
-
-              {values.etcdBackup && <EtcdBackupFields />}
-
-
-              <CheckboxField
-                id="prometheusMonitoringEnabled"
-                label="Enable monitoring with prometheus"
-                info="This deploys an instance of prometheus on the cluster."
-              />
-
-              {!values.prometheusMonitoringEnabled && (
-                <Alert
-                  small
-                  variant="error"
-                  message="The PMK management plane will not be able to monitor the cluster health."
-                />
-              )}
-
-
-              <PicklistField
-                id="runtimeConfigOption"
-                label="Advanced API Configuration"
-                options={runtimeConfigOptions}
-                info="Make sure you are familiar with the Kubernetes API configuration documentation before enabling this option."
-                required
-              />
-
-              {values.runtimeConfigOption === 'custom' && (
-                <TextField id="customRuntimeConfig" label="Custom API Configuration" info="" />
-              )} */}
-
+              <AdvancedApiConfigFields wizardContext={values} />
               {/* Enable Application Catalog */}
               {/* <CheckboxField
               id="appCatalogEnabled"
@@ -429,26 +219,68 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               info="Enable the Helm Application Catalog on this cluster"
             /> */}
 
-              {/* <KeyValuesField id="tags" label="Tags" info="Add tag metadata to this cluster" /> */}
+              <TagsField />
             </>
           )}
         </ValidatedForm>
       </WizardStep>
-      <WizardStep stepId="review" label="Review" onNext={reviewOnNext}>
+      <WizardStep stepId="review" label="Finalize & Review" onNext={reviewOnNext}>
         <ValidatedForm
-          initialValues={props.wizardContext}
-          onSubmit={props.setWizardContext}
+          initialValues={wizardContext}
+          onSubmit={setWizardContext}
           triggerSubmit={onNext}
           title="Finish and Review"
         >
-          {/* <BareOsClusterReviewTable data={wizardContext} /> */}
+          <BareOsClusterReviewTable wizardContext={wizardContext} columns={reviewTableColumns} />
         </ValidatedForm>
-      </WizardStep>{' '}
+      </WizardStep>
     </>
   )
 }
 
 export default VirtualSingleMasterCluster
+
+const reviewTableColumns = [
+  { id: 'name', label: 'Cluster Name' },
+  { id: 'kubernetesVersion', label: 'Kubernetes Version', insertDivider: true },
+  { id: 'masterNodes', label: 'Master Nodes' },
+  { id: 'workerNodes', label: 'Worker Nodes' },
+  { id: 'externalDnsName', label: 'API FQDN', insertDivider: true },
+  { id: 'containersCidr', label: 'Containers CIDR' },
+  { id: 'servicesCidr', label: 'Services CIDR' },
+  {
+    id: 'networkPlugin',
+    label: 'CNI',
+    render: (value) => capitalizeString(value),
+    insertDivider: true,
+  },
+  { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
+  { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
+  { id: 'calicoV4BlockSize', label: 'Block Size' },
+  { id: 'mtuSize', label: 'MTU Size' },
+  {
+    id: 'privileged',
+    label: 'Privileged',
+    render: (value) => castBoolToStr()(value),
+    insertDivider: true,
+  },
+  {
+    id: 'allowWorkloadsOnMaster',
+    label: 'Enable workloads on master node',
+    render: (value) => castBoolToStr()(value),
+  },
+  {
+    id: 'prometheusMonitoringEnabled',
+    label: 'Prometheus Monitoring',
+    render: (value) => castBoolToStr()(value),
+  },
+  {
+    id: 'runtimeConfigOption',
+    label: 'Advanced API Configuration',
+    render: (value) => capitalizeString(value),
+  },
+  { id: 'tags', label: 'Tags', render: (value) => <FormattedTags tags={value} /> },
+]
 
 const basicOnNext = (context) => {
   trackEvent('WZ New BareOS Cluster 1 Nodes Connected', {

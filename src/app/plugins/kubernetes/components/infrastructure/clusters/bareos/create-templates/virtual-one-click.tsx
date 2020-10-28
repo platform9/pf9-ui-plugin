@@ -97,8 +97,8 @@ const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext
             </ExternalLink>
           }
         >
-          <ClusterNameField setWizardContext={setWizardContext} />
-          <KubernetesVersion wizardContext={wizardContext} setWizardContext={setWizardContext} />
+          <ClusterNameField />
+          <KubernetesVersion />
         </FormFieldCard>
 
         <FormFieldCard

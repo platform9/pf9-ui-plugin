@@ -10,13 +10,20 @@ import ExternalLink from 'core/components/ExternalLink'
 import { gettingStartedHelpLink } from 'k8s/links'
 import BulletList from 'core/components/BulletList'
 
-const MetalLbField = () => (
+const MetalLbField = ({ label = 'Enable MetalLB' }) => (
   <CheckboxField
     id="enableMetallb"
-    label="Enable MetalLB"
+    label={label}
     infoPlacement="right-end"
     info="Platform9 uses MetalLB for bare metal service level load balancing. Enabling MetalLB will provide the ability to create services of type load-balancer."
   />
+)
+
+export const MetalLbLayer2Field = () => <MetalLbField label="Deploy MetalLB - Layer 2 Mode " />
+export const MetalLbAddonLayer2Field = () => (
+  <MetalLbAddonCard>
+    <MetalLbCidrField />
+  </MetalLbAddonCard>
 )
 
 const MetalLbCidrField = () => (
@@ -28,8 +35,26 @@ const MetalLbCidrField = () => (
     valueLabel="End Address"
   />
 )
-
-export const MetalLbAddonField = ({ values }) => {
+export const MetalLbAddonField = ({ values }) => (
+  <MetalLbAddonCard>
+    <PicklistField
+      required
+      DropdownComponent={MetalLbModePicklist}
+      id="metallbMode"
+      label="Metal Lb Mode"
+    />
+    {values.metallbMode === MetalLbModes.Layer2Mode && <MetalLbCidrField />}
+    {values.metallbMode === MetalLbModes.BGPMode && (
+      <>
+        <TextField id="metallbRouterIp" label="Router IP Address" required />
+        <TextField id="metallbRouterAS" label="Router's AS Number" required />
+        <TextField id="metallbAS" label="AS Number For MetalLb" required />
+        <MetalLbCidrField />
+      </>
+    )}
+  </MetalLbAddonCard>
+)
+export const MetalLbAddonCard = ({ children }) => {
   return (
     <FormFieldCard
       title="Metal Lb Configuration"
@@ -47,21 +72,7 @@ export const MetalLbAddonField = ({ values }) => {
           ]}
         />
       </IconInfo>
-      <PicklistField
-        required
-        DropdownComponent={MetalLbModePicklist}
-        id="metallbMode"
-        label="Metal Lb Mode"
-      />
-      {values.metallbMode === MetalLbModes.Layer2Mode && <MetalLbCidrField />}
-      {values.metallbMode === MetalLbModes.BGPMode && (
-        <>
-          <TextField id="metallbRouterIp" label="Router IP Address" required />
-          <TextField id="metallbRouterAS" label="Router's AS Number" required />
-          <TextField id="metallbAS" label="AS Number For MetalLb" required />
-          <MetalLbCidrField />
-        </>
-      )}
+      {children}
     </FormFieldCard>
   )
 }

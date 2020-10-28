@@ -122,7 +122,7 @@ const OneClickAwsCluster = ({ wizardContext, setWizardContext, onNext }) => {
                 }
               >
                 {/* Cluster Name */}
-                <ClusterNameField setWizardContext={setWizardContext} />
+                <ClusterNameField />
 
                 {/* Cloud Provider */}
                 <CloudProviderField
