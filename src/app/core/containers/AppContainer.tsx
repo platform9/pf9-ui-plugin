@@ -131,7 +131,7 @@ const AppContainer = () => {
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const { isSsoToken } = session
-  const [, updatePrefs, getUserPrefs] = useScopedPreferences()
+  const [, , getUserPrefs] = useScopedPreferences()
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -191,7 +191,6 @@ const AppContainer = () => {
       const activeTenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
       if (!currentTenant && activeTenant) {
         updateClarityStore('tenantObj', activeTenant)
-        updatePrefs({ currentTenant: activeTenant.id })
       }
       if (currentRegion) {
         setActiveRegion(currentRegion)

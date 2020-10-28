@@ -40,6 +40,13 @@ const TenantChooser = (props) => {
     }
   }, [currentRegion, tenants])
 
+  useEffect(() => {
+    if (curTenantName && tenants.length && !currentTenant) {
+      // Set currentTenant in prefs on first-ever load
+      updatePrefs({ currentTenant: curTenantName })
+    }
+  }, [curTenantName, tenants])
+
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
     setSelectedTenantName(tenantName)
