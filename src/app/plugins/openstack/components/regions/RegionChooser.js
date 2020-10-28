@@ -86,6 +86,7 @@ const RegionChooser = (props) => {
     if (!currentRegion) {
       // Set currentRegion in prefs on first-ever load
       updatePrefs({ currentRegion: curRegionId })
+      setActiveRegion(curRegionId)
     }
   }, [curRegionId, regions])
 

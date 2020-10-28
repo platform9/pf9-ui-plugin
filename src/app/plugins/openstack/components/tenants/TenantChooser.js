@@ -30,7 +30,9 @@ const TenantChooser = (props) => {
     if (currentTenant) {
       return pipe(find(propEq('id', currentTenant)), prop('name'))(tenants)
     }
-    return pipe(head, prop('name'))(tenants)
+    // match setupSession from AppContainer, set to service tenant if it exists
+    const tenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
+    return tenant.name
   }, [tenants, currentTenant, selectedTenantName])
 
   useEffect(() => {
@@ -43,7 +45,8 @@ const TenantChooser = (props) => {
   useEffect(() => {
     if (curTenantName && tenants.length && !currentTenant) {
       // Set currentTenant in prefs on first-ever load
-      updatePrefs({ currentTenant: curTenantName })
+      const tenant = tenants.find((t) => curTenantName === t.name)
+      updatePrefs({ currentTenant: tenant.id })
     }
   }, [curTenantName, tenants])
 
