@@ -9,6 +9,12 @@ export enum ClusterCreateTypes {
   MultiMaster = 'multi-master',
 }
 
+export enum BareOsRequiredNodes {
+  'one-click' = 1,
+  'single-master' = 1,
+  'multi-master' = 2,
+}
+
 export type HealthStatus =
   | 'healthy'
   | 'partially_healthy'

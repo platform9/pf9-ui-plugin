@@ -11,15 +11,13 @@ import Text from 'core/elements/text'
 import { IconInfo } from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
 import { capitalizeString } from 'utils/misc'
-import { ClusterCreateTypes } from '../model'
+import { BareOsRequiredNodes, ClusterCreateTypes } from '../model'
 import { CloudProviders } from '../../cloudProviders/model'
 import { loadNodes } from '../../nodes/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { allPass } from 'ramda'
 import { isConnected, isUnassignedNode } from './ClusterHostChooser'
 import InsufficientNodesNodesDialog from './InsufficientNodesDialog'
-
-const requiredNodes = 2
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -105,6 +103,7 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
   const [showDialog, setShowDialog] = useState(false)
   const [clusterCreateType, setClusterCreateType] = useState('')
   const [availableNodes, setAvailableNodes] = useState(0)
+  const [requiredNodes, setRequiredNodes] = useState(0)
   const [nodes, loading] = useDataLoader(loadNodes)
 
   useEffect(() => {
@@ -116,7 +115,9 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
 
   const handleClick = useCallback(
     (type: ClusterCreateTypes) => () => {
+      setRequiredNodes(BareOsRequiredNodes[type])
       const hasAvailableNodes = availableNodes >= requiredNodes
+
       if (!hasAvailableNodes) {
         setClusterCreateType(type)
         setShowDialog(true)

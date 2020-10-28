@@ -34,10 +34,12 @@ export interface GCluster<T> {
 }
 
 export interface INormalizedCluster {
+  uuid: string
   endpoint: string
   kubeconfigUrl: string
   isUpgrading: boolean
   nodes: Node[]
+  progressPercent: any
 }
 
 export type IGenericResource<T> = T & {
