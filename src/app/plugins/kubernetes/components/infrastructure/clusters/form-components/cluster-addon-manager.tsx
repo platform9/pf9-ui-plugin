@@ -51,6 +51,7 @@ const addonMap = {
     details: { component: MetalLbAddonField },
   },
   enableMetallbLayer2: {
+    formId: 'enableMetallb',
     toggler: MetalLbLayer2Field,
     details: { component: MetalLbAddonLayer2Field },
   },
@@ -89,8 +90,9 @@ export const AddonDetailCards = ({ values }) => {
   return (
     <Suspense fallback="loading...">
       {addons.map((addon) => {
+        const addonId = getAddonComponent(addon, 'formId') || addon
         const { component: Addon, reverse = false } = getAddonComponent(addon, 'details')
-        if (!values[addon]) {
+        if (!values[addonId]) {
           return reverse ? <Addon key={addon} values={values} /> : null
         }
 
