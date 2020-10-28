@@ -346,7 +346,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     <NumWorkerNodesField />
 
                     {/* Workloads on masters */}
-                    <AllowWorkloadsonMasterField />
+                    <AllowWorkloadsonMasterField setWizardContext={setWizardContext} />
                   </>
                 )}
               </FormFieldCard>

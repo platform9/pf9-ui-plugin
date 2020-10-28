@@ -106,7 +106,7 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
             <Divider className={classes.divider} />
             <Text variant="caption1">Application & Container Settings</Text>
             <PrivilegedContainers {...props} />
-            <AllowWorkloadsOnMaster />
+            <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
 
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Add-Ons</Text>
