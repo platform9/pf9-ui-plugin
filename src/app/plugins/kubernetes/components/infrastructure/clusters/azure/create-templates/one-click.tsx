@@ -110,7 +110,7 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
         triggerSubmit={onNext}
         elevated={false}
       >
-        {({ setFieldValue, values }) => (
+        {({ values }) => (
           <>
             <FormFieldCard
               title="Cluster Configuration"

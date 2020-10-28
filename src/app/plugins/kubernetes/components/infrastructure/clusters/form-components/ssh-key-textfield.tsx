@@ -13,7 +13,7 @@ export default ({ validations = [sshKeyValidator] }) => (
     label="Public SSH key"
     info="Copy/paste your SSH public key"
     size="small"
-    // validations={validations}
+    validations={validations}
     multiline
     rows={3}
     required

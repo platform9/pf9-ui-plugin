@@ -396,7 +396,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
           triggerSubmit={onNext}
           elevated={false}
         >
-          {({ setFieldValue, values }) => (
+          {({ values }) => (
             <>
               <FormFieldCard title="Network Info">
                 {/* Assign public IP's */}
@@ -468,7 +468,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
           triggerSubmit={onNext}
           elevated={false}
         >
-          {({ setFieldValue, values }) => (
+          {({ values }) => (
             <>
               <FormFieldCard title="Advanced Configuration">
                 {/* Advanced API Configuration & Custom Runtime Config */}

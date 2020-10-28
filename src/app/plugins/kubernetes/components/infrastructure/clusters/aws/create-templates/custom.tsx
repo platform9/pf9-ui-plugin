@@ -439,12 +439,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     - MTU Size Field
                     
                 */}
-                {values.networkPlugin === 'calico' && (
-                  <CalicoNetworkFields
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                  />
-                )}
+                {values.networkPlugin === 'calico' && <CalicoNetworkFields values={values} />}
               </FormFieldCard>
             </>
           )}
@@ -461,7 +456,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
           triggerSubmit={onNext}
           elevated={false}
         >
-          {({ setFieldValue, values }) => (
+          {({ values }) => (
             <>
               <FormFieldCard title="Advanced Configuration">
                 {/* Advanced API Configuration */}

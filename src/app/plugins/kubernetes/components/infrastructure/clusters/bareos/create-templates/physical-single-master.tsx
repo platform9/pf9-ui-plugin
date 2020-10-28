@@ -189,7 +189,7 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
                   setWizardContext={setWizardContext}
                 />
                 {values.networkPlugin === NetworkBackendTypes.Calico && (
-                  <CalicoNetworkFields wizardContext={wizardContext} />
+                  <CalicoNetworkFields values={values} />
                 )}
               </FormFieldCard>
             </>
@@ -205,7 +205,7 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         >
           {({ values }) => (
             <>
-              <AdvancedApiConfigFields wizardContext={values} />
+              <AdvancedApiConfigFields values={values} />
               <TagsField />
             </>
           )}

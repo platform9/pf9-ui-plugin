@@ -96,7 +96,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
     setWizardContext({ serviceFdqn: service })
   }
 
-  const handleClusterDomainUpdate = (values, setFieldValues) => updateFqdns(values)
+  const handleClusterDomainUpdate = (values) => updateFqdns(values)
 
   return (
     <WizardStep stepId="one-click" onNext={onNext}>
@@ -147,7 +147,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
               {/* Cluster Domain */}
               <ClusterDomainField
                 values={values}
-                onChange={handleClusterDomainUpdate(values, setFieldValue)}
+                onChange={handleClusterDomainUpdate(values)}
                 required={!wizardContext.usePf9Domain}
                 disabled={wizardContext.usePf9Domain}
               />
