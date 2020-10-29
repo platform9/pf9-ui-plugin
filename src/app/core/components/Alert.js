@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
     left: ({ small }) => (small ? 'initial' : theme.spacing(3)),
     top: ({ small }) => (small ? 'initial' : theme.spacing(3)),
     fontSize: 22,
+    height: 22,
     flexGrow: ({ small }) => (small ? 0 : 'initial'),
     alignSelf: ({ small }) => (small ? 'center' : 'initial'),
   },
@@ -44,6 +45,8 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: ({ small }) => (small ? 0 : 'initial'),
     alignSelf: ({ small }) => (small ? 'center' : 'initial'),
     fontSize: 22,
+    height: 22,
+
     color: theme.palette.blue.main,
   },
   iconVariant: {

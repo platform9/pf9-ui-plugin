@@ -38,6 +38,14 @@ const canFinishAndReview = (createType) => ({
   return false
 }
 
+const wizardMetaFormattedNames = {
+  name: 'Cluster Name',
+  masterNodes: 'Master Nodes',
+  workerNodes: 'Worker Nodes',
+  networkPlugin: 'CNI',
+}
+const wizardMetaCalloutFields = ['name', 'masterNodes', 'workerNodes', 'networkPlugin']
+
 const AddBareOsClusterPage = () => {
   const { history, match } = useReactRouter()
   const createType = match?.params?.type || ClusterCreateTypes.Custom
@@ -95,7 +103,8 @@ const AddBareOsClusterPage = () => {
             <WizardMeta
               fields={wizardContext}
               icon={<CloudProviderCard active type={providerType} />}
-              calloutFields={['networkPlugin']}
+              keyOverrides={wizardMetaFormattedNames}
+              calloutFields={wizardMetaCalloutFields}
             >
               {ViewComponent && (
                 <ViewComponent

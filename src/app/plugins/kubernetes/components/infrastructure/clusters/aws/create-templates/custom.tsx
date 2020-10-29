@@ -288,7 +288,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 }
               >
                 {/* Cluster Name */}
-                <ClusterNameField />
+                <ClusterNameField setWizardContext={setWizardContext} />
 
                 {/* Cloud Provider */}
                 <CloudProviderField cloudProviderType={CloudProviders.Aws} />

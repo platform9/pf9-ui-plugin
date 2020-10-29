@@ -97,7 +97,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               </ExternalLink>
             }
           >
-            <ClusterNameField />
+            <ClusterNameField setWizardContext={setWizardContext} />
           </FormFieldCard>
 
           {/* Cluster Settings */}
