@@ -2,9 +2,9 @@ import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import { CloudProviders } from '../../cloudProviders/model'
 
-export default ({ dropdownComponent, cloudProviderType, values }) => {
+export default ({ dropdownComponent, cloudProviderType, values, wizardContext }) => {
   const cloudProviderRegionId =
-    cloudProviderType === CloudProviders.Aws ? values.region : values.location // For Azure, it's location, not region
+    cloudProviderType === CloudProviders.Aws ? values.region : wizardContext.location // For Azure, it's location, not region
   return (
     <PicklistField
       DropdownComponent={dropdownComponent}

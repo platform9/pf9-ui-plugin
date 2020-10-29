@@ -4,7 +4,7 @@ import { CloudProviders } from '../../cloudProviders/model'
 
 const MasterNodeSkuField = ({ dropdownComponent, cloudProviderType, wizardContext, values }) => {
   const cloudProviderRegionId =
-    cloudProviderType === CloudProviders.Aws ? wizardContext.region : wizardContext.location // For Azure, it's location, not region
+    cloudProviderType === CloudProviders.Aws ? values.region : wizardContext.location // For Azure, it's location, not region
   return (
     <PicklistField
       DropdownComponent={dropdownComponent}

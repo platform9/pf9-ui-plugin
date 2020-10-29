@@ -294,6 +294,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                   dropdownComponent={AwsClusterSshKeyPicklist}
                   cloudProviderType={CloudProviders.Aws}
                   values={values}
+                  wizardContext={wizardContext}
                 />
 
                 {/* Template Chooser */}
@@ -315,6 +316,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                       dropdownComponent={AwsRegionFlavorPicklist}
                       cloudProviderType={CloudProviders.Aws}
                       values={values}
+                      wizardContext={wizardContext}
                     />
 
                     {/* Num master nodes */}
@@ -325,6 +327,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                       dropdownComponent={AwsRegionFlavorPicklist}
                       cloudProviderType={CloudProviders.Aws}
                       values={values}
+                      wizardContext={wizardContext}
                     />
 
                     {/* Num worker nodes */}

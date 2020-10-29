@@ -144,6 +144,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 dropdownComponent={AwsClusterSshKeyPickList}
                 cloudProviderType={CloudProviders.Aws}
                 values={values}
+                wizardContext={wizardContext}
               />
 
               {/* Cluster Domain */}
