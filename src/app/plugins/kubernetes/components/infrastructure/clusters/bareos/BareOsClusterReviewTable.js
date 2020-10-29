@@ -1,82 +1,28 @@
 import React from 'react'
-import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
-import Text from 'core/elements/text'
-
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
-import CodeBlock from 'core/components/CodeBlock'
-import { makeStyles } from '@material-ui/styles'
-import { castBoolToStr } from 'utils/misc'
-
-const useStyles = makeStyles((theme) => ({
-  cell: {
-    paddingRight: [theme.spacing(0.5), '!important'],
-  },
-}))
-
-const DataRow = ({ label, value }) => {
-  const classes = useStyles()
-  return (
-    <TableRow>
-      <TableCell>{label}</TableCell>
-      <TableCell className={classes.cell}>
-        {Array.isArray(value)
-          ? value.map((val, idx) => (
-              <Text key={idx} variant="body2">
-                {val}
-              </Text>
-            ))
-          : value}
-      </TableCell>
-    </TableRow>
-  )
-}
+import FormReviewTable from 'core/components/validatedForm/review-table'
+import { NetworkBackendTypes } from '../form-components/network-backend'
 
 const getFilteredNodesFormattedName = (nodes, filterList = []) =>
   nodes
     .filter((node) => filterList.includes(node.uuid))
     .map((node) => `${node.name} - ${node.primaryIp}`)
 
-// TODO: azs, networking info, services/api FQDN auto-generate, MTU size
-const BareOsClusterReviewTable = ({ data }) => {
+const calicoFields = ['calicoIpIpMode', 'calicoNatOutgoing', 'calicoV4BlockSize']
+const BareOsClusterReviewTable = ({ wizardContext, columns }) => {
   const [nodes] = useDataLoader(loadNodes)
-  // TODO why are form elements undefined here? wtf.
-  const masterNodes = getFilteredNodesFormattedName(nodes, data.masterNodes)
-  const workerNodes = getFilteredNodesFormattedName(nodes, data.workerNodes)
-  return (
-    <Table>
-      <TableBody>
-        <DataRow label="Name" value={data.name} />
-        <DataRow
-          label={`Master${data.allowWorkloadsOnMaster ? ' nodes with workloads' : 'nodes'}`}
-          value={masterNodes}
-        />
-        {data.allowWorkloadsOnMaster && workerNodes.length > 0 && (
-          <DataRow label="Worker nodes" value={workerNodes} />
-        )}
-        <DataRow label="Virtual IP address for cluster" value={data.masterVipIpv4} />
-        <DataRow
-          label="Physical interface for virtual IP association"
-          value={data.masterVipIface}
-        />
-        <DataRow label="MetalLB" value={castBoolToStr()(data.enableMetallb)} />
-        {data.enableMetalLb && <DataRow label="MetalLB CIDR" value={data.metalLbCidr} />}
-        <DataRow label="API FQDN" value={data.externalDnsName} />
-        <DataRow label="Containers CIDR" value={data.containersCidr} />
-        <DataRow label="Services CIDR" value={data.servicesCidr} />
-        <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
-        {/* <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} /> */}
-        <DataRow
-          label="Prometheus monitoring"
-          value={castBoolToStr()(data.prometheusMonitoringEnabled)}
-        />
-        <DataRow
-          label="Tags"
-          value={<CodeBlock>{JSON.stringify(data.tags || [], null, 2)}</CodeBlock>}
-        />
-      </TableBody>
-    </Table>
-  )
+  let reviewTableColumns = columns
+  const data = {
+    ...wizardContext,
+    masterNodes: getFilteredNodesFormattedName(nodes, wizardContext.masterNodes),
+    workerNodes: getFilteredNodesFormattedName(nodes, wizardContext.workerNodes),
+  }
+  if (wizardContext.networkPlugin !== NetworkBackendTypes.Calico) {
+    reviewTableColumns = columns.filter((column) => !calicoFields.includes(column.id))
+  }
+
+  return <FormReviewTable data={data} columns={reviewTableColumns} />
 }
 
 export default BareOsClusterReviewTable

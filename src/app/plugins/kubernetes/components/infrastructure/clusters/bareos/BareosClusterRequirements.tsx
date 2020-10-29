@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { FC, useCallback, useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import BulletList from 'core/components/BulletList'
 import SubmitButton from 'core/components/buttons/SubmitButton'
@@ -8,9 +8,16 @@ import { gettingStartedHelpLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import Text from 'core/elements/text'
-import Info from 'core/components/validatedForm/Info'
+import { IconInfo } from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
 import { capitalizeString } from 'utils/misc'
+import { BareOsRequiredNodes, ClusterCreateTypes } from '../model'
+import { CloudProviders } from '../../cloudProviders/model'
+import { loadNodes } from '../../nodes/actions'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { allPass } from 'ramda'
+import { isConnected, isUnassignedNode } from './ClusterHostChooser'
+import InsufficientNodesNodesDialog from './InsufficientNodesDialog'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -30,17 +37,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'grid',
     alignItems: 'center',
     gridTemplateColumns: 'repeat(auto-fill, 200px)',
-    margin: theme.spacing(4, 4, 1, 4),
-  },
-  alertTitle: {
-    display: 'flex',
-    alignItems: 'center',
-
-    '& i': {
-      color: theme.palette.blue[500],
-      fontSize: 22,
-      marginRight: 4,
-    },
+    margin: theme.spacing(2, 4, 1, 4),
   },
   text: {
     marginTop: theme.spacing(0.5),
@@ -84,9 +81,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     alignItems: 'center',
     marginBottom: theme.spacing(2),
   },
-  infoContainer: {
-    margin: '60px 0 40px 0',
-  },
   formCard: {
     color: theme.palette.grey[700],
   },
@@ -99,51 +93,96 @@ const nodeServices = [
   'Multi-Master Virtual IP using VRRP (Optional)',
 ]
 
-const BareOSClusterRequirements = ({ onComplete, provider }) => {
+interface Props {
+  onComplete: (route: string) => void
+  provider: CloudProviders
+}
+
+const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
   const classes = useStyles({})
-  const handleClick = useCallback(() => {
-    onComplete(routes.cluster.addBareOs.path())
-  }, [onComplete])
-  return (
-    <FormFieldCard
-      className={classes.formCard}
-      title={`BareOS ${capitalizeString(provider)} Cluster`}
-      link={
-        <div>
-          <ExternalLink textVariant="caption2" url={gettingStartedHelpLink}>
-            BareOS Cluster Help
-          </ExternalLink>
-        </div>
+  const [showDialog, setShowDialog] = useState(false)
+  const [createType, setCreateType] = useState('')
+  const [availableNodes, setAvailableNodes] = useState(0)
+  const [requiredNodes, setRequiredNodes] = useState(0)
+  const [nodes, loading] = useDataLoader(loadNodes)
+
+  useEffect(() => {
+    if (!loading) {
+      const numNodes = nodes.filter(allPass([isConnected, isUnassignedNode])).length
+      setAvailableNodes(numNodes)
+    }
+  }, nodes)
+
+  const handleClick = useCallback(
+    (type: ClusterCreateTypes) => () => {
+      setRequiredNodes(BareOsRequiredNodes[type])
+      const hasAvailableNodes = availableNodes >= requiredNodes
+
+      if (!hasAvailableNodes) {
+        setCreateType(type)
+        setShowDialog(true)
+      } else {
+        onComplete(routes.cluster.addBareOs[provider][type].path())
       }
-    >
-      <Text className={classes.text} variant="body2">
-        Create a BareOS cluster using Ubuntu or CentOS {provider} machines.
-      </Text>
-      <br />
-      <Text variant="body2" className={classes.text}>
-        Cluster comes built in with:
-      </Text>
-      <BulletList className={classes.bulletList} items={nodeServices} />
-      <Info className={classes.infoContainer}>
-        <Text className={classes.alertTitle} variant="body2">
-          <FontAwesomeIcon>info-circle</FontAwesomeIcon> Minimum Hardware Requirements:
+    },
+    [onComplete, provider, nodes],
+  )
+
+  return (
+    <>
+      {showDialog && (
+        <InsufficientNodesNodesDialog
+          createType={createType}
+          availableNodes={availableNodes}
+          requiredNodes={requiredNodes}
+          showDialog={showDialog}
+          setShowDialog={setShowDialog}
+        />
+      )}
+      <FormFieldCard
+        className={classes.formCard}
+        title={`BareOS ${capitalizeString(provider)} Cluster`}
+        link={
+          <div>
+            <ExternalLink textVariant="caption2" url={gettingStartedHelpLink}>
+              BareOS Cluster Help
+            </ExternalLink>
+          </div>
+        }
+      >
+        <Text className={classes.text} variant="body2">
+          Create a BareOS cluster using Ubuntu or CentOS {provider} machines.
         </Text>
-        <div className={classes.requirements}>
-          <HardwareSpec title="2 VCPUs" icon="microchip" />
-          <HardwareSpec title="5GB RAM" icon="memory" />
-          <HardwareSpec title="20GB HDD" icon="hdd" />
+        <br />
+        <Text variant="body2" className={classes.text}>
+          Cluster comes built in with:
+        </Text>
+        <BulletList className={classes.bulletList} items={nodeServices} />
+        <IconInfo icon="info-circle" title="Minimum Hardware Requirements:">
+          <div className={classes.requirements}>
+            <HardwareSpec title="2 VCPUs" icon="microchip" />
+            <HardwareSpec title="5GB RAM" icon="memory" />
+            <HardwareSpec title="20GB HDD" icon="hdd" />
+          </div>
+        </IconInfo>
+
+        <div className={classes.actionRow}>
+          <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
+          <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
+            One-Click Cluster
+          </SubmitButton>
         </div>
-      </Info>
-      <div className={classes.actionRow}>
-        <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
-        <SubmitButton onClick={handleClick}>One-Click Cluster</SubmitButton>
-      </div>
-      <div className={classes.actionRow}>
-        <Text variant="caption1">For more customized cluster creation:</Text>
-        <SubmitButton onClick={handleClick}>Single Master Cluster</SubmitButton>
-        <SubmitButton onClick={handleClick}>Multi-Master Cluster</SubmitButton>
-      </div>
-    </FormFieldCard>
+        <div className={classes.actionRow}>
+          <Text variant="caption1">For more customized cluster creation:</Text>
+          <SubmitButton onClick={handleClick(ClusterCreateTypes.SingleMaster)}>
+            Single Master Cluster
+          </SubmitButton>
+          <SubmitButton onClick={handleClick(ClusterCreateTypes.MultiMaster)}>
+            Multi-Master Cluster
+          </SubmitButton>
+        </div>
+      </FormFieldCard>
+    </>
   )
 }
 export default BareOSClusterRequirements

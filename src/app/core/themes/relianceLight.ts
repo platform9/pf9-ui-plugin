@@ -214,7 +214,6 @@ export const typography = {
     fontStyle: 'normal',
     lineHeight: 'normal',
     letterSpacing: 'normal',
-    textAlign: 'right',
   },
 
   buttonSecondary: {

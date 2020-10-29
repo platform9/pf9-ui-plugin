@@ -189,7 +189,7 @@ class Qbert extends ApiService {
   /* Node Pools */
   getNodePools = async () => {
     const url = `/nodePools`
-    return this.client.basicGet({
+    return this.client.basicGet<any>({
       url,
       options: {
         clsName: this.getClassName(),
@@ -273,7 +273,7 @@ class Qbert extends ApiService {
     // Note: This API response only returns new `uuid` in the response.
     // You might want to do a GET afterwards if you need any of the cluster information.
     const url = `/clusters`
-    return this.client.basicPost({
+    return this.client.basicPost<ClusterElement>({
       url,
       body,
       options: {

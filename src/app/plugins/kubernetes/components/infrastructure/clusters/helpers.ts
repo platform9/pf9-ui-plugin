@@ -5,8 +5,16 @@ import { compose, path, pick, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import { trackEvent } from 'utils/tracking'
+import { ClusterCreateTypes } from './model'
 
 const { qbert } = ApiClient.getInstance()
+
+export const getFormTitle = (title, target) => {
+  if (target === ClusterCreateTypes.OneClick) {
+    return `${title} Cluster`
+  }
+  return `Create a ${title} Cluster`
+}
 
 export const getProgressPercent = async (clusterId) => {
   try {
@@ -19,13 +27,13 @@ export const getProgressPercent = async (clusterId) => {
 }
 
 export const getKubernetesVersion = async (clusterId) => {
-  try {
-    const version = await qbert.getKubernetesVersion(clusterId)
-    return version && version.gitVersion && version.gitVersion.substr(1)
-  } catch (e) {
-    console.warn(e)
-    return null
-  }
+  // try {
+  //   const version = await qbert.getKubernetesVersion(clusterId)
+  //   return version && version.gitVersion && version.gitVersion.substr(1)
+  // } catch (e) {
+  //   console.warn(e)
+  //   return null
+  // }
 }
 export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
   const matches = /(?<major>\d+).(?<minor>\d+).(?<patch>\d+)/.exec(version)
@@ -33,7 +41,7 @@ export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) 
     return null
   }
   const { major, minor } = matches.groups || {}
-  const isNewDashboardUrl = major >= 1 && minor >= 16
+  const isNewDashboardUrl = parseInt(major) >= 1 && parseInt(minor) >= 16
   return `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/${
     isNewDashboardUrl ? 'kubernetes-dashboard' : 'kube-system'
   }/services/https:kubernetes-dashboard:443/proxy/`
@@ -55,7 +63,7 @@ export const getEtcdBackupPayload = (path, data) =>
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
-  (healthyMasterNodes) => healthyMasterNodes.length > 0,
+  (healthyMasterNodes: any) => healthyMasterNodes.length > 0,
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
@@ -63,43 +71,47 @@ export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 export const createAwsCluster = async (data) => {
-  const { domainId, usePf9Domain } = data
-  const body = {
-    // basic info
-    ...pick('name region azs ami sshKey'.split(' '), data),
-    // cluster configuration
-    ...pick(
-      (
-        'masterFlavor workerFlavor numMasters enableCAS numWorkers allowWorkloadsOnMaster ' +
-        'numSpotWorkers spotPrice'
-      ).split(' '),
-      data,
-    ),
+  const keysToPluck = [
+    'name',
+    'region',
+    'azs',
+    'ami',
+    'sshKey',
+    'masterFlavor',
+    'workerFlavor',
+    'numMasters',
+    'enableCAS',
+    'numWorkers',
+    'allowWorkloadsOnMaster',
+    'numSpotWorkers',
+    'spotPrice',
+    'vpc',
+    'isPrivate',
+    'privateSubnets',
+    'subnets',
+    'internalElb',
+    'serviceFqdn',
+    'containersCidr',
+    'servicesCidr',
+    'networkPlugin',
+    'privileged',
+    'appCatalogEnabled',
+    'customAmi',
+  ]
 
-    // network info
-    ...pick(
-      (
-        'vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr ' +
-        'servicesCidr networkPlugin'
-      ).split(' '),
-      data,
-    ),
-
-    // advanced configuration
-    ...pick('privileged appCatalogEnabled customAmi'.split(' '), data),
-  }
+  const body = pick(keysToPluck, data)
 
   if (data.enableCAS) {
     body.numMinWorkers = data.numWorkers
     body.numMaxWorkers = data.numMaxWorkers
   }
 
-  body.externalDnsName = usePf9Domain ? 'auto-generate' : sanitizeUrl(data.externalDnsName)
-  body.serviceFqdn = usePf9Domain ? 'auto-generate' : sanitizeUrl(data.serviceFqdn)
+  body.externalDnsName = body.usePf9Domain ? 'auto-generate' : sanitizeUrl(data.externalDnsName)
+  body.serviceFqdn = body.usePf9Domain ? 'auto-generate' : sanitizeUrl(data.serviceFqdn)
 
   // TODO: Follow up with backend team to find out why platform9.net is not showing up in the
   // domain list and why we are hard-coding this id.
-  body.domainId = usePf9Domain ? '/hostedzone/Z2LZB5ZNQY6JC2' : domainId
+  body.domainId = body.usePf9Domain ? '/hostedzone/Z2LZB5ZNQY6JC2' : body.domainId
 
   // Set other fields based on what the user chose for 'networkOptions'
   if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) {
@@ -120,28 +132,32 @@ export const createAwsCluster = async (data) => {
 }
 
 export const createAzureCluster = async (data) => {
-  const body = {
-    // basic info
-    ...pick('name location zones sshKey'.split(' '), data),
+  const keysToPluck = [
+    'name',
+    'location',
+    'zones',
+    'sshKey',
+    'masterSku',
+    'workerSku',
+    'numMasters',
+    'numWorkers',
+    'allowWorkloadsOnMaster',
+    'enableCAS',
+    'assignPublicIps',
+    'vnetResourceGroup',
+    'vnetName',
+    'masterSubnetName',
+    'workerSubnetName',
+    'externalDnsName',
+    'serviceFqdn',
+    'containersCidr',
+    'servicesCidr',
+    'networkPlugin',
+    'privileged',
+    'appCatalogEnabled',
+  ]
 
-    // cluster configuration
-    ...pick(
-      'masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster enableCAS'.split(' '),
-      data,
-    ),
-
-    // network info
-    ...pick(
-      (
-        'assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName ' +
-        'externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'
-      ).split(' '),
-      data,
-    ),
-
-    // advanced configuration
-    ...pick('privileged appCatalogEnabled'.split(' '), data),
-  }
+  const body = pick(keysToPluck, data)
 
   if (data.enableCAS) {
     body.numMinWorkers = data.numWorkers
@@ -161,7 +177,7 @@ export const createAzureCluster = async (data) => {
   return cluster
 }
 
-export const createBareOSCluster = async (data = {}) => {
+export const createBareOSCluster = async (data) => {
   const keysToPluck = [
     'name',
     'masterNodes',
@@ -180,7 +196,7 @@ export const createBareOSCluster = async (data = {}) => {
 
   if (data.enableMetallb) {
     body.enableMetallb = data.enableMetallb
-    body.metallbCidr = data.metallbCidr
+    body.metallbCidr = getMetalLbCidr(data.metallbCidr)
   }
 
   // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
@@ -244,10 +260,13 @@ const createGenericCluster = async (body, data) => {
   const uuid = createResponse.uuid
 
   if (data.prometheusMonitoringEnabled) {
-    localStorage.setItem(onboardingMonitoringSetup, true)
+    localStorage.setItem(onboardingMonitoringSetup, 'true')
   }
 
   // The POST call only returns the `uuid` and that's it.
   // We need to perform a GET afterwards and return that to add to the cache.
   return qbert.getClusterDetails(uuid)
 }
+
+const getMetalLbCidr = (keyValueArr = []) =>
+  keyValueArr.map(({ key, value }) => `${key}-${value}`).join()

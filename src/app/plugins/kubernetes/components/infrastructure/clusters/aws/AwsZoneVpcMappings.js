@@ -15,6 +15,7 @@ const AwsZoneVpcMappings = ({
   cloudProviderRegionId,
   vpcId,
   onChange,
+  disabled,
 }) => {
   if (!vpcId) return null
   const [details] = useDataLoader(loadCloudProviderRegionDetails, {
@@ -46,6 +47,7 @@ const AwsZoneVpcMappings = ({
     <>
       {Object.keys(subnetsByAz).map((az) => (
         <PicklistField
+          disabled={disabled}
           label={`Availability Zone (${type}): ${az}`}
           key={`az-subnet-${type}-${az}-${az.CidrBlock}`}
           id={`az-subnet-${type}-${az}`}

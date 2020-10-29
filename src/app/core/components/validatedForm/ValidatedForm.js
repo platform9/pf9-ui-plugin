@@ -8,6 +8,9 @@ import { pathEq, toPairs, path, lensPath, over, set, identity, dissocPath, pick 
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import ClusterAddonManager, {
+  AddonDetailCards,
+} from 'k8s/components/infrastructure/clusters/form-components/cluster-addon-manager'
 
 export const ValidatedFormContext = React.createContext({})
 
@@ -219,25 +222,39 @@ class ValidatedForm extends PureComponent {
       maxWidth,
       inputsWidth,
       elevated,
+      withAddonManager,
     } = this.props
     const inputs = children instanceof Function ? children(this.state) : children
+    const { values } = this.state
+    const contents = (
+      <>
+        {debug && <ValidatedFormDebug />}
+        {!elevated ? (
+          inputs
+        ) : (
+          <FormFieldCard
+            title={title}
+            link={link}
+            topContent={topContent}
+            className={className}
+            maxWidth={maxWidth}
+            inputsWidth={inputsWidth}
+          >
+            {inputs}
+          </FormFieldCard>
+        )}
+      </>
+    )
     return (
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
         <ValidatedFormProvider value={this.state}>
-          {debug && <ValidatedFormDebug />}
-          {!elevated ? (
-            inputs
+          {withAddonManager ? (
+            <ClusterAddonManager>
+              {contents}
+              <AddonDetailCards values={values} />
+            </ClusterAddonManager>
           ) : (
-            <FormFieldCard
-              title={title}
-              link={link}
-              topContent={topContent}
-              className={className}
-              maxWidth={maxWidth}
-              inputsWidth={inputsWidth}
-            >
-              {inputs}
-            </FormFieldCard>
+            contents
           )}
         </ValidatedFormProvider>
         {formActions ? <div className={classes.formActions}>{formActions}</div> : null}
@@ -278,6 +295,7 @@ ValidatedForm.propTypes = {
 
   // Wrap the children within a FormFieldCard
   elevated: PropTypes.bool,
+  withAddonManager: PropTypes.bool,
 
   // This function will get called with context passed
   // through as argument after onSubmit is called
@@ -287,7 +305,7 @@ ValidatedForm.propTypes = {
 ValidatedForm.defaultProps = {
   clearOnSubmit: false,
   debug: false,
-  maxWidth: 715,
+  maxWidth: 800,
   elevated: true,
 }
 

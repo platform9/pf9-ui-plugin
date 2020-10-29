@@ -1,7 +1,7 @@
 import React from 'react'
 import AddCloudProviderPage from './components/infrastructure/cloudProviders/AddCloudProviderPage'
-import AddAwsClusterPage from './components/infrastructure/clusters/AddAwsClusterPage'
-import AddAzureClusterPage from './components/infrastructure/clusters/AddAzureClusterPage'
+import AddAwsClusterPage from './components/infrastructure/clusters/aws/AddAwsClusterPage'
+import AddAzureClusterPage from './components/infrastructure/clusters/azure/AddAzureClusterPage'
 import AddClusterPage from './components/infrastructure/clusters/AddClusterPage'
 import AddBareOsClusterPage from './components/infrastructure/clusters/bareos/AddBareOsClusterPage'
 import ScaleMastersPage from './components/infrastructure/clusters/ScaleMastersPage'
@@ -82,19 +82,19 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'Create AWS Cluster',
-      link: { path: '/infrastructure/clusters/addAws', exact: true },
+      link: { path: '/infrastructure/clusters/aws/add/:type', exact: true },
       requiredRoles: 'admin',
       component: AddAwsClusterPage,
     },
     {
       name: 'Create Azure Cluster',
-      link: { path: '/infrastructure/clusters/addAzure', exact: true },
+      link: { path: '/infrastructure/clusters/azure/add/:type', exact: true },
       requiredRoles: 'admin',
       component: AddAzureClusterPage,
     },
     {
       name: 'Create Bare OS Cluster',
-      link: { path: '/infrastructure/clusters/addBareOs', exact: true },
+      link: { path: '/infrastructure/clusters/bareos/add/:platform/:type', exact: true },
       requiredRoles: 'admin',
       component: AddBareOsClusterPage,
     },

@@ -6,15 +6,14 @@ import { emptyObj, objToKeyValueArr, keyValueArrToObj } from 'utils/fp'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import TextField from 'core/components/validatedForm/TextField'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix, defaultEtcBackupPath } from 'app/constants'
 import { clusterActions } from './actions'
-import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
-import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
-import EtcdBackupFields from './EtcdBackupFields'
+import EtcdBackupFields from './form-components/etcd-backup'
+import Name from './form-components/name'
+import TagsField from './form-components/tags'
 import DocumentMeta from 'core/components/DocumentMeta'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
@@ -86,26 +85,14 @@ const EditClusterPage = () => {
           onSubmit={handleSubmit}
         >
           {/* Cluster Name */}
-          <TextField id="name" label="Name" info="Name of the cluster" required />
+           <Name setWizardContext={getParamsUpdater} />
 
           {/* Etcd Backup */}
-          <CheckboxField
-            id="etcdBackup"
-            label="Enable Etcd Backup"
-            info="Enable automated etcd backups on this cluster"
-            onChange={getParamsUpdater('etcdBackup')}
-            value={params.etcdBackup}
-          />
-
-          {params.etcdBackup && <EtcdBackupFields />}
+           <EtcdBackupFields wizardContext={params} setWizardContext={getParamsUpdater} />
 
           {/* Tags */}
-          <KeyValuesField
-            id="tags"
-            label="Tags"
-            info="Edit tag metadata on this cluster"
-            blacklistedTags={tagsToOmit}
-          />
+           <Tags info="Edit tag metadata on this cluster" blacklistedTags={tagsToOmit} />
+
         </ValidatedForm>
       </FormWrapper>
     </>

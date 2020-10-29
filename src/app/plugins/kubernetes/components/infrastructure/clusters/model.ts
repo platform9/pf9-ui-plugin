@@ -2,6 +2,26 @@ import { ClusterElement, INormalizedCluster } from 'api-client/qbert.model'
 import { Pkg } from 'api-client/appbert.model'
 import { INodesSelector } from '../nodes/model'
 
+export enum ClusterCreateTypes {
+  OneClick = 'one-click',
+  Custom = 'custom',
+  SingleMaster = 'single-master',
+  MultiMaster = 'multi-master',
+}
+
+export enum ClusterCreateTypeNames {
+  'one-click' = 'One-Click',
+  'custom' = 'Custom',
+  'single-master' = 'Single Master',
+  'multi-master' = 'Multi-Master',
+}
+
+export enum BareOsRequiredNodes {
+  'one-click' = 1,
+  'single-master' = 1,
+  'multi-master' = 2,
+}
+
 export type HealthStatus =
   | 'healthy'
   | 'partially_healthy'

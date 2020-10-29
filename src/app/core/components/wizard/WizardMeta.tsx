@@ -1,16 +1,18 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { RenderLabels } from 'k8s/components/pods/renderLabels'
 import { pick, pickBy } from 'ramda'
 import clsx from 'clsx'
+import { WizardContext } from './Wizard'
 
 interface Props<T extends {}> {
   fields: T
   calloutFields?: Array<keyof T>
-  children?: JSX.Element
+  children?: JSX.Element | JSX.Element[]
   icon?: JSX.Element
   className?: any
+  keyOverrides?: { [key: string]: string }
   renderLabels?: (labels) => JSX.Element
 }
 
@@ -22,12 +24,19 @@ const isNotUndefined = (val) => val !== undefined
 
 export default function WizardMeta<T>({
   children,
+  keyOverrides = undefined,
   calloutFields = [],
   fields,
   icon,
   className,
-  renderLabels = (labels) => <RenderLabels labels={labels} inverse split />,
+  renderLabels = (labels) => (
+    <RenderLabels keyOverrides={keyOverrides} labels={labels} inverse split />
+  ),
 }: Props<T>) {
+  const { setWizardCalloutFields } = useContext(WizardContext as any)
+  useEffect(() => {
+    setWizardCalloutFields(calloutFields)
+  }, [])
   const classes = useStyles({ icon: !!icon })
   const labels = pickBy(isNotUndefined, pick(calloutFields, fields))
   return (

@@ -1,26 +1,23 @@
-import React, { useState, useMemo } from 'react'
-import PropTypes from 'prop-types'
+import React, { useState, useMemo, ComponentType } from 'react'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import Box from '@material-ui/core/Box'
 import FormControl from '@material-ui/core/FormControl'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import OutlinedInput from '@material-ui/core/OutlinedInput'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Checkbox from '@material-ui/core/Checkbox'
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
-import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import SearchIcon from '@material-ui/icons/Search'
-import * as Fuse from 'fuse.js'
+import Fuse from 'fuse.js'
 import { FormHelperText } from '@material-ui/core'
 import { emptyArr } from 'utils/fp'
 import clsx from 'clsx'
 import Text from 'core/elements/text'
+import Theme from 'core/themes/model'
+import RadioFields from './validatedForm/radio-fields'
 
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
 }
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
       position: 'relative',
@@ -58,32 +55,37 @@ const useStyles = makeStyles((theme) =>
     positionStart: {
       marginRight: 0,
     },
-    formControlLabelRoot: {
-      marginLeft: -6,
-      margin: '2px 0',
-    },
-    checkbox: {
-      padding: 4,
-    },
-    checkboxSize: {
-      fontSize: 16,
-    },
     options: {
       overflowY: 'auto',
       display: 'flex',
       flexDirection: 'column',
     },
-    optionLabel: {
-      fontSize: 13,
-    },
   }),
 )
 
-const MultiSelect = React.forwardRef(
+interface Props {
+  id: string
+  label: string
+  options: any
+  wizardContext: any
+  setWizardContext: any
+  hasError?: boolean
+  required?: boolean
+  errorMessage?: string
+  values?: any
+  onChange?: (any) => any
+  maxOptions?: number
+  sortSelectedFirst?: boolean
+  className?: string
+}
+
+const SingleSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
   (
     {
       id,
       label,
+      wizardContext,
+      setWizardContext,
       hasError,
       required,
       errorMessage,
@@ -94,7 +96,7 @@ const MultiSelect = React.forwardRef(
       sortSelectedFirst,
       className,
     },
-    ref,
+    ref: React.Ref<HTMLDivElement>,
   ) => {
     const classes = useStyles()
 
@@ -139,16 +141,13 @@ const MultiSelect = React.forwardRef(
             className={classes.options}
             style={{ height: maxOptions ? getOptionsHeight(maxOptions) : 'initial' }}
           >
-            {sortedOptions.map((option) => (
-              <Option
-                classes={classes}
-                key={option.value}
-                label={option.label}
-                value={option.value}
-                checked={values.includes(option.value)}
-                onChange={() => toggleOption(option.value)}
-              />
-            ))}
+            <RadioFields
+              id={id}
+              key={id}
+              options={sortedOptions}
+              value={wizardContext[id]}
+              onChange={(changeValue) => setWizardContext({ [id]: changeValue })}
+            />
           </Box>
           {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
         </FormControl>
@@ -187,36 +186,6 @@ const SearchField = ({ classes, term, onSearchChange, onHitEnter }) => {
   )
 }
 
-const Option = ({ classes, label, ...checkboxProps }) => (
-  <FormControlLabel
-    label={label}
-    control={
-      <Checkbox
-        color="primary"
-        className={classes.checkbox}
-        icon={<CheckBoxOutlineBlankIcon className={classes.checkboxSize} />}
-        checkedIcon={<CheckBoxIcon className={classes.checkboxSize} />}
-        {...checkboxProps}
-      />
-    }
-    classes={{ root: classes.formControlLabelRoot, label: classes.optionLabel }}
-  />
-)
-
 const getOptionsHeight = (maxOptions) => maxOptions * 28
 
-const optionPropType = PropTypes.shape({
-  value: PropTypes.string,
-  label: PropTypes.string,
-})
-
-MultiSelect.propTypes = {
-  label: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(optionPropType).isRequired,
-  values: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func,
-  maxOptions: PropTypes.number,
-  sortSelectedFirst: PropTypes.bool,
-}
-
-export default MultiSelect
+export default SingleSelect

@@ -12,7 +12,6 @@ const AwsClusterSshKeyPicklist = forwardRef(
       cloudProviderId,
       cloudProviderRegionId,
     })
-
     const keypairs = pathStrOr([], '0.keyPairs', details)
     const options = keypairs.map((x) => ({ label: x.KeyName, value: x.KeyName }))
 
