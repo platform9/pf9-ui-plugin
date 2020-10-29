@@ -1,44 +1,37 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
-import { Paper, IconButton } from '@material-ui/core'
-import CheckCircleIcon from '@material-ui/icons/CheckCircle'
-import ErrorIcon from '@material-ui/icons/Error'
-import InfoIcon from '@material-ui/icons/Info'
-import CloseIcon from '@material-ui/icons/Close'
-import green from '@material-ui/core/colors/green'
-import amber from '@material-ui/core/colors/amber'
-import WarningIcon from '@material-ui/icons/Warning'
+import { Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import { hexToRGBA } from 'core/utils/colorHelpers'
 import Text from 'core/elements/text'
+import FontAwesomeIcon from './FontAwesomeIcon'
 
 const variantIcon = {
-  success: CheckCircleIcon,
-  warning: WarningIcon,
-  error: ErrorIcon,
-  info: InfoIcon,
+  success: 'check-circle',
+  warning: 'exclamation-circle',
+  error: 'exclamation-circle',
+  info: 'info-circle',
 }
 
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 800,
     position: ({ small }) => (small ? 'initial' : 'relative'),
-    padding: ({ small }) => (small ? theme.spacing(2, 1) : theme.spacing(2, 8)),
-    margin: theme.spacing(2, 0),
+    padding: ({ small }) => (small ? theme.spacing(2, 3) : theme.spacing(2, 8)),
     border: 0,
     display: ({ small }) => (small ? 'flex' : 'block'),
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
+    backgroundColor: ({ type }) =>
+      type === 'card' ? theme.palette.grey['000'] : theme.palette.blue[100],
   },
-  success: { color: green[600] },
-  error: { color: theme.components.error.dark },
-  info: { color: theme.palette.primary.dark },
-  warning: { color: amber[700] },
+  success: { color: theme.palette.green.main },
+  error: { color: theme.palette.red.main },
+  info: { color: theme.palette.blue.main },
+  warning: { color: theme.palette.yellow.main },
   icon: {
     position: ({ small }) => (small ? 'initial' : 'absolute'),
     left: ({ small }) => (small ? 'initial' : theme.spacing(3)),
     top: ({ small }) => (small ? 'initial' : theme.spacing(3)),
-    fontSize: 28,
+    fontSize: 22,
     flexGrow: ({ small }) => (small ? 0 : 'initial'),
     alignSelf: ({ small }) => (small ? 'center' : 'initial'),
   },
@@ -50,6 +43,8 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(-1),
     flexGrow: ({ small }) => (small ? 0 : 'initial'),
     alignSelf: ({ small }) => (small ? 'center' : 'initial'),
+    fontSize: 22,
+    color: theme.palette.blue.main,
   },
   iconVariant: {
     opacity: 0.9,
@@ -61,33 +56,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Alert = ({ children, message, variant, small, showClose }) => {
-  const classes = useStyles({ small })
+const Alert = ({ children, message, variant, small, type = 'message', showClose }) => {
+  const classes = useStyles({ small, type })
   const [open, setOpen] = useState(true)
   if (!open) {
     return null
   }
-  const Icon = variantIcon[variant]
 
   return (
     <Paper className={classes.root} elevation={0}>
-      <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
+      <FontAwesomeIcon className={clsx(classes.icon, classes.iconVariant, classes[variant])}>
+        {variantIcon[variant]}
+      </FontAwesomeIcon>
       {message && (
-        <Text variant="body1" color="inherit" className={classes.message}>
+        <Text variant="body2" color="inherit" className={classes.message}>
           {message}
         </Text>
       )}
       {children}
       {showClose && (
-        <IconButton
-          key="close"
-          aria-label="Close"
-          color="inherit"
-          className={classes.close}
-          onClick={() => setOpen(false)}
-        >
-          <CloseIcon />
-        </IconButton>
+        <FontAwesomeIcon className={classes.close} onClick={() => setOpen(false)}>
+          minus-circle
+        </FontAwesomeIcon>
+        // <IconButton
+        //   key="close"
+        //   aria-label="Close"
+        //   color="inherit"
+        //   className={classes.close}
+        //   onClick={() => setOpen(false)}
+        // >
+        //   <CloseIcon />
+        // </IconButton>
       )}
     </Paper>
   )
@@ -99,7 +98,7 @@ Alert.propTypes = {
 
   // Use message when it is just a short string of text.
   message: PropTypes.node,
-
+  type: PropTypes.oneOf(['card', 'message']),
   variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
   small: PropTypes.bool,
   showClose: PropTypes.bool,
