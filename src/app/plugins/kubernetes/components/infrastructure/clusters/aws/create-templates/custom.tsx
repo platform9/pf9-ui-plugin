@@ -376,9 +376,8 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
                 {/* AWS Custom Networking Fields */}
                 <AwsCustomNetworkingFields
-                  setFieldValue={setFieldValue}
+                  setWizardContext={setWizardContext}
                   wizardContext={wizardContext}
-                  values={values}
                 />
 
                 {/* API FQDN */}
