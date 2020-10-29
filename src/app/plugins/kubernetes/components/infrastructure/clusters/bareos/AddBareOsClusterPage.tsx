@@ -17,7 +17,7 @@ import { getFormTitle } from '../helpers'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const canFinishAndReview = ({
+const canFinishAndReview = (createType) => ({
   masterNodes,
   workerNodes,
   allowWorkloadsOnMaster,
@@ -28,11 +28,23 @@ const canFinishAndReview = ({
   const hasOneMaster = hasMasters && masterNodes.length === 1
   const hasMultipleMasters = hasMasters && masterNodes.length >= 1
   const hasWorkers = !!workerNodes && workerNodes.length > 0
-  return (
-    (hasOneMaster && (!!allowWorkloadsOnMaster || hasWorkers)) ||
-    (hasMultipleMasters && !!masterVipIpv4 && !!masterVipIface)
-  )
+  if (createType === ClusterCreateTypes.SingleMaster) {
+    return hasOneMaster && (!!allowWorkloadsOnMaster || hasWorkers)
+  }
+  if (createType === ClusterCreateTypes.MultiMaster) {
+    return hasMultipleMasters && !!masterVipIpv4 && !!masterVipIface
+  }
+
+  return false
 }
+
+const wizardMetaFormattedNames = {
+  name: 'Cluster Name',
+  masterNodes: 'Master Nodes',
+  workerNodes: 'Worker Nodes',
+  networkPlugin: 'CNI',
+}
+const wizardMetaCalloutFields = ['name', 'masterNodes', 'workerNodes', 'networkPlugin']
 
 const AddBareOsClusterPage = () => {
   const { history, match } = useReactRouter()
@@ -85,13 +97,14 @@ const AddBareOsClusterPage = () => {
           onComplete={handleSubmit}
           context={initialContext}
           originPath={routes.cluster.add.path({ type: providerType })}
-          showFinishAndReviewButton={canFinishAndReview}
+          showFinishAndReviewButton={canFinishAndReview(createType)}
         >
           {({ wizardContext, setWizardContext, onNext }) => (
             <WizardMeta
               fields={wizardContext}
               icon={<CloudProviderCard active type={providerType} />}
-              calloutFields={['networkPlugin']}
+              keyOverrides={wizardMetaFormattedNames}
+              calloutFields={wizardMetaCalloutFields}
             >
               {ViewComponent && (
                 <ViewComponent

@@ -26,6 +26,7 @@ export function PrometheusMonitoringAddonField() {
   return (
     <Alert
       small
+      type="card"
       variant="error"
       message="The PMK management plane cannot monitor your cluster's health."
     />

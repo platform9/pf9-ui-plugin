@@ -119,7 +119,7 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
               }
             >
               {/* Cluster Name */}
-              <ClusterNameField />
+              <ClusterNameField setWizardContext={setWizardContext} />
 
               {/* Cloud Provider */}
               <CloudProviderField cloudProviderType={CloudProviders.Azure} />

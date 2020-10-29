@@ -9,6 +9,7 @@ import MetalLbModePicklist, { MetalLbModes } from 'k8s/components/common/metal-l
 import ExternalLink from 'core/components/ExternalLink'
 import { gettingStartedHelpLink } from 'k8s/links'
 import BulletList from 'core/components/BulletList'
+import { IPValidator } from './validators'
 
 const MetalLbField = ({ label = 'Enable MetalLB' }) => (
   <CheckboxField
@@ -49,7 +50,13 @@ export const MetalLbAddonField = ({ values }) => (
         <TextField id="metallbRouterIp" label="Router IP Address" required />
         <TextField id="metallbRouterAS" label="Router's AS Number" required />
         <TextField id="metallbAS" label="AS Number For MetalLb" required />
-        <MetalLbCidrField />
+        <TextField
+          id="metallbCidr"
+          label="Address Pool CIDR"
+          // info="Network CIDR from which Kubernetes allocates IP addresses to containers. This CIDR shouldn't overlap with the VPC CIDR. A /16 CIDR enables 256 nodes."
+          required
+          validations={[IPValidator]}
+        />
       </>
     )}
   </MetalLbAddonCard>

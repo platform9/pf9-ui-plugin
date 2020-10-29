@@ -309,7 +309,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 }
               >
                 {/* Cluster Name */}
-                <ClusterNameField />
+                <ClusterNameField setWizardContext={setWizardContext} />
 
                 {/* Cloud Provider */}
                 <CloudProviderField cloudProviderType={CloudProviders.Azure} />
@@ -333,7 +333,9 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                   })}
                 />
 
-                {wizardContext.template !== 'custom' && <AllowWorkloadsOnMasterField />}
+                {wizardContext.template !== 'custom' && (
+                  <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
+                )}
 
                 {wizardContext.template === 'custom' && (
                   <>
@@ -356,7 +358,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                     <WorkerNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
 
                     {/* Allow workloads on masters */}
-                    <AllowWorkloadsOnMasterField />
+                    <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
                   </>
                 )}
               </FormFieldCard>

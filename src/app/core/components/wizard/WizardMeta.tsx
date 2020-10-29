@@ -12,6 +12,7 @@ interface Props<T extends {}> {
   children?: JSX.Element | JSX.Element[]
   icon?: JSX.Element
   className?: any
+  keyOverrides?: { [key: string]: string }
   renderLabels?: (labels) => JSX.Element
 }
 
@@ -23,11 +24,14 @@ const isNotUndefined = (val) => val !== undefined
 
 export default function WizardMeta<T>({
   children,
+  keyOverrides = undefined,
   calloutFields = [],
   fields,
   icon,
   className,
-  renderLabels = (labels) => <RenderLabels labels={labels} inverse split />,
+  renderLabels = (labels) => (
+    <RenderLabels keyOverrides={keyOverrides} labels={labels} inverse split />
+  ),
 }: Props<T>) {
   const { setWizardCalloutFields } = useContext(WizardContext as any)
   useEffect(() => {

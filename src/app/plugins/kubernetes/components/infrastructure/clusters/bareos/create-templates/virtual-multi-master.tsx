@@ -91,7 +91,7 @@ const VirtualMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               </ExternalLink>
             }
           >
-            <ClusterNameField />
+            <ClusterNameField setWizardContext={setWizardContext} />
           </FormFieldCard>
 
           {/* Cluster Settings */}
@@ -105,7 +105,7 @@ const VirtualMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
             <Divider className={classes.divider} />
             <Text variant="caption1">Application & Container Settings</Text>
             <PrivilegedContainers {...props} />
-            <AllowWorkloadsOnMaster />
+            <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
 
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Add-Ons</Text>

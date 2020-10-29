@@ -20,24 +20,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export const RenderLabels = ({ variant = 'body2', labels, inverse = false, split = false }) => {
+export const RenderLabels = ({
+  variant = 'body2',
+  labels,
+  keyOverrides = undefined,
+  inverse = false,
+  split = false,
+}) => {
   const classes = useStyles({ split, inverse })
   return (
     <React.Fragment>
-      {toPairs(labels).map(([name, value]) => (
-        <Text key={name} variant={variant} className={classes.label} component="p">
-          {inverse && (
-            <span>
-              {name}: <b>{value}</b>
-            </span>
-          )}
-          {!inverse && (
-            <span>
-              <b>{name}:</b> {value}
-            </span>
-          )}
-        </Text>
-      ))}
+      {toPairs(labels).map(([name, value]) => {
+        const labelValue = Array.isArray(value) ? value.length : value
+        // eslint-disable-next-line no-extra-boolean-cast
+        const formattedName = !!keyOverrides ? keyOverrides[name] : name
+        return (
+          <Text key={name} variant={variant} className={classes.label} component="p">
+            {inverse && (
+              <span>
+                {formattedName}: <b>{labelValue}</b>
+              </span>
+            )}
+            {!inverse && (
+              <span>
+                <b>{formattedName}:</b> {labelValue}
+              </span>
+            )}
+          </Text>
+        )
+      })}
     </React.Fragment>
   )
 }
