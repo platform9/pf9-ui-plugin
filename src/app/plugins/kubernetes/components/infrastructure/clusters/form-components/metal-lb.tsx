@@ -7,7 +7,7 @@ import { IconInfo } from 'core/components/validatedForm/Info'
 import TextField from 'core/components/validatedForm/TextField'
 import MetalLbModePicklist, { MetalLbModes } from 'k8s/components/common/metal-lb-mode-picklist'
 import ExternalLink from 'core/components/ExternalLink'
-import { gettingStartedHelpLink } from 'k8s/links'
+import { applicationLoadBalancer } from 'k8s/links'
 import BulletList from 'core/components/BulletList'
 import { IPValidator } from './validators'
 
@@ -66,7 +66,7 @@ export const MetalLbAddonCard = ({ children }) => {
     <FormFieldCard
       title="Metal Lb Configuration"
       link={
-        <ExternalLink textVariant="caption2" url={gettingStartedHelpLink}>
+        <ExternalLink textVariant="caption2" url={applicationLoadBalancer}>
           Advanced Configuration: MetalLB Help
         </ExternalLink>
       }
