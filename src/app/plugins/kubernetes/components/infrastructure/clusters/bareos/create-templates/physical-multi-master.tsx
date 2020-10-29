@@ -179,7 +179,7 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               </FormFieldCard>
 
               <FormFieldCard title="Cluster Virtual IP Configuration">
-                <MasterVipFields withInfo />
+                <MasterVipFields withInfo wizardContext={wizardContext} />
               </FormFieldCard>
 
               <FormFieldCard title="Cluster Networking Range & HTTP Proxy">

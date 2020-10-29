@@ -6,7 +6,7 @@ import { pf9PmkArchitectureDigLink } from 'k8s/links'
 import { IconInfo } from 'core/components/validatedForm/Info'
 import BulletList from 'core/components/BulletList'
 
-const MasterVipFields = ({ withInfo = false }) => (
+const MasterVipFields = ({ withInfo = false, wizardContext }) => (
   <>
     {withInfo && (
       <IconInfo
@@ -40,6 +40,7 @@ const MasterVipFields = ({ withInfo = false }) => (
 
     <PicklistField
       DropdownComponent={VipInterfaceChooser}
+      masterNodes={wizardContext.masterNodes}
       id="masterVipIface"
       label="Physical interface for virtual IP association"
       infoPlacement="right-end"
