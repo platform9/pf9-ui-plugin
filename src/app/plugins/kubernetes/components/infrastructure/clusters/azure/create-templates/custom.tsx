@@ -238,7 +238,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
 
   const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
-    cloudProviderRegionId: wizardContext.location,
+    cloudProviderRegionId: wizardContext.region,
   })
   const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
