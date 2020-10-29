@@ -65,7 +65,7 @@ interface WizardAddonContext {
   addons: string[]
   setAddonContext: (addons: string[]) => void
 }
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+
 const AddonContext = React.createContext<WizardAddonContext>({} as WizardAddonContext)
 
 export const AddonTogglers = ({ addons }) => {

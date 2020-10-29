@@ -15,19 +15,10 @@ import { ClusterCreateTypes } from '../model'
 import { getFormTitle } from '../helpers'
 import DocumentMeta from 'core/components/DocumentMeta'
 import { trackEvent } from 'utils/tracking'
-import { makeStyles } from '@material-ui/styles'
-import Theme from 'core/themes/model'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const useStyles = makeStyles((theme: Theme) => ({
-  addAwsClusterPage: {
-    marginTop: theme.spacing(3),
-  },
-}))
-
 const AddAwsClusterPage = () => {
-  const classes = useStyles()
   const { history, match } = useReactRouter()
   const createType = match?.params?.type || ClusterCreateTypes.Custom
   const [activeView, setActiveView] = useState<{ ViewComponent: FC<any> }>(null)
@@ -78,7 +69,6 @@ const AddAwsClusterPage = () => {
         >
           {({ wizardContext, setWizardContext, onNext }) => (
             <WizardMeta
-              className={classes.addAwsClusterPage}
               fields={wizardContext}
               icon={<CloudProviderCard active type={CloudProviders.Aws} />}
             >
