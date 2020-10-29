@@ -181,7 +181,7 @@ const templateOptions = [
 // small (single dev) - 1 node master + worker - select instance type (default t2.small)
 // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
 // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => (option) => {
+const handleTemplateChoice = ({ setFieldValue }) => (option) => {
   const options = {
     small: {
       numMasters: 1,
@@ -215,8 +215,6 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => (option) =
 
   // setImmediate is used because we need the fields to show up in the form before their values can be set
   setImmediate(() => {
-    setWizardContext({ template: option })
-    setWizardContext(options[option])
     Object.entries(options[option]).forEach(([key, value]) => {
       setFieldValue(key)(value)
     })
@@ -290,18 +288,12 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 )}
 
                 {/* SSH Key */}
-                <SshKeyField
-                  dropdownComponent={AwsClusterSshKeyPicklist}
-                  cloudProviderType={CloudProviders.Aws}
-                  values={values}
-                  wizardContext={wizardContext}
-                />
+                <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={values} />
 
                 {/* Template Chooser */}
                 <ClusterTemplatesField
                   options={templateOptions}
                   onChange={handleTemplateChoice({
-                    setWizardContext,
                     setFieldValue,
                   })}
                 />
@@ -314,9 +306,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     {/* Master node instance type */}
                     <MasterNodeInstanceTypeField
                       dropdownComponent={AwsRegionFlavorPicklist}
-                      cloudProviderType={CloudProviders.Aws}
                       values={values}
-                      wizardContext={wizardContext}
                     />
 
                     {/* Num master nodes */}
@@ -325,9 +315,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     {/* Worker node instance type */}
                     <WorkerNodeInstanceTypeField
                       dropdownComponent={AwsRegionFlavorPicklist}
-                      cloudProviderType={CloudProviders.Aws}
                       values={values}
-                      wizardContext={wizardContext}
                     />
 
                     {/* Num worker nodes */}

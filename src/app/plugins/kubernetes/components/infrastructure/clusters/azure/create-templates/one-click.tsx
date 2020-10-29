@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react'
+import React, { FC } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import ClusterNameField from '../../form-components/name'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
@@ -6,8 +6,6 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { azurePrerequisitesLink } from 'k8s/links'
 import Text from 'core/elements/text'
 import ExternalLink from 'core/components/ExternalLink'
-import { loadCloudProviderDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
-import useDataLoader from 'core/hooks/useDataLoader'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
@@ -79,24 +77,7 @@ interface Props {
 const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
 
-  const [cloudProviderDetails] = useDataLoader(loadCloudProviderDetails, {
-    cloudProviderId: wizardContext.cloudProviderId,
-  })
-
-  const mapRegionName = useCallback(
-    (displayName) => {
-      return cloudProviderDetails.find((x) => x.DisplayName === displayName).RegionName
-    },
-    [cloudProviderDetails],
-  )
-
-  const handleRegionChange = useCallback(
-    (displayName) => {
-      const regionName = mapRegionName(displayName)
-      setWizardContext({ location: regionName })
-    },
-    [cloudProviderDetails],
-  )
+  const handleRegionChange = (regionName) => setWizardContext({ location: regionName })
 
   return (
     <WizardStep stepId="one-click" onNext={onNext}>

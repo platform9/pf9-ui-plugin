@@ -7,13 +7,10 @@ import FormReviewTable from 'core/components/validatedForm/review-table'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import WizardStep from 'core/components/wizard/WizardStep'
 import useDataLoader from 'core/hooks/useDataLoader'
-import {
-  loadCloudProviderDetails,
-  loadCloudProviderRegionDetails,
-} from 'k8s/components/infrastructure/cloudProviders/actions'
+import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { azurePrerequisitesLink } from 'k8s/links'
-import React, { FC, useCallback } from 'react'
+import React, { FC } from 'react'
 import { pathStrOr } from 'utils/fp'
 import { castBoolToStr } from 'utils/misc'
 import { trackEvent } from 'utils/tracking'
@@ -180,7 +177,7 @@ const templateOptions = [
 // small (single dev) - 1 node master + worker - select instance type (default t2.small)
 // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
 // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => (option) => {
+const handleTemplateChoice = ({ setFieldValue }) => (option) => {
   const options = {
     small: {
       numMasters: 1,
@@ -214,8 +211,6 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => (option) =
 
   // setImmediate is used because we need the fields to show up in the form before their values can be set
   setImmediate(() => {
-    setWizardContext({ template: option })
-    setWizardContext(options[option])
     Object.entries(options[option]).forEach(([key, value]) => {
       setFieldValue(key)(value)
     })
@@ -241,38 +236,13 @@ interface Props {
 const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
 
-  const [cloudProviderDetails] = useDataLoader(loadCloudProviderDetails, {
-    cloudProviderId: wizardContext.cloudProviderId,
-  })
-
   const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
     cloudProviderRegionId: wizardContext.location,
   })
   const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
-  const mapRegionName = useCallback(
-    (displayName) => {
-      return cloudProviderDetails.find((x) => x.DisplayName === displayName).RegionName
-    },
-    [cloudProviderDetails],
-  )
-
-  /**
-   * Maps Azure's region display name to the actual region name
-   *
-   * Ex. East US -> eastus
-   *
-   * wizardContext.region contains the display name (Ex. East US)
-   * wizardContext.location will contain the region name (Ex. eastus)
-   */
-  const handleRegionChange = useCallback(
-    (displayName) => {
-      const regionName = mapRegionName(displayName)
-      setWizardContext({ location: regionName })
-    },
-    [cloudProviderDetails],
-  )
+  const handleRegionChange = (regionName) => setWizardContext({ location: regionName })
 
   return (
     <>
@@ -317,16 +287,15 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <ClusterTemplatesField
                   options={templateOptions}
                   onChange={handleTemplateChoice({
-                    setWizardContext,
                     setFieldValue,
                   })}
                 />
 
-                {wizardContext.template !== 'custom' && (
+                {values.template !== 'custom' && (
                   <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
                 )}
 
-                {wizardContext.template === 'custom' && (
+                {values.template === 'custom' && (
                   <>
                     {/* Use All Availability Zones Checkbox Field and Azure Availability Zone Chooser */}
                     <AzureAvailabilityZoneFields
@@ -338,23 +307,13 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                     <NumMasterNodesField />
 
                     {/* Master node SKU */}
-                    <MasterNodeSkuField
-                      dropdownComponent={AzureSkuPicklist}
-                      cloudProviderType={CloudProviders.Azure}
-                      wizardContext={wizardContext}
-                      values={values}
-                    />
+                    <MasterNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
 
                     {/* Num worker nodes */}
                     <NumWorkerNodesField />
 
                     {/* Worker node SKU */}
-                    <WorkerNodeSkuField
-                      dropdownComponent={AzureSkuPicklist}
-                      cloudProviderType={CloudProviders.Azure}
-                      wizardContext={wizardContext}
-                      values={values}
-                    />
+                    <WorkerNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
 
                     {/* Allow workloads on masters */}
                     <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
@@ -409,31 +368,21 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                     {/* Resource group */}
                     <ResourceGroupField
                       dropdownComponent={AzureResourceGroupPicklist}
-                      cloudProviderType={CloudProviders.Azure}
                       wizardContext={wizardContext}
                     />
 
                     {/* Existing network.  I don't get the point of this field. */}
-                    <ExistingNetworkField
-                      dropdownComponent={AzureVnetPicklist}
-                      cloudProviderType={CloudProviders.Azure}
-                      values={values}
-                      wizardContext={wizardContext}
-                    />
+                    <ExistingNetworkField dropdownComponent={AzureVnetPicklist} values={values} />
 
                     {/* Master node subnet */}
                     <MasterNodeSubnetField
                       dropdownComponent={AzureSubnetPicklist}
-                      cloudProviderType={CloudProviders.Azure}
-                      wizardContext={wizardContext}
                       values={values}
                     />
 
                     {/* Worker node subnet */}
                     <WorkerNodeSubnetField
                       dropdownComponent={AzureSubnetPicklist}
-                      cloudProviderType={CloudProviders.Azure}
-                      wizardContext={wizardContext}
                       values={values}
                     />
                   </>
