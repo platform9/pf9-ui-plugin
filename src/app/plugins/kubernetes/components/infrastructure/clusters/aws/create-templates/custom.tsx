@@ -30,12 +30,11 @@ import HttpProxyField from '../../form-components/http-proxy'
 import NetworkBackendField from '../../form-components/network-backend'
 import CalicoNetworkFields from '../../form-components/calico-network-fields'
 import PrivilegedField from '../../form-components/privileged'
-import TagsField from '../../form-components/tags'
+import TagsField, { FormattedTags } from '../../form-components/tags'
 import CustomAmiField from '../../form-components/custom-ami'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
 import FormReviewTable from 'core/components/validatedForm/review-table'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
-import CodeBlock from 'core/components/CodeBlock'
 import { Divider } from '@material-ui/core'
 import KubernetesVersion from '../../form-components/kubernetes-version'
 import Text from 'core/elements/text'
@@ -69,25 +68,6 @@ export const initialContext = {
 
 const renderNumWorkersCellValue = (data) => (cellValue) => {
   return data.enableCAS ? `Min ${data.numWorkers} - Max ${data.numMaxWorkers}` : data.numWorkers
-}
-
-const renderTagRow = ({ key, value }) => (
-  <tr>
-    <td>
-      <CodeBlock>{key}</CodeBlock>
-    </td>
-    <td>
-      <CodeBlock>{value}</CodeBlock>
-    </td>
-  </tr>
-)
-
-const renderTags = (keyValuePairs) => {
-  return (
-    <table>
-      <tbody>{keyValuePairs.map((pair) => renderTagRow(pair))}</tbody>
-    </table>
-  )
 }
 
 const getReviewTableColumns = (data) => {
@@ -132,7 +112,8 @@ const getReviewTableColumns = (data) => {
     {
       id: 'tags',
       label: 'Tags',
-      render: (keyValuePairs) => renderTags(keyValuePairs),
+      renderArray: true,
+      render: (value) => <FormattedTags tags={value} />,
     },
   ]
 }
@@ -304,7 +285,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     values={values}
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
-                    allowMultiSelect={true}
+                    allowMultiSelect
                   />
                 )}
 

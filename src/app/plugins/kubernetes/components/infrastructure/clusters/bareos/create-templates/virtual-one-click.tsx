@@ -18,7 +18,7 @@ import ClusterHostChooser, { isConnected, isUnassignedNode } from '../ClusterHos
 import KubernetesVersion from '../../form-components/kubernetes-version'
 
 import Theme from 'core/themes/model'
-import { ClusterCreateTypeNames } from '../../model'
+import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -89,7 +89,7 @@ const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext
         {/* <PollingData loading={loading} onReload={reload} hidden /> */}
         {/* Cluster Name */}
         <FormFieldCard
-          title={`${ClusterCreateTypeNames['one-click']} Single Node Cluster Setup`}
+          title={`${ClusterCreateTypeNames[ClusterCreateTypes.OneClick]} Single Node Cluster Setup`}
           link={
             <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
               BareOS Cluster Help

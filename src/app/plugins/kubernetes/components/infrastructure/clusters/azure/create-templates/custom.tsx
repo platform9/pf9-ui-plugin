@@ -1,7 +1,6 @@
 import { Divider, makeStyles, Theme } from '@material-ui/core'
 import { defaultEtcBackupPath } from 'app/constants'
 import Alert from 'core/components/Alert'
-import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FormReviewTable from 'core/components/validatedForm/review-table'
@@ -38,7 +37,7 @@ import NumWorkerNodesField from '../../form-components/num-worker-nodes'
 import PrivilegedField from '../../form-components/privileged'
 import ResourceGroupField from '../../form-components/resource-group'
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
-import TagsField from '../../form-components/tags'
+import TagsField, { FormattedTags } from '../../form-components/tags'
 import WorkerNodeSkuField from '../../form-components/worker-node-sku'
 import WorkerNodeSubnetField from '../../form-components/worker-node-subnet'
 import AzureAvailabilityZoneFields from '../azure-availability-zone'
@@ -76,25 +75,6 @@ const renderNumWorkersCellValue = (data) => (cellValue) => {
   return data.enableCAS ? `Min ${data.numWorkers} - Max ${data.numMaxWorkers}` : data.numWorkers
 }
 
-const renderTagRow = ({ key, value }) => (
-  <tr>
-    <td>
-      <CodeBlock>{key}</CodeBlock>
-    </td>
-    <td>
-      <CodeBlock>{value}</CodeBlock>
-    </td>
-  </tr>
-)
-
-const renderTags = (keyValuePairs) => {
-  return (
-    <table>
-      <tbody>{keyValuePairs.map((pair) => renderTagRow(pair))}</tbody>
-    </table>
-  )
-}
-
 const getReviewTableColumns = (data) => {
   return [
     { id: 'name', label: 'Name' },
@@ -128,7 +108,8 @@ const getReviewTableColumns = (data) => {
     {
       id: 'tags',
       label: 'Tags',
-      render: (keyValuePairs) => renderTags(keyValuePairs),
+      renderArray: true,
+      render: (value) => <FormattedTags tags={value} />,
     },
   ]
 }
@@ -436,7 +417,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                   </>
                 )}
 
-                {values.network === 'existing' && virtualNetworks.length == 0 && (
+                {values.network === 'existing' && virtualNetworks.length === 0 && (
                   <Alert
                     small
                     variant="error"

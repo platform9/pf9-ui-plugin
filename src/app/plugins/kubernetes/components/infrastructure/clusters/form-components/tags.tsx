@@ -9,6 +9,6 @@ const TagsField = ({ info = 'Add tag metadata to this cluster', blacklistedTags 
 export default TagsField
 
 export const FormattedTags = ({ tags }) => {
-  const elems = tags.map((tag) => <CodeBlock>{tag.key}</CodeBlock>)
+  const elems = tags.map((tag) => <CodeBlock key={tag.key}>{tag.key}</CodeBlock>)
   return <>{!tags.length ? '-' : elems}</>
 }

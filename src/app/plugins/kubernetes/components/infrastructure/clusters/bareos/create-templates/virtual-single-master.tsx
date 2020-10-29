@@ -42,7 +42,7 @@ import CalicoNetworkFields from '../../form-components/calico-network-fields'
 import TagsField, { FormattedTags } from '../../form-components/tags'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
-import { ClusterCreateTypeNames } from '../../model'
+import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -89,7 +89,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           {/* <PollingData loading={loading} onReload={reload} hidden /> */}
           {/* Cluster Name */}
           <FormFieldCard
-            title={`Name your ${ClusterCreateTypeNames['single-master']} Cluster`}
+            title={`Name your ${ClusterCreateTypeNames[ClusterCreateTypes.SingleMaster]} Cluster`}
             link={
               <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
                 BareOS Cluster Help
@@ -278,7 +278,12 @@ const reviewTableColumns = [
     label: 'Advanced API Configuration',
     render: (value) => capitalizeString(value),
   },
-  { id: 'tags', label: 'Tags', render: (value) => <FormattedTags tags={value} /> },
+  {
+    id: 'tags',
+    label: 'Tags',
+    renderArray: true,
+    render: (value) => <FormattedTags tags={value} />,
+  },
 ]
 
 const basicOnNext = (context) => {

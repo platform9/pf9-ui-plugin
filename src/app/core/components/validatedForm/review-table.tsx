@@ -25,7 +25,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const DataRow = ({ label, value, render = identity }) => {
+const DataRow = ({ label, value, renderArray = false, render = identity }) => {
   const classes = useStyles()
   return (
     <tr>
@@ -40,7 +40,7 @@ const DataRow = ({ label, value, render = identity }) => {
           className={clsx(classes.rowValue, value === 'Not Enabled' && classes.disabledText)}
           component="span"
         >
-          {Array.isArray(value)
+          {!renderArray && Array.isArray(value)
             ? value.map((val, idx) => (
                 <Text key={idx} variant="caption1">
                   {render(val || '-')}
@@ -60,6 +60,7 @@ interface ReviewRow<T> {
   label: string
   render?: (value) => any
   insertDivider?: boolean
+  renderArray?: boolean
 }
 
 interface Props<T = GenericObject> {
@@ -70,20 +71,21 @@ interface Props<T = GenericObject> {
 const FormReviewTable: FC<Props> = ({ data, columns }) => {
   const classes = useStyles()
   const elems: JSX.Element[] = []
-  columns.map((column) => {
+
+  for (const column of columns) {
     const value = data[column.id]
     if (column.insertDivider) {
       // We have a new section, insert a divider
       elems.push(
-        <tr>
+        <tr key={`${column.id}-divider`}>
           <td colSpan={2}>
             <Divider className={classes.divider} />
           </td>
         </tr>,
       )
     }
-    elems.push(<DataRow {...column} value={value} />)
-  })
+    elems.push(<DataRow key={column.id} {...column} value={value} />)
+  }
 
   return (
     <table className={classes.reviewTable}>
