@@ -9,7 +9,7 @@ import { k8sPrefix } from 'app/constants'
 import { routes } from 'core/utils/routes'
 import { trackEvent } from 'utils/tracking'
 import WizardMeta from 'core/components/wizard/WizardMeta'
-import { ClusterCreateTypes } from '../model'
+import { ClusterCreateTypeNames, ClusterCreateTypes } from '../model'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import { CloudProviders } from '../../cloudProviders/model'
 import DocumentMeta from 'core/components/DocumentMeta'
@@ -46,7 +46,7 @@ const AddBareOsClusterPage = () => {
     async function loadFile(name, provider) {
       const view = await import(`./create-templates/${provider}-${name}`)
       setActiveView({ ViewComponent: view.default })
-      setFormTitle(view.templateTitle)
+      setFormTitle(ClusterCreateTypeNames[name])
       setInitialContext(view.initialContext)
     }
     loadFile(createType, providerType)

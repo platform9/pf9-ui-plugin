@@ -10,7 +10,7 @@ import { k8sPrefix } from 'app/constants'
 import { CloudProviders } from '../../cloudProviders/model'
 
 import { routes } from 'core/utils/routes'
-import { ClusterCreateTypes } from '../model'
+import { ClusterCreateTypeNames, ClusterCreateTypes } from '../model'
 
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { getFormTitle } from '../helpers'
@@ -31,7 +31,7 @@ const AddAzureClusterPage = () => {
     async function loadFile(name) {
       const view = await import(`./create-templates/${name}`)
       setActiveView({ ViewComponent: view.default })
-      setFormTitle(view.templateTitle)
+      setFormTitle(ClusterCreateTypeNames[name])
       setInitialContext(view.initialContext)
     }
     loadFile(createType)

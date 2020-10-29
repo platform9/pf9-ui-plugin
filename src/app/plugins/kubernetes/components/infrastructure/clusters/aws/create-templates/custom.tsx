@@ -43,8 +43,6 @@ import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-mast
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import WorkerNodeInstanceTypeField from '../../form-components/worker-node-instance-type'
 
-export const templateTitle = 'Custom'
-
 export const initialContext = {
   template: 'small',
   ami: 'ubuntu',

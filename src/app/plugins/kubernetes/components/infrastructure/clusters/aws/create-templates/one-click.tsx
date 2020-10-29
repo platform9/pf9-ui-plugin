@@ -18,8 +18,6 @@ import ClusterDomainField from '../../form-components/cluster-domain'
 import AwsAvailabilityZoneField from '../aws-availability-zone'
 import { castBoolToStr } from 'utils/misc'
 
-export const templateTitle = 'One Click'
-
 export const initialContext = {
   network: 'newPublic',
   numMasters: 1,

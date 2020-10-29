@@ -18,8 +18,7 @@ import ClusterHostChooser, { isConnected, isUnassignedNode } from '../ClusterHos
 import KubernetesVersion from '../../form-components/kubernetes-version'
 
 import Theme from 'core/themes/model'
-
-export const templateTitle = 'One Click'
+import { ClusterCreateTypeNames } from '../../model'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -90,7 +89,7 @@ const OneClickPhysicalMachineCluster = ({ wizardContext, setWizardContext, onNex
         {/* <PollingData loading={loading} onReload={reload} hidden /> */}
         {/* Cluster Name */}
         <FormFieldCard
-          title={`${templateTitle} Single Node Cluster Setup`}
+          title={`${ClusterCreateTypeNames['one-click']} Single Node Cluster Setup`}
           link={
             <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
               BareOS Cluster Help

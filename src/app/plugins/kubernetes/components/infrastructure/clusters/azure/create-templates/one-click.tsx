@@ -18,8 +18,6 @@ import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
 
-export const templateTitle = 'One Click'
-
 export const initialContext = {
   numMasters: 1,
   numWorkers: 0,

@@ -50,8 +50,6 @@ import Text from 'core/elements/text'
 import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-master-nodes-master-and-worker'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 
-export const templateTitle = 'Custom'
-
 export const initialContext = {
   template: 'small',
   masterSku: 'Standard_A1_v2',

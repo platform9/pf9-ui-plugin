@@ -38,8 +38,7 @@ import CalicoNetworkFields from '../../form-components/calico-network-fields'
 import TagsField, { FormattedTags } from '../../form-components/tags'
 import MasterVipFields from '../../form-components/master-virtual-ip'
 import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
-
-export const templateTitle = 'Multi Master'
+import { ClusterCreateTypeNames } from '../../model'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -85,7 +84,7 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         >
           {/* Cluster Name */}
           <FormFieldCard
-            title={`Name your ${templateTitle} Cluster`}
+            title={`Name your ${ClusterCreateTypeNames['multi-master']} Cluster`}
             link={
               <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
                 BareOS Cluster Help

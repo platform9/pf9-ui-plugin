@@ -9,6 +9,13 @@ export enum ClusterCreateTypes {
   MultiMaster = 'multi-master',
 }
 
+export enum ClusterCreateTypeNames {
+  'one-click' = 'One-Click',
+  'custom' = 'Custom',
+  'single-master' = 'Single Master',
+  'multi-master' = 'Multi-Master',
+}
+
 export enum BareOsRequiredNodes {
   'one-click' = 1,
   'single-master' = 1,

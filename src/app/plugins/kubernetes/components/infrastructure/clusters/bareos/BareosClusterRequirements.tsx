@@ -101,7 +101,7 @@ interface Props {
 const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
   const classes = useStyles({})
   const [showDialog, setShowDialog] = useState(false)
-  const [clusterCreateType, setClusterCreateType] = useState('')
+  const [createType, setCreateType] = useState('')
   const [availableNodes, setAvailableNodes] = useState(0)
   const [requiredNodes, setRequiredNodes] = useState(0)
   const [nodes, loading] = useDataLoader(loadNodes)
@@ -119,7 +119,7 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
       const hasAvailableNodes = availableNodes >= requiredNodes
 
       if (!hasAvailableNodes) {
-        setClusterCreateType(type)
+        setCreateType(type)
         setShowDialog(true)
       } else {
         onComplete(routes.cluster.addBareOs[provider][type].path())
@@ -132,7 +132,7 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
     <>
       {showDialog && (
         <InsufficientNodesNodesDialog
-          clusterCreateType={clusterCreateType}
+          createType={createType}
           availableNodes={availableNodes}
           requiredNodes={requiredNodes}
           showDialog={showDialog}

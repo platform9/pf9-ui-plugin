@@ -11,7 +11,7 @@ import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import { CloudProviders } from '../../cloudProviders/model'
 import { routes } from 'core/utils/routes'
-import { ClusterCreateTypes } from '../model'
+import { ClusterCreateTypes, ClusterCreateTypeNames } from '../model'
 import { getFormTitle } from '../helpers'
 import DocumentMeta from 'core/components/DocumentMeta'
 import { trackEvent } from 'utils/tracking'
@@ -29,7 +29,7 @@ const AddAwsClusterPage = () => {
     async function loadFile(name) {
       const view = await import(`./create-templates/${name}`)
       setActiveView({ ViewComponent: view.default })
-      setFormTitle(view.templateTitle)
+      setFormTitle(ClusterCreateTypeNames[name])
       setInitialContext(view.initialContext)
     }
     loadFile(createType)

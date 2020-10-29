@@ -12,7 +12,7 @@ import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
 import { prop } from 'ramda'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { capitalizeString } from 'utils/misc'
+import { ClusterCreateTypeNames } from '../model'
 
 const downloadCliCommand =
   'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
@@ -59,10 +59,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const capitalizeHyphenatedWord = (word) => word.replace(/[a-z]+/g, (s) => capitalizeString(s))
-
 const InsufficientNodesNodesDialog = ({
-  clusterCreateType,
+  createType,
   availableNodes,
   requiredNodes,
   showDialog,
@@ -71,7 +69,6 @@ const InsufficientNodesNodesDialog = ({
   const classes = useStyles()
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const createType = capitalizeHyphenatedWord(clusterCreateType)
 
   return (
     <Dialog fullWidth maxWidth="md" open={showDialog}>
@@ -80,7 +77,7 @@ const InsufficientNodesNodesDialog = ({
         title={
           <Text variant="body1" component="div">
             <FontAwesomeIcon className={classes.icon}>exclamation-circle</FontAwesomeIcon>
-            {`Insufficient Nodes for ${createType} Cluster Configuration`}
+            {`Insufficient Nodes for ${ClusterCreateTypeNames[createType]} Cluster Configuration`}
           </Text>
         }
         link={
@@ -90,8 +87,8 @@ const InsufficientNodesNodesDialog = ({
         }
       >
         <Text variant="subtitle2" className={classes.text}>
-          {`The available number of connected nodes is insufficient for a ${createType} Cluster. You
-          will need to connect additional BareOS Nodes prior to creating a ${createType} Cluster.`}
+          {`The available number of connected nodes is insufficient for a ${ClusterCreateTypeNames[createType]} Cluster. You
+          will need to connect additional BareOS Nodes prior to creating a ${ClusterCreateTypeNames[createType]} Cluster.`}
         </Text>
         <div className={classes.nodesInfo}>
           <Text variant="body1">Number of available nodes:</Text>
