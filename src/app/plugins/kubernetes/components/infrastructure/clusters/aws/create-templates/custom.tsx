@@ -290,7 +290,11 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 )}
 
                 {/* SSH Key */}
-                <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={values} />
+                <SshKeyField
+                  dropdownComponent={AwsClusterSshKeyPicklist}
+                  cloudProviderType={CloudProviders.Aws}
+                  values={values}
+                />
 
                 {/* Template Chooser */}
                 <ClusterTemplatesField
@@ -309,6 +313,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     {/* Master node instance type */}
                     <MasterNodeInstanceTypeField
                       dropdownComponent={AwsRegionFlavorPicklist}
+                      cloudProviderType={CloudProviders.Aws}
                       values={values}
                     />
 
@@ -318,6 +323,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     {/* Worker node instance type */}
                     <WorkerNodeInstanceTypeField
                       dropdownComponent={AwsRegionFlavorPicklist}
+                      cloudProviderType={CloudProviders.Aws}
                       values={values}
                     />
 

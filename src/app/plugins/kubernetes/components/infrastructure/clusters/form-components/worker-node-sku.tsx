@@ -1,8 +1,10 @@
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import React from 'react'
+import { CloudProviders } from '../../cloudProviders/model'
 
-const WorkerNodeSkuField = ({ dropdownComponent, values }) => {
-  const cloudProviderRegionId = values.region !== 'undefined' ? values.region : values.location // AWS uses region. Azure uses location
+const WorkerNodeSkuField = ({ dropdownComponent, cloudProviderType, wizardContext, values }) => {
+  const cloudProviderRegionId =
+    cloudProviderType === CloudProviders.Aws ? wizardContext.region : wizardContext.location // For Azure, it's location, not region
   return (
     <PicklistField
       DropdownComponent={dropdownComponent}
@@ -12,7 +14,7 @@ const WorkerNodeSkuField = ({ dropdownComponent, values }) => {
       cloudProviderId={values.cloudProviderId}
       cloudProviderRegionId={cloudProviderRegionId}
       filterByZones={!values.useAllAvailabilityZones}
-      selectedZones={values.zones}
+      selectedZones={wizardContext.zones}
       info="Choose an instance type used by worker nodes."
       required
     />

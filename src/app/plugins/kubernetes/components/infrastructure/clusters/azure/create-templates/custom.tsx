@@ -247,7 +247,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
 
   const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
-    cloudProviderRegionId: wizardContext.cloudProviderRegionId,
+    cloudProviderRegionId: wizardContext.location,
   })
   const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
@@ -258,6 +258,14 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
     [cloudProviderDetails],
   )
 
+  /**
+   * Maps Azure's region display name to the actual region name
+   *
+   * Ex. East US -> eastus
+   *
+   * wizardContext.region contains the display name (Ex. East US)
+   * wizardContext.location will contain the region name (Ex. eastus)
+   */
   const handleRegionChange = useCallback(
     (displayName) => {
       const regionName = mapRegionName(displayName)
@@ -330,13 +338,23 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                     <NumMasterNodesField />
 
                     {/* Master node SKU */}
-                    <MasterNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
+                    <MasterNodeSkuField
+                      dropdownComponent={AzureSkuPicklist}
+                      cloudProviderType={CloudProviders.Azure}
+                      wizardContext={wizardContext}
+                      values={values}
+                    />
 
                     {/* Num worker nodes */}
                     <NumWorkerNodesField />
 
                     {/* Worker node SKU */}
-                    <WorkerNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
+                    <WorkerNodeSkuField
+                      dropdownComponent={AzureSkuPicklist}
+                      cloudProviderType={CloudProviders.Azure}
+                      wizardContext={wizardContext}
+                      values={values}
+                    />
 
                     {/* Allow workloads on masters */}
                     <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
@@ -391,19 +409,22 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                     {/* Resource group */}
                     <ResourceGroupField
                       dropdownComponent={AzureResourceGroupPicklist}
+                      cloudProviderType={CloudProviders.Azure}
                       wizardContext={wizardContext}
                     />
 
                     {/* Existing network.  I don't get the point of this field. */}
                     <ExistingNetworkField
                       dropdownComponent={AzureVnetPicklist}
+                      cloudProviderType={CloudProviders.Azure}
                       values={values}
-                      wizardContext={setWizardContext}
+                      wizardContext={wizardContext}
                     />
 
                     {/* Master node subnet */}
                     <MasterNodeSubnetField
                       dropdownComponent={AzureSubnetPicklist}
+                      cloudProviderType={CloudProviders.Azure}
                       wizardContext={wizardContext}
                       values={values}
                     />
@@ -411,6 +432,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                     {/* Worker node subnet */}
                     <WorkerNodeSubnetField
                       dropdownComponent={AzureSubnetPicklist}
+                      cloudProviderType={CloudProviders.Azure}
                       wizardContext={wizardContext}
                       values={values}
                     />
@@ -421,7 +443,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                   <Alert
                     small
                     variant="error"
-                    message={`No existing virtual networks in location ${wizardContext.cloudProviderRegionId}.`}
+                    message={`No existing virtual networks in location ${wizardContext.region}.`}
                   />
                 )}
 
