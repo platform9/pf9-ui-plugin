@@ -17,19 +17,10 @@ import { getFormTitle } from '../helpers'
 import DocumentMeta from 'core/components/DocumentMeta'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import { trackEvent } from 'utils/tracking'
-import { makeStyles } from '@material-ui/styles'
-import Theme from 'core/themes/model'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const useStyles = makeStyles((theme: Theme) => ({
-  addAzureClusterPage: {
-    marginTop: theme.spacing(3),
-  },
-}))
-
 const AddAzureClusterPage = () => {
-  const classes = useStyles()
   const { history, match } = useReactRouter()
   const createType = match?.params?.type || ClusterCreateTypes.Custom
   const [activeView, setActiveView] = useState<{ ViewComponent: FC<any> }>(null)
@@ -81,7 +72,6 @@ const AddAzureClusterPage = () => {
           {({ wizardContext, setWizardContext, onNext }) => {
             return (
               <WizardMeta
-                className={classes.addAzureClusterPage}
                 fields={wizardContext}
                 icon={<CloudProviderCard active type={CloudProviders.Azure} />}
               >
