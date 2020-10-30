@@ -182,16 +182,20 @@ const renderRawComponents = moize((plugins) =>
     .flat(),
 )
 
+// TODO: Deprecate this when a better URL management system is crafted
 const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) => {
   // If it is neither ironic nor kubernetes, bump user to old UI
-  // TODO: For production, I need to always bump user to old UI in both ironic
-  // and standard openstack cases, but I don't want to do that yet for development.
-  // In fact maybe just never do that for development build since old ui is not running.
   if (!ironicEnabled && !kubernetesEnabled) {
     history.push(clarityDashboardUrl)
-  } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
+  }
+
+  // Redirect to ironic wizard if region only has ironic enabled & currently on kubernetes view
+  if (ironicEnabled && !kubernetesEnabled && history.location.pathname.includes('kubernetes')) {
     history.push(ironicWizardUrl)
-  } else if (!ironicEnabled && history.location.pathname.includes('metalstack')) {
+  }
+
+  // Redirect to kubernetes dashboard if region only has kubernetes & currently on ironic view
+  if (!ironicEnabled && kubernetesEnabled && history.location.pathname.includes('metalstack')) {
     history.push(dashboardUrl)
   }
 }
@@ -250,7 +254,6 @@ const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, dispat
     setStacks(determineStacks(regionFeatures))
 
     redirectToAppropriateStack(
-      // false, // Keep this false until ironic supported by the new UI
       features.experimental.ironic,
       features.experimental.containervisor,
       history,

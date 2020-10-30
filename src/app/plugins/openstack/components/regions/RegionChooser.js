@@ -25,6 +25,7 @@ const RegionChooser = (props) => {
   const [regions, loadingRegions, reloadRegions] = useDataLoader(regionActions.list)
   const dispatch = useDispatch()
   const [selectedRegion, setRegion] = useState()
+
   const curRegionId = useMemo(() => {
     if (selectedRegion) {
       return selectedRegion
@@ -54,12 +55,15 @@ const RegionChooser = (props) => {
         'regionObj',
         regions.find((r) => regionId === r.id),
       )
+
+      // Redirect to the root of the current section (there's no need to reload all the app)
+      // Must be done prior to updatePrefs until improved url management system is in place
+      // bc of listener in AuthenticatedContainer which may also redirect
+      history.push(currentSection)
+
       updatePrefs({ currentRegion: regionId })
       // Clearing the cache will cause all the current loaders to reload its data
       await dispatch(cacheActions.clearCache())
-
-      // Redirect to the root of the current section (there's no need to reload all the app)
-      history.push(currentSection)
 
       setLoading(false)
     },
@@ -79,8 +83,11 @@ const RegionChooser = (props) => {
       'regionObj',
       regions.find((r) => curRegionId === r.id),
     )
-    updatePrefs({ currentRegion: curRegionId })
-    setActiveRegion(curRegionId)
+    if (!currentRegion) {
+      // Set currentRegion in prefs on first-ever load
+      updatePrefs({ currentRegion: curRegionId })
+      setActiveRegion(curRegionId)
+    }
   }, [curRegionId, regions])
 
   return (
