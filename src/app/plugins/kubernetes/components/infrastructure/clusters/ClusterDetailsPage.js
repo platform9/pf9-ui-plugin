@@ -122,6 +122,7 @@ const useStyles = makeStyles((theme) => ({
   },
   tabContainer: {
     paddingTop: theme.spacing(2),
+    maxWidth: 1131,
   },
   detailsHeader: {
     display: 'grid',
@@ -136,7 +137,6 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.red[500],
   },
   taskErrorAlert: {
-    maxWidth: 1085,
     maxHeight: 200,
     padding: theme.spacing(1, 1, 1, 4.5),
     marginBottom: theme.spacing(2),
