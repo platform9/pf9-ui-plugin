@@ -9,6 +9,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'grid',
     gridTemplateColumns: ({ valueOff }) => (!valueOff ? '58px 1fr 138px' : '58px 138px'),
+    gridGap: ({ valueOff }) => (valueOff ? '8px' : '0px'),
   },
   label: {
     color: theme.palette.grey[500],

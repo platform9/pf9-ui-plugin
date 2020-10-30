@@ -4,20 +4,12 @@ import { pathStrOr, projectAs } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
-import MultiSelectDefault from 'core/components/MultiSelect'
+import MultiSelect from 'core/components/MultiSelect'
 import SingleSelect from 'core/components/SingleSelect'
-const MultiSelect: any = MultiSelectDefault // types on forward ref .js file dont work well.
 
 const AwsAvailabilityZoneChooser = forwardRef(
   (
-    {
-      cloudProviderId,
-      cloudProviderRegionId,
-      allowMultiSelect,
-      wizardContext,
-      setWizardContext,
-      ...rest
-    }: Props,
+    { cloudProviderId, cloudProviderRegionId, allowMultiSelect, values, id, ...rest }: Props,
     ref,
   ) => {
     const [details] = useDataLoader(loadCloudProviderRegionDetails, {
@@ -28,27 +20,20 @@ const AwsAvailabilityZoneChooser = forwardRef(
     const azs = pathStrOr([], '0.azs', details)
     const regions = projectAs({ label: 'ZoneName', value: 'ZoneName' }, azs)
 
-    if (allowMultiSelect) {
-      return (
-        <MultiSelect
-          className="validatedFormInput"
-          label="Availability Zones"
-          options={regions}
-          {...rest}
-        />
-      )
-    } else {
-      return (
-        <SingleSelect
-          className="validatedFormInput"
-          label="Availability Zones"
-          wizardContext={wizardContext}
-          setWizardContext={setWizardContext}
-          options={regions}
-          {...rest}
-        />
-      )
-    }
+    const SelectComponent = allowMultiSelect ? MultiSelect : SingleSelect
+    const componentProps: any = {}
+    if (!allowMultiSelect && values.length === 1) componentProps.value = values[0]
+
+    return (
+      <SelectComponent
+        className="validatedFormInput"
+        label="Availability Zones"
+        options={regions}
+        values={values}
+        {...componentProps}
+        {...rest}
+      />
+    )
   },
 )
 
@@ -72,8 +57,6 @@ interface Props {
   onChange: any
   required?: boolean
   allowMultiSelect: boolean
-  wizardContext: any
-  setWizardContext: any
 }
 AwsAvailabilityZoneChooser.displayName = 'AwsAvailabilityZoneChooser'
 

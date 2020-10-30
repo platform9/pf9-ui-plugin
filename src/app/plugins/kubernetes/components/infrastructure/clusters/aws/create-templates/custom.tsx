@@ -38,7 +38,6 @@ import { capitalizeString, castBoolToStr } from 'utils/misc'
 import { Divider } from '@material-ui/core'
 import KubernetesVersion from '../../form-components/kubernetes-version'
 import Text from 'core/elements/text'
-import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-master-nodes-master-and-worker'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import WorkerNodeInstanceTypeField from '../../form-components/worker-node-instance-type'
 
@@ -66,57 +65,47 @@ export const initialContext = {
   appCatalogEnabled: false,
 }
 
-const renderNumWorkersCellValue = (data) => (cellValue) => {
-  return data.enableCAS ? `Min ${data.numWorkers} - Max ${data.numMaxWorkers}` : data.numWorkers
-}
-
-const getReviewTableColumns = (data) => {
-  return [
-    { id: 'name', label: 'Name' },
-    { id: 'region', label: 'Region' },
-    { id: 'ami', label: 'Operating System' },
-    { id: 'masterFlavor', label: 'Master node instance type', insertDivider: true },
-    { id: 'workerFlavor', label: 'Worker node instance type' },
-    { id: 'numMasters', label: 'Num master nodes' },
-    {
-      id: 'numWorkers',
-      label: 'Num worker nodes',
-      render: (value) => renderNumWorkersCellValue(data),
-    },
-    {
-      id: 'allowWorkloadsOnMaster',
-      label: 'Enable workloads on all master nodes',
-      render: (value) => castBoolToStr()(value),
-    },
-    { id: 'enableCAS', label: 'Auto scaling', render: (value) => castBoolToStr()(value) },
-    { id: 'sshKey', label: 'SSH Key', insertDivider: true },
-    { id: 'externalDnsName', label: 'API FQDN' },
-    { id: 'containersCidr', label: 'Containers CIDR' },
-    { id: 'servicesCidr', label: 'Services CIDR' },
-    {
-      id: 'networkPlugin',
-      label: 'CNI',
-      render: (value) => capitalizeString(value),
-    },
-    {
-      id: 'privileged',
-      label: 'Privileged',
-      render: (value) => castBoolToStr()(value),
-      insertDivider: true,
-    },
-    {
-      id: 'prometheusMonitoringEnabled',
-      label: 'Prometheus monitoring',
-      render: (value) => castBoolToStr()(value),
-    },
-    {
-      id: 'tags',
-      label: 'Tags',
-      renderArray: true,
-      render: (value) => <FormattedTags tags={value} />,
-    },
-  ]
-}
+const columns = [
+  { id: 'name', label: 'Name' },
+  { id: 'region', label: 'Region' },
+  { id: 'ami', label: 'Operating System' },
+  { id: 'masterFlavor', label: 'Master node instance type', insertDivider: true },
+  { id: 'workerFlavor', label: 'Worker node instance type' },
+  { id: 'numMasters', label: 'Master nodes' },
+  { id: 'numWorkers', label: 'Worker nodes' },
+  {
+    id: 'allowWorkloadsOnMaster',
+    label: 'Make Master nodes Master + Worker',
+    render: (value) => castBoolToStr()(value),
+  },
+  { id: 'enableCAS', label: 'Auto scaling', render: (value) => castBoolToStr()(value) },
+  { id: 'sshKey', label: 'SSH Key', insertDivider: true },
+  { id: 'externalDnsName', label: 'API FQDN' },
+  { id: 'containersCidr', label: 'Containers CIDR' },
+  { id: 'servicesCidr', label: 'Services CIDR' },
+  {
+    id: 'networkPlugin',
+    label: 'CNI',
+    render: (value) => capitalizeString(value),
+  },
+  {
+    id: 'privileged',
+    label: 'Privileged',
+    render: (value) => castBoolToStr()(value),
+    insertDivider: true,
+  },
+  {
+    id: 'prometheusMonitoringEnabled',
+    label: 'Prometheus monitoring',
+    render: (value) => castBoolToStr()(value),
+  },
+  {
+    id: 'tags',
+    label: 'Tags',
+    renderArray: true,
+    render: (value) => <FormattedTags tags={value} />,
+  },
+]
 
 // Segment tracking for wizard steps
 const configOnNext = (context) => {
@@ -320,9 +309,6 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
                     {/* Num worker nodes */}
                     <NumWorkerNodesField />
-
-                    {/* Workloads on masters */}
-                    <AllowWorkloadsonMasterField setWizardContext={setWizardContext} />
                   </>
                 )}
               </FormFieldCard>
@@ -334,7 +320,10 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
                 {/* App & Container Settings */}
                 <Text variant="caption1">Application & Container Settings</Text>
-                <MakeMasterNodesMasterAndWorkerField />
+
+                {/* Workloads on masters */}
+                <AllowWorkloadsonMasterField setWizardContext={setWizardContext} />
+
                 <PrivilegedField wizardContext={wizardContext} />
 
                 <Divider className={classes.divider} />
@@ -360,7 +349,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
           triggerSubmit={onNext}
           elevated={false}
         >
-          {({ setFieldValue, values }) => (
+          {({ values }) => (
             <>
               <FormFieldCard title="Networking Details">
                 {/* Use PF9 domain */}
@@ -373,9 +362,8 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
                 {/* AWS Custom Networking Fields */}
                 <AwsCustomNetworkingFields
-                  setFieldValue={setFieldValue}
+                  setWizardContext={setWizardContext}
                   wizardContext={wizardContext}
-                  values={values}
                 />
 
                 {/* API FQDN */}
@@ -468,7 +456,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
           elevated={false}
         >
           <FormFieldCard title="Finalize & Review">
-            <FormReviewTable data={wizardContext} columns={getReviewTableColumns(wizardContext)} />
+            <FormReviewTable data={wizardContext} columns={columns} />
           </FormFieldCard>
         </ValidatedForm>
       </WizardStep>

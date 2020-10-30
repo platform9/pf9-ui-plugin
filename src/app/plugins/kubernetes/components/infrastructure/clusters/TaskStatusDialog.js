@@ -172,7 +172,13 @@ const RenderNodeStatus = ({ status, logs }) => {
   )
 }
 
-export const NodeTaskStatus = ({ status, iconStatus = false, inverseStatus = false, children }) => {
+export const NodeTaskStatus = ({
+  status,
+  iconStatus = false,
+  inverseStatus = false,
+  className = undefined,
+  children,
+}) => {
   const classes = useStyles()
   if (status === 'none') {
     return <EmptyStatus />
@@ -187,7 +193,7 @@ export const NodeTaskStatus = ({ status, iconStatus = false, inverseStatus = fal
       <ClusterStatusSpan
         inverseStatus={inverseStatus}
         rootClassName={classes.statusSpanRoot}
-        className={classes.statusSpan}
+        className={className || classes.statusSpan}
         iconStatus={showIconStatusAlways}
         status={renderStatus}
         title={renderValue}

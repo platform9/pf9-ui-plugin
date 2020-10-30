@@ -46,17 +46,16 @@ const RadioFields = compose(
     }
 
     render() {
-      const { classes, value, hasError, errorMessage, onChange, options, ...restProps } = this.props
+      const { classes, value, hasError, errorMessage, options } = this.props
 
       return (
-        <div {...restProps} className={classes.root}>
+        <div className={classes.root}>
           {options.map((option) => (
             <FormControl key={option.value} className={classes.formControl} error={hasError}>
               <FormControlLabel
                 label={option.label}
                 control={
                   <Radio
-                    {...restProps}
                     color="primary"
                     checked={option.value === value}
                     onChange={() => this.handleChange(option.value)}

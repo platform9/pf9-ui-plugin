@@ -7,7 +7,6 @@ import OutlinedInput from '@material-ui/core/OutlinedInput'
 import SearchIcon from '@material-ui/icons/Search'
 import Fuse from 'fuse.js'
 import { FormHelperText } from '@material-ui/core'
-import { emptyArr } from 'utils/fp'
 import clsx from 'clsx'
 import Text from 'core/elements/text'
 import Theme from 'core/themes/model'
@@ -67,12 +66,10 @@ interface Props {
   id: string
   label: string
   options: any
-  wizardContext: any
-  setWizardContext: any
   hasError?: boolean
   required?: boolean
   errorMessage?: string
-  values?: any
+  value?: any
   onChange?: (any) => any
   maxOptions?: number
   sortSelectedFirst?: boolean
@@ -84,13 +81,11 @@ const SingleSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
     {
       id,
       label,
-      wizardContext,
-      setWizardContext,
       hasError,
       required,
       errorMessage,
       options,
-      values = emptyArr,
+      value,
       onChange,
       maxOptions,
       sortSelectedFirst,
@@ -107,16 +102,12 @@ const SingleSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
     // `options` is originally `[]` during most async data loading.
     const sortedOptions = useMemo(() => {
       const visibleOptions = term ? fuse.search(term) : options
-      const sortBySelected = (a, b) => values.includes(b.value) - values.includes(a.value)
+      const sortBySelected = (a, b) => (value === b.value - value) === a.value
       return sortSelectedFirst ? visibleOptions.sort(sortBySelected) : visibleOptions
-    }, [term, fuse, values, sortSelectedFirst])
+    }, [term, fuse, value, sortSelectedFirst])
 
     const toggleOption = (value) => {
-      const updatedValues = values.includes(value)
-        ? values.filter((currentValue) => currentValue !== value)
-        : [...values, value]
-
-      onChange(updatedValues)
+      onChange(value)
     }
 
     const onHitEnter = () => {
@@ -145,8 +136,8 @@ const SingleSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
               id={id}
               key={id}
               options={sortedOptions}
-              value={wizardContext[id]}
-              onChange={(changeValue) => setWizardContext({ [id]: changeValue })}
+              value={value}
+              onChange={onChange}
             />
           </Box>
           {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}

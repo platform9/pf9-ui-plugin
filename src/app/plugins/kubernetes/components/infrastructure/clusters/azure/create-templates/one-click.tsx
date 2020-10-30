@@ -17,9 +17,15 @@ import CloudProviderRegionField from '../../form-components/cloud-provider-regio
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
 
 export const initialContext = {
+  containersCidr: '10.20.0.0/16',
+  servicesCidr: '10.21.0.0/16',
   numMasters: 1,
   numWorkers: 0,
   allowWorkloadsOnMaster: true,
+  enableCAS: false,
+  runtimeConfigOption: 'default',
+  useAllAvailabilityZones: true,
+  assignPublicIps: false,
   masterSku: 'Standard_A1_v2',
   workerSku: 'Standard_A1_v2',
   ami: 'ubuntu',
@@ -28,6 +34,8 @@ export const initialContext = {
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
+  tags: [],
+  appCatalogEnabled: false,
 }
 
 const columns = [

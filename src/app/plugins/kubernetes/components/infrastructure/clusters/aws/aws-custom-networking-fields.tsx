@@ -15,18 +15,18 @@ const networkOptions = [
 ]
 
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
-const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => {
+const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
   const updateFqdns = (value, label) => {
     const name = wizardContext.name
 
     const api = `${name}-api.${label}`
-    setFieldValue('externalDnsName')(api)
+    setWizardContext({ externalDnsName: api })
 
     const service = `${name}-service.${label}`
-    setFieldValue('serviceFqdn')(service)
+    setWizardContext({ serviceFqdn: service })
   }
 
-  const renderNetworkFields = (wizardContext, values) => {
+  const renderNetworkFields = (wizardContext, setWizardContext) => {
     switch (wizardContext.network) {
       case 'newPublic':
       case 'newPublicPrivate':
@@ -39,6 +39,7 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
+              onChange={(value) => setWizardContext({ vpc: value })}
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
               info=""
@@ -50,7 +51,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
               type="public"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
-              vpcId={values.vpc}
+              onChange={(value) => setWizardContext({ subnets: value })}
+              vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -64,6 +66,7 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
+              onChange={(value) => setWizardContext({ vpc: value })}
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
               info=""
@@ -75,7 +78,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
               type="public"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
-              vpcId={values.vpc}
+              onChange={(value) => setWizardContext({ subnets: value })}
+              vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -84,7 +88,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
               type="private"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
-              vpcId={values.vpc}
+              onChange={(value) => setWizardContext({ privateSubnets: value })}
+              vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -98,6 +103,7 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
+              onChange={(value) => setWizardContext({ vpc: value })}
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
               info=""
@@ -109,7 +115,8 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
               type="private"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
-              vpcId={values.vpc}
+              onChange={(value) => setWizardContext({ privateSubnets: value })}
+              vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
             />
@@ -138,6 +145,7 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
         id="network"
         label="Network"
         options={networkOptions}
+        onChange={(value) => setWizardContext({ network: value })}
         disabled={wizardContext.usePf9Domain}
         info={
           <div>
@@ -147,7 +155,7 @@ const AwsCustomNetworkingFields = ({ setFieldValue, wizardContext, values }) => 
           </div>
         }
       />
-      {renderNetworkFields(wizardContext, values)}
+      {renderNetworkFields(wizardContext, setWizardContext)}
     </>
   )
 }
