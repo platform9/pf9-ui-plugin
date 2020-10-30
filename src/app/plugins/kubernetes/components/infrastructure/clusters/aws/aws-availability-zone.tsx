@@ -13,12 +13,10 @@ const AwsAvailabilityZoneField = ({
     info="Select from the Availability Zones for the specified region"
     cloudProviderId={values.cloudProviderId}
     cloudProviderRegionId={values.region}
-    onChange={(value) => setWizardContext({ azs: value })}
+    onChange={(value) => setWizardContext({ azs: Array.isArray(value) ? value : [value] })}
     values={wizardContext.azs}
     type={CloudProviders.Aws}
     required
-    wizardContext={wizardContext}
-    setWizardContext={setWizardContext}
     allowMultiSelect={allowMultiSelect}
   />
 )

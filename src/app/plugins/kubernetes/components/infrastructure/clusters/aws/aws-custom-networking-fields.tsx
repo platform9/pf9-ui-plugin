@@ -74,7 +74,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               disabled={wizardContext.usePf9Domain}
             />
 
-            {/* <AwsZoneVpcMappings
+            <AwsZoneVpcMappings
               type="public"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
@@ -82,7 +82,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
-            /> */}
+            />
 
             <AwsZoneVpcMappings
               type="private"

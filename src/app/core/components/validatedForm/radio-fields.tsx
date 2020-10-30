@@ -46,7 +46,7 @@ const RadioFields = compose(
     }
 
     render() {
-      const { classes, value, hasError, errorMessage, onChange, options } = this.props
+      const { classes, value, hasError, errorMessage, options } = this.props
 
       return (
         <div className={classes.root}>
