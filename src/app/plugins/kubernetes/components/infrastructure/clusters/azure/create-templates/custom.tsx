@@ -80,11 +80,11 @@ const columns = [
     render: (value) => castBoolToStr()(value),
   },
   { id: 'enableCAS', label: 'Auto scaling', render: (value) => castBoolToStr()(value) },
-  { id: 'sshKey', label: 'SSH Key', insertDivider: true },
   {
     id: 'assignPublicIps',
     label: "Assign public IP's",
     render: (value) => castBoolToStr()(value),
+    insertDivider: true,
   },
   { id: 'externalDnsName', label: 'API FQDN' },
   { id: 'containersCidr', label: 'Containers CIDR' },
