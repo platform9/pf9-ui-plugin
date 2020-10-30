@@ -8,10 +8,8 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import { CloudProviders } from '../../cloudProviders/model'
-
 import { routes } from 'core/utils/routes'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../model'
-
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { getFormTitle } from '../helpers'
 import DocumentMeta from 'core/components/DocumentMeta'

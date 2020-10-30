@@ -24,7 +24,7 @@ const AzureAvailabilityZoneFields = ({ values, setWizardContext }) => {
         label="Use all availability zones"
         value={!values.region ? false : values.useAllAvailabilityZones}
         info=""
-        disabled={!values.cloudProviderRegionId}
+        disabled={!values.region}
       />
 
       {/* Azure Availability Zone */}
