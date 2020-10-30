@@ -26,13 +26,11 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   gridContainer: {
     marginTop: theme.spacing(2),
   },
-  // ellipsis: {
-  //   maxWidth: 160,
-  //   whiteSpace: 'nowrap',
-  //   overflow: 'hidden',
-  //   textOverflow: 'ellipsis',
-  //   display: 'block',
-  // },
+  ellipsis: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   renderPane: {
     display: 'flex',
     flexDirection: 'column',
@@ -58,12 +56,12 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     padding: theme.spacing(1, 2, 0, 2),
     display: 'grid',
     gridGap: theme.spacing(2),
-    gridTemplateColumns: '1fr min-content',
+    gridTemplateColumns: '1fr max-content',
     alignItems: 'center',
   },
   paneHeader: {
     display: 'grid',
-    gridTemplateRows: '38px 1fr',
+    gridTemplateRows: 'minmax(38px, max-content) 1fr',
     alignItems: 'stretch',
     minHeight: 118,
     border: `1px solid ${theme.palette.grey[300]}`,
@@ -97,12 +95,16 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     justifyItems: 'stretch',
     gridGap: 8,
   },
+  selectedNodeStatus: {
+    fontSize: 14,
+    color: theme.palette.blue.main,
+  },
   nodeCard: {
     cursor: 'pointer',
     borderRadius: 4,
     border: `1px solid ${theme.palette.grey[300]}`,
     display: 'grid',
-    gridTemplateColumns: 'minmax(150px, max-content) 1fr',
+    gridTemplateColumns: 'minmax(150px, 350px) 1fr',
     alignItems: 'start',
     justifyItems: 'start',
     padding: 8,
@@ -110,6 +112,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
 
     '& > article': {
       justifySelf: 'start',
+      width: '100%',
     },
     '& > div': {
       width: '100%',
@@ -222,10 +225,14 @@ export const NodeHealthWithTasksToggler: FC = () => {
   }`
   const shouldShowStateStatus = !!nodeState && nodeState !== 'ok'
   const selectedNodeStatus = shouldShowStateStatus ? (
-    <NodeTaskStatus status={nodeState}>
+    <NodeTaskStatus status={nodeState} className={classes.selectedNodeStatus}>
       {(nodeState.includes('fail') || nodeState === 'retrying') && (
-        <ExternalLink className={classes.linkSpacer} url={nodeInstallTroubleshooting}>
-          Troubleshooting Help
+        <ExternalLink
+          className={classes.linkSpacer}
+          textVariant="body2"
+          url={nodeInstallTroubleshooting}
+        >
+          Install Help
         </ExternalLink>
       )}
     </NodeTaskStatus>
@@ -285,13 +292,15 @@ export const NodeHealthWithTasksToggler: FC = () => {
                 >
                   <article>
                     <Tooltip title={node.name}>
-                      <Text variant="subtitle2" component="h3">
+                      <Text variant="subtitle2" className={classes.ellipsis} component="h3">
                         {node.name}
                       </Text>
                     </Tooltip>
-                    <Text variant="body2" component="p">
-                      ({node.primaryIp})
-                    </Text>
+                    <Tooltip title={node.primaryIp}>
+                      <Text variant="body2" className={classes.ellipsis} component="p">
+                        ({node.primaryIp})
+                      </Text>
+                    </Tooltip>
                   </article>
                   <div>
                     <Text className={classes.nodeProgressLabel} variant="caption3" component="p">
@@ -313,7 +322,9 @@ export const NodeHealthWithTasksToggler: FC = () => {
           <header className={classes.paneHeader}>
             <div className={classes.paneHeaderTitle}>
               <Tooltip title={selectedNodeTitle || ''}>
-                <Text variant="subtitle1">{selectedNodeTitle}</Text>
+                <Text variant="subtitle1" className={classes.ellipsis}>
+                  {selectedNodeTitle}
+                </Text>
               </Tooltip>
               {!!selectedNode && selectedNodeStatus}
             </div>
