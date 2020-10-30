@@ -19,6 +19,8 @@ import AwsAvailabilityZoneField from '../aws-availability-zone'
 import { castBoolToStr } from 'utils/misc'
 
 export const initialContext = {
+  containersCidr: '10.20.0.0/16',
+  servicesCidr: '10.21.0.0/16',
   network: 'newPublic',
   numMasters: 1,
   numWorkers: 0,
@@ -91,7 +93,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
     setWizardContext({ externalDnsName: api })
 
     const service = `${name}-service.${label}`
-    setWizardContext({ serviceFdqn: service })
+    setWizardContext({ serviceFqdn: service })
   }
 
   const handleClusterDomainUpdate = (values) => updateFqdns(values)

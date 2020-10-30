@@ -360,7 +360,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
           triggerSubmit={onNext}
           elevated={false}
         >
-          {({ setFieldValue, values }) => (
+          {({ values }) => (
             <>
               <FormFieldCard title="Networking Details">
                 {/* Use PF9 domain */}
@@ -373,9 +373,8 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
                 {/* AWS Custom Networking Fields */}
                 <AwsCustomNetworkingFields
-                  setFieldValue={setFieldValue}
+                  setWizardContext={setWizardContext}
                   wizardContext={wizardContext}
-                  values={values}
                 />
 
                 {/* API FQDN */}

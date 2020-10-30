@@ -17,6 +17,8 @@ import CloudProviderRegionField from '../../form-components/cloud-provider-regio
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
 
 export const initialContext = {
+  containersCidr: '10.20.0.0/16',
+  servicesCidr: '10.21.0.0/16',
   numMasters: 1,
   numWorkers: 0,
   allowWorkloadsOnMaster: true,
