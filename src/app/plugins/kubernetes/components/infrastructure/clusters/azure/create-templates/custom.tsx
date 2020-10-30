@@ -43,7 +43,6 @@ import AzureSkuPicklist from '../AzureSkuPicklist'
 import AzureSubnetPicklist from '../AzureSubnetPicklist'
 import AzureVnetPicklist from '../AzureVnetPicklist'
 import Text from 'core/elements/text'
-import MakeMasterNodesMasterAndWorkerField from '../../form-components/make-master-nodes-master-and-worker'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 
 export const initialContext = {
@@ -68,48 +67,42 @@ export const initialContext = {
   appCatalogEnabled: false,
 }
 
-const renderNumWorkersCellValue = (data) => (cellValue) => {
-  return data.enableCAS ? `Min ${data.numWorkers} - Max ${data.numMaxWorkers}` : data.numWorkers
-}
-
-const getReviewTableColumns = (data) => {
-  return [
-    { id: 'name', label: 'Name' },
-    { id: 'location', label: 'Region' },
-    { id: 'masterSku', label: 'Master node SKU', insertDivider: true },
-    { id: 'workerSku', label: 'Worker node SKU' },
-    { id: 'numMasters', label: 'Number of master nodes' },
-    { id: 'numWorkers', label: 'Number of worker nodes', render: renderNumWorkersCellValue(data) },
-    {
-      id: 'allowWorkloadsOnMaster',
-      label: 'Enable workloads on all master nodes',
-      render: (value) => castBoolToStr()(value),
-    },
-    { id: 'enableCAS', label: 'Auto scaling', render: (value) => castBoolToStr()(value) },
-    { id: 'sshKey', label: 'SSH Key', insertDivider: true },
-    {
-      id: 'assignPublicIps',
-      label: "Assign public IP's",
-      render: (value) => castBoolToStr()(value),
-    },
-    { id: 'externalDnsName', label: 'API FQDN' },
-    { id: 'containersCidr', label: 'Containers CIDR' },
-    { id: 'servicesCidr', label: 'Services CIDR' },
-    { id: 'privileged', label: 'Privileged', render: (value) => castBoolToStr()(value) },
-    {
-      id: 'prometheusMonitoringEnabled',
-      label: 'Prometheus monitoring',
-      render: (value) => castBoolToStr()(value),
-      insertDivider: true,
-    },
-    {
-      id: 'tags',
-      label: 'Tags',
-      renderArray: true,
-      render: (value) => <FormattedTags tags={value} />,
-    },
-  ]
-}
+const columns = [
+  { id: 'name', label: 'Name' },
+  { id: 'location', label: 'Region' },
+  { id: 'masterSku', label: 'Master node SKU', insertDivider: true },
+  { id: 'workerSku', label: 'Worker node SKU' },
+  { id: 'numMasters', label: 'Master nodes' },
+  { id: 'numWorkers', label: 'Worker nodes' },
+  {
+    id: 'allowWorkloadsOnMaster',
+    label: 'Make Master nodes Master + Worker',
+    render: (value) => castBoolToStr()(value),
+  },
+  { id: 'enableCAS', label: 'Auto scaling', render: (value) => castBoolToStr()(value) },
+  { id: 'sshKey', label: 'SSH Key', insertDivider: true },
+  {
+    id: 'assignPublicIps',
+    label: "Assign public IP's",
+    render: (value) => castBoolToStr()(value),
+  },
+  { id: 'externalDnsName', label: 'API FQDN' },
+  { id: 'containersCidr', label: 'Containers CIDR' },
+  { id: 'servicesCidr', label: 'Services CIDR' },
+  { id: 'privileged', label: 'Privileged', render: (value) => castBoolToStr()(value) },
+  {
+    id: 'prometheusMonitoringEnabled',
+    label: 'Prometheus monitoring',
+    render: (value) => castBoolToStr()(value),
+    insertDivider: true,
+  },
+  {
+    id: 'tags',
+    label: 'Tags',
+    renderArray: true,
+    render: (value) => <FormattedTags tags={value} />,
+  },
+]
 
 const configOnNext = (context) => {
   trackEvent('WZ New Azure Cluster 1 Master Nodes', {
@@ -291,10 +284,6 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                   })}
                 />
 
-                {values.template !== 'custom' && (
-                  <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
-                )}
-
                 {values.template === 'custom' && (
                   <>
                     {/* Use All Availability Zones Checkbox Field and Azure Availability Zone Chooser */}
@@ -314,12 +303,10 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
 
                     {/* Worker node SKU */}
                     <WorkerNodeSkuField dropdownComponent={AzureSkuPicklist} values={values} />
-
-                    {/* Allow workloads on masters */}
-                    <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
                   </>
                 )}
               </FormFieldCard>
+
               <FormFieldCard title="Cluster Settings">
                 {/* Kubernetes Version */}
                 <KubernetesVersion />
@@ -328,7 +315,10 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
 
                 {/* App & Container Settings */}
                 <Text variant="caption1">Application & Container Settings</Text>
-                <MakeMasterNodesMasterAndWorkerField />
+
+                {/* Allow workloads on masters */}
+                <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
+
                 <PrivilegedField wizardContext={wizardContext} />
 
                 <Divider className={classes.divider} />
@@ -452,7 +442,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
           elevated={false}
         >
           <FormFieldCard title="Finalize & Review">
-            <FormReviewTable data={wizardContext} columns={getReviewTableColumns(wizardContext)} />
+            <FormReviewTable data={wizardContext} columns={columns} />
           </FormFieldCard>
         </ValidatedForm>
       </WizardStep>

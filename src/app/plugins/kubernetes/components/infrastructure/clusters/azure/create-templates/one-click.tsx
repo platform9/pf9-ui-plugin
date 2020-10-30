@@ -30,6 +30,8 @@ export const initialContext = {
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
+  tags: [],
+  appCatalogEnabled: false,
 }
 
 const columns = [
