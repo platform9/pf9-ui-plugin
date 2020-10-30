@@ -22,6 +22,8 @@ export const initialContext = {
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   network: 'newPublic',
+  runtimeConfigOption: 'default',
+  networkPlugin: 'calico',
   numMasters: 1,
   numWorkers: 0,
   masterFlavor: 't2.medium',
