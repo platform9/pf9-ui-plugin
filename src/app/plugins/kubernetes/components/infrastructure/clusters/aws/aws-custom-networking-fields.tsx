@@ -26,7 +26,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
     setWizardContext({ serviceFqdn: service })
   }
 
-  const renderNetworkFields = (wizardContext) => {
+  const renderNetworkFields = (wizardContext, setWizardContext) => {
     switch (wizardContext.network) {
       case 'newPublic':
       case 'newPublicPrivate':
@@ -39,6 +39,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
+              onChange={(value) => setWizardContext({ vpc: value })}
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
               info=""
@@ -50,6 +51,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               type="public"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
+              onChange={(value) => setWizardContext({ subnets: value })}
               vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
@@ -64,6 +66,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
+              onChange={(value) => setWizardContext({ vpc: value })}
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
               info=""
@@ -71,19 +74,21 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               disabled={wizardContext.usePf9Domain}
             />
 
-            <AwsZoneVpcMappings
+            {/* <AwsZoneVpcMappings
               type="public"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
+              onChange={(value) => setWizardContext({ subnets: value })}
               vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
-            />
+            /> */}
 
             <AwsZoneVpcMappings
               type="private"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
+              onChange={(value) => setWizardContext({ privateSubnets: value })}
               vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
@@ -98,6 +103,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               id="vpc"
               label="VPC"
               azs={wizardContext.azs}
+              onChange={(value) => setWizardContext({ vpc: value })}
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
               info=""
@@ -109,6 +115,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
               type="private"
               cloudProviderId={wizardContext.cloudProviderId}
               cloudProviderRegionId={wizardContext.region}
+              onChange={(value) => setWizardContext({ privateSubnets: value })}
               vpcId={wizardContext.vpc}
               azs={wizardContext.azs}
               disabled={wizardContext.usePf9Domain}
@@ -138,6 +145,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
         id="network"
         label="Network"
         options={networkOptions}
+        onChange={(value) => setWizardContext({ network: value })}
         disabled={wizardContext.usePf9Domain}
         info={
           <div>
@@ -147,7 +155,7 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
           </div>
         }
       />
-      {renderNetworkFields(wizardContext)}
+      {renderNetworkFields(wizardContext, setWizardContext)}
     </>
   )
 }
