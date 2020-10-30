@@ -1,9 +1,11 @@
 import React, { FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
+import clsx from 'clsx'
 
 interface Props {
   fill?: boolean
+  className?: any
   children: any
 }
 
@@ -36,11 +38,11 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   },
 }))
 
-const CodeBlock: FunctionComponent<Props> = ({ children, fill = false }) => {
+const CodeBlock: FunctionComponent<Props> = ({ children, className, fill = false }) => {
   const styles = useStyles({ fill })
 
   return (
-    <pre className={styles.pre}>
+    <pre className={clsx(styles.pre, className)}>
       <code>{children}</code>
     </pre>
   )

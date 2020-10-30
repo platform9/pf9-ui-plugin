@@ -27,6 +27,8 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import ExternalLink from 'core/components/ExternalLink'
 import { capitalizeString } from 'utils/misc'
 import { cloudProviderTypes } from 'k8s/components/infrastructure/cloudProviders/selectors'
+import Alert from 'core/components/Alert'
+import CodeBlock from 'core/components/CodeBlock'
 
 const oneSecond = 1000
 
@@ -127,6 +129,23 @@ const useStyles = makeStyles((theme) => ({
     gridGap: theme.spacing(2),
     paddingBottom: 20,
   },
+  taskErrorMessage: {
+    maxHeight: 176,
+    fontSize: 13,
+    backgroundColor: 'transparent',
+    color: theme.palette.red[500],
+  },
+  taskErrorAlert: {
+    maxWidth: 1085,
+    maxHeight: 200,
+    padding: theme.spacing(1, 1, 1, 4.5),
+    marginBottom: theme.spacing(2),
+    border: `1px solid ${theme.palette.red[500]}`,
+
+    '& > i': {
+      left: 12,
+    },
+  },
 }))
 
 const ClusterDetailsPage = () => {
@@ -136,7 +155,16 @@ const ClusterDetailsPage = () => {
     loadingFeedback: false,
   })
   const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
-  const clusterHeader = <ClusterStatusAndUsage cluster={cluster} loading={loading} />
+  const clusterHeader = (
+    <>
+      <ClusterStatusAndUsage cluster={cluster} loading={loading} />
+      {cluster.taskError && (
+        <Alert variant="error" type="error" className={classes.taskErrorAlert}>
+          <CodeBlock className={classes.taskErrorMessage}>{cluster.taskError}</CodeBlock>
+        </Alert>
+      )}
+    </>
+  )
   return (
     <PageContainer className={classes.pageContainer}>
       <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
