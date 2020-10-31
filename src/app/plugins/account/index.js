@@ -1,10 +1,10 @@
 import React from 'react'
-import UserManagementIndexPage from 'k8s/components/userManagement/UserManagementIndexPage'
-import AddTenantPage from 'k8s/components/userManagement/tenants/AddTenantPage'
-import EditTenantPage from 'k8s/components/userManagement/tenants/EditTenantPage'
-import AddUserPage from 'k8s/components/userManagement/users/AddUserPage'
-import EditUserPage from 'k8s/components/userManagement/users/EditUserPage'
-import MyAccountHeader from './components/secondHeader/MyAccountHeader'
+import UserManagementIndexPage from 'account/components/userManagement/UserManagementIndexPage'
+import AddTenantPage from 'account/components/userManagement/tenants/AddTenantPage'
+import EditTenantPage from 'account/components/userManagement/tenants/EditTenantPage'
+import AddUserPage from 'account/components/userManagement/users/AddUserPage'
+import EditUserPage from 'account/components/userManagement/users/EditUserPage'
+import MyAccountHeader from 'account/components/secondHeader/MyAccountHeader'
 
 class Account extends React.PureComponent {
   render() {

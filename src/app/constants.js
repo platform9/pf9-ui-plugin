@@ -31,6 +31,7 @@ export const uuidRegex = new RegExp(
 export const originUsernameRegex = new RegExp(/:\/\/(?<originUsername>(.+?)).platform9./, 'i')
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
+export const userAccountPrefix = `${appUrlRoot}/account`
 
 export const onboardingAccessSetup = 'onboarding/api-access'
 export const onboardingMonitoringSetup = 'onboarding/monitoring-enabled'

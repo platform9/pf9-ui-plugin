@@ -1,8 +1,8 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { isSystemUser } from 'k8s/components/userManagement/users/actions'
+import { isSystemUser } from 'account/components/userManagement/users/actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, listTablePrefs } from 'app/constants'
-import SystemUsersToggle from 'k8s/components/userManagement/users/SystemUsersToggle'
+import { userAccountPrefix, listTablePrefs } from 'app/constants'
+import SystemUsersToggle from 'account/components/userManagement/users/SystemUsersToggle'
 import React, { useMemo } from 'react'
 import useToggler from 'core/hooks/useToggler'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -48,9 +48,9 @@ export const options = {
     { id: 'tenants', label: 'Tenants', render: pipe(arrayIfNil, pluck('name'), join(', ')) },
   ],
   addText: 'Create a new User',
-  addUrl: pathJoin(k8sPrefix, 'user_management/users/add'),
+  addUrl: pathJoin(userAccountPrefix, 'user_management/users/add'),
   deleteFn: mngmUserActions.delete,
-  editUrl: pathJoin(k8sPrefix, 'user_management/users/edit'),
+  editUrl: pathJoin(userAccountPrefix, 'user_management/users/edit'),
   name: 'Users',
   title: 'Users',
   uniqueIdentifier: 'id',

@@ -7,22 +7,22 @@ import FormWrapper from 'core/components/FormWrapper'
 import Text from 'core/elements/text'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { k8sPrefix } from 'app/constants'
+import { userAccountPrefix } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import useDataLoader from 'core/hooks/useDataLoader'
-import TenantRolesTableField from 'k8s/components/userManagement/users/TenantRolesTableField'
-import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
+import TenantRolesTableField from 'account/components/userManagement/users/TenantRolesTableField'
+import { mngmUserActions } from 'account/components/userManagement/users/actions'
 import Progress from 'core/components/progress/Progress'
 import FormControl from '@material-ui/core/FormControl'
 import FormLabel from '@material-ui/core/FormLabel'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Radio from '@material-ui/core/Radio'
-import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
-import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordField'
+import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
+import UserPasswordField from 'account/components/userManagement/users/UserPasswordField'
 import { requiredValidator, emailValidator } from 'core/utils/fieldValidators'
 
-const listUrl = pathJoin(k8sPrefix, 'user_management#users')
+const listUrl = pathJoin(userAccountPrefix, 'user_management#users')
 
 const initialContext = {
   username: '',
