@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Toolbar = ({ open }) => {
+const Toolbar = ({ open, setStack }) => {
   const classes = useStyles()
   const { history } = useReactRouter()
 
@@ -59,7 +59,7 @@ const Toolbar = ({ open }) => {
         <div className={classes.rightTools}>
           <RegionChooser className={classes.leftMargin} />
           <TenantChooser className={classes.leftMargin} />
-          <UserMenu className={classes.leftMargin} />
+          <UserMenu className={classes.leftMargin} setStack={setStack} />
           <NotificationsPopover className={classes.leftMargin} />
         </div>
       </MaterialToolbar>
@@ -69,6 +69,7 @@ const Toolbar = ({ open }) => {
 
 Toolbar.propTypes = {
   open: PropTypes.bool,
+  setStack: PropTypes.func.isRequired,
 }
 
 export default Toolbar

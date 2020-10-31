@@ -3,13 +3,14 @@ import PropTypes from 'prop-types'
 import { Menu, MenuItem } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
-import { logoutUrl, helpUrl } from 'app/constants'
+import { logoutUrl, helpUrl, userAccountUrl } from 'app/constants'
 import { connect } from 'react-redux'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import ChangePasswordModal from './ChangePasswordModal'
 import FontAwesomeIcon from './FontAwesomeIcon'
 import SimpleLink from './SimpleLink'
 import Text from 'core/elements/text'
+import clsx from 'clsx'
 
 const styles = (theme) => ({
   avatar: {
@@ -25,18 +26,63 @@ const styles = (theme) => ({
     width: theme.spacing(3),
   },
   menuItem: {
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
     display: 'grid',
     minWidth: 150,
-    gridTemplateColumns: '30px 1fr',
-    gridTemplateRows: 'minmax(35px, min-content)',
-    gridColumnGap: theme.spacing(),
-    padding: theme.spacing(0, 1),
+    gridTemplateColumns: '16px 1fr',
+    gridGap: theme.spacing(1),
+    padding: theme.spacing(0),
+  },
+  menuIcon: {
+    position: 'relative',
+    top: 1,
   },
   link: {
     textDecoration: 'none !important',
+    color: 'rgba(0, 0, 0, 0.87)',
   },
-  title: {
-    color: theme.palette.grey[200],
+  userIcon: {
+    borderRadius: '50%',
+    background: theme.palette.grey[200],
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textTransform: 'uppercase',
+    fontWeight: 600,
+  },
+  toolbarIcon: {
+    height: 36,
+    width: 36,
+    fontSize: 16,
+  },
+  userDetails: {
+    display: 'grid',
+    margin: theme.spacing(1, 0, 3, 0),
+    gridTemplateColumns: 'auto auto',
+    gridGap: theme.spacing(2),
+  },
+  detailsIcon: {
+    height: 48,
+    width: 48,
+    fontSize: 18,
+    cursor: 'default',
+  },
+  dropdownContainer: {
+    padding: theme.spacing(0, 2),
+  },
+  dropdownLinks: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+  dropdownSection: {
+    padding: theme.spacing(2),
+  },
+  divider: {
+    border: 'none',
+    height: 1,
+    backgroundColor: theme.palette.blue[200],
   },
 })
 
@@ -46,7 +92,9 @@ class MenuListItem extends React.PureComponent {
     const { classes, title, children, icon, ...props } = this.props
     return (
       <MenuItem {...props} className={classes.menuItem}>
-        <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+        <FontAwesomeIcon size="sm" className={classes.menuIcon}>
+          {icon}
+        </FontAwesomeIcon>
         <Text variant="body2">{title || children}</Text>
       </MenuItem>
     )
@@ -67,9 +115,12 @@ class UserMenu extends React.PureComponent {
   handleCancelChangePassword = () => this.setState({ showChangePasswordModal: false })
 
   render() {
-    const { classes, className, session } = this.props
+    const { classes, className, session, setStack } = this.props
     const { anchorEl, showChangePasswordModal } = this.state
-    const username = session.username || '?'
+    const {
+      username,
+      userDetails: { displayName },
+    } = session
 
     if (showChangePasswordModal) {
       return <ChangePasswordModal onCancel={this.handleCancelChangePassword} />
@@ -77,9 +128,9 @@ class UserMenu extends React.PureComponent {
 
     return (
       <div className={`${classes.avatar} ${className}`}>
-        <Text color="inherit" variant="body2" className={classes.title} onClick={this.handleClick}>
-          {username} &#9662;
-        </Text>
+        <div onClick={this.handleClick} className={clsx(classes.userIcon, classes.toolbarIcon)}>
+          {displayName[0]}
+        </div>
         <Menu
           id="user-menu"
           anchorEl={anchorEl}
@@ -88,13 +139,36 @@ class UserMenu extends React.PureComponent {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
-          <SimpleLink src={helpUrl} className={classes.link}>
-            <MenuListItem icon="question-circle">Help</MenuListItem>
-          </SimpleLink>
-          <MenuListItem icon="sign-out" onClick={this.logout}>
-            Sign Out
-          </MenuListItem>
+          <div className={classes.dropdownContainer}>
+            <div className={classes.dropdownSection}>
+              <div className={classes.userDetails}>
+                <div className={clsx(classes.userIcon, classes.detailsIcon)}>{displayName[0]}</div>
+                <div>
+                  <Text variant="subtitle2">{displayName}</Text>
+                  <Text variant="body2">{username}</Text>
+                </div>
+              </div>
+              <div className={classes.dropdownLinks}>
+                {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
+                <SimpleLink
+                  src={userAccountUrl}
+                  className={classes.link}
+                  onClick={() => setStack('account')}
+                >
+                  <MenuListItem icon="cog">Settings</MenuListItem>
+                </SimpleLink>
+                <MenuListItem icon="sign-out" onClick={this.logout}>
+                  Sign Out
+                </MenuListItem>
+              </div>
+            </div>
+            <hr className={classes.divider}></hr>
+            <div className={classes.dropdownSection}>
+              <SimpleLink src={helpUrl} className={classes.link}>
+                <MenuListItem icon="question-circle">Support</MenuListItem>
+              </SimpleLink>
+            </div>
+          </div>
         </Menu>
       </div>
     )
@@ -103,6 +177,7 @@ class UserMenu extends React.PureComponent {
 
 UserMenu.propTypes = {
   classes: PropTypes.object,
+  setStack: PropTypes.func.isRequired,
 }
 
 export default UserMenu

@@ -94,7 +94,7 @@ const styles = (theme) => ({
     // },
   },
   paper: {
-    marginTop: 55,
+    marginTop: ({ stack }) => (stack === 'account' ? 151 : 55),
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
@@ -610,7 +610,7 @@ class Navbar extends PureComponent {
         anchor="left"
         open={open}
       >
-        {withStackSlider ? this.renderStackSlider() : null}
+        {withStackSlider && stack !== 'account' ? this.renderStackSlider() : null}
         {filteredSections.length > 1
           ? this.renderSections(filteredSections)
           : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
