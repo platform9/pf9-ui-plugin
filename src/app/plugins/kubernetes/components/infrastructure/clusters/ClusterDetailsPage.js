@@ -137,6 +137,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.red[500],
   },
   taskErrorAlert: {
+    maxWidth: 'inherit',
     maxHeight: 200,
     padding: theme.spacing(1, 1, 1, 4.5),
     marginBottom: theme.spacing(2),
