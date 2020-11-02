@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useRef } from 'react'
+import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
@@ -22,6 +22,8 @@ import ClusterHostChooser, {
 import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
 import { customValidator, FieldValidator } from 'core/utils/fieldValidators'
+import { CloudProviders } from '../cloudProviders/model'
+import Alert from 'core/components/Alert'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -33,6 +35,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   masterCount: {
     margin: theme.spacing(4, 0),
+  },
+  warning: {
+    margin: theme.spacing(1),
   },
 }))
 
@@ -47,47 +52,66 @@ interface IConstraint {
 export const scaleConstraints: IConstraint[] = [
   // shrink
   {
+    startNum: 5,
+    desiredNum: 4,
+    relation: 'warn',
+    message:
+      'You must have 1, 3 or 5 masters to hold quorum. Please scale to 3 nodes once this node has converged to achieve quorum',
+  },
+  {
+    startNum: 4,
+    desiredNum: 3,
+    relation: 'allow',
+    message: '',
+  },
+  {
+    startNum: 3,
+    desiredNum: 2,
+    relation: 'warn',
+    message:
+      'You must have 1, 3 or 5 masters to hold quorum. Please scale to 1 node once this node has converged to achieve quorum',
+  },
+  {
+    startNum: 2,
+    desiredNum: 1,
+    relation: 'allow',
+    message: '',
+  },
+  {
     startNum: 1,
     desiredNum: 0,
     relation: 'deny',
     message:
       'You cannot remove master node from a single master cluster.  If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead.',
   },
-  {
-    startNum: 3,
-    desiredNum: 1,
-    relation: 'allow',
-    message: '',
-  },
-  {
-    startNum: 5,
-    desiredNum: 3,
-    relation: 'allow',
-    message: '',
-  },
-  {
-    startNum: 5,
-    desiredNum: 1,
-    relation: 'allow',
-    message: '',
-  },
 
   // grow
   {
     startNum: 1,
-    desiredNum: 3,
-    relation: 'deny',
+    desiredNum: 2,
+    relation: 'warn',
     message:
-      'You cannot add master nodes to a single master cluster.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.',
+      '2 Master nodes provides the same resiliency as 1. Please scale to 3 nodes once this node has converged',
   },
   {
-    startNum: 1,
-    desiredNum: 5,
-    relation: 'deny',
-    message:
-      'You cannot add master nodes to a single master cluster.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.',
+    startNum: 2,
+    desiredNum: 3,
+    relation: 'allow',
+    message: '',
   },
-  { startNum: 3, desiredNum: 5, relation: 'allow', message: '' },
+  {
+    startNum: 3,
+    desiredNum: 4,
+    relation: 'warn',
+    message:
+      '4 Master nodes provides the same resiliency as 3. Please scale to 5 nodes once this node has converged',
+  },
+  {
+    startNum: 4,
+    desiredNum: 5,
+    relation: 'allow',
+    message: '',
+  },
 ]
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
@@ -110,27 +134,49 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   onAttach,
   onDetach,
 }) => {
+  const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
-
+  const [selectedNode, setSelectedNode] = useState(null)
   const validatorRef = useRef<FieldValidator>()
+
+  const hasMasterVip = cluster.masterVipIpv4
   const numMasters = (cluster.nodes || []).filter(isMaster).length
+  const numToChange = params.scaleType === 'add' ? 1 : -1
+  const totalMasters = numMasters + numToChange
+  // Look up the transition in the state transition table.
+  const transitionConstraint =
+    scaleConstraints.find(
+      (t) => t.startNum === numMasters && t.desiredNum === totalMasters,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    ) || ({} as IConstraint)
+
+  const showWarningMessage = selectedNode && transitionConstraint.relation === 'warn'
+
+  useEffect(() => {
+    setSelectedNode(null)
+  }, [params.scaleType])
 
   const masterNodeLengthValidator = useCallback(() => {
-    return customValidator((value: string[], formValues) => {
-      const posNegSign = params.scaleType === 'add' ? 1 : -1
-      const numToChange = value.length * posNegSign
-      const totalMasters = numMasters + numToChange
-
-      // Look up the transition in the state transition table.
-      const transitionConstraint =
-        scaleConstraints.find(
-          (t) => t.startNum === numMasters && t.desiredNum === totalMasters,
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        ) || ({} as IConstraint)
+    return customValidator(() => {
       if (validatorRef.current) {
         validatorRef.current.errorMessage = transitionConstraint.message || defaultErrorMessage
       }
-      return transitionConstraint.relation === 'allow'
+      // BareOs clusters with single master node cannot scale without a virtial IP
+      if (
+        cluster.cloudProviderType === CloudProviders.BareOS &&
+        numMasters === 1 &&
+        !hasMasterVip
+      ) {
+        if (validatorRef.current) {
+          validatorRef.current.errorMessage =
+            'You cannot add master nodes to a single master cluster without a virtual IP.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.'
+        }
+        return false
+      }
+      return (
+        cluster.masterNodesHealthStatus === 'healthy' &&
+        (transitionConstraint.relation === 'allow' || transitionConstraint.relation === 'warn')
+      )
     }, defaultErrorMessage)
   }, [numMasters, params, validatorRef])()
 
@@ -165,15 +211,21 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
         >
           <ClusterHostChooser
             id={params.scaleType === 'add' ? 'mastersToAdd' : 'mastersToRemove'}
-            selection="multiple"
+            selection="single"
             filterFn={
               params.scaleType === 'add'
                 ? isUnassignedNode
                 : allPass([isMaster, inCluster(cluster.uuid)])
             }
             validations={[validatorRef.current]}
+            onChange={(value) => setSelectedNode(value)}
             required
           />
+          {showWarningMessage && (
+            <div className={classes.warning}>
+              <Alert variant={'warning'} message={transitionConstraint.message} />
+            </div>
+          )}
           <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
         </ValidatedForm>
       )}
