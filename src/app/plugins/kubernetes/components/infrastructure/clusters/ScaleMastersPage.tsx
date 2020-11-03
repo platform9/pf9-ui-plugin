@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react'
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
@@ -21,9 +21,10 @@ import ClusterHostChooser, {
 } from './bareos/ClusterHostChooser'
 import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
-import { customValidator, FieldValidator } from 'core/utils/fieldValidators'
+import { customValidator } from 'core/utils/fieldValidators'
 import { CloudProviders } from '../cloudProviders/model'
 import Alert from 'core/components/Alert'
+import { hasConvergingNodes } from './ClusterStatusUtils'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -36,10 +37,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   masterCount: {
     margin: theme.spacing(4, 0),
   },
-  warning: {
-    margin: theme.spacing(1),
-  },
 }))
+
+const oneNodeMessage =
+  "A single master cluster is thus never recommended for production environments as it can not tolerate any loss of masters. Its only recommended for test environments where you wish to quickly deploy a cluster and you can tolerate the possibility of cluster downtime caused by the master going down. You can not add more master nodes to a cluster that's created with a single master node today. You need to start with a cluster that has atleast 2 master nodes before you can add any more masters to it."
+const twoNodeMessage =
+  'A 2 master cluster can not tolerate any master loss. Losing 1 master will cause quorum to be lost and so the etcd cluster and hence the Kubernetes cluster will not function.'
+const threeNodeMessage =
+  '3 masters is the minimum we recommend for a highly available cluster. A 3 master cluster can tolerate loss of at most 1 master at a given time. In that case, the remaining 2 masters will elect a new active master if necessary.'
+const fourNodeMessage =
+  'A 4 master cluster can tolerate loss of at most 1 master at a given time. In that case, the remaining 3 masters will have majroity and will elect a new active master if necessary.'
+const fiveNodeMessage =
+  '	A 5 master cluster can tolerate loss of at most 2 masters at a given time. In that case, the remaining 4 or 3 masters will have majroity and will elect a new active master if necessary.'
 
 interface IConstraint {
   startNum: number
@@ -54,28 +63,26 @@ export const scaleConstraints: IConstraint[] = [
   {
     startNum: 5,
     desiredNum: 4,
-    relation: 'warn',
-    message:
-      'You must have 1, 3 or 5 masters to hold quorum. Please scale to 3 nodes once this node has converged to achieve quorum',
+    relation: 'allow',
+    message: fourNodeMessage,
   },
   {
     startNum: 4,
     desiredNum: 3,
     relation: 'allow',
-    message: '',
+    message: threeNodeMessage,
   },
   {
     startNum: 3,
     desiredNum: 2,
-    relation: 'warn',
-    message:
-      'You must have 1, 3 or 5 masters to hold quorum. Please scale to 1 node once this node has converged to achieve quorum',
+    relation: 'allow',
+    message: twoNodeMessage,
   },
   {
     startNum: 2,
     desiredNum: 1,
     relation: 'allow',
-    message: '',
+    message: oneNodeMessage,
   },
   {
     startNum: 1,
@@ -89,28 +96,26 @@ export const scaleConstraints: IConstraint[] = [
   {
     startNum: 1,
     desiredNum: 2,
-    relation: 'warn',
-    message:
-      '2 Master nodes provides the same resiliency as 1. Please scale to 3 nodes once this node has converged',
+    relation: 'allow',
+    message: twoNodeMessage,
   },
   {
     startNum: 2,
     desiredNum: 3,
     relation: 'allow',
-    message: '',
+    message: threeNodeMessage,
   },
   {
     startNum: 3,
     desiredNum: 4,
-    relation: 'warn',
-    message:
-      '4 Master nodes provides the same resiliency as 3. Please scale to 5 nodes once this node has converged',
+    relation: 'allow',
+    message: fourNodeMessage,
   },
   {
     startNum: 4,
     desiredNum: 5,
     relation: 'allow',
-    message: '',
+    message: fiveNodeMessage,
   },
 ]
 
@@ -134,12 +139,10 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   onAttach,
   onDetach,
 }) => {
-  const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const [selectedNode, setSelectedNode] = useState(null)
-  const validatorRef = useRef<FieldValidator>()
 
-  const hasMasterVip = cluster.masterVipIpv4
+  const hasMasterVip = cluster.masterVipIpv4 !== 'undefined'
   const numMasters = (cluster.nodes || []).filter(isMaster).length
   const numToChange = params.scaleType === 'add' ? 1 : -1
   const totalMasters = numMasters + numToChange
@@ -150,37 +153,37 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     ) || ({} as IConstraint)
 
-  const showWarningMessage = selectedNode && transitionConstraint.relation === 'warn'
+  debugger
 
   useEffect(() => {
     setSelectedNode(null)
   }, [params.scaleType])
 
+  const masterNodesHealthStatusValidator = useCallback(() => {
+    return customValidator(() => {
+      return cluster.masterNodesHealthStatus === 'healthy'
+    }, 'Master nodes are unhealthy. Cannot scale')
+  }, [cluster, params])()
+
   const masterNodeLengthValidator = useCallback(() => {
     return customValidator(() => {
-      if (validatorRef.current) {
-        validatorRef.current.errorMessage = transitionConstraint.message || defaultErrorMessage
-      }
+      return transitionConstraint.relation === 'allow'
+    }, defaultErrorMessage)
+  }, [cluster, params])()
+
+  const bareOsValidator = useCallback(() => {
+    return customValidator(() => {
       // BareOs clusters with single master node cannot scale without a virtial IP
       if (
         cluster.cloudProviderType === CloudProviders.BareOS &&
         numMasters === 1 &&
         !hasMasterVip
       ) {
-        if (validatorRef.current) {
-          validatorRef.current.errorMessage =
-            'You cannot add master nodes to a single master cluster without a virtual IP.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.'
-        }
         return false
       }
-      return (
-        cluster.masterNodesHealthStatus === 'healthy' &&
-        (transitionConstraint.relation === 'allow' || transitionConstraint.relation === 'warn')
-      )
-    }, defaultErrorMessage)
-  }, [numMasters, params, validatorRef])()
-
-  validatorRef.current = masterNodeLengthValidator
+      return true
+    }, 'No Virtual IP Detected. To scale Masters a Virtual IP is required. Please recreate this cluster and provide a Virtual IP on the Network step')
+  }, [cluster, params])()
 
   return (
     <div>
@@ -217,15 +220,15 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
                 ? isUnassignedNode
                 : allPass([isMaster, inCluster(cluster.uuid)])
             }
-            validations={[validatorRef.current]}
+            validations={[
+              masterNodesHealthStatusValidator,
+              masterNodeLengthValidator,
+              bareOsValidator,
+            ]}
             onChange={(value) => setSelectedNode(value)}
             required
           />
-          {showWarningMessage && (
-            <div className={classes.warning}>
-              <Alert variant={'warning'} message={transitionConstraint.message} />
-            </div>
-          )}
+          {selectedNode && <Alert small variant="warning" message={transitionConstraint.message} />}
           <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
         </ValidatedForm>
       )}
@@ -250,6 +253,7 @@ const ScaleMastersPage: FunctionComponent = () => {
   const isUpdating = updating || isAttaching || isDetaching
 
   const cluster = clusters.find((x) => x.uuid === id)
+  const hasMasterNodesConverging = hasConvergingNodes(cluster.masterNodes)
 
   const handleSubmit = async (data): Promise<void> => {
     const uuid = cluster.uuid
@@ -272,9 +276,15 @@ const ScaleMastersPage: FunctionComponent = () => {
       className={classes.root}
       title="Scale Masters"
       backUrl={listUrl}
-      loading={loading || isUpdating}
+      loading={loading || isUpdating || hasMasterNodesConverging}
       renderContentOnMount={!!cluster}
-      message={isUpdating ? 'Scaling cluster...' : 'Loading cluster...'}
+      message={
+        isUpdating
+          ? 'Scaling cluster...'
+          : loading
+          ? 'Loading cluster...'
+          : 'Master nodes are converging...'
+      }
     >
       <ScaleMasters
         cluster={cluster}
