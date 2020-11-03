@@ -142,7 +142,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   const { params, getParamsUpdater } = useParams()
   const [selectedNode, setSelectedNode] = useState(null)
 
-  const hasMasterVip = cluster.masterVipIpv4 !== 'undefined'
+  const hasMasterVip = cluster.masterVipIpv4 !== ''
   const numMasters = (cluster.nodes || []).filter(isMaster).length
   const numToChange = params.scaleType === 'add' ? 1 : -1
   const totalMasters = numMasters + numToChange
@@ -153,16 +153,19 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     ) || ({} as IConstraint)
 
-  debugger
-
   useEffect(() => {
     setSelectedNode(null)
   }, [params.scaleType])
 
-  const masterNodesHealthStatusValidator = useCallback(() => {
+  const clusterAndNodeStatusValidator = useCallback(() => {
     return customValidator(() => {
-      return cluster.masterNodesHealthStatus === 'healthy'
-    }, 'Master nodes are unhealthy. Cannot scale')
+      return (
+        cluster.status === 'ok' &&
+        cluster.taskStatus === 'success' &&
+        cluster.masterNodesHealthStatus === 'healthy' &&
+        !hasConvergingNodes(cluster.nodes)
+      )
+    }, 'Unable to scale nodes. All nodes must be converged and healthy')
   }, [cluster, params])()
 
   const masterNodeLengthValidator = useCallback(() => {
@@ -221,7 +224,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
                 : allPass([isMaster, inCluster(cluster.uuid)])
             }
             validations={[
-              masterNodesHealthStatusValidator,
+              clusterAndNodeStatusValidator,
               masterNodeLengthValidator,
               bareOsValidator,
             ]}
@@ -253,7 +256,6 @@ const ScaleMastersPage: FunctionComponent = () => {
   const isUpdating = updating || isAttaching || isDetaching
 
   const cluster = clusters.find((x) => x.uuid === id)
-  const hasMasterNodesConverging = hasConvergingNodes(cluster.masterNodes)
 
   const handleSubmit = async (data): Promise<void> => {
     const uuid = cluster.uuid
@@ -276,15 +278,9 @@ const ScaleMastersPage: FunctionComponent = () => {
       className={classes.root}
       title="Scale Masters"
       backUrl={listUrl}
-      loading={loading || isUpdating || hasMasterNodesConverging}
+      loading={loading || isUpdating}
       renderContentOnMount={!!cluster}
-      message={
-        isUpdating
-          ? 'Scaling cluster...'
-          : loading
-          ? 'Loading cluster...'
-          : 'Master nodes are converging...'
-      }
+      message={isUpdating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
       <ScaleMasters
         cluster={cluster}

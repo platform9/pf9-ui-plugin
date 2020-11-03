@@ -27,6 +27,8 @@ import { cloudProviderTypes } from '../cloudProviders/selectors'
 import ClusterDeleteDialog from './ClusterDeleteDialog'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import ResourceUsageTables from '../common/ResourceUsageTables'
+import { CloudProviders } from '../cloudProviders/model'
+import { hasConvergingNodes } from './ClusterStatusUtils'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -131,9 +133,12 @@ const renderMetaData = (_, { tags }) => {
 }
 
 const canScaleMasters = ([cluster]) =>
+  cluster.cloudProviderType === CloudProviders.BareOS &&
+  cluster.status === 'ok' &&
   cluster.taskStatus === 'success' &&
-  cluster.cloudProviderType === 'local' &&
-  (cluster.nodes || []).length > 1
+  ((cluster.nodes || []).length > 1 || cluster.masterVipIpv4 != '') &&
+  cluster.masterNodesHealthStatus === 'healthy' &&
+  !hasConvergingNodes(cluster.nodes)
 const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
 const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
 const canDeleteCluster = ([cluster]) => !['creating', 'deleting'].includes(cluster.taskStatus)
