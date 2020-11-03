@@ -177,14 +177,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   const bareOsValidator = useCallback(() => {
     return customValidator(() => {
       // BareOs clusters with single master node cannot scale without a virtial IP
-      if (
-        cluster.cloudProviderType === CloudProviders.BareOS &&
-        numMasters === 1 &&
-        !hasMasterVip
-      ) {
-        return false
-      }
-      return true
+      return cluster.cloudProviderType === CloudProviders.BareOS && (numMasters > 1 || hasMasterVip)
     }, 'No Virtual IP Detected. To scale Masters a Virtual IP is required. Please recreate this cluster and provide a Virtual IP on the Network step')
   }, [cluster, params])()
 
