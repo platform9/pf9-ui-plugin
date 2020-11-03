@@ -133,7 +133,7 @@ const renderTransientStatus = ({ uuid, connectionStatus }, variant) => {
 
 interface IClusterStatusProps {
   cluster: IClusterSelector
-  variant: StatusVariant
+  variant?: StatusVariant
   message?: string
 }
 

@@ -3,7 +3,7 @@ import ResourceUsageTable from './ResourceUsageTable'
 
 interface Props {
   usage: Usage
-  valueOff: boolean
+  valueOff?: boolean
 }
 
 interface Usage {

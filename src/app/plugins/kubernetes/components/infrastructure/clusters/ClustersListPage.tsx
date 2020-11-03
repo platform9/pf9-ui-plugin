@@ -19,7 +19,7 @@ import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/Cluster
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { isAdminRole } from 'k8s/util/helpers'
-import { both, omit, path, pathOr, prop } from 'ramda'
+import { both, omit, prop } from 'ramda'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
@@ -132,13 +132,16 @@ const renderMetaData = (_, { tags }) => {
   )
 }
 
+const clusterIsHealthy = (cluster) =>
+  cluster.status === 'ok' && cluster.masterNodesHealthStatus === 'healthy'
+const clusterNotBusy = (cluster) =>
+  cluster.taskStatus === 'success' && !hasConvergingNodes(cluster.nodes)
+
 const canScaleMasters = ([cluster]) =>
   cluster.cloudProviderType === CloudProviders.BareOS &&
-  cluster.status === 'ok' &&
-  cluster.taskStatus === 'success' &&
-  ((cluster.nodes || []).length > 1 || cluster.masterVipIpv4 != '') &&
-  cluster.masterNodesHealthStatus === 'healthy' &&
-  !hasConvergingNodes(cluster.nodes)
+  clusterIsHealthy(cluster) &&
+  clusterNotBusy(cluster) &&
+  (cluster.masterNodes?.length > 1 || !!cluster.masterVipIpv4)
 const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
 const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
 const canDeleteCluster = ([cluster]) => !['creating', 'deleting'].includes(cluster.taskStatus)
@@ -151,7 +154,7 @@ export const options = {
     const session = useSelector(prop(sessionStoreKey))
     const {
       userDetails: { role },
-    } = session
+    }: any = session
     if (role !== 'admin') {
       return null
     }
