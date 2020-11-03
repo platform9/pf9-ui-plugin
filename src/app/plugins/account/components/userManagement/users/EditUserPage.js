@@ -15,8 +15,6 @@ import { emptyObj, pathStr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
 import { propEq } from 'ramda'
-import { pathJoin } from 'utils/misc'
-import { userAccountPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import UserPasswordField from 'account/components/userManagement/users/UserPasswordField'
@@ -25,8 +23,9 @@ import SimpleLink from 'core/components/SimpleLink'
 import makeStyles from '@material-ui/styles/makeStyles'
 import { requiredValidator } from 'core/utils/fieldValidators'
 import Progress from 'core/components/progress/Progress'
+import { routes } from 'core/utils/routes'
 
-const listUrl = pathJoin(userAccountPrefix, 'user_management#users')
+const listUrl = routes.userManagement.users.path()
 
 const useStyles = makeStyles((theme) => ({
   togglableFieldContainer: {

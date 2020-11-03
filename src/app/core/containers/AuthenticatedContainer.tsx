@@ -358,7 +358,7 @@ const AuthenticatedContainer = () => {
     <>
       <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
-        <Toolbar setStack={setStack} />
+        <Toolbar />
         {SecondHeader && <SecondHeader className={classes.secondHeader} />}
         <Navbar
           withStackSlider={withStackSlider}

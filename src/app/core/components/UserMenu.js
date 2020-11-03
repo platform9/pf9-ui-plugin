@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Menu, MenuItem } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
-import { logoutUrl, helpUrl, userAccountUrl } from 'app/constants'
+import { logoutUrl, helpUrl } from 'app/constants'
 import { connect } from 'react-redux'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import ChangePasswordModal from './ChangePasswordModal'
@@ -11,6 +11,8 @@ import FontAwesomeIcon from './FontAwesomeIcon'
 import SimpleLink from './SimpleLink'
 import Text from 'core/elements/text'
 import clsx from 'clsx'
+import Avatar from './Avatar'
+import { routes } from 'core/utils/routes'
 
 const styles = (theme) => ({
   avatar: {
@@ -43,31 +45,11 @@ const styles = (theme) => ({
     textDecoration: 'none !important',
     color: 'rgba(0, 0, 0, 0.87)',
   },
-  userIcon: {
-    borderRadius: '50%',
-    background: theme.palette.grey[200],
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textTransform: 'uppercase',
-    fontWeight: 600,
-  },
-  toolbarIcon: {
-    height: 36,
-    width: 36,
-    fontSize: 16,
-  },
   userDetails: {
     display: 'grid',
     margin: theme.spacing(1, 0, 3, 0),
     gridTemplateColumns: 'auto auto',
     gridGap: theme.spacing(2),
-  },
-  detailsIcon: {
-    height: 48,
-    width: 48,
-    fontSize: 18,
-    cursor: 'default',
   },
   dropdownContainer: {
     padding: theme.spacing(0, 2),
@@ -115,7 +97,7 @@ class UserMenu extends React.PureComponent {
   handleCancelChangePassword = () => this.setState({ showChangePasswordModal: false })
 
   render() {
-    const { classes, className, session, setStack } = this.props
+    const { classes, className, session } = this.props
     const { anchorEl, showChangePasswordModal } = this.state
     const {
       username,
@@ -128,9 +110,7 @@ class UserMenu extends React.PureComponent {
 
     return (
       <div className={`${classes.avatar} ${className}`}>
-        <div onClick={this.handleClick} className={clsx(classes.userIcon, classes.toolbarIcon)}>
-          {displayName[0]}
-        </div>
+        <Avatar onClick={this.handleClick} displayName={displayName} diameter={36} fontSize={16} />
         <Menu
           id="user-menu"
           anchorEl={anchorEl}
@@ -142,7 +122,7 @@ class UserMenu extends React.PureComponent {
           <div className={classes.dropdownContainer}>
             <div className={classes.dropdownSection}>
               <div className={classes.userDetails}>
-                <div className={clsx(classes.userIcon, classes.detailsIcon)}>{displayName[0]}</div>
+                <Avatar displayName={displayName} diameter={48} fontSize={18} />
                 <div>
                   <Text variant="subtitle2">{displayName}</Text>
                   <Text variant="body2">{username}</Text>
@@ -150,11 +130,7 @@ class UserMenu extends React.PureComponent {
               </div>
               <div className={classes.dropdownLinks}>
                 {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
-                <SimpleLink
-                  src={userAccountUrl}
-                  className={classes.link}
-                  onClick={() => setStack('account')}
-                >
+                <SimpleLink src={routes.userManagement.users.path()} className={classes.link}>
                   <MenuListItem icon="cog">Settings</MenuListItem>
                 </SimpleLink>
                 <MenuListItem icon="sign-out" onClick={this.logout}>
@@ -177,7 +153,6 @@ class UserMenu extends React.PureComponent {
 
 UserMenu.propTypes = {
   classes: PropTypes.object,
-  setStack: PropTypes.func.isRequired,
 }
 
 export default UserMenu

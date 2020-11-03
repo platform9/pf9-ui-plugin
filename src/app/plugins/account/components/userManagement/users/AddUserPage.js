@@ -7,8 +7,6 @@ import FormWrapper from 'core/components/FormWrapper'
 import Text from 'core/elements/text'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { userAccountPrefix } from 'app/constants'
-import { pathJoin } from 'utils/misc'
 import useDataLoader from 'core/hooks/useDataLoader'
 import TenantRolesTableField from 'account/components/userManagement/users/TenantRolesTableField'
 import { mngmUserActions } from 'account/components/userManagement/users/actions'
@@ -21,8 +19,9 @@ import Radio from '@material-ui/core/Radio'
 import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
 import UserPasswordField from 'account/components/userManagement/users/UserPasswordField'
 import { requiredValidator, emailValidator } from 'core/utils/fieldValidators'
+import { routes } from 'core/utils/routes'
 
-const listUrl = pathJoin(userAccountPrefix, 'user_management#users')
+const listUrl = routes.userManagement.users.path()
 
 const initialContext = {
   username: '',

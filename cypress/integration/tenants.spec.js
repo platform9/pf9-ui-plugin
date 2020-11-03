@@ -2,7 +2,7 @@ describe('tenants', () => {
   before(() => {
     cy.resetServerContext('dev')
     cy.login()
-    cy.visit('/ui/account/user_management#tenants')
+    cy.visit('/ui/my-account/user_management#tenants')
   })
 
   context('list tenants', () => {

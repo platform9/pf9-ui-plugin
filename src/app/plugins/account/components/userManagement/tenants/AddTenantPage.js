@@ -6,16 +6,15 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import FormWrapper from 'core/components/FormWrapper'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { userAccountPrefix } from 'app/constants'
-import { pathJoin } from 'utils/misc'
 import useDataLoader from 'core/hooks/useDataLoader'
 import UserRolesTableField from 'account/components/userManagement/tenants/UserRolesTableField'
 import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
 import { mngmUserActions } from 'account/components/userManagement/users/actions'
 import Progress from 'core/components/progress/Progress'
 import { requiredValidator } from 'core/utils/fieldValidators'
+import { routes } from 'core/utils/routes'
 
-const listUrl = pathJoin(userAccountPrefix, 'user_management')
+const listUrl = routes.userManagement.tenants.path()
 
 const initialContext = {
   name: '',

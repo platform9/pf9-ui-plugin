@@ -6,6 +6,7 @@ import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { RootState } from 'app/store'
 import { prop } from 'ramda'
 import Text from 'core/elements/text'
+import Avatar from 'core/components/Avatar'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   root: {
@@ -25,17 +26,6 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
     maxWidth: '75%',
   },
   userIcon: {
-    borderRadius: '50%',
-    background: theme.palette.grey[200],
-    display: 'inline-flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textTransform: 'uppercase',
-    fontWeight: 600,
-    height: 48,
-    width: 48,
-    fontSize: 18,
-    cursor: 'default',
     marginLeft: theme.spacing(4),
   },
   displayName: {
@@ -62,7 +52,12 @@ const MyAccountHeader = ({ className }) => {
     <div className={clsx(classes.root, className)}>
       <div className={classes.upgrade}></div>
       <div className={classes.userDetails}>
-        <div className={classes.userIcon}>{displayName[0]}</div>
+        <Avatar
+          displayName={displayName}
+          diameter={48}
+          fontSize={18}
+          className={classes.userIcon}
+        />
         <Text variant="h3" className={classes.displayName}>
           {displayName}
         </Text>

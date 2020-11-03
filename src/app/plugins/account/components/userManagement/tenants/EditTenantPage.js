@@ -13,15 +13,13 @@ import { emptyObj, pathStr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
 import { propEq } from 'ramda'
-import { pathJoin } from 'utils/misc'
-import { userAccountPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { requiredValidator } from 'core/utils/fieldValidators'
 import { Redirect } from 'react-router'
 import { routes } from 'core/utils/routes'
 
-const listUrl = pathJoin(userAccountPrefix, 'user_management')
+const listUrl = routes.userManagement.tenants.path()
 
 const userParams = { systemUsers: true }
 

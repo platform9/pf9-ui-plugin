@@ -12,7 +12,6 @@ export const activateUserUrl = `${appUrlRoot}/users/activate`
 export const logoutUrl = `${appUrlRoot}/logout`
 export const resetPasswordApiUrl = '/clemency/reset/password'
 export const forgotPasswordApiUrl = '/clemency/request'
-export const userAccountUrl = `${appUrlRoot}/account/`
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const ironicWizardUrl = `${appUrlRoot}/metalstack/setup`
 export const allKey = '__all__'
@@ -31,7 +30,7 @@ export const uuidRegex = new RegExp(
 export const originUsernameRegex = new RegExp(/:\/\/(?<originUsername>(.+?)).platform9./, 'i')
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
-export const userAccountPrefix = `${appUrlRoot}/account`
+export const userAccountPrefix = `${appUrlRoot}/my-account`
 
 export const onboardingAccessSetup = 'onboarding/api-access'
 export const onboardingMonitoringSetup = 'onboarding/monitoring-enabled'

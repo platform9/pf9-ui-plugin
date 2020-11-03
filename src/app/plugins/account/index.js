@@ -6,16 +6,16 @@ import AddUserPage from 'account/components/userManagement/users/AddUserPage'
 import EditUserPage from 'account/components/userManagement/users/EditUserPage'
 import MyAccountHeader from 'account/components/secondHeader/MyAccountHeader'
 
-class Account extends React.PureComponent {
+class MyAccount extends React.PureComponent {
   render() {
     return <h1>Account Plugin</h1>
   }
 }
 
-Account.__name__ = 'account'
+MyAccount.__name__ = 'account'
 
-Account.registerPlugin = (pluginManager) => {
-  const plugin = pluginManager.registerPlugin('account', 'Account', '/ui/account')
+MyAccount.registerPlugin = (pluginManager) => {
+  const plugin = pluginManager.registerPlugin('account', 'Account', '/ui/my-account')
 
   plugin.registerSecondHeader(MyAccountHeader)
 
@@ -52,8 +52,6 @@ Account.registerPlugin = (pluginManager) => {
     },
   ])
 
-  const hostPrefix = '' // set to another host during development
-
   // These nav items are in active development but not shown in production.
   const navItems = [
     {
@@ -73,4 +71,4 @@ Account.registerPlugin = (pluginManager) => {
   plugin.registerNavItems(navItems)
 }
 
-export default Account
+export default MyAccount

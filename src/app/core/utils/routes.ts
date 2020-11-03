@@ -1,4 +1,4 @@
-import { k8sPrefix, appUrlRoot } from 'app/constants'
+import { k8sPrefix, userAccountPrefix, appUrlRoot } from 'app/constants'
 import URLPattern from 'url-pattern'
 
 interface GenericKVP {
@@ -242,27 +242,27 @@ export const routes = {
   },
   userManagement: {
     users: Route.register({
-      url: `${k8sPrefix}/user_management#users`,
+      url: `${userAccountPrefix}/user_management#users`,
       name: 'UserManagement:Users:List',
     }),
     tenants: Route.register({
-      url: `${k8sPrefix}/user_management#tenants`,
+      url: `${userAccountPrefix}/user_management#tenants`,
       name: 'UserManagement:Tenants:List',
     }),
     addTenant: Route.register({
-      url: `${k8sPrefix}/user_management/tenants/add`,
+      url: `${userAccountPrefix}/user_management/tenants/add`,
       name: 'UserManagement:Tenants:Add',
     }),
     editTenant: Route.register({
-      url: `${k8sPrefix}/user_management/tenants/edit/:id`,
+      url: `${userAccountPrefix}/user_management/tenants/edit/:id`,
       name: 'UserManagement:Tenants:Edit',
     }),
     addUser: Route.register({
-      url: `${k8sPrefix}/user_management/users/add`,
+      url: `${userAccountPrefix}/user_management/users/add`,
       name: 'UserManagement:User:Add',
     }),
     editUser: Route.register({
-      url: `${k8sPrefix}/user_management/users/edit/:id`,
+      url: `${userAccountPrefix}/user_management/users/edit/:id`,
       name: 'UserManagement:User:Edit',
     }),
   },
