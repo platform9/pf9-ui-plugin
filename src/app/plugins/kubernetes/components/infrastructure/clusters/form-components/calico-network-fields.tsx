@@ -3,6 +3,7 @@ import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import { customValidator } from 'core/utils/fieldValidators'
+import { NetworkStackTypes } from './network-stack'
 
 const calicoIpIPHelpText = {
   Always: 'Encapsulates POD traffic in IP-in-IP between nodes.',
@@ -31,11 +32,19 @@ const CalicoNetworkFields = ({ values }) => (
       info={calicoIpIPHelpText[values.calicoIpIpMode] || ''}
       required
     />
-    <CheckboxField
-      id="calicoNatOutgoing"
-      label="NAT Outgoing"
-      info="Packets destined outside the POD network will be SNAT'd using the node's IP."
-    />
+    {values.networkStack === NetworkStackTypes.IPv6 ? (
+      <CheckboxField
+        id="calicoIPv6PoolNatOutgoing"
+        label="NAT Outgoing"
+        info="Packets destined outside the POD network will be SNAT'd using the node's IP."
+      />
+    ) : (
+      <CheckboxField
+        id="calicoNatOutgoing"
+        label="NAT Outgoing"
+        info="Packets destined outside the POD network will be SNAT'd using the node's IP."
+      />
+    )}
     <TextField
       id="calicoV4BlockSize"
       label="Block Size"

@@ -105,6 +105,7 @@ const AddBareOsClusterPage = () => {
               icon={<CloudProviderCard active type={providerType} />}
               keyOverrides={wizardMetaFormattedNames}
               calloutFields={wizardMetaCalloutFields}
+              showContextPreview
             >
               {ViewComponent && (
                 <ViewComponent

@@ -5,6 +5,7 @@ import { RenderLabels } from 'k8s/components/pods/renderLabels'
 import { pick, pickBy } from 'ramda'
 import clsx from 'clsx'
 import { WizardContext } from './Wizard'
+import CodeBlock from '../CodeBlock'
 
 interface Props<T extends {}> {
   fields: T
@@ -12,6 +13,7 @@ interface Props<T extends {}> {
   children?: JSX.Element | JSX.Element[]
   icon?: JSX.Element
   className?: any
+  showContextPreview?: boolean
   keyOverrides?: { [key: string]: string }
   renderLabels?: (labels) => JSX.Element
 }
@@ -29,6 +31,7 @@ export default function WizardMeta<T>({
   fields,
   icon,
   className,
+  showContextPreview = false,
   renderLabels = (labels) => (
     <RenderLabels keyOverrides={keyOverrides} labels={labels} inverse split />
   ),
@@ -51,6 +54,7 @@ export default function WizardMeta<T>({
         {labels && renderLabels(labels)}
       </aside>
       {children}
+      {showContextPreview && <CodeBlock>{JSON.stringify(fields, null, 2)}</CodeBlock>}
     </div>
   )
 }
@@ -58,7 +62,7 @@ export default function WizardMeta<T>({
 const useStyles = makeStyles<Theme, { icon: boolean }>((theme) => ({
   wizardMeta: {
     display: 'grid',
-    gridTemplateColumns: '240px 1fr',
+    gridTemplateColumns: '240px max-content max-content',
     gridGap: 24,
 
     '& aside': {

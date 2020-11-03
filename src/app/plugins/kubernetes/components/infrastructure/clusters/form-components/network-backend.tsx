@@ -1,5 +1,6 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
+import { NetworkStackTypes } from './network-stack'
 
 export enum NetworkBackendTypes {
   Flannel = 'flannel',
@@ -12,15 +13,14 @@ const networkBackendOptions = [
   // { label: 'Canal (experimental)', value: 'canal' },
 ]
 
-const handleNetworkBackendChange = (option, wizardContext) => {
-  const payload = {
+export const handleNetworkBackendChange = (option, wizardContext) => {
+  return {
     networkPlugin: option,
     privileged: option === 'calico' ? true : wizardContext.privileged,
     calicoIpIpMode: option === 'calico' ? 'Always' : undefined,
     calicoNatOutgoing: option === 'calico' ? true : undefined,
     calicoV4BlockSize: option === 'calico' ? '24' : undefined,
   }
-  return payload
 }
 
 const NetworkBackendField = ({
@@ -34,6 +34,7 @@ const NetworkBackendField = ({
     onChange={(value) => setWizardContext(handleNetworkBackendChange(value, wizardContext))}
     options={options}
     info=""
+    disabled={wizardContext.networkStack !== NetworkStackTypes.IPv4}
     required
   />
 )
