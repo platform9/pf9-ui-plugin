@@ -39,16 +39,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const oneNodeMessage =
-  "A single master cluster is thus never recommended for production environments as it can not tolerate any loss of masters. Its only recommended for test environments where you wish to quickly deploy a cluster and you can tolerate the possibility of cluster downtime caused by the master going down. You can not add more master nodes to a cluster that's created with a single master node today. You need to start with a cluster that has atleast 2 master nodes before you can add any more masters to it."
-const twoNodeMessage =
-  'A 2 master cluster can not tolerate any master loss. Losing 1 master will cause quorum to be lost and so the etcd cluster and hence the Kubernetes cluster will not function.'
-const threeNodeMessage =
-  '3 masters is the minimum we recommend for a highly available cluster. A 3 master cluster can tolerate loss of at most 1 master at a given time. In that case, the remaining 2 masters will elect a new active master if necessary.'
-const fourNodeMessage =
-  'A 4 master cluster can tolerate loss of at most 1 master at a given time. In that case, the remaining 3 masters will have majroity and will elect a new active master if necessary.'
-const fiveNodeMessage =
-  '	A 5 master cluster can tolerate loss of at most 2 masters at a given time. In that case, the remaining 4 or 3 masters will have majroity and will elect a new active master if necessary.'
+// Quorum Messages
+const zeroMasterMsg =
+  'You cannot remove master node from a single master cluster.  If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead.'
+const oneMasterMsg =
+  'Quorum Risk. A single master cluster is not recommended for production environments. An outage of the master will bring the cluster offline. Recommended for test environments only.'
+const twoMastersMsg =
+  'Quorum Risk. A two master cluster does not hold quorum. Losing 1 master will cause the Kubernetes cluster to not function.'
+const threeMastersMsg = 'Quorum Achieved with a tolerance of 1.'
+const fourMastersMsg =
+  'Quorum Achieved with a tolerance of 1. Operating four masters can tolerate a loss of at  most 1 node as quorum is majority, 3 of 4.'
+const fiveMastersMsg = 'Quorum Achieved with a tolerance of 2.'
 
 interface IConstraint {
   startNum: number
@@ -64,32 +65,31 @@ export const scaleConstraints: IConstraint[] = [
     startNum: 5,
     desiredNum: 4,
     relation: 'allow',
-    message: fourNodeMessage,
+    message: fourMastersMsg,
   },
   {
     startNum: 4,
     desiredNum: 3,
     relation: 'allow',
-    message: threeNodeMessage,
+    message: threeMastersMsg,
   },
   {
     startNum: 3,
     desiredNum: 2,
     relation: 'allow',
-    message: twoNodeMessage,
+    message: twoMastersMsg,
   },
   {
     startNum: 2,
     desiredNum: 1,
     relation: 'allow',
-    message: oneNodeMessage,
+    message: oneMasterMsg,
   },
   {
     startNum: 1,
     desiredNum: 0,
     relation: 'deny',
-    message:
-      'You cannot remove master node from a single master cluster.  If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead.',
+    message: zeroMasterMsg,
   },
 
   // grow
@@ -97,25 +97,25 @@ export const scaleConstraints: IConstraint[] = [
     startNum: 1,
     desiredNum: 2,
     relation: 'allow',
-    message: twoNodeMessage,
+    message: twoMastersMsg,
   },
   {
     startNum: 2,
     desiredNum: 3,
     relation: 'allow',
-    message: threeNodeMessage,
+    message: threeMastersMsg,
   },
   {
     startNum: 3,
     desiredNum: 4,
     relation: 'allow',
-    message: fourNodeMessage,
+    message: fourMastersMsg,
   },
   {
     startNum: 4,
     desiredNum: 5,
     relation: 'allow',
-    message: fiveNodeMessage,
+    message: fiveMastersMsg,
   },
 ]
 
