@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: 20,
   },
   taskErrorMessage: {
-    maxHeight: 176,
+    maxHeight: 165,
     fontSize: 14,
     padding: theme.spacing(0, 2),
     margin: 0,
@@ -147,8 +147,8 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: '15px',
   },
   taskErrorAlert: {
-    maxHeight: 240,
-    padding: theme.spacing(0, 2),
+    maxHeight: 224,
+    padding: theme.spacing(0, 2, 2, 2),
     marginBottom: theme.spacing(2),
     border: `1px solid ${theme.palette.red[500]}`,
     backgroundColor: hexToRGBA(theme.palette.red[500], 0.1),
