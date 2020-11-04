@@ -36,7 +36,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
     display: 'grid',
     alignItems: 'center',
-    gridTemplateColumns: 'repeat(auto-fill, 200px)',
+    gridAutoColumns: 200,
     margin: theme.spacing(2, 4, 1, 4),
   },
   text: {
