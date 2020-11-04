@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   rowValue: {
     marginLeft: theme.spacing(0.5),
     color: theme.palette.grey[700],
+    wordBreak: 'break-all',
   },
   card: {
     marginRight: theme.spacing(2),

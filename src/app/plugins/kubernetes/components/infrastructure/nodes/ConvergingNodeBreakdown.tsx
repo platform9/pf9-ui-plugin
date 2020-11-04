@@ -66,18 +66,15 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     minHeight: 118,
     border: `1px solid ${theme.palette.grey[300]}`,
     borderRadius: 4,
-    margin: theme.spacing(0, 2),
   },
   paneBody: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(2, 0),
   },
   tablePolling: {
     display: 'flex',
     justifyContent: 'flex-end',
-    maxWidth: 1130,
   },
   tableChooser: {
-    maxWidth: 1130,
     display: 'grid',
     gridTemplateColumns: `
       minmax(400px, 500px)
@@ -91,7 +88,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   nodeHealthContainer: {
     // background: theme.palette.grey[200],
     display: 'grid',
-    gridTemplateRows: 'repeat(auto-fill, 65px)',
+    gridAutoRows: 65,
     justifyItems: 'stretch',
     gridGap: 8,
   },

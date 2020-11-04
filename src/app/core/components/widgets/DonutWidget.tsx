@@ -8,6 +8,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   container: {
     position: 'relative',
     display: 'flex',
+    alignItems: 'center',
   },
 }))
 

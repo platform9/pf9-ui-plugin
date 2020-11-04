@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
-import { Card, CardHeader, CardContent, Divider } from '@material-ui/core'
 import { DetailRow } from 'k8s/components/infrastructure/nodes/NodeDetailsPage'
 import Text from 'core/elements/text'
 
@@ -18,7 +17,7 @@ const styles = (theme) => ({
     margin: theme.spacing(0, 2, 1),
   },
   card: {
-    maxWidth: 555,
+    maxWidth: 607,
     width: 'max-content',
     border: `solid 1px ${theme.palette.grey[300]}`,
     borderRadius: 4,

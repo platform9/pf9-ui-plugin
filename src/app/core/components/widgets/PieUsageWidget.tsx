@@ -15,10 +15,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   pieLegend: {
     display: 'grid',
-    gridTemplateRows: 'repeat(auto-fill, 20px)',
-    gridTemplateColumns: 'minmax(min-content, 20px) 1fr',
+    gridAutoRows: 20,
     gridGap: theme.spacing(),
-    marginLeft: theme.spacing(2),
     alignContent: 'center',
     justifyItems: 'start',
   },
@@ -27,15 +25,20 @@ const useStyles = makeStyles<Theme>((theme) => ({
     whiteSpace: 'nowrap',
   },
   legendCount: {
-    justifySelf: 'center', // for when there are large and small counts
+    justifySelf: 'end', // for when there are large and small counts
     color: theme.palette.grey['000'],
     padding: '0px 5px 2px',
     borderRadius: 20,
-    display: 'flex',
+    display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     height: 18,
     minWidth: 10,
+  },
+  legendRow: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(min-content, 36px) 1fr',
+    gridGap: theme.spacing(),
   },
 }))
 
@@ -55,18 +58,19 @@ export const PieLegend = ({ data }) => {
     <legend className={pieLegend}>
       {data &&
         data.map((entry) => (
-          <React.Fragment key={entry.name}>
+          <div key={entry.name} className={classes.legendRow}>
             <Text
+              component="span"
               variant="caption1"
               className={classes.legendCount}
               style={{ backgroundColor: pathStr(entry.color, theme.palette) }}
             >
               {entry.value}
             </Text>
-            <Text variant="body2" className={legendName}>
+            <Text component="span" variant="body2" className={legendName}>
               {formattedName(entry.name)}
             </Text>
-          </React.Fragment>
+          </div>
         ))}
     </legend>
   )
