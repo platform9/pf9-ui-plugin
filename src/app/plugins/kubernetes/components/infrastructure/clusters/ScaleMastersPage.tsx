@@ -12,7 +12,6 @@ import BlockChooser from 'core/components/BlockChooser'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import useParams from 'core/hooks/useParams'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterHostChooser, {
   isUnassignedNode,
@@ -138,11 +137,11 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   onAttach,
   onDetach,
 }) => {
-  const { params, getParamsUpdater } = useParams()
+  const [scaleType, setScaleType] = useState(null)
   const [selectedNode, setSelectedNode] = useState(null)
 
   const numMasters = (cluster.nodes || []).filter(isMaster).length
-  const numToChange = params.scaleType === 'add' ? 1 : -1
+  const numToChange = scaleType === 'add' ? 1 : -1
   const totalMasters = numMasters + numToChange
   // Look up the transition in the state transition table.
   const transitionConstraint =
@@ -153,33 +152,33 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
 
   useEffect(() => {
     setSelectedNode(null)
-  }, [params.scaleType])
+  }, [scaleType])
 
   const clusterAndNodeStatusValidator = useCallback(() => {
     return customValidator(() => {
       return clusterIsHealthy(cluster) && clusterNotBusy(cluster)
     }, 'Unable to scale nodes. All nodes must be converged and healthy')
-  }, [cluster, params])()
+  }, [cluster, scaleType])()
 
   const masterNodeLengthValidator = useCallback(() => {
     return customValidator(() => {
       return transitionConstraint.relation === 'allow'
     }, defaultErrorMessage)
-  }, [cluster, params])()
+  }, [cluster, scaleType])()
 
   const bareOsValidator = useCallback(() => {
     return customValidator(() => {
       // BareOs clusters with single master node cannot scale without a virtial IP
       return isBareOsMultiMasterCluster(cluster)
     }, 'No Virtual IP Detected. To scale Masters a Virtual IP is required. Please recreate this cluster and provide a Virtual IP on the Network step')
-  }, [cluster, params])()
+  }, [cluster, scaleType])()
 
   return (
     <div>
       <Text variant="subtitle1">Current Masters: {numMasters}</Text>
 
       <BlockChooser
-        onChange={getParamsUpdater('scaleType')}
+        onChange={(type) => setScaleType(type)}
         options={[
           {
             id: 'add',
@@ -196,18 +195,17 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
         ]}
       />
 
-      {!!params.scaleType && (
+      {!!scaleType && (
         <ValidatedForm
-          onSubmit={params.scaleType === 'add' ? onAttach : onDetach}
-          title={`Choose nodes to ${params.scaleType}`}
+          onSubmit={scaleType === 'add' ? onAttach : onDetach}
+          title={`Choose nodes to ${scaleType}`}
         >
           <ClusterHostChooser
-            id={params.scaleType === 'add' ? 'mastersToAdd' : 'mastersToRemove'}
+            // id={scaleType === 'add' ? 'mastersToAdd' : 'mastersToRemove'}
+            id="nodes"
             selection="single"
             filterFn={
-              params.scaleType === 'add'
-                ? isUnassignedNode
-                : allPass([isMaster, inCluster(cluster.uuid)])
+              scaleType === 'add' ? isUnassignedNode : allPass([isMaster, inCluster(cluster.uuid)])
             }
             validations={[
               clusterAndNodeStatusValidator,
@@ -218,7 +216,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
             required
           />
           {selectedNode && <Alert small variant="warning" message={transitionConstraint.message} />}
-          <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
+          <SubmitButton>{scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
         </ValidatedForm>
       )}
     </div>
@@ -248,14 +246,14 @@ const ScaleMastersPage: FunctionComponent = () => {
     await update({ uuid, ...data })
   }
 
-  const handleAttach = (data: { mastersToAdd: string[] }) => {
-    const uuids = data.mastersToAdd
+  const handleAttach = (data: { nodes: string[] }) => {
+    const uuids = data.nodes
     const nodes = uuids.map((uuid) => ({ uuid, isMaster: true }))
     return attach({ cluster, nodes })
   }
 
-  const handleDetach = (data: { mastersToRemove: string[] }) => {
-    const uuids = data.mastersToRemove
+  const handleDetach = (data: { nodes: string[] }) => {
+    const uuids = data.nodes
     return detach({ cluster, nodes: uuids })
   }
 
