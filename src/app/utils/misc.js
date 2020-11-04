@@ -202,3 +202,9 @@ export const normalizeUsername = (name = '') => {
 // Really simple indefinite article function, does not account for special
 // cases such as 'a user'
 export const indefiniteArticle = (word = '') => (/^([aeiou])/i.test(word) ? 'an' : 'a')
+
+export const cleanupStacktrace = (stacktrace = '') =>
+  stacktrace
+    .split('\n')
+    .filter((res) => !!res.trim())
+    .join('\n\n')

@@ -61,6 +61,7 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   iconColor: {
     fontSize: ({ variant }) => (variant === 'header' ? '1rem' : theme.typography.body1.fontSize),
     color: ({ status }) => getIconOrBubbleColor(status, theme),
+    justifySelf: 'end',
   },
 }))
 
@@ -108,8 +109,13 @@ const ClusterStatusSpan: FC<Props> = (props) => {
 
 export default ClusterStatusSpan
 
-const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
-  <ClusterStatusSpan iconStatus title={taskError} status="error" variant={variant}>
+const renderErrorStatus = (nodesDetailsUrl, variant) => (
+  <ClusterStatusSpan
+    iconStatus
+    title="Click the link to view more details"
+    status="error"
+    variant={variant}
+  >
     <SimpleLink variant="error" src={nodesDetailsUrl}>
       Error
     </SimpleLink>
@@ -166,7 +172,8 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
           )}
         </ClusterStatusSpan>
       )}
-      {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
+      {cluster.taskError &&
+        renderErrorStatus(routes.cluster.detail.path({ id: cluster.uuid }), variant)}
     </div>
   )
 }

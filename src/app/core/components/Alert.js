@@ -5,8 +5,9 @@ import { Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import Text from 'core/elements/text'
 import FontAwesomeIcon from './FontAwesomeIcon'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
-const variantIcon = {
+export const variantIcon = {
   success: 'check-circle',
   warning: 'exclamation-circle',
   error: 'exclamation-circle',
@@ -21,7 +22,11 @@ const useStyles = makeStyles((theme) => ({
     border: 0,
     display: ({ small }) => (small ? 'flex' : 'block'),
     backgroundColor: ({ type }) =>
-      type === 'card' ? theme.palette.grey['000'] : theme.palette.blue[100],
+      type === 'card'
+        ? theme.palette.grey['000']
+        : type === 'error'
+        ? hexToRGBA(theme.palette.red[500], 0.1)
+        : theme.palette.blue[100],
   },
   success: { color: theme.palette.green.main },
   error: { color: theme.palette.red.main },
@@ -65,7 +70,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Alert = ({ children, message, variant, small, type = 'message', showClose }) => {
+const Alert = ({
+  className = undefined,
+  children,
+  message,
+  variant,
+  small,
+  type = 'message',
+  showClose,
+}) => {
   const classes = useStyles({ small, type })
   const [open, setOpen] = useState(true)
   if (!open) {
@@ -73,7 +86,7 @@ const Alert = ({ children, message, variant, small, type = 'message', showClose 
   }
 
   return (
-    <Paper className={classes.root} elevation={0}>
+    <Paper className={clsx(classes.root, className)} elevation={0}>
       <FontAwesomeIcon className={clsx(classes.icon, classes.iconVariant, classes[variant])}>
         {variantIcon[variant]}
       </FontAwesomeIcon>
@@ -87,15 +100,6 @@ const Alert = ({ children, message, variant, small, type = 'message', showClose 
         <FontAwesomeIcon className={classes.close} onClick={() => setOpen(false)}>
           minus-circle
         </FontAwesomeIcon>
-        // <IconButton
-        //   key="close"
-        //   aria-label="Close"
-        //   color="inherit"
-        //   className={classes.close}
-        //   onClick={() => setOpen(false)}
-        // >
-        //   <CloseIcon />
-        // </IconButton>
       )}
     </Paper>
   )
@@ -107,7 +111,7 @@ Alert.propTypes = {
 
   // Use message when it is just a short string of text.
   message: PropTypes.node,
-  type: PropTypes.oneOf(['card', 'message']),
+  type: PropTypes.oneOf(['card', 'message', 'error']),
   variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
   small: PropTypes.bool,
   showClose: PropTypes.bool,

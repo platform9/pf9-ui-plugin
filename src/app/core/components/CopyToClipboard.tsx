@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useRef } from 'react'
-import { Done } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/styles'
 import useParams from 'core/hooks/useParams'
 import Theme from 'core/themes/model'
+import FontAwesomeIcon from './FontAwesomeIcon'
 
 interface Props {
   copyText: string
@@ -14,6 +14,7 @@ interface Props {
   // the entire width of the parent, but still want the copy to clipboard
   // icon inline
   fill?: boolean
+  copyIcon?: any
 }
 
 interface State {
@@ -75,7 +76,10 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     justifyContent: 'center',
   },
   done: {
-    color: theme.components.wizard.dark,
+    color: theme.palette.green.main,
+  },
+  copy: {
+    color: 'inherit',
   },
   header: {
     display: 'flex',
@@ -105,6 +109,7 @@ const CopyToClipboard: FunctionComponent<Props> = ({
   codeBlock = true,
   header = undefined,
   fill = false,
+  copyIcon,
 }) => {
   const { params, updateParams } = useParams<State>(defaultParams)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -135,11 +140,12 @@ const CopyToClipboard: FunctionComponent<Props> = ({
     }
   }
   const copyActionElems = (
-    <div className={classes.copyIconContainer} onClick={handleCopy}>
-      {params.isCopySuccessful ? (
-        <Done className={classes.done} />
-      ) : (
-        <CopyIcon codeBlock={codeBlock} />
+    <div className={!!copyIcon ? undefined : classes.copyIconContainer} onClick={handleCopy}>
+      {!copyIcon && !params.isCopySuccessful && <CopyIcon codeBlock={codeBlock} />}
+      {!!copyIcon && (
+        <FontAwesomeIcon className={params.isCopySuccessful ? classes.done : classes.copy}>
+          {params.isCopySuccessful ? 'check' : copyIcon}
+        </FontAwesomeIcon>
       )}
     </div>
   )
