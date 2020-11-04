@@ -22,9 +22,8 @@ import ClusterHostChooser, {
 import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
 import { customValidator } from 'core/utils/fieldValidators'
-import { CloudProviders } from '../cloudProviders/model'
 import Alert from 'core/components/Alert'
-import { hasConvergingNodes } from './ClusterStatusUtils'
+import { clusterIsHealthy, clusterNotBusy, isBareOsMultiMasterCluster } from './helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -142,7 +141,6 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   const { params, getParamsUpdater } = useParams()
   const [selectedNode, setSelectedNode] = useState(null)
 
-  const hasMasterVip = cluster.masterVipIpv4 !== ''
   const numMasters = (cluster.nodes || []).filter(isMaster).length
   const numToChange = params.scaleType === 'add' ? 1 : -1
   const totalMasters = numMasters + numToChange
@@ -159,12 +157,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
 
   const clusterAndNodeStatusValidator = useCallback(() => {
     return customValidator(() => {
-      return (
-        cluster.status === 'ok' &&
-        cluster.taskStatus === 'success' &&
-        cluster.masterNodesHealthStatus === 'healthy' &&
-        !hasConvergingNodes(cluster.nodes)
-      )
+      return clusterIsHealthy(cluster) && clusterNotBusy(cluster)
     }, 'Unable to scale nodes. All nodes must be converged and healthy')
   }, [cluster, params])()
 
@@ -177,7 +170,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   const bareOsValidator = useCallback(() => {
     return customValidator(() => {
       // BareOs clusters with single master node cannot scale without a virtial IP
-      return cluster.cloudProviderType === CloudProviders.BareOS && (numMasters > 1 || hasMasterVip)
+      return isBareOsMultiMasterCluster(cluster)
     }, 'No Virtual IP Detected. To scale Masters a Virtual IP is required. Please recreate this cluster and provide a Virtual IP on the Network step')
   }, [cluster, params])()
 

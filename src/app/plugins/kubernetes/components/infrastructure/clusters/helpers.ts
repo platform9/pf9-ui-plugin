@@ -1,11 +1,38 @@
 import ApiClient from 'api-client/ApiClient'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
-import { compose, path, pick, propEq, propSatisfies } from 'ramda'
+import { isAdminRole } from 'k8s/util/helpers'
+import { compose, path, pick, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import { trackEvent } from 'utils/tracking'
+import { CloudProviders } from '../cloudProviders/model'
+import { hasConvergingNodes } from './ClusterStatusUtils'
 import { ClusterCreateTypes } from './model'
+
+export const clusterIsHealthy = (cluster) =>
+  cluster.status === 'ok' && cluster.masterNodesHealthStatus === 'healthy'
+
+export const clusterNotBusy = (cluster) =>
+  cluster.taskStatus === 'success' && !hasConvergingNodes(cluster.nodes)
+
+export const isBareOsMultiMasterCluster = (cluster) =>
+  cluster.cloudProviderType === CloudProviders.BareOS &&
+  (cluster.masterNodes?.length > 1 || !!cluster.masterVipIpv4)
+
+export const canScaleMasters = ([cluster]) =>
+  isBareOsMultiMasterCluster(cluster) && clusterIsHealthy(cluster) && clusterNotBusy(cluster)
+
+export const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
+
+export const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
+
+export const canDeleteCluster = ([cluster]) =>
+  !['creating', 'deleting'].includes(cluster.taskStatus)
+
+export const notBusy = ([cluster]) => cluster.taskStatus !== 'updating'
+
+export const isAdmin = (selected, store) => isAdminRole(prop('session', store))
 
 const { qbert } = ApiClient.getInstance()
 

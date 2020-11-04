@@ -135,6 +135,7 @@ interface IClusterStatusProps {
   cluster: IClusterSelector
   variant?: StatusVariant
   message?: string
+  iconStatus?: boolean
 }
 
 export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
@@ -156,7 +157,6 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
           title={fields.message}
           status={fields.status}
           variant={variant}
-          iconStatus={fields.status === 'loading' ? true : false}
           {...rest}
         >
           {variant === 'header' ? (
@@ -195,7 +195,6 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
       title={fields.message}
       status={fields.clusterStatus}
       variant={variant}
-      iconStatus={fields.clusterStatus === 'loading' ? true : false}
       {...rest}
     >
       {variant === 'header' ? (

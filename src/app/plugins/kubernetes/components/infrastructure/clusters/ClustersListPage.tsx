@@ -18,7 +18,6 @@ import {
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { isAdminRole } from 'k8s/util/helpers'
 import { both, omit, prop } from 'ramda'
 import React from 'react'
 import { useSelector } from 'react-redux'
@@ -27,8 +26,14 @@ import { cloudProviderTypes } from '../cloudProviders/selectors'
 import ClusterDeleteDialog from './ClusterDeleteDialog'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import ResourceUsageTables from '../common/ResourceUsageTables'
-import { CloudProviders } from '../cloudProviders/model'
-import { hasConvergingNodes } from './ClusterStatusUtils'
+import {
+  isAdmin,
+  canDeleteCluster,
+  canScaleMasters,
+  canScaleWorkers,
+  canUpgradeCluster,
+  notBusy,
+} from './helpers'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -57,8 +62,15 @@ const renderUUID = (_, { uuid }) => {
     </CopyToClipboard>
   )
 }
-const renderConnectionStatus = (_, cluster) => <ClusterConnectionStatus cluster={cluster} />
-const renderHealthStatus = (_, cluster) => <ClusterHealthStatus cluster={cluster} />
+const renderConnectionStatus = (_, cluster) => (
+  <ClusterConnectionStatus
+    iconStatus={cluster.connectionStatus === 'converging'}
+    cluster={cluster}
+  />
+)
+const renderHealthStatus = (_, cluster) => (
+  <ClusterHealthStatus iconStatus={cluster.connectionStatus === 'converging'} cluster={cluster} />
+)
 const renderClusterLink = (links, { usage }) => <ClusterLinks links={links} usage={usage} />
 
 const ClusterLinks = ({ links, usage }) => {
@@ -131,22 +143,6 @@ const renderMetaData = (_, { tags }) => {
     </Tooltip>
   )
 }
-
-const clusterIsHealthy = (cluster) =>
-  cluster.status === 'ok' && cluster.masterNodesHealthStatus === 'healthy'
-const clusterNotBusy = (cluster) =>
-  cluster.taskStatus === 'success' && !hasConvergingNodes(cluster.nodes)
-
-const canScaleMasters = ([cluster]) =>
-  cluster.cloudProviderType === CloudProviders.BareOS &&
-  clusterIsHealthy(cluster) &&
-  clusterNotBusy(cluster) &&
-  (cluster.masterNodes?.length > 1 || !!cluster.masterVipIpv4)
-const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
-const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
-const canDeleteCluster = ([cluster]) => !['creating', 'deleting'].includes(cluster.taskStatus)
-const notBusy = ([cluster]) => cluster.taskStatus !== 'updating'
-const isAdmin = (selected, store) => isAdminRole(prop('session', store))
 
 export const options = {
   addUrl: routes.cluster.add.path(),
