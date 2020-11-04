@@ -10,7 +10,7 @@ import ClusterNodes from './ClusterNodes'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
-import { Card } from '@material-ui/core'
+import { Card, Tooltip } from '@material-ui/core'
 import Text from 'core/elements/text'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
@@ -25,10 +25,12 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PollingData from 'core/components/PollingData'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { capitalizeString } from 'utils/misc'
+import { capitalizeString, cleanupStacktrace } from 'utils/misc'
 import { cloudProviderTypes } from 'k8s/components/infrastructure/cloudProviders/selectors'
-import Alert from 'core/components/Alert'
+import { variantIcon } from 'core/components/Alert'
 import CodeBlock from 'core/components/CodeBlock'
+import CopyToClipboard from 'core/components/CopyToClipboard'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const oneSecond = 1000
 
@@ -59,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   headerCardContainer: {
-    width: 320,
+    width: 424,
     minHeight: 175,
     display: 'grid',
     gridTemplateRows: ({ hasLinks }) => `62px 1fr ${hasLinks ? 56 : 12}px`,
@@ -92,6 +94,9 @@ const useStyles = makeStyles((theme) => ({
       gridArea: 'header',
       margin: 0,
       color: theme.palette.grey[700],
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
     },
     '& p': {
       gridArea: 'cluster',
@@ -122,32 +127,60 @@ const useStyles = makeStyles((theme) => ({
   },
   tabContainer: {
     paddingTop: theme.spacing(2),
-    maxWidth: 1131,
+    maxWidth: 1234,
   },
   detailsHeader: {
     display: 'grid',
-    gridTemplateColumns: '330px repeat(3, 250px)',
+    gridTemplateColumns: '434px repeat(3, 250px)',
     gridGap: theme.spacing(2),
     paddingBottom: 20,
   },
   taskErrorMessage: {
     maxHeight: 176,
-    fontSize: 13,
+    fontSize: 14,
+    padding: theme.spacing(0, 2),
+    margin: 0,
+    marginTop: theme.spacing(2),
     backgroundColor: 'transparent',
     color: theme.palette.red[500],
+    fontWeight: 300,
+    lineHeight: '15px',
   },
   taskErrorAlert: {
-    maxWidth: 'inherit',
-    maxHeight: 200,
-    padding: theme.spacing(1, 1, 1, 4.5),
+    maxHeight: 240,
+    padding: theme.spacing(0, 2),
     marginBottom: theme.spacing(2),
     border: `1px solid ${theme.palette.red[500]}`,
+    backgroundColor: hexToRGBA(theme.palette.red[500], 0.1),
+    borderRadius: 4,
 
-    '& > i': {
-      left: 12,
+    '& > header': {
+      color: theme.palette.red[500],
+      borderBottom: `1px solid ${theme.palette.red[500]}`,
+      display: 'grid',
+      gridGap: theme.spacing(),
+      gridTemplateColumns: '22px 1fr 22px',
+      fontSize: 14,
+      height: 40,
+      alignItems: 'center',
     },
   },
 }))
+
+const ClusterTaskError = ({ taskError }) => {
+  const classes = useStyles()
+  const formattedError = cleanupStacktrace(taskError)
+  return (
+    <div className={classes.taskErrorAlert}>
+      <header>
+        <FontAwesomeIcon>{variantIcon.error}</FontAwesomeIcon>
+        <Text variant="caption1">Error Impacting Cluster Availability</Text>
+        <CopyToClipboard copyText={formattedError} copyIcon="copy" codeBlock={false} />
+      </header>
+      <CodeBlock className={classes.taskErrorMessage}>{formattedError}</CodeBlock>
+    </div>
+  )
+}
 
 const ClusterDetailsPage = () => {
   const { match } = useReactRouter()
@@ -159,11 +192,7 @@ const ClusterDetailsPage = () => {
   const clusterHeader = (
     <>
       <ClusterStatusAndUsage cluster={cluster} loading={loading} />
-      {cluster.taskError && (
-        <Alert variant="error" type="error" className={classes.taskErrorAlert}>
-          <CodeBlock className={classes.taskErrorMessage}>{cluster.taskError}</CodeBlock>
-        </Alert>
-      )}
+      {cluster.taskError && <ClusterTaskError taskError={cluster.taskError} />}
     </>
   )
   return (
@@ -242,9 +271,12 @@ const HeaderCard = ({ title, subtitle, icon, loading = false, links, children })
   return (
     <Card className={classes.headerCardContainer} elevation={0}>
       <header className={classes.headerCardHeader}>
-        <Text variant="subtitle1" component="h1">
-          {title}
-        </Text>
+        <Tooltip title={title} interactive>
+          <Text variant="subtitle1" component="h1">
+            {title}
+          </Text>
+        </Tooltip>
+
         <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>
           {loading ? 'sync' : icon}
         </FontAwesomeIcon>

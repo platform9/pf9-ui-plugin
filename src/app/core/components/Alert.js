@@ -7,7 +7,7 @@ import Text from 'core/elements/text'
 import FontAwesomeIcon from './FontAwesomeIcon'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 
-const variantIcon = {
+export const variantIcon = {
   success: 'check-circle',
   warning: 'exclamation-circle',
   error: 'exclamation-circle',
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
       type === 'card'
         ? theme.palette.grey['000']
         : type === 'error'
-        ? hexToRGBA(theme.palette.red[500], 0.075)
+        ? hexToRGBA(theme.palette.red[500], 0.1)
         : theme.palette.blue[100],
   },
   success: { color: theme.palette.green.main },
