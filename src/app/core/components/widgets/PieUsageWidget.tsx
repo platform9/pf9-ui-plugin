@@ -15,7 +15,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   pieLegend: {
     display: 'grid',
-    gridAutoRows: 20,
+    gridTemplateRows: 'repeat(auto-fill, 20px)',
     gridGap: theme.spacing(),
     alignContent: 'center',
     justifyItems: 'start',
