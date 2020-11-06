@@ -88,7 +88,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   nodeHealthContainer: {
     // background: theme.palette.grey[200],
     display: 'grid',
-    gridAutoRows: 65,
+    gridTemplateRows: 'repeat(auto-fill, 65px)',
     justifyItems: 'stretch',
     gridGap: 8,
   },
