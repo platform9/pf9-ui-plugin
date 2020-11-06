@@ -141,6 +141,10 @@ class Keystone extends ApiService {
     return `${this.v3}/auth/tokens?nocatalog`
   }
 
+  get ssoLoginUrl() {
+    return `${this.v3}/OS-FEDERATION/identity_providers/IDP1/protocols/saml2/auth`
+  }
+
   get usersUrl() {
     return `${this.v3}/users`
   }
@@ -396,6 +400,31 @@ class Keystone extends ApiService {
       return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
       // authentication failed
+      return {}
+    }
+  }
+
+  authenticateSso = async () => {
+    try {
+      const response = await this.client.rawGet<any>({
+        url: this.ssoLoginUrl,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'authenticateSso',
+        },
+      })
+      const {
+        expires_at: expiresAt,
+        issued_at: issuedAt,
+        user: { name: username },
+      } = response.data.token
+      const unscopedToken = response.headers['x-subject-token']
+      this.client.unscopedToken = unscopedToken
+      return { unscopedToken, username, expiresAt, issuedAt }
+    } catch (err) {
+      // Redirect to login page manually
+      // When implementing hagrid this will be dynamic, get from API
+      location.href = '/Shibboleth.sso/Login'
       return {}
     }
   }

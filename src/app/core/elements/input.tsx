@@ -49,9 +49,13 @@ interface Props extends Omit<OutlinedTextFieldProps, 'onChange' | 'variant'> {
   onChange?: (e: any) => void
 }
 
-const Input: FC<Props> = ({ className = undefined, variant = 'light', ...rest }) => {
+const Input: FC<Props> = ({ className = undefined, variant = 'light', children, ...rest }) => {
   const { input } = useStyles({ variant })
-  return <MUITextField {...rest} variant="outlined" className={clsx(input, className)} />
+  return (
+    <MUITextField {...rest} variant="outlined" className={clsx(input, className)}>
+      {children}
+    </MUITextField>
+  )
 }
 
 const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
@@ -69,6 +73,17 @@ const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
       fontSize: 15,
       padding: '0 12px 0 5px',
       color: ({ variant }) => getColor(theme, 'default', variant).color,
+    },
+    '& .MuiSelect-selectMenu': {
+      minHeight: 54,
+      lineHeight: '54px',
+      padding: theme.spacing(0, 2),
+      color: ({ variant }) => getColor(theme, 'default', variant).color,
+      background: ({ variant }) => getColor(theme, 'default', variant).background,
+    },
+    '& .MuiSelect-icon': {
+      color: ({ variant }) => getColor(theme, 'default', variant).color,
+      background: ({ variant }) => getColor(theme, 'default', variant).background,
     },
     '& input': {
       ...theme.typography.inputPlaceholder,

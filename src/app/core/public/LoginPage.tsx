@@ -3,7 +3,7 @@ import ApiClient from 'api-client/ApiClient'
 import { Checkbox, FormControlLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
-import { compose } from 'utils/fp'
+import { compose, pathStrOr } from 'utils/fp'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
@@ -19,6 +19,8 @@ import { sessionActions } from 'core/session/sessionReducers'
 import clsx from 'clsx'
 import Input from 'core/elements/input'
 import Button from 'core/elements/button'
+import LoginMethodPicklist from './LoginMethodPicklist'
+import axios from 'axios'
 
 const styles = (theme) => ({
   page: {
@@ -51,15 +53,17 @@ const styles = (theme) => ({
     padding: '40px 40px 20px',
     backgroundColor: theme.palette.grey[800],
     display: 'grid',
-    gridTemplateRows: '30px 1fr 15px',
+    gridTemplateRows: '30px 1fr 45px',
     alignItems: 'center',
     justifyItems: 'center',
+    gridGap: theme.spacing(2),
   },
   form: {
     width: 280,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
+    height: '100%',
   },
   textField: {
     '& input': {
@@ -67,7 +71,7 @@ const styles = (theme) => ({
     },
   },
   emailInput: {
-    marginTop: 35,
+    marginTop: 20,
     marginBottom: 20,
   },
   checkbox: {
@@ -101,10 +105,15 @@ const styles = (theme) => ({
     fontWeight: 'normal',
   },
   mfaContainer: {
-    minHeight: 80,
     display: 'flex',
     flexDirection: 'column',
     marginBottom: theme.spacing(),
+  },
+  fields: {
+    flexGrow: 1,
+    display: 'flex',
+    flexFlow: 'column',
+    justifyContent: 'center',
   },
 })
 
@@ -115,14 +124,38 @@ interface Props {
   classes: any
 }
 
+const authenticationMethod = async (keystone, method, username, password) => {
+  if (method === 'sso') {
+    return await keystone.authenticateSso()
+  }
+  return await keystone.authenticate(username, password)
+}
+
 @(connect() as any)
 class LoginPage extends React.PureComponent<Props> {
   state = {
     username: '',
     password: '',
+    loginMethod: 'local',
     MFAcheckbox: false,
     loginFailed: false,
     loading: false,
+  }
+
+  componentDidMount() {
+    this.setSso()
+  }
+
+  setSso = async () => {
+    const features = await axios.get('/clarity/features.json').catch(() => null)
+    const sso = pathStrOr(false, 'data.experimental.sso', features)
+    if (sso) {
+      this.setState({ loginMethod: 'sso' })
+    }
+  }
+
+  updateLoginMethod = (event) => {
+    this.setState({ loginMethod: event.target.value })
   }
 
   updateValue = (key) => (event) => {
@@ -132,11 +165,18 @@ class LoginPage extends React.PureComponent<Props> {
   performLogin = async (event) => {
     event.preventDefault()
     const { onAuthSuccess } = this.props
-    const { username, password } = this.state
+    const { username: loginUsername, password, loginMethod } = this.state
     const { keystone } = ApiClient.getInstance()
 
     this.setState({ loginFailed: false, loading: true })
-    const { unscopedToken, expiresAt, issuedAt } = await keystone.authenticate(username, password)
+
+    const { unscopedToken, username, expiresAt, issuedAt } = await authenticationMethod(
+      keystone,
+      loginMethod,
+      loginUsername,
+      password,
+    )
+    const isSsoToken = loginMethod === 'sso'
 
     if (!unscopedToken) {
       return this.setState({ loading: false, loginFailed: true })
@@ -160,7 +200,7 @@ class LoginPage extends React.PureComponent<Props> {
       duDomain: window.location.origin,
     })
 
-    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
+    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt, isSsoToken })
     return this.setState(
       {
         loading: false,
@@ -261,7 +301,7 @@ class LoginPage extends React.PureComponent<Props> {
 
   render() {
     const { classes } = this.props
-    const { loginFailed, loading } = this.state
+    const { loginFailed, loading, loginMethod } = this.state
 
     return (
       <section className={clsx('login-page', classes.page)}>
@@ -283,15 +323,28 @@ class LoginPage extends React.PureComponent<Props> {
               <Text variant="h3" className={classes.formTitle} align="center">
                 Sign In
               </Text>
-              {this.renderInputfield()}
-              <Text className={classes.forgotPwd} gutterBottom>
-                <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
-                  Forgot password?
-                </SimpleLink>
-              </Text>
-              <div className={classes.mfaContainer}>
-                {this.renderMFACheckbox()}
-                {this.state.MFAcheckbox && this.renderMFAInput()}
+              <div className={classes.fields}>
+                <LoginMethodPicklist
+                  id="loginMethod"
+                  label="Login Method"
+                  variant="dark"
+                  value={loginMethod}
+                  onChange={this.updateLoginMethod}
+                />
+                {loginMethod === 'local' && (
+                  <>
+                    {this.renderInputfield()}
+                    <Text className={classes.forgotPwd} gutterBottom>
+                      <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
+                        Forgot password?
+                      </SimpleLink>
+                    </Text>
+                    <div className={classes.mfaContainer}>
+                      {this.renderMFACheckbox()}
+                      {this.state.MFAcheckbox && this.renderMFAInput()}
+                    </div>
+                  </>
+                )}
               </div>
               {loginFailed && <Alert small variant="error" message="Login failed" />}
               <Button
