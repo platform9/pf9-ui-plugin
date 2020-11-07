@@ -17,8 +17,7 @@ export const clusterNotBusy = (cluster) =>
   cluster.taskStatus === 'success' && !hasConvergingNodes(cluster.nodes)
 
 export const isBareOsMultiMasterCluster = (cluster) =>
-  cluster.cloudProviderType === CloudProviders.BareOS &&
-  (cluster.masterNodes?.length > 1 || !!cluster.masterVipIpv4)
+  cluster.cloudProviderType === CloudProviders.BareOS && !!cluster.masterVipIpv4
 
 export const canScaleMasters = ([cluster]) =>
   isBareOsMultiMasterCluster(cluster) && clusterIsHealthy(cluster) && clusterNotBusy(cluster)
