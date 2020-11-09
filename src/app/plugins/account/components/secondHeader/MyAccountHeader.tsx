@@ -9,21 +9,20 @@ import Text from 'core/elements/text'
 import Avatar from 'core/components/Avatar'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
-  root: {
+  myAccountHeader: {
     height: 96,
     background: theme.palette.grey[900],
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: '180px minmax(max-content, 1150px)',
   },
   upgrade: {
     width: 180,
   },
   userDetails: {
     paddingBottom: theme.spacing(2),
-    flexGrow: 1,
     display: 'flex',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    maxWidth: '75%',
   },
   userIcon: {
     marginLeft: theme.spacing(4),
@@ -49,7 +48,7 @@ const MyAccountHeader = ({ className }) => {
   } = session
 
   return (
-    <div className={clsx(classes.root, className)}>
+    <div className={clsx(classes.myAccountHeader, className)}>
       <div className={classes.upgrade}></div>
       <div className={classes.userDetails}>
         <Avatar

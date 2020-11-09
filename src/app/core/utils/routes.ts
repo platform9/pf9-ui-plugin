@@ -35,7 +35,10 @@ export class Route<T extends OptionalGenericKVP = null> {
     return this.createUrlWithQueryString(new URL(this.url, window.location.origin), params)
   }
 
-  public toString(): string {
+  public toString(stripPrefix, prefix): string {
+    if (stripPrefix) {
+      return this.path(null).replace(prefix, '')
+    }
     return this.path(null)
   }
 
@@ -241,6 +244,10 @@ export const routes = {
     add: Route.register({ url: `${k8sPrefix}/namespaces/add`, name: 'Namespaces:Add' }),
   },
   userManagement: {
+    root: Route.register({
+      url: `${userAccountPrefix}/user_management`,
+      name: 'UserManagement:Root',
+    }),
     users: Route.register({
       url: `${userAccountPrefix}/user_management#users`,
       name: 'UserManagement:Users:List',
