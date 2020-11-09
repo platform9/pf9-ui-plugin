@@ -318,21 +318,25 @@ const DashboardPage = () => {
     <section className={classes.cardColumn}>
       <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
 
-      {isLoading && <Progress loading={isLoading} overlay />}
+      {false && isLoading && <Progress loading={isLoading} overlay />}
       {false && showOnboarding && !isLoading && (
         <>
           <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
           <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
         </>
       )}
-
-      {!isLoading && (
+      <div className={classes.dashboardMosaic}>
+        {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+          <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+        ))}
+      </div>
+      {/* {!isLoading && (
         <div className={classes.dashboardMosaic}>
           {reportsWithPerms(reports, session.userDetails.role).map((report) => (
             <StatusCard key={report.route} {...report} className={classes[report.entity]} />
           ))}
         </div>
-      )}
+      )} */}
     </section>
   )
 }

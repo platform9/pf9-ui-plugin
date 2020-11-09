@@ -13,9 +13,6 @@ import WizardMeta from 'core/components/wizard/WizardMeta'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
-  wizardMeta: {
-    marginTop: theme.spacing(4),
-  },
   cpName: {
     color: theme.palette.grey['700'],
     paddingTop: theme.spacing(2),
@@ -49,7 +46,6 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
       <WizardMeta
         fields={wizardContext}
         icon={<CloudProviderCard active type={wizardContext.provider} />}
-        className={classes.wizardMeta}
       >
         <div className={classes.form}>
           <ValidatedForm

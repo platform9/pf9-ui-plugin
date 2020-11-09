@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
     display: 'grid',
-    gridAutoColumns: 242,
+    gridTemplateColumns: 'repeat(auto-fill, 242px)',
     gridGap: theme.spacing(2),
   },
   title: {
