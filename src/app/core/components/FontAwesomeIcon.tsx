@@ -11,7 +11,7 @@ interface Props extends React.HTMLAttributes<HTMLElement> {
 }
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const FontAwesomeIcon: React.ComponentType<Props> = forwardRef(
+const FontAwesomeIcon = forwardRef<HTMLElement, Props>(
   ({ children, name, className, size, solid, brand, ...rest }, ref?: React.Ref<HTMLElement>) => {
     const classGroup = solid ? 'fas' : brand ? 'fab' : 'fal'
     const defaultClasses = [
@@ -24,4 +24,4 @@ const FontAwesomeIcon: React.ComponentType<Props> = forwardRef(
   },
 )
 
-export default FontAwesomeIcon as React.FC<Props>
+export default FontAwesomeIcon

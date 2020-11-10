@@ -1,3 +1,4 @@
+import { MessageTypes } from 'core/components/notifications/model'
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { useToast } from 'core/providers/ToastProvider'
 import { emptyObj } from 'utils/fp'
@@ -22,7 +23,6 @@ const useDataUpdater = (updaterFn, onComplete) => {
   const updaterPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
   const dispatch = useDispatch()
-  const showToast = useToast()
   const additionalOptions = useMemo(() => {
     const dispatchRegisterNotif = (title, message, type) => {
       dispatch(notificationActions.registerNotification({ title, message, type }))
@@ -30,11 +30,9 @@ const useDataUpdater = (updaterFn, onComplete) => {
     return {
       onSuccess: (successMessage, params) => {
         console.info(`Entity "${cacheKey}" updated successfully`)
-        showToast(successMessage, 'success')
       },
       onError: (errorMessage, catchedErr, params) => {
         console.error(`Error when updating items for entity "${cacheKey}"`, catchedErr)
-        showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
         dispatchRegisterNotif(errorMessage, catchedErr.message || catchedErr, 'error')
       },
     }

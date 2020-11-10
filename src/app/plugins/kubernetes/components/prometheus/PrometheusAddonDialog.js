@@ -4,16 +4,17 @@ import { onboardingMonitoringSetup } from 'app/constants'
 import Alert from 'core/components/Alert'
 import Progress from 'core/components/progress/Progress'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { useToast } from 'core/providers/ToastProvider'
+import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
 import { hasPrometheusTag } from 'k8s/components/infrastructure/clusters/helpers'
 import React, { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import { clusterActions } from '../infrastructure/clusters/actions'
 
 const { appbert } = ApiClient.getInstance()
 
 const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
   const enabled = hasPrometheusTag(cluster)
-  const showToast = useToast()
+  const dispatch = useDispatch()
   const [tagUpdater, updatingTag] = useDataUpdater(clusterActions.updateTag, (success) => {
     if (success) {
       onClose()
@@ -26,7 +27,13 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
       const monPkg = pkgs.find((pkg) => pkg.name === 'pf9-mon')
 
       if (!monPkg) {
-        showToast('No monitoring package found', 'error')
+        dispatch(
+          notificationActions.registerNotification({
+            title: 'Prometheus error',
+            message: 'No monitoring package found',
+            type: NotificationType.error,
+          }),
+        )
         return onClose(false)
       }
 
@@ -36,7 +43,13 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
         localStorage.setItem(onboardingMonitoringSetup, 'true')
       }
     } catch (e) {
-      showToast('Failed to update monitoring status', 'error')
+      dispatch(
+        notificationActions.registerNotification({
+          title: 'Prometheus error',
+          message: 'Failed to update monitoring status',
+          type: NotificationType.error,
+        }),
+      )
       return onClose(false)
     }
 

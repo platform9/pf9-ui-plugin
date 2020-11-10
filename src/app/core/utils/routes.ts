@@ -181,6 +181,7 @@ export const routes = {
   },
   dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
   apiAccess: Route.register({ url: `${k8sPrefix}/api_access`, name: 'APIAccess' }),
+  notifications: Route.register({ url: `${k8sPrefix}/notifications`, name: 'Notifications' }),
   nodes: {
     list: Route.register({ url: `${k8sPrefix}/infrastructure#nodes`, name: 'Nodes:List' }),
     detail: Route.register({ url: `${k8sPrefix}/infrastructure/nodes/:id`, name: 'Nodes:Details' }),
