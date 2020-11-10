@@ -1,4 +1,5 @@
 import React from 'react'
+import NotificationsPage from 'core/components/notifications/NotificationsPage'
 import AddCloudProviderPage from './components/infrastructure/cloudProviders/AddCloudProviderPage'
 import AddAwsClusterPage from './components/infrastructure/clusters/aws/AddAwsClusterPage'
 import AddAzureClusterPage from './components/infrastructure/clusters/azure/AddAzureClusterPage'
@@ -68,6 +69,11 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Dashboard',
       link: { path: '/dashboard', exact: true, default: true },
       component: DashboardPage,
+    },
+    {
+      name: 'Notifications',
+      link: { path: '/notifications', exact: true },
+      component: NotificationsPage,
     },
     {
       name: 'Infrastructure',

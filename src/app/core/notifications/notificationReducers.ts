@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { pipe, take, prepend } from 'ramda'
+import { pipe, prepend, take } from 'ramda'
 import moment from 'moment'
 import uuid from 'uuid'
 
@@ -17,11 +17,18 @@ export interface Notification {
   message: string
   date: string
   type: NotificationType
+  silent: boolean
 }
 
-export type NotificationState = Notification[]
+export interface NotificationState {
+  notifications: Notification[]
+  unreadCount: number
+}
 
-export const initialState: Notification[] = []
+export const initialState: NotificationState = {
+  notifications: [],
+  unreadCount: 0,
+}
 
 const {
   name: notificationStoreKey,
@@ -34,10 +41,16 @@ const {
     registerNotification: (
       state,
       {
-        payload: { title, message, type },
-      }: PayloadAction<{ title: string; message: string; type: NotificationType }>,
+        payload: { title, message, type, silent = false },
+      }: PayloadAction<{
+        title: string
+        message: string
+        type: NotificationType
+        silent?: boolean
+      }>,
     ) => {
-      return pipe<Notification[], Notification[], Notification[]>(
+      const { notifications, unreadCount } = state
+      const addNotification = pipe<Notification[], Notification[], Notification[]>(
         take(maxNotifications - 1),
         prepend({
           id: uuid.v4(),
@@ -45,8 +58,19 @@ const {
           message,
           date: moment().format(),
           type,
+          silent,
         }),
-      )(state)
+      )
+      return {
+        notifications: addNotification(notifications),
+        unreadCount: unreadCount + 1,
+      }
+    },
+    markAsRead: (state) => {
+      return {
+        ...state,
+        unreadCount: 0,
+      }
     },
     clearNotifications: () => {
       return initialState
