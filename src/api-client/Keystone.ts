@@ -413,11 +413,9 @@ class Keystone extends ApiService {
           mthdName: 'authenticateSso',
         },
       })
-      const {
-        expires_at: expiresAt,
-        issued_at: issuedAt,
-        user: { name: username },
-      } = response.data.token
+      const { expires_at: expiresAt, issued_at: issuedAt, user } = response?.data?.token || {}
+      const username = user.name || 'Unknown'
+
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
       return { unscopedToken, username, expiresAt, issuedAt }

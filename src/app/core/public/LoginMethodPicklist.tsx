@@ -1,33 +1,33 @@
 import React from 'react'
-// import PicklistDefault from 'core/components/Picklist'
 import Input from 'core/elements/input'
 import MenuItem from '@material-ui/core/MenuItem'
-// const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
+
+export enum LoginMethodTypes {
+  Local = 'local',
+  SSO = 'sso',
+}
 
 interface Props {
   id: string
   label: string
-  value: string
+  value: LoginMethodTypes
   variant?: 'light' | 'dark'
   onChange?: any
 }
 
-const LoginMethodPicklist = ({ ...rest }: Props) => {
-  const options = [
-    { label: 'Single Sign On', value: 'sso' },
-    { label: 'Local Credentials', value: 'local' },
-  ]
+const options = [
+  { label: 'Local Credentials', value: LoginMethodTypes.Local },
+  { label: 'Single Sign On', value: LoginMethodTypes.SSO },
+]
 
-  return (
-    <Input select {...rest}>
-      {options.map((option) => (
-        <MenuItem key={option.value} value={option.value}>
-          {option.label}
-        </MenuItem>
-      ))}
-    </Input>
-  )
-  // return <Picklist {...rest} options={options} showAll={false} />
-}
+const LoginMethodPicklist = ({ ...rest }: Props) => (
+  <Input select {...rest}>
+    {options.map((option) => (
+      <MenuItem key={option.value} value={option.value}>
+        {option.label}
+      </MenuItem>
+    ))}
+  </Input>
+)
 
 export default LoginMethodPicklist

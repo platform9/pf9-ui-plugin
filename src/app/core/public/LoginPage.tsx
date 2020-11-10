@@ -19,7 +19,7 @@ import { sessionActions } from 'core/session/sessionReducers'
 import clsx from 'clsx'
 import Input from 'core/elements/input'
 import Button from 'core/elements/button'
-import LoginMethodPicklist from './LoginMethodPicklist'
+import LoginMethodPicklist, { LoginMethodTypes } from './LoginMethodPicklist'
 import axios from 'axios'
 
 const styles = (theme) => ({
@@ -124,11 +124,11 @@ interface Props {
   classes: any
 }
 
-const authenticationMethod = async (keystone, method, username, password) => {
-  if (method === 'sso') {
-    return await keystone.authenticateSso()
-  }
-  return await keystone.authenticate(username, password)
+const { keystone } = ApiClient.getInstance()
+
+const authMethods = {
+  [LoginMethodTypes.Local]: async (username, password) => keystone.authenticate(username, password),
+  [LoginMethodTypes.SSO]: async (_u, _p) => keystone.authenticateSso(),
 }
 
 @(connect() as any)
@@ -136,7 +136,7 @@ class LoginPage extends React.PureComponent<Props> {
   state = {
     username: '',
     password: '',
-    loginMethod: 'local',
+    loginMethod: LoginMethodTypes.Local,
     MFAcheckbox: false,
     loginFailed: false,
     loading: false,
@@ -150,7 +150,7 @@ class LoginPage extends React.PureComponent<Props> {
     const features = await axios.get('/clarity/features.json').catch(() => null)
     const sso = pathStrOr(false, 'data.experimental.sso', features)
     if (sso) {
-      this.setState({ loginMethod: 'sso' })
+      this.setState({ loginMethod: LoginMethodTypes.SSO })
     }
   }
 
@@ -166,17 +166,14 @@ class LoginPage extends React.PureComponent<Props> {
     event.preventDefault()
     const { onAuthSuccess } = this.props
     const { username: loginUsername, password, loginMethod } = this.state
-    const { keystone } = ApiClient.getInstance()
 
     this.setState({ loginFailed: false, loading: true })
 
-    const { unscopedToken, username, expiresAt, issuedAt } = await authenticationMethod(
-      keystone,
-      loginMethod,
+    const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[loginMethod](
       loginUsername,
       password,
     )
-    const isSsoToken = loginMethod === 'sso'
+    const isSsoToken = loginMethod === LoginMethodTypes.SSO
 
     if (!unscopedToken) {
       return this.setState({ loading: false, loginFailed: true })
@@ -331,7 +328,7 @@ class LoginPage extends React.PureComponent<Props> {
                   value={loginMethod}
                   onChange={this.updateLoginMethod}
                 />
-                {loginMethod === 'local' && (
+                {loginMethod === LoginMethodTypes.Local && (
                   <>
                     {this.renderInputfield()}
                     <Text className={classes.forgotPwd} gutterBottom>
