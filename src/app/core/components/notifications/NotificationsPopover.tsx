@@ -105,7 +105,7 @@ const NotificationsPopover = ({ className }) => {
     prop<string, NotificationState>(notificationStoreKey),
   )
   const { history } = useReactRouter()
-  const [lastNotification] = notifications
+  const [lastNotification] = notifications || []
   const inboxEl = useRef<HTMLElement>(null)
 
   const popoverClasses = usePopoverStyles({})

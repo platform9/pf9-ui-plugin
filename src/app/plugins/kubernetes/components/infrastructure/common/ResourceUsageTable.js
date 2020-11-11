@@ -39,11 +39,11 @@ const ResourceUsageTable = ({
   valueConverter,
   usedText,
   units,
-  stats,
+  stats = {},
   precision,
 }) => {
   const classes = useStyles({ valueOff })
-  const { current, max, percent = (current / max) * 100 } = stats
+  const { current = 0, max = 0, percent = (current / max) * 100 } = stats
 
   const curStr = valueConverter(current).toFixed(precision)
   const maxStr = valueConverter(max).toFixed(precision)

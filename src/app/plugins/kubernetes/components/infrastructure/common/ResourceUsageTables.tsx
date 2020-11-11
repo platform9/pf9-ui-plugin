@@ -27,10 +27,10 @@ const ResourceUsageTables = ({ usage, valueOff = false }: Props) => (
       valueConverter={toMHz}
       units="MHz"
       label="CPU"
-      stats={usage.compute}
+      stats={usage?.compute}
     />
-    <ResourceUsageTable valueOff={valueOff} units="GiB" label="Memory" stats={usage.memory} />
-    <ResourceUsageTable valueOff={valueOff} units="GiB" label="Storage" stats={usage.disk} />
+    <ResourceUsageTable valueOff={valueOff} units="GiB" label="Memory" stats={usage?.memory} />
+    <ResourceUsageTable valueOff={valueOff} units="GiB" label="Storage" stats={usage?.disk} />
   </>
 )
 
