@@ -13,7 +13,7 @@ import { prop } from 'ramda'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { regionActions } from 'k8s/components/infrastructure/common/actions'
-import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {

@@ -1,27 +1,25 @@
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import React, { useMemo, useCallback } from 'react'
-import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRolesTableField'
+import UserRolesTableField from 'account/components/userManagement/tenants/UserRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import {
   mngmTenantActions,
   mngmTenantRoleAssignmentsLoader,
-} from 'k8s/components/userManagement/tenants/actions'
+} from 'account/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
+import { mngmUserActions } from 'account/components/userManagement/users/actions'
 import { emptyObj, pathStr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
 import { propEq } from 'ramda'
-import { pathJoin } from 'utils/misc'
-import { k8sPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { requiredValidator } from 'core/utils/fieldValidators'
 import { Redirect } from 'react-router'
 import { routes } from 'core/utils/routes'
 
-const listUrl = pathJoin(k8sPrefix, 'user_management')
+const listUrl = routes.userManagement.tenants.path()
 
 const userParams = { systemUsers: true }
 

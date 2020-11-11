@@ -6,7 +6,6 @@ import {
   paramsStoreKey,
 } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
-import { useToast } from 'core/providers/ToastProvider'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import moize from 'moize'
 import { either, equals, find, isNil, path, pickAll, pipe, reject, whereEq } from 'ramda'
@@ -15,14 +14,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
 import { memoizedDep } from 'utils/misc'
 
-const onErrorHandler = moize(
-  (loaderFn, showToast, registerNotification) => (errorMessage, catchedErr) => {
-    const { cacheKey } = loaderFn
-    console.error(`Error when fetching items for entity "${cacheKey}"`, catchedErr)
-    showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
-    registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
-  },
-)
+const onErrorHandler = moize((loaderFn, registerNotification) => (errorMessage, catchedErr) => {
+  const { cacheKey } = loaderFn
+  console.error(`Error when fetching items for entity "${cacheKey}"`, catchedErr)
+  registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
+})
 
 /**
  * Hook to load data using the specified loader function
@@ -71,15 +67,13 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // We use this ref to flag when the component has been unmounted so we prevent further state updates
   const unmounted = useRef(false)
 
-  const showToast = useToast()
-
   // Set a custom error handler for all loading functions using this hook
   // We do this here because we have access to the ToastContext, unlike in the dataLoader functions
   const onError = useMemo(() => {
     const dispatchRegisterNotif = (title, message, type) => {
       dispatch(notificationActions.registerNotification({ title, message, type }))
     }
-    return onErrorHandler(loaderFn, showToast, dispatchRegisterNotif)
+    return onErrorHandler(loaderFn, dispatchRegisterNotif)
   }, [])
 
   // The following function will handle the calls to the data loading and

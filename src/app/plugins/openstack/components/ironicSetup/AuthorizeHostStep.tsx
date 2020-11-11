@@ -1,14 +1,14 @@
-import React, { useEffect, useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import ListTableField from 'core/components/validatedForm/ListTableField'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
 import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
-import { MessageTypes } from 'core/components/notifications/model'
-import { useToast } from 'core/providers/ToastProvider'
 import { addRole } from 'openstack/components/resmgr/actions'
 import { Host } from 'api-client/resmgr.model'
+import { useDispatch } from 'react-redux'
+import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
 
 // Put any for now to let me proceed
 interface Props {
@@ -32,7 +32,7 @@ const AuthorizeHostStep = ({
   title,
   setSubmitting,
 }: Props) => {
-  const showToast = useToast()
+  const dispatch = useDispatch()
   const validatorRef = useRef(null)
 
   const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<Host> = useDataLoader(
@@ -55,7 +55,13 @@ const AuthorizeHostStep = ({
       await addRole(wizardContext.selectedHost[0].id, 'pf9-onboarding', {})
     } catch (err) {
       setSubmitting(false)
-      showToast(err, MessageTypes.error)
+      dispatch(
+        notificationActions.registerNotification({
+          title: 'Authorize Host Error',
+          message: err.message,
+          type: NotificationType.error,
+        }),
+      )
       return false
     }
 

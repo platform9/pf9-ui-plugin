@@ -27,7 +27,8 @@
       "utils/*": ["src/app/utils/*"],
       "app/*": ["src/app/*"],
       "server/*": ["src/server/*"],
-      "api-client/*": ["src/api-client/*"]
+      "api-client/*": ["src/api-client/*"],
+      "account/*": ["src/app/plugins/account/*"]
     }
   },
   "exclude": ["./config*.js"],

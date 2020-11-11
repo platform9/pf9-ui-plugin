@@ -10,6 +10,9 @@ import ChangePasswordModal from './ChangePasswordModal'
 import FontAwesomeIcon from './FontAwesomeIcon'
 import SimpleLink from './SimpleLink'
 import Text from 'core/elements/text'
+import clsx from 'clsx'
+import Avatar from './Avatar'
+import { routes } from 'core/utils/routes'
 
 const styles = (theme) => ({
   avatar: {
@@ -25,18 +28,43 @@ const styles = (theme) => ({
     width: theme.spacing(3),
   },
   menuItem: {
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
     display: 'grid',
     minWidth: 150,
-    gridTemplateColumns: '30px 1fr',
-    gridTemplateRows: 'minmax(35px, min-content)',
-    gridColumnGap: theme.spacing(),
-    padding: theme.spacing(0, 1),
+    gridTemplateColumns: '16px 1fr',
+    gridGap: theme.spacing(1),
+    padding: theme.spacing(0),
+  },
+  menuIcon: {
+    position: 'relative',
+    top: 1,
   },
   link: {
     textDecoration: 'none !important',
+    color: 'rgba(0, 0, 0, 0.87)',
   },
-  title: {
-    color: theme.palette.grey[200],
+  userDetails: {
+    display: 'grid',
+    margin: theme.spacing(1, 0, 3, 0),
+    gridTemplateColumns: 'auto auto',
+    gridGap: theme.spacing(2),
+  },
+  dropdownContainer: {
+    padding: theme.spacing(0, 2),
+  },
+  dropdownLinks: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+  dropdownSection: {
+    padding: theme.spacing(2),
+  },
+  divider: {
+    border: 'none',
+    height: 1,
+    backgroundColor: theme.palette.blue[200],
   },
 })
 
@@ -46,7 +74,9 @@ class MenuListItem extends React.PureComponent {
     const { classes, title, children, icon, ...props } = this.props
     return (
       <MenuItem {...props} className={classes.menuItem}>
-        <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+        <FontAwesomeIcon size="sm" className={classes.menuIcon}>
+          {icon}
+        </FontAwesomeIcon>
         <Text variant="body2">{title || children}</Text>
       </MenuItem>
     )
@@ -69,7 +99,10 @@ class UserMenu extends React.PureComponent {
   render() {
     const { classes, className, session } = this.props
     const { anchorEl, showChangePasswordModal } = this.state
-    const username = session.username || '?'
+    const {
+      username,
+      userDetails: { displayName },
+    } = session
 
     if (showChangePasswordModal) {
       return <ChangePasswordModal onCancel={this.handleCancelChangePassword} />
@@ -77,9 +110,7 @@ class UserMenu extends React.PureComponent {
 
     return (
       <div className={`${classes.avatar} ${className}`}>
-        <Text color="inherit" variant="body2" className={classes.title} onClick={this.handleClick}>
-          {username} &#9662;
-        </Text>
+        <Avatar onClick={this.handleClick} displayName={displayName} diameter={36} fontSize={16} />
         <Menu
           id="user-menu"
           anchorEl={anchorEl}
@@ -88,13 +119,32 @@ class UserMenu extends React.PureComponent {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
-          <SimpleLink src={helpUrl} className={classes.link}>
-            <MenuListItem icon="question-circle">Help</MenuListItem>
-          </SimpleLink>
-          <MenuListItem icon="sign-out" onClick={this.logout}>
-            Sign Out
-          </MenuListItem>
+          <div className={classes.dropdownContainer}>
+            <div className={classes.dropdownSection}>
+              <div className={classes.userDetails}>
+                <Avatar displayName={displayName} diameter={48} fontSize={18} />
+                <div>
+                  <Text variant="subtitle2">{displayName}</Text>
+                  <Text variant="body2">{username}</Text>
+                </div>
+              </div>
+              <div className={classes.dropdownLinks}>
+                {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
+                <SimpleLink src={routes.userManagement.root.path()} className={classes.link}>
+                  <MenuListItem icon="cog">Settings</MenuListItem>
+                </SimpleLink>
+                <MenuListItem icon="sign-out" onClick={this.logout}>
+                  Sign Out
+                </MenuListItem>
+              </div>
+            </div>
+            <hr className={classes.divider}></hr>
+            <div className={classes.dropdownSection}>
+              <SimpleLink src={helpUrl} className={classes.link}>
+                <MenuListItem icon="question-circle">Support</MenuListItem>
+              </SimpleLink>
+            </div>
+          </div>
         </Menu>
       </div>
     )
