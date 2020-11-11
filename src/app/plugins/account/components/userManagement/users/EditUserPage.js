@@ -2,31 +2,30 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import React, { useMemo, useCallback } from 'react'
 import clsx from 'clsx'
-import TenantRolesTableField from 'k8s/components/userManagement/users/TenantRolesTableField'
+import TenantRolesTableField from 'account/components/userManagement/users/TenantRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import {
   mngmUserActions,
   mngmUserRoleAssignmentsLoader,
-} from 'k8s/components/userManagement/users/actions'
+} from 'account/components/userManagement/users/actions'
 import { TextField as BaseTextField } from '@material-ui/core'
 import { emptyObj, pathStr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
 import { propEq } from 'ramda'
-import { pathJoin } from 'utils/misc'
-import { k8sPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
-import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordField'
+import UserPasswordField from 'account/components/userManagement/users/UserPasswordField'
 import useToggler from 'core/hooks/useToggler'
 import SimpleLink from 'core/components/SimpleLink'
 import makeStyles from '@material-ui/styles/makeStyles'
 import { requiredValidator } from 'core/utils/fieldValidators'
 import Progress from 'core/components/progress/Progress'
+import { routes } from 'core/utils/routes'
 
-const listUrl = pathJoin(k8sPrefix, 'user_management#users')
+const listUrl = routes.userManagement.users.path()
 
 const useStyles = makeStyles((theme) => ({
   togglableFieldContainer: {

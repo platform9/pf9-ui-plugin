@@ -1,8 +1,7 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { isSystemUser } from 'k8s/components/userManagement/users/actions'
-import { pathJoin } from 'utils/misc'
-import { k8sPrefix, listTablePrefs } from 'app/constants'
-import SystemUsersToggle from 'k8s/components/userManagement/users/SystemUsersToggle'
+import { isSystemUser } from 'account/components/userManagement/users/actions'
+import { listTablePrefs } from 'app/constants'
+import SystemUsersToggle from 'account/components/userManagement/users/SystemUsersToggle'
 import React, { useMemo } from 'react'
 import useToggler from 'core/hooks/useToggler'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -10,6 +9,7 @@ import { mngmUserActions } from './actions'
 import { pipe, pluck, join, pick } from 'ramda'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { arrayIfNil } from 'utils/fp'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = { systemUsers: true }
 const usePrefParams = createUsePrefParamsHook('ManagementUsers', listTablePrefs)
@@ -48,9 +48,9 @@ export const options = {
     { id: 'tenants', label: 'Tenants', render: pipe(arrayIfNil, pluck('name'), join(', ')) },
   ],
   addText: 'Create a new User',
-  addUrl: pathJoin(k8sPrefix, 'user_management/users/add'),
+  addUrl: routes.userManagement.addUser.path(),
   deleteFn: mngmUserActions.delete,
-  editUrl: pathJoin(k8sPrefix, 'user_management/users/edit'),
+  editUrl: routes.userManagement.editUser.path(),
   name: 'Users',
   title: 'Users',
   uniqueIdentifier: 'id',

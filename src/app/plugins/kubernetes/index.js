@@ -20,7 +20,6 @@ import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
 import StorageClassesAddPage from './components/storage/AddStorageClassPage'
-import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
 import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitoringPage'
@@ -34,10 +33,6 @@ import LoggingEditPage from './components/logging/LoggingEditPage'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
 import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
-import AddTenantPage from 'k8s/components/userManagement/tenants/AddTenantPage'
-import EditTenantPage from 'k8s/components/userManagement/tenants/EditTenantPage'
-import AddUserPage from 'k8s/components/userManagement/users/AddUserPage'
-import EditUserPage from 'k8s/components/userManagement/users/EditUserPage'
 import RbacIndexPage from './components/rbac/RbacIndexPage'
 import AddRolePage from './components/rbac/AddRolePage'
 import AddClusterRolePage from './components/rbac/AddClusterRolePage'
@@ -229,36 +224,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
       component: ApiAccessPage,
     },
     {
-      name: 'Tenants & Users',
-      requiredRoles: 'admin',
-      link: { path: '/user_management', exact: true },
-      component: UserManagementIndexPage,
-    },
-    {
-      name: 'Add Tenant',
-      requiredRoles: 'admin',
-      link: { path: '/user_management/tenants/add', exact: true },
-      component: AddTenantPage,
-    },
-    {
-      name: 'Edit Tenant',
-      requiredRoles: 'admin',
-      link: { path: '/user_management/tenants/edit/:id', exact: true },
-      component: EditTenantPage,
-    },
-    {
-      name: 'Add User',
-      requiredRoles: 'admin',
-      link: { path: '/user_management/users/add', exact: true },
-      component: AddUserPage,
-    },
-    {
-      name: 'Edit User',
-      requiredRoles: 'admin',
-      link: { path: '/user_management/users/edit/:id', exact: true },
-      component: EditUserPage,
-    },
-    {
       name: 'Create Prometheus Instance',
       link: { path: '/prometheus/instances/add', exact: true },
       component: AddPrometheusInstancePage,
@@ -407,18 +372,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
     { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
-    {
-      name: 'Tenants & Users',
-      icon: 'user',
-      ...clarityLink('/kubernetes/users'),
-      requiredRoles: 'admin',
-      nestedLinks: [
-        { name: 'Tenants', ...clarityLink('/kubernetes/users#tenants') },
-        { name: 'Users', ...clarityLink('/kubernetes/users#users') },
-        { name: 'Groups', ...clarityLink('/kubernetes/users#groups') },
-        { name: 'Roles', ...clarityLink('/kubernetes/users#roles') },
-      ],
-    },
   ]
 
   // These nav items are in active development but not shown in production.
@@ -476,18 +429,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/rbac' },
     },
     { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
-    {
-      name: 'Tenants & Users',
-      link: { path: '/user_management' },
-      icon: 'user',
-      requiredRoles: 'admin',
-      nestedLinks: [
-        { name: 'Tenants', link: { path: '/user_management#tenants' } },
-        { name: 'Users', link: { path: '/user_management#users' } },
-        { name: 'Groups', link: { path: '/user_management#userGroups' } },
-        { name: 'Roles', link: { path: '/user_management#roles' } },
-      ],
-    },
   ]
 
   const navItems = useClarityLinks ? clarityNavItems : devNavItems

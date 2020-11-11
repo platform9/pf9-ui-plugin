@@ -35,7 +35,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginRight: theme.spacing(1),
   },
   inbox: {
-    fontWeight: 900,
     color: theme.palette.grey[200],
   },
   errIcon: {

@@ -30,7 +30,7 @@ import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
 import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { loginUrl } from 'app/constants.js'
+import { loginUrl } from 'app/constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

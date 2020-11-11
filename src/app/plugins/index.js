@@ -2,6 +2,7 @@ import openstack from './openstack'
 import metalstack from './metalstack'
 import kubernetes from './kubernetes'
 import developer from './developer'
+import account from './account'
 import theme from './theme'
 
 const devEnabled = window.localStorage.enableDevPlugin === 'true'
@@ -12,6 +13,7 @@ const plugins = [
   kubernetes,
   openstack,
   metalstack,
+  account,
   theme,
   ...(devEnabled ? [developer] : []),
 ]

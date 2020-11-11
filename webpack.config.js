@@ -144,6 +144,7 @@ module.exports = {
       developer: path.resolve(__dirname, 'src/app/plugins/developer'),
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
       openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
+      account: path.resolve(__dirname, 'src/app/plugins/account'),
       core: path.resolve(__dirname, 'src/app/core'),
       utils: path.resolve(__dirname, 'src/app/utils'),
       app: path.resolve(__dirname, 'src/app'),

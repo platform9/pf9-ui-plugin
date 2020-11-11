@@ -1,6 +1,6 @@
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
-import { makeManagementRolesSelector } from 'k8s/components/userManagement/roles/selectors'
+import { makeManagementRolesSelector } from 'account/components/userManagement/roles/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()

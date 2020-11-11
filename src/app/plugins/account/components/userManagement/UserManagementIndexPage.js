@@ -1,9 +1,9 @@
 import React from 'react'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
-import TenantsListPage from 'k8s/components/userManagement/tenants/TenantsListPage'
-import UsersListPage from 'k8s/components/userManagement/users/UsersListPage'
-import UserRolesListPage from 'k8s/components/userManagement/roles/UserRolesListPage'
+import TenantsListPage from 'account/components/userManagement/tenants/TenantsListPage'
+import UsersListPage from 'account/components/userManagement/users/UsersListPage'
+import UserRolesListPage from 'account/components/userManagement/roles/UserRolesListPage'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 
 const UserManagementIndexPage = () => (

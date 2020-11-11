@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { mngmRoleActions } from 'k8s/components/userManagement/roles/actions'
+import { mngmRoleActions } from 'account/components/userManagement/roles/actions'
 
 export const options = {
   headlessTable: true,

@@ -2,7 +2,7 @@ describe('users', () => {
   before(() => {
     cy.resetServerContext('dev')
     cy.login()
-    cy.visit('/ui/kubernetes/user_management#users')
+    cy.visit('/ui/my-account/user_management#users')
   })
 
   context('list users', () => {
@@ -19,16 +19,24 @@ describe('users', () => {
     })
 
     it('fills the name and description fields and move to next step', () => {
-      cy.get('input#username').clear().type('User#Test')
-      cy.get('input#displayname').clear().type('User#Test')
-      cy.get('input#password').clear().type('Secret-123')
+      cy.get('input#username')
+        .clear()
+        .type('User#Test')
+      cy.get('input#displayname')
+        .clear()
+        .type('User#Test')
+      cy.get('input#password')
+        .clear()
+        .type('Secret-123')
 
       cy.contains('button', 'Next').click()
       cy.contains('Select one or more tenants that should map to this user')
     })
 
     it('select the users and roles and submit', () => {
-      cy.contains('tr', 'Tenant #0').find('.MuiCheckbox-root').click()
+      cy.contains('tr', 'Tenant #0')
+        .find('.MuiCheckbox-root')
+        .click()
       cy.contains('button', 'Complete').click()
       cy.contains('User User#Test created successfully')
       cy.contains('tr', 'User#Test')
@@ -45,13 +53,25 @@ describe('users', () => {
     })
 
     it('updates the user name and passsword and move to next step', () => {
-      cy.contains('.togglableField', 'Username or Email').find('a').click()
-      cy.contains('.togglableField', 'Display Name').find('a').click()
-      cy.contains('.togglableField', 'Password').find('a').click()
+      cy.contains('.togglableField', 'Username or Email')
+        .find('a')
+        .click()
+      cy.contains('.togglableField', 'Display Name')
+        .find('a')
+        .click()
+      cy.contains('.togglableField', 'Password')
+        .find('a')
+        .click()
 
-      cy.get('input#username').clear().type('User#Test *EDITED*')
-      cy.get('input#displayname').clear().type('User#Test *EDITED*')
-      cy.get('input#password').clear().type('Secret-321')
+      cy.get('input#username')
+        .clear()
+        .type('User#Test *EDITED*')
+      cy.get('input#displayname')
+        .clear()
+        .type('User#Test *EDITED*')
+      cy.get('input#password')
+        .clear()
+        .type('Secret-321')
 
       cy.contains('button', 'Next').click()
       cy.contains('Select one or more tenants that should map to this user')
@@ -59,9 +79,12 @@ describe('users', () => {
 
     it('change selected tenants and roles and submit', () => {
       cy.contains('tr', 'Tenant #0')
-        .find('.MuiCheckbox-root').click()
+        .find('.MuiCheckbox-root')
+        .click()
 
-      cy.contains('tr', 'Tenant #2').find('.MuiSelect-root').click()
+      cy.contains('tr', 'Tenant #2')
+        .find('.MuiSelect-root')
+        .click()
       cy.contains('li', 'admin').click()
 
       cy.contains('button', 'Complete').click()

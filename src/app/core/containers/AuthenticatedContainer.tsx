@@ -3,6 +3,8 @@ import { Button } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
 import { CustomWindow } from 'app/polyfills/window'
 import {
+  AppPlugins,
+  appPlugins,
   clarityDashboardUrl,
   dashboardUrl,
   helpUrl,
@@ -39,12 +41,18 @@ import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
 import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
+import { Route as Router } from 'core/utils/routes'
 
 declare let window: CustomWindow
 
 const { keystone } = ApiClient.getInstance()
 
-const useStyles = makeStyles((theme: Theme) => ({
+interface StyleProps {
+  path?: string
+  hasSecondaryHeader?: boolean
+}
+
+const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   '@global': {
     'body.form-view #main': {
       backgroundColor: theme.palette.grey['100'],
@@ -59,7 +67,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.grey['000'],
   },
   content: {
-    marginTop: 55, // header height is hardcoded to 55px. account for that here.
+    // marginTop: 55, // header height is hardcoded to 55px. account for that here.
+    marginTop: ({ hasSecondaryHeader }) => (hasSecondaryHeader ? 151 : 55),
     overflowX: 'auto',
     flexGrow: 1,
     backgroundColor: theme.palette.grey['000'],
@@ -68,6 +77,12 @@ const useStyles = makeStyles((theme: Theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+  },
+  secondaryHeader: {
+    position: 'fixed',
+    top: 55,
+    width: '100%',
+    zIndex: 1100,
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
@@ -200,11 +215,17 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   }
 }
 
-const determineCurrentStack = (history, features) => {
-  if (features.metalstack) {
-    return 'metalstack'
+const determineCurrentStack = (location, features, lastStack) => {
+  const currentRoute = Router.getCurrentRoute()
+  const match = currentRoute.pattern.match(location.pathname)
+  if (appPlugins.includes(match.plugin)) {
+    return match.plugin
   }
-  return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
+  // first try the pathname, then use the saved session, else default to kubernetes
+  if (lastStack) {
+    return lastStack
+  }
+  return AppPlugins.Kubernetes
 }
 
 const linkedStacks = (stacks) =>
@@ -236,7 +257,7 @@ const determineStacks = (features) => {
   return linkedStacks(stacks)
 }
 
-const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, dispatch, history) => {
+const loadRegionFeatures = async (setRegionFeatures, setStacks, dispatch, history) => {
   try {
     const features = await keystone.getFeatures()
 
@@ -250,7 +271,6 @@ const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, dispat
     }
 
     setRegionFeatures(regionFeatures)
-    setStack(determineCurrentStack(history, regionFeatures))
     setStacks(determineStacks(regionFeatures))
 
     redirectToAppropriateStack(
@@ -266,7 +286,7 @@ const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, dispat
 const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
 const AuthenticatedContainer = () => {
-  const { history } = useReactRouter()
+  const { history, location } = useReactRouter()
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState<{
     openstack?: boolean
@@ -274,23 +294,37 @@ const AuthenticatedContainer = () => {
     intercom?: boolean
     ironic?: boolean
   }>(emptyObj)
-  const [{ currentRegion }] = useScopedPreferences()
+  const [{ currentRegion, lastStack }, updatePrefs] = useScopedPreferences()
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
-  const [currentStack, setStack] = useState(determineCurrentStack(history, regionFeatures))
+  const [currentStack, setStack] = useState(
+    determineCurrentStack(history.location, regionFeatures, lastStack),
+  )
   const [stacks, setStacks] = useState([])
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const {
     userDetails: { id: userId, name, displayName, role },
     features,
   } = session
+  const plugins = pluginManager.getPlugins()
+  const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
+
   const dispatch = useDispatch()
   const showToast = useToast()
-  const classes = useStyles({ path: history.location.pathname })
+  const classes = useStyles({ path: history.location.pathname, hasSecondaryHeader: !!SecondaryHeader })
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadRegionFeatures(setRegionFeatures, setStack, setStacks, dispatch, history)
+    loadRegionFeatures(setRegionFeatures, setStacks, dispatch, history)
   }, [currentRegion])
+
+  useEffect(() => {
+    if (!location || !regionFeatures) {
+      return
+    }
+    const newStack = determineCurrentStack(location, regionFeatures, lastStack)
+    setStack(newStack)
+    updatePrefs({ lastStack: newStack })
+  }, [location, regionFeatures])
 
   useEffect(() => {
     Bugsnag.setUser(userId, name, displayName)
@@ -314,7 +348,6 @@ const AuthenticatedContainer = () => {
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
 
-  const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
@@ -323,6 +356,7 @@ const AuthenticatedContainer = () => {
       <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
         <Toolbar />
+        {SecondaryHeader && <SecondaryHeader className={classes.secondaryHeader} />}
         <Navbar
           withStackSlider={withStackSlider}
           drawerWidth={drawerWidth}
@@ -332,6 +366,7 @@ const AuthenticatedContainer = () => {
           setStack={setStack}
           handleDrawerToggle={toggleDrawer}
           stacks={stacks}
+          hasSecondaryHeader={!!SecondaryHeader}
         />
         <PushEventsProvider>
           <main
