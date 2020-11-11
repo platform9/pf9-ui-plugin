@@ -31,10 +31,11 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   container: {
     position: 'relative',
-    cursor: 'pointer',
     marginRight: theme.spacing(1),
   },
   inbox: {
+    cursor: 'pointer',
+    fontWeight: 900,
     color: theme.palette.grey[200],
   },
   errIcon: {
@@ -132,9 +133,14 @@ const NotificationsPopover = ({ className }) => {
 
   // @ts-ignore
   return (
-    <div className={clsx(className, classes.container)} onClick={redirectToNotifications}>
+    <div className={clsx(className, classes.container)}>
       <Tooltip title={'Notifications'}>
-        <FontAwesomeIcon aria-describedby={id} ref={inboxEl} className={classes.inbox}>
+        <FontAwesomeIcon
+          onClick={redirectToNotifications}
+          aria-describedby={id}
+          ref={inboxEl}
+          className={classes.inbox}
+        >
           inbox
         </FontAwesomeIcon>
       </Tooltip>
