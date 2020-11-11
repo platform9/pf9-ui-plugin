@@ -24,9 +24,7 @@ import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { clarityDashboardUrl, helpUrl, ironicWizardUrl, dashboardUrl } from 'app/constants'
 import Text from 'core/elements/text'
-
 import SimpleLink from './SimpleLink'
-// import { withAppContext } from 'core/providers/AppProvider'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { connect } from 'react-redux'
 
@@ -40,7 +38,7 @@ const styles = (theme) => ({
     display: 'none !important',
   },
   bottomContent: {
-    display: 'flex',
+    display: ({ stack }) => (stack === 'my-account' ? 'none' : 'flex'),
     flexDirection: 'column',
     alignItems: 'center',
     padding: theme.spacing(2, 1, 1, 1),
@@ -74,7 +72,7 @@ const styles = (theme) => ({
     whiteSpace: 'nowrap',
     height: '100%',
     minHeight: '100vh',
-    backgroundColor: theme.components.sidebar.background,
+    backgroundColor: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].background,
   },
   drawerOpen: {
     width: drawerWidth,
@@ -94,7 +92,7 @@ const styles = (theme) => ({
     // },
   },
   paper: {
-    marginTop: ({ stack }) => (stack === 'account' ? 151 : 55),
+    marginTop: ({ hasSecondaryHeader }) => (hasSecondaryHeader ? 151 : 55),
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
@@ -118,15 +116,21 @@ const styles = (theme) => ({
     margin: 0,
   },
   activeNavItem: {
-    backgroundColor: theme.components.sidebar.activeBackground,
-    color: theme.components.sidebar.activeText,
+    backgroundColor: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].activeBackground,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].activeText,
   },
   currentNavLink: {
-    backgroundColor: [theme.components.sidebar.activeBackground, '!important'],
-    color: [theme.components.sidebar.activeText, '!important'],
+    backgroundColor: ({ stack = 'kubernetes' }) => [
+      theme.components.sidebar[stack].activeBackground,
+      '!important',
+    ],
+    color: ({ stack = 'kubernetes' }) => [theme.components.sidebar[stack].activeText, '!important'],
 
     '&:hover *': {
-      color: [theme.components.sidebar.hoverText, '!important'],
+      color: ({ stack = 'kubernetes' }) => [
+        theme.components.sidebar[stack].hoverText,
+        '!important',
+      ],
     },
   },
   navHeading: {
@@ -167,19 +171,19 @@ const styles = (theme) => ({
     gridTemplateColumns: '50px 1fr',
     padding: 0,
     minHeight: 45,
-    backgroundColor: theme.components.sidebar.background,
-    color: theme.components.sidebar.text,
-
+    backgroundColor: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].background,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].text,
     transition: 'background .3s ease',
 
     '& i, & span': {
       transition: 'color .3s ease',
     },
     '&:hover': {
-      backgroundColor: theme.components.sidebar.activeBackground,
+      backgroundColor: ({ stack = 'kubernetes' }) =>
+        theme.components.sidebar[stack].activeBackground,
     },
     '&:hover *': {
-      color: theme.components.sidebar.hoverText, // override child color styles
+      color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].hoverText, // override child color styles
     },
     borderTop: '2px solid transparent',
     borderBottom: '2px solid transparent',
@@ -199,7 +203,7 @@ const styles = (theme) => ({
   navMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: theme.components.sidebar.text,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].text,
   },
   toggleButton: {
     background: theme.components.header.background,
@@ -222,7 +226,7 @@ const styles = (theme) => ({
   currentNavMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: theme.components.sidebar.activeText,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].activeText,
   },
   navMenuList: {
     borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
@@ -275,7 +279,7 @@ const styles = (theme) => ({
   },
   sliderArrow: {
     width: '0.8em',
-    color: theme.components.sidebar.text,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].text,
     cursor: 'pointer',
   },
   heavyWeight: {
@@ -610,7 +614,8 @@ class Navbar extends PureComponent {
         anchor="left"
         open={open}
       >
-        {withStackSlider && stack !== 'account' ? this.renderStackSlider() : null}
+        {/* TODO: refactor to typescript file & use enum for stack comparison */}
+        {withStackSlider && stack !== 'my-account' ? this.renderStackSlider() : null}
         {filteredSections.length > 1
           ? this.renderSections(filteredSections)
           : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}

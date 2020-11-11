@@ -7,7 +7,7 @@ import Text from 'core/elements/text'
 import useParams from 'core/hooks/useParams'
 import Progress from 'core/components/progress/Progress'
 import Alert from 'core/components/Alert'
-import { loginUrl, forgotPasswordApiUrl } from 'app/constants.js'
+import { loginUrl, forgotPasswordApiUrl } from 'app/constants'
 
 const useStyles = makeStyles((theme) => ({
   root: {

@@ -4,10 +4,9 @@ import AddTenantPage from 'account/components/userManagement/tenants/AddTenantPa
 import EditTenantPage from 'account/components/userManagement/tenants/EditTenantPage'
 import AddUserPage from 'account/components/userManagement/users/AddUserPage'
 import EditUserPage from 'account/components/userManagement/users/EditUserPage'
-import MyAccountHeader from 'account/components/secondHeader/MyAccountHeader'
+import MyAccountHeader from 'account/components/secondaryHeaders/MyAccountHeader'
 import { routes } from 'core/utils/routes'
-
-const myAccountPrefix = '/ui/my-account'
+import { AppPlugins, userAccountPrefix } from 'app/constants'
 
 class MyAccount extends React.PureComponent {
   render() {
@@ -15,19 +14,19 @@ class MyAccount extends React.PureComponent {
   }
 }
 
-MyAccount.__name__ = 'account'
+MyAccount.__name__ = AppPlugins.MyAccount
 
 MyAccount.registerPlugin = (pluginManager) => {
-  const plugin = pluginManager.registerPlugin('account', 'Account', myAccountPrefix)
+  const plugin = pluginManager.registerPlugin(AppPlugins.MyAccount, 'Account', userAccountPrefix)
 
-  plugin.registerSecondHeader(MyAccountHeader)
+  plugin.registerSecondaryHeader(MyAccountHeader)
 
   plugin.registerRoutes([
     {
       name: 'Tenants & Users',
       requiredRoles: 'admin',
       link: {
-        path: routes.userManagement.root.toString(true, myAccountPrefix),
+        path: routes.userManagement.root.toString(userAccountPrefix),
         exact: true,
         default: true,
       },
@@ -36,25 +35,25 @@ MyAccount.registerPlugin = (pluginManager) => {
     {
       name: 'Add Tenant',
       requiredRoles: 'admin',
-      link: { path: routes.userManagement.addTenant.toString(true, myAccountPrefix), exact: true },
+      link: { path: routes.userManagement.addTenant.toString(userAccountPrefix), exact: true },
       component: AddTenantPage,
     },
     {
       name: 'Edit Tenant',
       requiredRoles: 'admin',
-      link: { path: routes.userManagement.editTenant.toString(true, myAccountPrefix), exact: true },
+      link: { path: routes.userManagement.editTenant.toString(userAccountPrefix), exact: true },
       component: EditTenantPage,
     },
     {
       name: 'Add User',
       requiredRoles: 'admin',
-      link: { path: routes.userManagement.addUser.toString(true, myAccountPrefix), exact: true },
+      link: { path: routes.userManagement.addUser.toString(userAccountPrefix), exact: true },
       component: AddUserPage,
     },
     {
       name: 'Edit User',
       requiredRoles: 'admin',
-      link: { path: routes.userManagement.editUser.toString(true, myAccountPrefix), exact: true },
+      link: { path: routes.userManagement.editUser.toString(userAccountPrefix), exact: true },
       component: EditUserPage,
     },
   ])
@@ -63,17 +62,17 @@ MyAccount.registerPlugin = (pluginManager) => {
   const navItems = [
     {
       name: 'Tenants & Users',
-      link: { path: routes.userManagement.root.toString(true, myAccountPrefix) },
+      link: { path: routes.userManagement.root.toString(userAccountPrefix) },
       icon: 'user',
       requiredRoles: 'admin',
       nestedLinks: [
         {
           name: 'Tenants',
-          link: { path: routes.userManagement.tenants.toString(true, myAccountPrefix) },
+          link: { path: routes.userManagement.tenants.toString(userAccountPrefix) },
         },
         {
           name: 'Users',
-          link: { path: routes.userManagement.users.toString(true, myAccountPrefix) },
+          link: { path: routes.userManagement.users.toString(userAccountPrefix) },
         },
         { name: 'Groups', link: { path: '/user_management#userGroups' } },
         { name: 'Roles', link: { path: '/user_management#roles' } },

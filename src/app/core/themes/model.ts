@@ -1,4 +1,5 @@
 import { Theme as DefaultTheme } from '@material-ui/core'
+import { AppPlugins } from 'app/constants'
 
 export interface AppTheme {
   breakpoints: any
@@ -242,6 +243,13 @@ export interface Header {
 }
 
 export interface Sidebar {
+  [AppPlugins.Kubernetes]: SidebarStyles
+  [AppPlugins.OpenStack]: SidebarStyles
+  [AppPlugins.MyAccount]: SidebarStyles
+  [AppPlugins.BareMetal]: SidebarStyles
+}
+
+export interface SidebarStyles {
   background: string
   text: string
   activeText: string

@@ -1,4 +1,4 @@
-import { k8sPrefix, userAccountPrefix, appUrlRoot } from 'app/constants'
+import { AppPlugins, appUrlRoot, pluginRoutePrefix } from 'app/constants'
 import URLPattern from 'url-pattern'
 
 interface GenericKVP {
@@ -8,6 +8,7 @@ interface GenericKVP {
 interface IRouteOptions {
   url: string
   name: string
+  defaultParams?: GenericKVP
 }
 
 type OptionalGenericKVP = GenericKVP | null | void
@@ -21,6 +22,7 @@ type RouterPathFn<T extends OptionalGenericKVP> = (params: OptionalParamType<T>)
 export class Route<T extends OptionalGenericKVP = null> {
   url: string
   name: string
+  defaultParams: GenericKVP
   pattern: URLPattern
 
   static routes: Route[] = []
@@ -28,18 +30,18 @@ export class Route<T extends OptionalGenericKVP = null> {
   constructor(options: IRouteOptions) {
     this.url = options.url
     this.name = options.name
+    this.defaultParams = options.defaultParams || {}
     this.pattern = new URLPattern(options.url)
   }
 
   public path: RouterPathFn<T> = (params: OptionalParamType<T>) => {
-    return this.createUrlWithQueryString(new URL(this.url, window.location.origin), params)
+    // @ts-ignore
+    const allParams = { ...this.defaultParams, ...(params || {}) }
+    return this.createUrlWithQueryString(new URL(this.url, window.location.origin), allParams)
   }
 
-  public toString(stripPrefix, prefix): string {
-    if (stripPrefix) {
-      return this.path(null).replace(prefix, '')
-    }
-    return this.path(null)
+  public toString(prefix = ''): string {
+    return this.path(null).replace(prefix, '')
   }
 
   /**
@@ -100,228 +102,493 @@ export class Route<T extends OptionalGenericKVP = null> {
 export const routes = {
   cluster: {
     list: Route.register({
-      url: `${k8sPrefix}/infrastructure#clusters`,
+      url: `${pluginRoutePrefix}/infrastructure#clusters`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:List',
     }),
     edit: Route.register({
-      url: `${k8sPrefix}/infrastructure/clusters/edit/:id`,
+      url: `${pluginRoutePrefix}/infrastructure/clusters/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:Edit',
     }),
     detail: Route.register({
-      url: `${k8sPrefix}/infrastructure/clusters/:id#clusterDetails`,
+      url: `${pluginRoutePrefix}/infrastructure/clusters/:id#clusterDetails`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:Details',
     }),
     nodes: Route.register({
-      url: `${k8sPrefix}/infrastructure/clusters/:id#nodes`,
+      url: `${pluginRoutePrefix}/infrastructure/clusters/:id#nodes`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:Nodes',
     }),
     nodeHealth: Route.register({
-      url: `${k8sPrefix}/infrastructure/clusters/:id#nodeHealth`,
+      url: `${pluginRoutePrefix}/infrastructure/clusters/:id#nodeHealth`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:NodeHealth',
     }),
     add: Route.register({
-      url: `${k8sPrefix}/infrastructure/clusters/add`,
+      url: `${pluginRoutePrefix}/infrastructure/clusters/add`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:Add',
     }),
     addAws: {
       custom: Route.register({
-        url: `${k8sPrefix}/infrastructure/clusters/aws/add/custom`,
+        url: `${pluginRoutePrefix}/infrastructure/clusters/aws/add/custom`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
         name: 'Infrastructure:Clusters:AddAws:Custom',
       }),
       'one-click': Route.register({
-        url: `${k8sPrefix}/infrastructure/clusters/aws/add/one-click`,
+        url: `${pluginRoutePrefix}/infrastructure/clusters/aws/add/one-click`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
         name: 'Infrastructure:Clusters:AddAws:OneClick',
       }),
     },
     addAzure: {
       custom: Route.register({
-        url: `${k8sPrefix}/infrastructure/clusters/azure/add/custom`,
+        url: `${pluginRoutePrefix}/infrastructure/clusters/azure/add/custom`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
         name: 'Infrastructure:Clusters:AddAzure:Custom',
       }),
       'one-click': Route.register({
-        url: `${k8sPrefix}/infrastructure/clusters/azure/add/one-click`,
+        url: `${pluginRoutePrefix}/infrastructure/clusters/azure/add/one-click`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
         name: 'Infrastructure:Clusters:AddAzure:OneClick',
       }),
     },
     addBareOs: {
       virtual: {
         'one-click': Route.register({
-          url: `${k8sPrefix}/infrastructure/clusters/bareos/add/virtual/one-click`,
+          url: `${pluginRoutePrefix}/infrastructure/clusters/bareos/add/virtual/one-click`,
+          defaultParams: {
+            plugin: AppPlugins.Kubernetes,
+          },
           name: 'Infrastructure:Clusters:AddBareOs:Virtual:OneClick',
         }),
         'single-master': Route.register({
-          url: `${k8sPrefix}/infrastructure/clusters/bareos/add/virtual/single-master`,
+          url: `${pluginRoutePrefix}/infrastructure/clusters/bareos/add/virtual/single-master`,
+          defaultParams: {
+            plugin: AppPlugins.Kubernetes,
+          },
           name: 'Infrastructure:Clusters:AddBareOs:Virtual:SingleMaster',
         }),
         'multi-master': Route.register({
-          url: `${k8sPrefix}/infrastructure/clusters/bareos/add/virtual/multi-master`,
+          url: `${pluginRoutePrefix}/infrastructure/clusters/bareos/add/virtual/multi-master`,
+          defaultParams: {
+            plugin: AppPlugins.Kubernetes,
+          },
           name: 'Infrastructure:Clusters:AddBareOs:Virtual:MultiMaster',
         }),
       },
       physical: {
         'one-click': Route.register({
-          url: `${k8sPrefix}/infrastructure/clusters/bareos/add/physical/one-click`,
+          url: `${pluginRoutePrefix}/infrastructure/clusters/bareos/add/physical/one-click`,
+          defaultParams: {
+            plugin: AppPlugins.Kubernetes,
+          },
           name: 'Infrastructure:Clusters:AddBareOs:Physical:OneClick',
         }),
         'single-master': Route.register({
-          url: `${k8sPrefix}/infrastructure/clusters/bareos/add/physical/single-master`,
+          url: `${pluginRoutePrefix}/infrastructure/clusters/bareos/add/physical/single-master`,
+          defaultParams: {
+            plugin: AppPlugins.Kubernetes,
+          },
           name: 'Infrastructure:Clusters:AddBareOs:Physical:SingleMaster',
         }),
         'multi-master': Route.register({
-          url: `${k8sPrefix}/infrastructure/clusters/bareos/add/physical/multi-master`,
+          url: `${pluginRoutePrefix}/infrastructure/clusters/bareos/add/physical/multi-master`,
+          defaultParams: {
+            plugin: AppPlugins.Kubernetes,
+          },
           name: 'Infrastructure:Clusters:AddBareOs:Physical:MultiMaster',
         }),
       },
     },
     scaleMasters: Route.register({
-      url: `${k8sPrefix}/infrastructure/clusters/scaleMasters/:id`,
+      url: `${pluginRoutePrefix}/infrastructure/clusters/scaleMasters/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:ScaleMasters',
     }),
     scaleWorkers: Route.register({
-      url: `${k8sPrefix}/infrastructure/clusters/scaleWorkers/:id`,
+      url: `${pluginRoutePrefix}/infrastructure/clusters/scaleWorkers/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Infrastructure:Clusters:ScaleWorkers',
     }),
   },
-  dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
-  apiAccess: Route.register({ url: `${k8sPrefix}/api_access`, name: 'APIAccess' }),
-  notifications: Route.register({ url: `${k8sPrefix}/notifications`, name: 'Notifications' }),
+  dashboard: Route.register({
+    url: `${pluginRoutePrefix}/dashboard`,
+    name: 'Dashboard',
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+  }),
+  apiAccess: Route.register({
+    url: `${pluginRoutePrefix}/api_access`,
+    name: 'APIAccess',
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+  }),
+  notifications: Route.register({
+    url: `${pluginRoutePrefix}/notifications`,
+    name: 'Notifications',
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+  }),
   nodes: {
-    list: Route.register({ url: `${k8sPrefix}/infrastructure#nodes`, name: 'Nodes:List' }),
-    detail: Route.register({ url: `${k8sPrefix}/infrastructure/nodes/:id`, name: 'Nodes:Details' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/infrastructure#nodes`,
+      name: 'Nodes:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    detail: Route.register({
+      url: `${pluginRoutePrefix}/infrastructure/nodes/:id`,
+      name: 'Nodes:Details',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
     download: Route.register({
-      url: `${k8sPrefix}/infrastructure/nodes/cli/download`,
+      url: `${pluginRoutePrefix}/infrastructure/nodes/cli/download`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Nodes:Download',
     }),
   },
   cloudProviders: {
     list: Route.register({
-      url: `${k8sPrefix}/infrastructure#cloudProviders`,
+      url: `${pluginRoutePrefix}/infrastructure#cloudProviders`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'CloudProviders:List',
     }),
     edit: Route.register({
-      url: `${k8sPrefix}/infrastructure/cloudProviders/edit/:id`,
+      url: `${pluginRoutePrefix}/infrastructure/cloudProviders/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'CloudProviders:Edit',
     }),
     add: Route.register({
-      url: `${k8sPrefix}/infrastructure/cloudProviders/add`,
+      url: `${pluginRoutePrefix}/infrastructure/cloudProviders/add`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'CloudProviders:Add',
     }),
   },
   apps: {
-    list: Route.register({ url: `${k8sPrefix}/apps`, name: 'Apps:List' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/apps`,
+      name: 'Apps:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
     detail: Route.register({
-      url: `${k8sPrefix}/apps/:clusterId/:release/:id`,
+      url: `${pluginRoutePrefix}/apps/:clusterId/:release/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Apps:Details',
     }),
     deployed: Route.register({
-      url: `${k8sPrefix}/apps/deployed/:clusterId/:release`,
+      url: `${pluginRoutePrefix}/apps/deployed/:clusterId/:release`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Apps:Deployed',
     }),
   },
   pods: {
-    list: Route.register({ url: `${k8sPrefix}/pods#pods`, name: 'Pods:List' }),
-    add: Route.register({ url: `${k8sPrefix}/pods/add`, name: 'Pods:Add' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/pods#pods`,
+      name: 'Pods:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+
+    add: Route.register({
+      url: `${pluginRoutePrefix}/pods/add`,
+      name: 'Pods:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
   },
   services: {
-    list: Route.register({ url: `${k8sPrefix}/pods#services`, name: 'Services:List' }),
-    add: Route.register({ url: `${k8sPrefix}/pods/services/add`, name: 'Services:Add' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/pods#services`,
+      name: 'Services:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/pods/services/add`,
+      name: 'Services:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
   },
   deployments: {
-    list: Route.register({ url: `${k8sPrefix}/pods#deployments`, name: 'Deployments:List' }),
-    add: Route.register({ url: `${k8sPrefix}/pods/deployments/add`, name: 'Deployments:Add' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/pods#deployments`,
+      name: 'Deployments:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/pods/deployments/add`,
+      name: 'Deployments:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
   },
   storage: {
-    list: Route.register({ url: `${k8sPrefix}/storage_classes`, name: 'Storage:List' }),
-    add: Route.register({ url: `${k8sPrefix}/storage_classes/add`, name: 'Storage:Add' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/storage_classes`,
+      name: 'Storage:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/storage_classes/add`,
+      name: 'Storage:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
   },
   logging: {
-    list: Route.register({ url: `${k8sPrefix}/logging`, name: 'Logging:List' }),
-    add: Route.register({ url: `${k8sPrefix}/logging/add`, name: 'Logging:Add' }),
-    edit: Route.register({ url: `${k8sPrefix}/logging/edit/:id`, name: 'Logging:Edit' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/logging`,
+      name: 'Logging:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/logging/add`,
+      name: 'Logging:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    edit: Route.register({
+      url: `${pluginRoutePrefix}/logging/edit/:id`,
+      name: 'Logging:Edit',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
   },
   namespaces: {
-    list: Route.register({ url: `${k8sPrefix}/namespaces`, name: 'Namespaces:List' }),
-    add: Route.register({ url: `${k8sPrefix}/namespaces/add`, name: 'Namespaces:Add' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/namespaces`,
+      name: 'Namespaces:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/namespaces/add`,
+      name: 'Namespaces:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
   },
   userManagement: {
     root: Route.register({
-      url: `${userAccountPrefix}/user_management`,
+      url: `${pluginRoutePrefix}/user_management`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
       name: 'UserManagement:Root',
     }),
     users: Route.register({
-      url: `${userAccountPrefix}/user_management#users`,
+      url: `${pluginRoutePrefix}/user_management#users`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
       name: 'UserManagement:Users:List',
     }),
     tenants: Route.register({
-      url: `${userAccountPrefix}/user_management#tenants`,
+      url: `${pluginRoutePrefix}/user_management#tenants`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
       name: 'UserManagement:Tenants:List',
     }),
     addTenant: Route.register({
-      url: `${userAccountPrefix}/user_management/tenants/add`,
+      url: `${pluginRoutePrefix}/user_management/tenants/add`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
       name: 'UserManagement:Tenants:Add',
     }),
     editTenant: Route.register({
-      url: `${userAccountPrefix}/user_management/tenants/edit/:id`,
+      url: `${pluginRoutePrefix}/user_management/tenants/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
       name: 'UserManagement:Tenants:Edit',
     }),
     addUser: Route.register({
-      url: `${userAccountPrefix}/user_management/users/add`,
+      url: `${pluginRoutePrefix}/user_management/users/add`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
       name: 'UserManagement:User:Add',
     }),
     editUser: Route.register({
-      url: `${userAccountPrefix}/user_management/users/edit/:id`,
+      url: `${pluginRoutePrefix}/user_management/users/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
       name: 'UserManagement:User:Edit',
     }),
   },
   prometheus: {
-    list: Route.register({ url: `${k8sPrefix}/prometheus`, name: 'Prometheus:List' }),
-    add: Route.register({ url: `${k8sPrefix}/prometheus/instances/add`, name: 'Prometheus:Add' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/prometheus`,
+      name: 'Prometheus:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/prometheus/instances/add`,
+      name: 'Prometheus:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
     edit: Route.register({
-      url: `${k8sPrefix}/prometheus/instances/edit/:id`,
+      url: `${pluginRoutePrefix}/prometheus/instances/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Prometheus:Edit',
     }),
     editRules: Route.register({
-      url: `${k8sPrefix}/prometheus/rules/edit/:id`,
+      url: `${pluginRoutePrefix}/prometheus/rules/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Prometheus:Rules:Edit',
     }),
     editServiceMonitors: Route.register({
-      url: `${k8sPrefix}/prometheus/serviceMonitors/edit/:id`,
+      url: `${pluginRoutePrefix}/prometheus/serviceMonitors/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Prometheus:ServiceMonitors:Edit',
     }),
     editAlertManagers: Route.register({
-      url: `${k8sPrefix}/prometheus/alertManagers/edit/:id`,
+      url: `${pluginRoutePrefix}/prometheus/alertManagers/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'Promtheus:AltertManagers:Edit',
     }),
   },
   rbac: {
-    list: Route.register({ url: `${k8sPrefix}/rbac`, name: 'RBAC:List' }),
-    addRoles: Route.register({ url: `${k8sPrefix}/rbac/roles/add`, name: 'RBAC:List' }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/rbac`,
+      name: 'RBAC:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    addRoles: Route.register({
+      url: `${pluginRoutePrefix}/rbac/roles/add`,
+      name: 'RBAC:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
     addClusterRoles: Route.register({
-      url: `${k8sPrefix}/rbac/clusterroles/add`,
+      url: `${pluginRoutePrefix}/rbac/clusterroles/add`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'RBAC:ClusterRoles:Add',
     }),
     addRoleBindings: Route.register({
-      url: `${k8sPrefix}/rbac/rolebindings/add`,
+      url: `${pluginRoutePrefix}/rbac/rolebindings/add`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'RBAC:RoleBindings:Add',
     }),
     editRoleBindings: Route.register({
-      url: `${k8sPrefix}/rbac/rolebindings/edit/:id/cluster/:clusterId`,
+      url: `${pluginRoutePrefix}/rbac/rolebindings/edit/:id/cluster/:clusterId`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'RBAC:RoleBindings:Edit',
     }),
     addClusterRoleBindings: Route.register({
-      url: `${k8sPrefix}/rbac/clusterrolebindings/add`,
+      url: `${pluginRoutePrefix}/rbac/clusterrolebindings/add`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'RBAC:ClusterRolesBindings:Add',
     }),
     editRoles: Route.register({
-      url: `${k8sPrefix}/rbac/roles/edit/:id/cluster/:clusterId`,
+      url: `${pluginRoutePrefix}/rbac/roles/edit/:id/cluster/:clusterId`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'RBAC:Roles:Edit',
     }),
     editClusterRoles: Route.register({
-      url: `${k8sPrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`,
+      url: `${pluginRoutePrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'RBAC:ClusterRoles:Edit',
     }),
     editClusterRoleBindings: Route.register({
-      url: `${k8sPrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`,
+      url: `${pluginRoutePrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
       name: 'RBAC:ClusterRoleBindings:Edit',
     }),
   },

@@ -3,6 +3,8 @@ import { Button } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
 import { CustomWindow } from 'app/polyfills/window'
 import {
+  AppPlugins,
+  appPlugins,
   clarityDashboardUrl,
   dashboardUrl,
   helpUrl,
@@ -39,6 +41,7 @@ import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
 import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
+import { Route as Router } from 'core/utils/routes'
 
 declare let window: CustomWindow
 
@@ -46,7 +49,7 @@ const { keystone } = ApiClient.getInstance()
 
 interface StyleProps {
   path?: string
-  stack?: string
+  hasSecondaryHeader?: boolean
 }
 
 const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
@@ -65,7 +68,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   },
   content: {
     // marginTop: 55, // header height is hardcoded to 55px. account for that here.
-    marginTop: ({ stack }) => (stack === 'account' ? 151 : 55),
+    marginTop: ({ hasSecondaryHeader }) => (hasSecondaryHeader ? 151 : 55),
     overflowX: 'auto',
     flexGrow: 1,
     backgroundColor: theme.palette.grey['000'],
@@ -75,7 +78,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
-  secondHeader: {
+  secondaryHeader: {
     position: 'fixed',
     top: 55,
     width: '100%',
@@ -213,23 +216,16 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
 }
 
 const determineCurrentStack = (location, features, lastStack) => {
+  const currentRoute = Router.getCurrentRoute()
+  const match = currentRoute.pattern.match(location.pathname)
+  if (appPlugins.includes(match.plugin)) {
+    return match.plugin
+  }
   // first try the pathname, then use the saved session, else default to kubernetes
-  if (location.pathname.includes('account')) {
-    return 'account'
-  }
-  if (location.pathname.includes('metalstack')) {
-    return 'metalstack'
-  }
-  if (location.pathname.includes('kubernetes')) {
-    return 'kubernetes'
-  }
-  if (location.pathname.includes('openstack')) {
-    return 'openstack'
-  }
   if (lastStack) {
     return lastStack
   }
-  return 'kubernetes'
+  return AppPlugins.Kubernetes
 }
 
 const linkedStacks = (stacks) =>
@@ -309,9 +305,12 @@ const AuthenticatedContainer = () => {
     userDetails: { id: userId, name, displayName, role },
     features,
   } = session
+  const plugins = pluginManager.getPlugins()
+  const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
+
   const dispatch = useDispatch()
   const showToast = useToast()
-  const classes = useStyles({ path: history.location.pathname, stack: currentStack })
+  const classes = useStyles({ path: history.location.pathname, hasSecondaryHeader: !!SecondaryHeader })
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
@@ -349,8 +348,6 @@ const AuthenticatedContainer = () => {
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
 
-  const plugins = pluginManager.getPlugins()
-  const SecondHeader = plugins[currentStack]?.getSecondHeader()
   const sections = getSections(plugins, role)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
@@ -359,7 +356,7 @@ const AuthenticatedContainer = () => {
       <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
         <Toolbar />
-        {SecondHeader && <SecondHeader className={classes.secondHeader} />}
+        {SecondaryHeader && <SecondaryHeader className={classes.secondaryHeader} />}
         <Navbar
           withStackSlider={withStackSlider}
           drawerWidth={drawerWidth}
@@ -369,6 +366,7 @@ const AuthenticatedContainer = () => {
           setStack={setStack}
           handleDrawerToggle={toggleDrawer}
           stacks={stacks}
+          hasSecondaryHeader={!!SecondaryHeader}
         />
         <PushEventsProvider>
           <main

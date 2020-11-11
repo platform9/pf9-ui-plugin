@@ -31,6 +31,20 @@ export const originUsernameRegex = new RegExp(/:\/\/(?<originUsername>(.+?)).pla
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
 export const userAccountPrefix = `${appUrlRoot}/my-account`
+export const pluginRoutePrefix = `${appUrlRoot}/:plugin`
+
+export enum AppPlugins {
+  MyAccount = 'my-account',
+  Kubernetes = 'kubernetes',
+  OpenStack = 'openstack',
+  BareMetal = 'metalstack',
+}
+export const appPlugins = [
+  AppPlugins.MyAccount,
+  AppPlugins.BareMetal,
+  AppPlugins.Kubernetes,
+  AppPlugins.OpenStack,
+]
 
 export const onboardingAccessSetup = 'onboarding/api-access'
 export const onboardingMonitoringSetup = 'onboarding/monitoring-enabled'

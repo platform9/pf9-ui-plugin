@@ -1,3 +1,4 @@
+import { AppPlugins } from 'app/constants'
 import { generateTheme } from './helpers'
 
 export const colors = {
@@ -68,11 +69,34 @@ const components = {
     background: colors.grey[900],
   },
   sidebar: {
-    background: colors.grey[800],
-    activeBackground: colors.grey['000'],
-    text: colors.grey[200],
-    activeText: '#000000',
-    hoverText: '#000000',
+    [AppPlugins.MyAccount]: {
+      background: colors.grey[200],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[800],
+      activeText: colors.grey[800],
+      hoverText: '#000000',
+    },
+    [AppPlugins.Kubernetes]: {
+      background: colors.grey[800],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[200],
+      activeText: '#000000',
+      hoverText: '#000000',
+    },
+    [AppPlugins.OpenStack]: {
+      background: colors.grey[800],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[200],
+      activeText: '#000000',
+      hoverText: '#000000',
+    },
+    [AppPlugins.BareMetal]: {
+      background: colors.grey[800],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[200],
+      activeText: '#000000',
+      hoverText: '#000000',
+    },
   },
   dashboardCard: {
     background: '#FFF',

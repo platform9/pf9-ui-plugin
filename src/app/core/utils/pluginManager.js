@@ -11,7 +11,7 @@ const initData = () => ({
   components: [],
   routes: [],
   navItems: [],
-  secondHeader: null,
+  secondaryHeader: null,
   options: { ...defaultOptions },
 })
 
@@ -61,8 +61,8 @@ const pluginManager = {
         data.navItems = [...data.navItems, ...items.map(prependBasePath)]
       },
 
-      registerSecondHeader: (component) => {
-        data.secondHeader = component
+      registerSecondaryHeader: (component) => {
+        data.secondaryHeader = component
       },
 
       getComponents: () => {
@@ -77,8 +77,8 @@ const pluginManager = {
         return data.navItems
       },
 
-      getSecondHeader: () => {
-        return data.secondHeader
+      getSecondaryHeader: () => {
+        return data.secondaryHeader
       },
 
       getOptions: () => {
