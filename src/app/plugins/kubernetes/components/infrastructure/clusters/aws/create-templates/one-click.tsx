@@ -19,8 +19,8 @@ import AwsAvailabilityZoneField from '../aws-availability-zone'
 import { castBoolToStr } from 'utils/misc'
 
 export const initialContext = {
-  containersCidr: '10.20.0.0/16',
-  servicesCidr: '10.21.0.0/16',
+  containersCidr: '10.20.0.0/22',
+  servicesCidr: '10.21.0.0/22',
   network: 'newPublic',
   runtimeConfigOption: 'default',
   networkPlugin: 'calico',

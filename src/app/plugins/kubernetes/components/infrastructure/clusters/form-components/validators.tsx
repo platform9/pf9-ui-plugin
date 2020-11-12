@@ -1,12 +1,12 @@
 import { customValidator } from 'core/utils/fieldValidators'
-import IpAddress from 'ip-address'
-import { NetworkStackTypes } from './network-stack'
+import * as IpAddress from 'ip-address'
+import { NetworkStackTypes } from '../constants'
 
 const getIpValidator = (type = NetworkStackTypes.IPv4) =>
   ({
     [NetworkStackTypes.IPv4]: {
       cls: IpAddress.Address4,
-      blockSize: [1, 32],
+      blockSize: [20, 32],
     },
     [NetworkStackTypes.IPv6]: {
       cls: IpAddress.Address6,
@@ -26,26 +26,39 @@ const IPValidator = customValidator((value, formValues) => {
   return IPValidatorCls.isValid(value)
 }, 'Invalid IP address provided')
 
-const servicesCIDRSubnetValidator = customValidator((value, formValues) => {
-  const containersIP = formValues.containersCidr
-  const servicesIP = value
+const cidrIndependenceValidator = customValidator((value, formValues) => {
   const { cls: IPValidatorCls } = getIpValidator(formValues.networkStack)
+  const containersIPInstance = new IPValidatorCls(formValues.containersCidr)
+  const servicesIPInstance = new IPValidatorCls(value)
 
-  return new IPValidatorCls(containersIP).isInSubnet(servicesIP)
-}, 'The services CIDR must be a subnet of the containers CIDR')
+  return (
+    servicesIPInstance.isInSubnet(containersIPInstance) === false &&
+    containersIPInstance.isInSubnet(servicesIPInstance) === false
+  )
+}, 'Services CIDR must be an independent subnet of Containers CIDR')
 
-const ipv6BlockSizeValidator = customValidator((value) => {
-  const blockSize = parseInt(`${value}`.split('/')[1])
-  return blockSize >= 116 && blockSize <= 128
+const ipv6BlockSizeValidator = customValidator((value, formValues) => {
+  const blockSize = parseInt(value)
+  return isValidBlockSize(blockSize, formValues.networkStack)
 }, 'Block Size must be in the range 116 -> 128')
 
-const ipv4BlockSizeValidator = customValidator((value) => {
-  const blockSize = parseInt(`${value}`.split('/')[1])
-  return blockSize >= 1 && blockSize <= 32
-}, 'Block Size must be in the range 1 -> 32')
+const ipv4BlockSizeValidator = customValidator((value, formValues) => {
+  const blockSize = parseInt(value)
+  return isValidBlockSize(blockSize, formValues.networkStack)
+}, 'Block Size must be in the range 20 -> 32')
+
+const ipv6SubnetMaskSizeValidator = customValidator((value, formValues) => {
+  const subnetMask = parseInt(`${value}`.split('/')[1])
+  return isValidBlockSize(subnetMask, formValues.networkStack)
+}, 'Subnet Mask must be in the range 116 -> 128')
+
+const ipv4SubnetMaskSizeValidator = customValidator((value, formValues) => {
+  const subnetMask = parseInt(`${value}`.split('/')[1])
+  return isValidBlockSize(subnetMask, formValues.networkStack)
+}, 'Subnet Mask must be in the range 20 -> 32')
 
 const calicoBlockSizeCIDRValidator = customValidator((value, formValues) => {
-  const blockSize = `${formValues.containersCidr}`.split('/')[1]
+  const blockSize = parseInt(`${formValues.containersCidr}`.split('/')[1])
   if (!isValidBlockSize(blockSize, formValues.networkStack)) {
     return false
   }
@@ -54,15 +67,17 @@ const calicoBlockSizeCIDRValidator = customValidator((value, formValues) => {
 
 export const ipValidators = {
   [NetworkStackTypes.IPv4]: {
+    cidrIndependenceValidator,
+    calicoBlockSizeCIDRValidator,
+    subnetMaskSizeValidator: ipv4SubnetMaskSizeValidator,
     ipValidator: IPValidator,
-    servicesCIDRSubnetValidator: servicesCIDRSubnetValidator,
     blockSizeValidator: ipv4BlockSizeValidator,
-    calicoBlockSizeCIDRValidator: calicoBlockSizeCIDRValidator,
   },
   [NetworkStackTypes.IPv6]: {
+    cidrIndependenceValidator,
+    calicoBlockSizeCIDRValidator,
+    subnetMaskSizeValidator: ipv6SubnetMaskSizeValidator,
     ipValidator: IPValidator,
-    servicesCIDRSubnetValidator: servicesCIDRSubnetValidator,
     blockSizeValidator: ipv6BlockSizeValidator,
-    calicoBlockSizeCIDRValidator: calicoBlockSizeCIDRValidator,
   },
 }

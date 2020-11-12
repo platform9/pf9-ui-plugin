@@ -42,8 +42,8 @@ import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 
 export const initialContext = {
-  containersCidr: '10.20.0.0/16',
-  servicesCidr: '10.21.0.0/16',
+  containersCidr: '10.20.0.0/22',
+  servicesCidr: '10.21.0.0/22',
   networkPlugin: 'calico',
   calicoIpIpMode: 'Always',
   calicoNatOutgoing: true,

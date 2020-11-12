@@ -62,7 +62,7 @@ export default function WizardMeta<T>({
 const useStyles = makeStyles<Theme, { icon: boolean }>((theme) => ({
   wizardMeta: {
     display: 'grid',
-    gridTemplateColumns: '240px max-content max-content',
+    gridTemplateColumns: '240px minmax(800px, max-content) minmax(200px, max-content)',
     gridGap: 24,
 
     '& aside': {

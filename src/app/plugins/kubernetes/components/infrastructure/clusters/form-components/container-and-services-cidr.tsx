@@ -12,7 +12,7 @@ const ContainerAndServicesCIDRField = ({ values }) => (
       required
       validations={[
         ipValidators?.[values.networkStack]?.ipValidator,
-        ipValidators?.[values.networkStack]?.blockSizeValidator,
+        ipValidators?.[values.networkStack]?.subnetMaskSizeValidator,
       ]}
     />
 
@@ -24,8 +24,8 @@ const ContainerAndServicesCIDRField = ({ values }) => (
       required
       validations={[
         ipValidators?.[values.networkStack]?.ipValidator,
-        ipValidators?.[values.networkStack]?.servicesCIDRSubnetValidator,
-        ipValidators?.[values.networkStack]?.blockSizeValidator,
+        ipValidators?.[values.networkStack]?.cidrIndependenceValidator,
+        ipValidators?.[values.networkStack]?.subnetMaskSizeValidator,
       ]}
     />
   </>

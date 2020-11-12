@@ -1,7 +1,7 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import { NetworkStackTypes } from './network-stack'
 import { CalicoDetectionTypes } from './calico-network-fields'
+import { NetworkStackTypes } from '../constants'
 
 export enum NetworkBackendTypes {
   Flannel = 'flannel',

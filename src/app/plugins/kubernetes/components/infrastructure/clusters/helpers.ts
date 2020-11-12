@@ -8,8 +8,8 @@ import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import { trackEvent } from 'utils/tracking'
 import { CloudProviders } from '../cloudProviders/model'
 import { hasConvergingNodes } from './ClusterStatusUtils'
+import { NetworkStackTypes } from './constants'
 import { CalicoDetectionTypes } from './form-components/calico-network-fields'
-import { NetworkStackTypes } from './form-components/network-stack'
 import { ClusterCreateTypes } from './model'
 
 export const clusterIsHealthy = (cluster) =>
@@ -260,7 +260,7 @@ export const createBareOSCluster = async (data) => {
   return cluster
 }
 
-const createGenericCluster = async (body, data, makeRequest = false) => {
+const createGenericCluster = async (body, data) => {
   const { cloudProviderId } = data
 
   if (!body.nodePoolUuid && !!cloudProviderId) {
@@ -307,11 +307,6 @@ const createGenericCluster = async (body, data, makeRequest = false) => {
   const tags = data.prometheusMonitoringEnabled ? [defaultMonitoringTag] : []
   body.tags = keyValueArrToObj(tags.concat(data.tags || []))
 
-  if (!makeRequest) {
-    console.log('cluster to create: ', body)
-    debugger
-    return
-  }
   const createResponse = await qbert.createCluster(body)
   const uuid = createResponse.uuid
 

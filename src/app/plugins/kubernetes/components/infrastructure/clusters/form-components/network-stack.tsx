@@ -1,12 +1,7 @@
 import RadioFields from 'core/components/validatedForm/radio-fields'
 import React from 'react'
+import { NetworkStackTypes, getDefaultCIDRIpsForStack } from '../constants'
 import { NetworkBackendTypes, handleNetworkBackendChange } from './network-backend'
-
-export enum NetworkStackTypes {
-  IPv4 = 'ipv4',
-  IPv6 = 'ipv6',
-  // DualStack = 'dualstack',
-}
 
 const networkStackOptions = [
   { label: 'IPv4', value: NetworkStackTypes.IPv4 },
@@ -21,6 +16,7 @@ export const handleNetworkStackChange = (changeValue, wizardContext) => {
     networkStack: changeValue,
     calicoIPv4: changeValue === NetworkStackTypes.IPv4 ? 'autodetect' : 'none',
     calicoIPv6: changeValue === NetworkStackTypes.IPv6 ? 'autodetect' : 'none',
+    ...getDefaultCIDRIpsForStack(changeValue),
     ...handleNetworkBackendChange(
       changeValue === NetworkStackTypes.IPv4
         ? wizardContext.networkPlugin
