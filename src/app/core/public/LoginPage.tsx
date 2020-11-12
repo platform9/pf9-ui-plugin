@@ -49,7 +49,7 @@ const styles = (theme) => ({
     margin: '0 80px',
   },
   formPane: {
-    padding: '40px 40px 20px',
+    padding: '48px 24px 20px',
     backgroundColor: theme.palette.grey[800],
     display: 'grid',
     gridTemplateRows: '1fr 45px',
@@ -170,6 +170,7 @@ class LoginPage extends React.PureComponent<Props> {
     MFAcheckbox: false,
     loginFailed: false,
     loading: false,
+    ssoEnabled: false,
   }
 
   componentDidMount() {
@@ -180,6 +181,7 @@ class LoginPage extends React.PureComponent<Props> {
     const features = await axios.get('/clarity/features.json').catch(() => null)
     const sso = pathStrOr(false, 'data.experimental.sso', features)
     if (sso) {
+      this.setState({ ssoEnabled: true })
       this.setState({ loginMethod: LoginMethodTypes.SSO })
     }
   }
@@ -328,7 +330,7 @@ class LoginPage extends React.PureComponent<Props> {
 
   render() {
     const { classes } = this.props
-    const { loginFailed, loading, loginMethod } = this.state
+    const { loginFailed, loading, loginMethod, ssoEnabled } = this.state
 
     return (
       <section className={clsx('login-page', classes.page)}>
@@ -345,28 +347,30 @@ class LoginPage extends React.PureComponent<Props> {
               <Text variant="h3" className={classes.formTitle} align="center">
                 Sign In
               </Text>
-              <div className={classes.loginMethods}>
-                <Text
-                  className={clsx(
-                    classes.loginMethod,
-                    loginMethod === LoginMethodTypes.Local ? 'active' : 'inactive',
-                  )}
-                  onClick={() => this.setState({ loginMethod: LoginMethodTypes.Local })}
-                  variant="subtitle2"
-                >
-                  Local Credentials
-                </Text>
-                <Text
-                  className={clsx(
-                    classes.loginMethod,
-                    loginMethod === LoginMethodTypes.SSO ? 'active' : 'inactive',
-                  )}
-                  onClick={() => this.setState({ loginMethod: LoginMethodTypes.SSO })}
-                  variant="subtitle2"
-                >
-                  Single Sign On
-                </Text>
-              </div>
+              {ssoEnabled && (
+                <div className={classes.loginMethods}>
+                  <Text
+                    className={clsx(
+                      classes.loginMethod,
+                      loginMethod === LoginMethodTypes.Local ? 'active' : 'inactive',
+                    )}
+                    onClick={() => this.setState({ loginMethod: LoginMethodTypes.Local })}
+                    variant="subtitle2"
+                  >
+                    Local Credentials
+                  </Text>
+                  <Text
+                    className={clsx(
+                      classes.loginMethod,
+                      loginMethod === LoginMethodTypes.SSO ? 'active' : 'inactive',
+                    )}
+                    onClick={() => this.setState({ loginMethod: LoginMethodTypes.SSO })}
+                    variant="subtitle2"
+                  >
+                    Single Sign On
+                  </Text>
+                </div>
+              )}
               <div className={classes.fields}>
                 {loginMethod === LoginMethodTypes.Local && (
                   <>
