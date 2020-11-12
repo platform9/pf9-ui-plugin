@@ -217,15 +217,22 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
 
 const determineCurrentStack = (location, features, lastStack) => {
   const currentRoute = Router.getCurrentRoute()
+  const handleReturn = () => {
+    if (lastStack) {
+      return lastStack
+    }
+    return AppPlugins.Kubernetes
+  }
+
+  if (!currentRoute) return handleReturn()
+
   const match = currentRoute.pattern.match(location.pathname)
+  if (!match) return handleReturn()
+
   if (appPlugins.includes(match.plugin)) {
     return match.plugin
   }
-  // first try the pathname, then use the saved session, else default to kubernetes
-  if (lastStack) {
-    return lastStack
-  }
-  return AppPlugins.Kubernetes
+  return handleReturn()
 }
 
 const linkedStacks = (stacks) =>
@@ -310,7 +317,10 @@ const AuthenticatedContainer = () => {
 
   const dispatch = useDispatch()
   const showToast = useToast()
-  const classes = useStyles({ path: history.location.pathname, hasSecondaryHeader: !!SecondaryHeader })
+  const classes = useStyles({
+    path: history.location.pathname,
+    hasSecondaryHeader: !!SecondaryHeader,
+  })
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
