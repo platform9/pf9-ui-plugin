@@ -1,6 +1,7 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import { NetworkStackTypes } from './network-stack'
+import { CalicoDetectionTypes } from './calico-network-fields'
 
 export enum NetworkBackendTypes {
   Flannel = 'flannel',
@@ -20,6 +21,7 @@ export const handleNetworkBackendChange = (option, wizardContext) => {
     calicoIpIpMode: option === 'calico' ? 'Always' : undefined,
     calicoNatOutgoing: option === 'calico' ? true : undefined,
     calicoV4BlockSize: option === 'calico' ? '24' : undefined,
+    calicoDetectionMethod: option === 'calico' ? CalicoDetectionTypes.FirstFound : undefined,
   }
 }
 

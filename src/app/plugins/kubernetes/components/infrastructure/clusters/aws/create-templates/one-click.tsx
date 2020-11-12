@@ -39,6 +39,7 @@ export const initialContext = {
   etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
   usePf9Domain: false,
+  networkStack: 'ipv4',
 }
 
 const columns = [

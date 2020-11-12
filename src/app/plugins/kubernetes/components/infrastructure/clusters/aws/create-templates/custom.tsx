@@ -63,6 +63,7 @@ export const initialContext = {
   prometheusMonitoringEnabled: true,
   tags: [],
   appCatalogEnabled: false,
+  networkStack: 'ipv4',
 }
 
 const columns = [
@@ -381,7 +382,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
               <FormFieldCard title="Cluster Networking Range & HTTP Proxy">
                 {/* Containers & Services CIDR */}
-                <ContainerAndServicesCidr />
+                <ContainerAndServicesCidr values={values} />
 
                 {/* HTTP proxy */}
                 <HttpProxyField />

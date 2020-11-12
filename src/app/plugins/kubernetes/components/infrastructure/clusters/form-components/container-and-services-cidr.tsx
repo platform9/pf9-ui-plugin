@@ -1,12 +1,8 @@
 import TextField from 'core/components/validatedForm/TextField'
 import React from 'react'
-import {
-  cidrBlockSizeValidator,
-  containerAndServicesIPEqualsValidator,
-  IPValidator,
-} from './validators'
+import { ipValidators } from './validators'
 
-const ContainerAndServicesCIDRField = () => (
+const ContainerAndServicesCIDRField = ({ values }) => (
   <>
     {/* Containers CIDR */}
     <TextField
@@ -14,7 +10,10 @@ const ContainerAndServicesCIDRField = () => (
       label="Containers CIDR"
       info="Network CIDR from which Kubernetes allocates IP addresses to containers. This CIDR shouldn't overlap with the VPC CIDR. A /16 CIDR enables 256 nodes."
       required
-      validations={[IPValidator, cidrBlockSizeValidator]}
+      validations={[
+        ipValidators?.[values.networkStack]?.ipValidator,
+        ipValidators?.[values.networkStack]?.blockSizeValidator,
+      ]}
     />
 
     {/* Services CIDR */}
@@ -23,7 +22,11 @@ const ContainerAndServicesCIDRField = () => (
       label="Services CIDR"
       info="The network CIDR for Kubernetes virtual IP addresses for Services. This CIDR shouldn't overlap with the VPC CIDR."
       required
-      validations={[IPValidator, containerAndServicesIPEqualsValidator, cidrBlockSizeValidator]}
+      validations={[
+        ipValidators?.[values.networkStack]?.ipValidator,
+        ipValidators?.[values.networkStack]?.servicesCIDRSubnetValidator,
+        ipValidators?.[values.networkStack]?.blockSizeValidator,
+      ]}
     />
   </>
 )

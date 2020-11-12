@@ -65,6 +65,7 @@ export const initialContext = {
   prometheusMonitoringEnabled: true,
   tags: [],
   appCatalogEnabled: false,
+  networkStack: 'ipv4',
 }
 
 const columns = [
@@ -390,7 +391,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <ApiFqdnField />
 
                 {/* Containers CIDR and Services CIDR */}
-                <ContainerAndServicesCidrField />
+                <ContainerAndServicesCidrField values={values} />
 
                 {/* HTTP proxy */}
                 <HttpProxyField />

@@ -36,6 +36,7 @@ export const initialContext = {
   prometheusMonitoringEnabled: true,
   tags: [],
   appCatalogEnabled: false,
+  networkStack: 'ipv4',
 }
 
 const columns = [

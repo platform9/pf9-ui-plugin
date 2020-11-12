@@ -34,7 +34,9 @@ import ApiFQDNField from '../../form-components/external-dns-name'
 import ContainerAndServicesCIDRField from '../../form-components/container-and-services-cidr'
 import HttpProxyField from '../../form-components/http-proxy'
 import NetworkBackendField, { NetworkBackendTypes } from '../../form-components/network-backend'
-import CalicoNetworkFields from '../../form-components/calico-network-fields'
+import CalicoNetworkFields, {
+  CalicoDetectionTypes,
+} from '../../form-components/calico-network-fields'
 import TagsField, { FormattedTags } from '../../form-components/tags'
 import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
@@ -58,6 +60,9 @@ export const initialContext = {
   appCatalogEnabled: false,
   kubernetesVersion: 'v1.19',
   networkStack: 'ipv4',
+  calicoIPv4: 'autodetect',
+  calicoIPv6: 'none',
+  calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
 }
 
 interface Props {
@@ -178,7 +183,7 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               </FormFieldCard>
 
               <FormFieldCard title="Cluster Networking Range & HTTP Proxy">
-                <ContainerAndServicesCIDRField />
+                <ContainerAndServicesCIDRField values={values} />
                 <HttpProxyField />
               </FormFieldCard>
 

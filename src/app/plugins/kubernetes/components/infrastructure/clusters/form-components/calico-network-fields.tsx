@@ -17,11 +17,52 @@ const calicoBlockSizeValidator = customValidator((value, formValues) => {
   return value > 20 && value < 32 && value > blockSize
 }, 'Calico Block Size must be greater than 20, less than 32 and not conflict with the Container CIDR')
 
+const calicoIpv6BlockSizeValidator = customValidator((value) => {
+  return value > 116 && value < 128
+}, 'Calico Block Size must be greater than 116 and less than 128')
+
 const calicoIpIpOptions = [
   { label: 'Always', value: 'Always' },
   { label: 'Cross Subnet', value: 'CrossSubnet' },
   { label: 'Never', value: 'Never' },
 ]
+
+export enum CalicoDetectionTypes {
+  FirstFound = 'first-found',
+  CanReach = 'can-reach',
+  Interface = 'interface',
+  SkipInterface = 'skip-interface',
+}
+
+const calicoDetectionOptions = [
+  { label: 'First Found', value: CalicoDetectionTypes.FirstFound },
+  { label: 'can-reach=<IP OR DOMAIN NAME>', value: CalicoDetectionTypes.CanReach },
+  { label: 'interface=<IFACE NAME REGEX LIST>', value: CalicoDetectionTypes.Interface },
+  { label: 'skip-interface=<IFACE NAME REGEX LIST>', value: CalicoDetectionTypes.SkipInterface },
+]
+const detectionMethodLabels = {
+  'can-reach': 'IP or Domain Name',
+  interface: 'IFace Name Regex List',
+  'skip-interface': 'IFace Name Regex List',
+}
+
+const CalicoDetectionMethods = ({ values }) => (
+  <>
+    <PicklistField
+      id="calicoDetectionMethod"
+      label="Interface Detection Method"
+      options={calicoDetectionOptions}
+      required
+    />
+    {values.calicoDetectionMethod !== 'first-found' && (
+      <TextField
+        id="calicoDetectionMethodValue"
+        label={detectionMethodLabels[values.calicoDetectionMethod]}
+        required
+      />
+    )}
+  </>
+)
 
 const CalicoNetworkFields = ({ values }) => (
   <>
@@ -32,25 +73,22 @@ const CalicoNetworkFields = ({ values }) => (
       info={calicoIpIPHelpText[values.calicoIpIpMode] || ''}
       required
     />
-    {values.networkStack === NetworkStackTypes.IPv6 ? (
-      <CheckboxField
-        id="calicoIPv6PoolNatOutgoing"
-        label="NAT Outgoing"
-        info="Packets destined outside the POD network will be SNAT'd using the node's IP."
-      />
-    ) : (
-      <CheckboxField
-        id="calicoNatOutgoing"
-        label="NAT Outgoing"
-        info="Packets destined outside the POD network will be SNAT'd using the node's IP."
-      />
-    )}
+    <CalicoDetectionMethods values={values} />
+    <CheckboxField
+      id="calicoNatOutgoing"
+      label="NAT Outgoing"
+      info="Packets destined outside the POD network will be SNAT'd using the node's IP."
+    />
     <TextField
-      id="calicoV4BlockSize"
+      id="calicoBlockSize"
       label="Block Size"
       info="Block size determines how many Pod's can run per node vs total number of nodes per cluster. Example /22 enables 1024 IPs per node, and a maximum of 64 nodes. Block size must be greater than 20 and less than 32 and not conflict with the Contain CIDR"
       required
-      validations={[calicoBlockSizeValidator]}
+      validations={[
+        values.networkStack === NetworkStackTypes.IPv6
+          ? calicoIpv6BlockSizeValidator
+          : calicoBlockSizeValidator,
+      ]}
     />
     <TextField
       id="mtuSize"
