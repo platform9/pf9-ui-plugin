@@ -19,7 +19,6 @@ import { sessionActions } from 'core/session/sessionReducers'
 import clsx from 'clsx'
 import Input from 'core/elements/input'
 import Button from 'core/elements/button'
-import LoginMethodPicklist, { LoginMethodTypes } from './LoginMethodPicklist'
 import axios from 'axios'
 
 const styles = (theme) => ({
@@ -53,19 +52,20 @@ const styles = (theme) => ({
     padding: '40px 40px 20px',
     backgroundColor: theme.palette.grey[800],
     display: 'grid',
-    gridTemplateRows: '30px 1fr 45px',
+    gridTemplateRows: '1fr 45px',
     alignItems: 'center',
     justifyItems: 'center',
     gridGap: theme.spacing(2),
   },
   form: {
-    width: 280,
+    width: 420,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
     height: '100%',
   },
   textField: {
+    width: 280,
     '& input': {
       backgroundColor: `${theme.palette.grey[800]} !important`,
     },
@@ -86,11 +86,15 @@ const styles = (theme) => ({
     maxWidth: '100%',
   },
   signinButton: {
-    minHeight: 54,
+    minHeight: 45,
+    alignSelf: 'center',
+    width: 280,
   },
   forgotPwd: {
     marginTop: 4,
     textAlign: 'right',
+    display: 'inline-block',
+    width: 280,
     '& a': {
       ...theme.typography.caption2,
     },
@@ -105,15 +109,36 @@ const styles = (theme) => ({
     fontWeight: 'normal',
   },
   mfaContainer: {
-    display: 'flex',
-    flexDirection: 'column',
     marginBottom: theme.spacing(),
+    textAlign: 'center',
   },
   fields: {
     flexGrow: 1,
     display: 'flex',
-    flexFlow: 'column',
+    flexDirection: 'column',
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginMethods: {
+    display: 'flex',
+    marginTop: theme.spacing(3),
+  },
+  loginMethod: {
+    flexGrow: 1,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    color: theme.palette.grey['000'],
+    borderBottomStyle: 'solid',
+    borderBottomColor: theme.palette.grey['000'],
+    '&.active': {
+      borderBottomWidth: 3,
+    },
+    '&.inactive': {
+      borderBottomWidth: 1,
+      color: theme.palette.grey[500],
+      marginBottom: 1,
+      cursor: 'pointer',
+    },
   },
 })
 
@@ -125,6 +150,11 @@ interface Props {
 }
 
 const { keystone } = ApiClient.getInstance()
+
+enum LoginMethodTypes {
+  Local = 'local',
+  SSO = 'sso',
+}
 
 const authMethods = {
   [LoginMethodTypes.Local]: async (username, password) => keystone.authenticate(username, password),
@@ -311,23 +341,33 @@ class LoginPage extends React.PureComponent<Props> {
             />
           </div>
           <div className={clsx('right-pane', classes.formPane)}>
-            <img
-              alt="Platform9"
-              src={pathJoin(imageUrlRoot, 'primary-logo.svg')}
-              className={classes.img}
-            />
             <form className={classes.form} onSubmit={this.performLogin}>
               <Text variant="h3" className={classes.formTitle} align="center">
                 Sign In
               </Text>
+              <div className={classes.loginMethods}>
+                <Text
+                  className={clsx(
+                    classes.loginMethod,
+                    loginMethod === LoginMethodTypes.Local ? 'active' : 'inactive',
+                  )}
+                  onClick={() => this.setState({ loginMethod: LoginMethodTypes.Local })}
+                  variant="subtitle2"
+                >
+                  Local Credentials
+                </Text>
+                <Text
+                  className={clsx(
+                    classes.loginMethod,
+                    loginMethod === LoginMethodTypes.SSO ? 'active' : 'inactive',
+                  )}
+                  onClick={() => this.setState({ loginMethod: LoginMethodTypes.SSO })}
+                  variant="subtitle2"
+                >
+                  Single Sign On
+                </Text>
+              </div>
               <div className={classes.fields}>
-                <LoginMethodPicklist
-                  id="loginMethod"
-                  label="Login Method"
-                  variant="dark"
-                  value={loginMethod}
-                  onChange={this.updateLoginMethod}
-                />
                 {loginMethod === LoginMethodTypes.Local && (
                   <>
                     {this.renderInputfield()}
@@ -342,17 +382,17 @@ class LoginPage extends React.PureComponent<Props> {
                     </div>
                   </>
                 )}
+                {loginFailed && <Alert small variant="error" message="Login failed" />}
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className={classes.signinButton}
+                  variant="light"
+                  color="primary"
+                >
+                  {loading ? 'Attempting login...' : 'Sign In'}
+                </Button>
               </div>
-              {loginFailed && <Alert small variant="error" message="Login failed" />}
-              <Button
-                type="submit"
-                disabled={loading}
-                className={classes.signinButton}
-                variant="light"
-                color="primary"
-              >
-                {loading ? 'Attempting login...' : 'Sign In'}
-              </Button>
             </form>
             {this.renderFooter()}
           </div>
