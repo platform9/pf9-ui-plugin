@@ -85,6 +85,12 @@ const styles = (theme) => ({
   img: {
     maxWidth: '100%',
   },
+  logo: {
+    width: 200,
+    position: 'fixed',
+    top: 'calc(50% - 360px)',
+    right: 'calc(50% - 100px)',
+  },
   signinButton: {
     minHeight: 45,
     alignSelf: 'center',
@@ -334,6 +340,11 @@ class LoginPage extends React.PureComponent<Props> {
 
     return (
       <section className={clsx('login-page', classes.page)}>
+        <img
+          alt="Platform9"
+          src={pathJoin(imageUrlRoot, 'primary-logo.svg')}
+          className={classes.logo}
+        />
         <article className={classes.container}>
           <div className={clsx('left-pane', classes.managementPlane)}>
             <img
