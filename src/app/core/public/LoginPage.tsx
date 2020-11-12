@@ -30,6 +30,7 @@ const styles = (theme) => ({
     right: 0,
     backgroundColor: theme.palette.grey[900],
     display: 'flex',
+    flexFlow: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -87,9 +88,7 @@ const styles = (theme) => ({
   },
   logo: {
     width: 200,
-    position: 'fixed',
-    top: 'calc(50% - 360px)',
-    right: 'calc(50% - 100px)',
+    marginBottom: theme.spacing(6),
   },
   signinButton: {
     minHeight: 45,
