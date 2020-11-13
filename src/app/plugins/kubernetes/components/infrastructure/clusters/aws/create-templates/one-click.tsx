@@ -40,6 +40,7 @@ export const initialContext = {
   prometheusMonitoringEnabled: true,
   usePf9Domain: false,
   networkStack: 'ipv4',
+  privileged: true,
 }
 
 const columns = [
