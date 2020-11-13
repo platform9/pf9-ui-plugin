@@ -28,7 +28,8 @@ const TenantChooser = (props) => {
       return selectedTenantName
     }
     if (currentTenant) {
-      return pipe(find(propEq('id', currentTenant)), prop('name'))(tenants)
+      // The || is just in case the currentTenant in prefs no longer exists
+      return pipe(find(propEq('id', currentTenant)), prop('name'))(tenants) || head(tenants)?.name
     }
     // match setupSession from AppContainer, set to service tenant if it exists
     const tenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
