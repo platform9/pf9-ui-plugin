@@ -69,7 +69,7 @@ interface WizardAddonContext {
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 const AddonContext = React.createContext<WizardAddonContext>({} as WizardAddonContext)
 
-export const AddonTogglers = ({ addons }) => {
+export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
   const { setAddonContext } = useContext(AddonContext)
 
   useEffect(() => {
@@ -79,7 +79,11 @@ export const AddonTogglers = ({ addons }) => {
     <Suspense fallback="loading...">
       {addons.map((addon) => {
         const Addon = getAddonComponent(addon, 'toggler')
-        return Addon && <Addon key={addon} />
+        return (
+          Addon && (
+            <Addon key={addon} wizardContext={wizardContext} setWizardContext={setWizardContext} />
+          )
+        )
       })}
     </Suspense>
   )

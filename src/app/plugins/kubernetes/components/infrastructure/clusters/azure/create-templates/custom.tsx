@@ -319,13 +319,18 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 {/* Allow workloads on masters */}
                 <AllowWorkloadsOnMasterField setWizardContext={setWizardContext} />
 
-                <PrivilegedField wizardContext={wizardContext} />
+                <PrivilegedField
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <Divider className={classes.divider} />
 
                 {/* Managed Add-Ons */}
                 <Text variant="caption1">Cluster Add-Ons</Text>
                 <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
                   addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
                 />
               </FormFieldCard>

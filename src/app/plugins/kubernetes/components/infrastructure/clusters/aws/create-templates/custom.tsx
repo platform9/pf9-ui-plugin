@@ -324,13 +324,18 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 {/* Workloads on masters */}
                 <AllowWorkloadsonMasterField setWizardContext={setWizardContext} />
 
-                <PrivilegedField wizardContext={wizardContext} />
+                <PrivilegedField
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <Divider className={classes.divider} />
 
                 {/* Managed Add-Ons */}
                 <Text variant="caption1">Managed Add-Ons</Text>
                 <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
                   addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
                 />
               </FormFieldCard>
