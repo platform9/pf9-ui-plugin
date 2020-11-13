@@ -19,10 +19,11 @@ import KubernetesVersion from '../../form-components/kubernetes-version'
 
 import Theme from 'core/themes/model'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
+import { CalicoDetectionTypes } from '../../form-components/calico-network-fields'
 
 export const initialContext = {
-  containersCidr: '10.20.0.0/16',
-  servicesCidr: '10.21.0.0/16',
+  containersCidr: '10.20.0.0/22',
+  servicesCidr: '10.21.0.0/22',
   networkPlugin: 'calico',
   calicoIpIpMode: 'Always',
   calicoNatOutgoing: true,
@@ -38,6 +39,10 @@ export const initialContext = {
   tags: [],
   appCatalogEnabled: false,
   kubernetesVersion: 'v1.19',
+  networkStack: 'ipv4',
+  calicoIPv4: 'autodetect',
+  calicoIPv6: 'none',
+  calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
 }
 
 const columns = [

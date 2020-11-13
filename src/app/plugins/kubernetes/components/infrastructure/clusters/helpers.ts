@@ -8,6 +8,8 @@ import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import { trackEvent } from 'utils/tracking'
 import { CloudProviders } from '../cloudProviders/model'
 import { hasConvergingNodes } from './ClusterStatusUtils'
+import { NetworkStackTypes } from './constants'
+import { CalicoDetectionTypes } from './form-components/calico-network-fields'
 import { ClusterCreateTypes } from './model'
 
 export const clusterIsHealthy = (cluster) =>
@@ -86,6 +88,15 @@ export const getEtcdBackupPayload = (path, data) =>
     : {
         isEtcdBackupEnabled: 0,
       }
+
+const getMetalLbCidr = (keyValueArr = []) =>
+  keyValueArr.map(({ key, value }) => `${key}-${value}`).join()
+
+const getCalicoDetectionMethod = ({ calicoDetectionMethod, calicoDetectionMethodValue }) => {
+  if (calicoDetectionMethod === CalicoDetectionTypes.FirstFound) return calicoDetectionMethod
+
+  return `${calicoDetectionMethod}=${calicoDetectionMethodValue}`
+}
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
@@ -262,11 +273,25 @@ const createGenericCluster = async (body, data) => {
   if (data.httpProxy) {
     body.httpProxy = data.httpProxy
   }
+
+  // Calico is required when ipv6 is selected
+  if (data.networkStack === NetworkStackTypes.IPv6) {
+    body.calicoIPv6PoolCidr = body.containersCidr
+    body.ipv6 = true
+    body.calicoIPv6DetectionMethod = getCalicoDetectionMethod(data)
+    body.calicoIPv6PoolBlockSize = data.calicoBlockSize
+    body.calicoIPv6PoolNatOutgoing = data.calicoNatOutgoing
+  }
+
   if (data.networkPlugin === 'calico') {
     body.mtuSize = data.mtuSize
     body.calicoIpIpMode = data.calicoIpIpMode
-    body.calicoNatOutgoing = data.calicoNatOutgoing
-    body.calicoV4BlockSize = data.calicoV4BlockSize
+
+    if (data.networkStack === NetworkStackTypes.IPv4) {
+      body.calicoNatOutgoing = data.calicoNatOutgoing
+      body.calicoV4BlockSize = data.calicoBlockSize
+      body.calicoIPv4DetectionMethod = getCalicoDetectionMethod(data)
+    }
   }
   body.networkPlugin = data.networkPlugin
   body.runtimeConfig = {
@@ -293,6 +318,3 @@ const createGenericCluster = async (body, data) => {
   // We need to perform a GET afterwards and return that to add to the cache.
   return qbert.getClusterDetails(uuid)
 }
-
-const getMetalLbCidr = (keyValueArr = []) =>
-  keyValueArr.map(({ key, value }) => `${key}-${value}`).join()

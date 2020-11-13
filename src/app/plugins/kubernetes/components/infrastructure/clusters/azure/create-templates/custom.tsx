@@ -54,8 +54,8 @@ export const initialContext = {
   enableCAS: false,
   usePf9Domain: true,
   network: 'newNetwork',
-  containersCidr: '10.20.0.0/16',
-  servicesCidr: '10.21.0.0/16',
+  containersCidr: '10.20.0.0/22',
+  servicesCidr: '10.21.0.0/22',
   networkPlugin: 'flannel',
   runtimeConfigOption: 'default',
   useAllAvailabilityZones: true,
@@ -65,6 +65,7 @@ export const initialContext = {
   prometheusMonitoringEnabled: true,
   tags: [],
   appCatalogEnabled: false,
+  networkStack: 'ipv4',
 }
 
 const columns = [
@@ -390,7 +391,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <ApiFqdnField />
 
                 {/* Containers CIDR and Services CIDR */}
-                <ContainerAndServicesCidrField />
+                <ContainerAndServicesCidrField values={values} />
 
                 {/* HTTP proxy */}
                 <HttpProxyField />

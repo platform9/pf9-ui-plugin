@@ -51,8 +51,8 @@ export const initialContext = {
   enableCAS: false,
   usePf9Domain: false,
   network: 'newPublic',
-  containersCidr: '10.20.0.0/16',
-  servicesCidr: '10.21.0.0/16',
+  containersCidr: '10.20.0.0/22',
+  servicesCidr: '10.21.0.0/22',
   networkPlugin: 'flannel',
   mtuSize: 1440,
   runtimeConfigOption: 'default',
@@ -63,6 +63,7 @@ export const initialContext = {
   prometheusMonitoringEnabled: true,
   tags: [],
   appCatalogEnabled: false,
+  networkStack: 'ipv4',
 }
 
 const columns = [
@@ -381,7 +382,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
               <FormFieldCard title="Cluster Networking Range & HTTP Proxy">
                 {/* Containers & Services CIDR */}
-                <ContainerAndServicesCidr />
+                <ContainerAndServicesCidr values={values} />
 
                 {/* HTTP proxy */}
                 <HttpProxyField />

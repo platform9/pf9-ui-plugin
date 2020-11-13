@@ -5,6 +5,7 @@ import VipInterfaceChooser from '../bareos/VipInterfaceChooser'
 import { pf9PmkArchitectureDigLink } from 'k8s/links'
 import { IconInfo } from 'core/components/validatedForm/Info'
 import BulletList from 'core/components/BulletList'
+import { ipValidators } from './validators'
 
 const MasterVipFields = ({ withInfo = false, wizardContext }) => (
   <>
@@ -35,6 +36,7 @@ const MasterVipFields = ({ withInfo = false, wizardContext }) => (
           for help on VIP operations and configuration
         </div>
       }
+      validations={[ipValidators?.[wizardContext.networkStack]?.ipValidator]}
       required
     />
 
