@@ -127,6 +127,8 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
                 'networkPluginOperator',
                 'kubevirtPluginOperator',
               ]}
+              wizardContext={wizardContext}
+              setWizardContext={setWizardContext}
             />
           </FormFieldCard>
         </ValidatedForm>
