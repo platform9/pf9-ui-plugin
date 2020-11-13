@@ -120,7 +120,13 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Add-Ons</Text>
             <AddonTogglers
-              addons={['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled']}
+              addons={[
+                'etcdBackup',
+                'enableMetallbLayer2',
+                'prometheusMonitoringEnabled',
+                'networkPluginOperator',
+                'kubevirtPluginOperator',
+              ]}
             />
           </FormFieldCard>
         </ValidatedForm>

@@ -1,6 +1,9 @@
 import React, { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { memoizedDep } from 'utils/misc'
 
+const NetworkPluginOperator = React.lazy(async () => import('./network-plugin-operator'))
+const KubevirtPluginOperator = React.lazy(async () => import('./kubevirt-plugin-operator'))
+
 const PrometheusMonitoringField = React.lazy(async () => import('./prometheus-monitoring'))
 const PrometheusMonitoringAddonField = React.lazy(async () =>
   import('./prometheus-monitoring').then((module) => ({
@@ -38,6 +41,14 @@ const AutoScalingAddonFields = React.lazy(async () =>
 )
 
 const addonMap = {
+  networkPluginOperator: {
+    toggler: NetworkPluginOperator,
+    details: { component: null },
+  },
+  kubevirtPluginOperator: {
+    toggler: KubevirtPluginOperator,
+    details: { component: null },
+  },
   etcdBackup: {
     toggler: EtcdBackupFields,
     details: { component: EdcdBackupAddonFields },
