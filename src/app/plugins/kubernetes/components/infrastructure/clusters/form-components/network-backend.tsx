@@ -1,5 +1,7 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
+import { CalicoDetectionTypes } from './calico-network-fields'
+import { NetworkStackTypes } from '../constants'
 
 export enum NetworkBackendTypes {
   Flannel = 'flannel',
@@ -12,15 +14,15 @@ const networkBackendOptions = [
   // { label: 'Canal (experimental)', value: 'canal' },
 ]
 
-const handleNetworkBackendChange = (option, wizardContext) => {
-  const payload = {
+export const handleNetworkBackendChange = (option, wizardContext) => {
+  return {
     networkPlugin: option,
     privileged: option === 'calico' ? true : wizardContext.privileged,
     calicoIpIpMode: option === 'calico' ? 'Always' : undefined,
     calicoNatOutgoing: option === 'calico' ? true : undefined,
     calicoV4BlockSize: option === 'calico' ? '24' : undefined,
+    calicoDetectionMethod: option === 'calico' ? CalicoDetectionTypes.FirstFound : undefined,
   }
-  return payload
 }
 
 const NetworkBackendField = ({
@@ -33,7 +35,10 @@ const NetworkBackendField = ({
     label="Network backend"
     onChange={(value) => setWizardContext(handleNetworkBackendChange(value, wizardContext))}
     options={options}
-    info=""
+    info={
+      wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
+    }
+    disabled={wizardContext.networkStack !== NetworkStackTypes.IPv4}
     required
   />
 )

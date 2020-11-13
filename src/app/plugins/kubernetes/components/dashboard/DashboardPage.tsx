@@ -330,13 +330,6 @@ const DashboardPage = () => {
           <StatusCard key={report.route} {...report} className={classes[report.entity]} />
         ))}
       </div>
-      {/* {!isLoading && (
-        <div className={classes.dashboardMosaic}>
-          {reportsWithPerms(reports, session.userDetails.role).map((report) => (
-            <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-          ))}
-        </div>
-      )} */}
     </section>
   )
 }
