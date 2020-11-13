@@ -11,16 +11,29 @@ import { applicationLoadBalancer } from 'k8s/links'
 import BulletList from 'core/components/BulletList'
 import { ipValidators } from './validators'
 
-const MetalLbField = ({ label = 'Enable MetalLB' }) => (
+const handleMetallbChange = (value, wizardContext) => ({
+  enableMetallb: value,
+  privileged: value ? true : wizardContext?.privileged,
+})
+
+const MetalLbField = ({ label = 'Enable MetalLB', wizardContext, setWizardContext }) => (
   <CheckboxField
     id="enableMetallb"
     label={label}
     infoPlacement="right-end"
+    onChange={(value) => setWizardContext(handleMetallbChange(value, wizardContext))}
+    value={wizardContext?.enableMetallb}
     info="Platform9 uses MetalLB for bare metal service level load balancing. Enabling MetalLB will provide the ability to create services of type load-balancer."
   />
 )
 
-export const MetalLbLayer2Field = () => <MetalLbField label="Deploy MetalLB - Layer 2 Mode " />
+export const MetalLbLayer2Field = ({ wizardContext, setWizardContext }) => (
+  <MetalLbField
+    label="Deploy MetalLB - Layer 2 Mode"
+    wizardContext={wizardContext}
+    setWizardContext={setWizardContext}
+  />
+)
 export const MetalLbAddonLayer2Field = () => (
   <MetalLbAddonCard>
     <MetalLbCidrField />
