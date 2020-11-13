@@ -3,12 +3,19 @@ import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import { ipValidators } from './validators'
+import { NetworkStackTypes } from '../constants'
 
 const calicoIpIPHelpText = {
   Always: 'Encapsulates POD traffic in IP-in-IP between nodes.',
   CrossSubnet:
     'Encapsulation when nodes span subnets and cross routers that may drop native POD traffic, this is not required between nodes with L2 connectivity.',
   Never: 'Disables IP in IP Encapsulation.',
+}
+const calicoBlockSizeTooltip = {
+  [NetworkStackTypes.IPv6]:
+    'Block size to use for the IPv6 POOL created at startup. Block size for IPv6 should be in the range 116-128',
+  [NetworkStackTypes.IPv4]:
+    "Block size determines how many Pod's can run per node vs total number of nodes per cluster. Example /22 enables 1024 IPs per node, and a maximum of 64 nodes. Block size must be greater than 20 and less than 32 and not conflict with the Contain CIDR",
 }
 
 const calicoIpIpOptions = [
@@ -47,6 +54,7 @@ const CalicoDetectionMethods = ({ values }) => (
     {values.calicoDetectionMethod !== 'first-found' && (
       <TextField
         id="calicoDetectionMethodValue"
+        info="Use the first valid IP address on the first enumerated interface (same logic as first-found above) that does NOT match with any of the specified interface name regexes. Regexes are separated by commas (e.g. eth.,enp0s.)."
         label={detectionMethodLabels[values.calicoDetectionMethod]}
         required
       />
@@ -72,7 +80,7 @@ const CalicoNetworkFields = ({ values }) => (
     <TextField
       id="calicoBlockSize"
       label="Block Size"
-      info="Block size determines how many Pod's can run per node vs total number of nodes per cluster. Example /22 enables 1024 IPs per node, and a maximum of 64 nodes. Block size must be greater than 20 and less than 32 and not conflict with the Contain CIDR"
+      info={calicoBlockSizeTooltip?.[values.networkStack]}
       required
       validations={[ipValidators?.[values.networkStack]?.blockSizeValidator]}
     />

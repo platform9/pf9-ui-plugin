@@ -35,7 +35,9 @@ const NetworkBackendField = ({
     label="Network backend"
     onChange={(value) => setWizardContext(handleNetworkBackendChange(value, wizardContext))}
     options={options}
-    info=""
+    info={
+      wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
+    }
     disabled={wizardContext.networkStack !== NetworkStackTypes.IPv4}
     required
   />
