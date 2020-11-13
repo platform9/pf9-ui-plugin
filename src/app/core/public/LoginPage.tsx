@@ -3,7 +3,7 @@ import ApiClient from 'api-client/ApiClient'
 import { Checkbox, FormControlLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
-import { compose } from 'utils/fp'
+import { compose, pathStrOr } from 'utils/fp'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
@@ -19,6 +19,7 @@ import { sessionActions } from 'core/session/sessionReducers'
 import clsx from 'clsx'
 import Input from 'core/elements/input'
 import Button from 'core/elements/button'
+import axios from 'axios'
 
 const styles = (theme) => ({
   page: {
@@ -29,6 +30,7 @@ const styles = (theme) => ({
     right: 0,
     backgroundColor: theme.palette.grey[900],
     display: 'flex',
+    flexFlow: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -48,26 +50,29 @@ const styles = (theme) => ({
     margin: '0 80px',
   },
   formPane: {
-    padding: '40px 40px 20px',
+    padding: '48px 24px 20px',
     backgroundColor: theme.palette.grey[800],
     display: 'grid',
-    gridTemplateRows: '30px 1fr 15px',
+    gridTemplateRows: '1fr 45px',
     alignItems: 'center',
     justifyItems: 'center',
+    gridGap: theme.spacing(2),
   },
   form: {
-    width: 280,
+    width: 420,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
+    height: '100%',
   },
   textField: {
+    width: 280,
     '& input': {
       backgroundColor: `${theme.palette.grey[800]} !important`,
     },
   },
   emailInput: {
-    marginTop: 35,
+    marginTop: 20,
     marginBottom: 20,
   },
   checkbox: {
@@ -81,12 +86,20 @@ const styles = (theme) => ({
   img: {
     maxWidth: '100%',
   },
+  logo: {
+    width: 200,
+    marginBottom: theme.spacing(6),
+  },
   signinButton: {
-    minHeight: 54,
+    minHeight: 45,
+    alignSelf: 'center',
+    width: 280,
   },
   forgotPwd: {
     marginTop: 4,
     textAlign: 'right',
+    display: 'inline-block',
+    width: 280,
     '& a': {
       ...theme.typography.caption2,
     },
@@ -101,10 +114,36 @@ const styles = (theme) => ({
     fontWeight: 'normal',
   },
   mfaContainer: {
-    minHeight: 80,
+    marginBottom: theme.spacing(),
+    textAlign: 'center',
+  },
+  fields: {
+    flexGrow: 1,
     display: 'flex',
     flexDirection: 'column',
-    marginBottom: theme.spacing(),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginMethods: {
+    display: 'flex',
+    marginTop: theme.spacing(3),
+  },
+  loginMethod: {
+    flexGrow: 1,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    color: theme.palette.grey['000'],
+    borderBottomStyle: 'solid',
+    borderBottomColor: theme.palette.grey['000'],
+    '&.active': {
+      borderBottomWidth: 3,
+    },
+    '&.inactive': {
+      borderBottomWidth: 1,
+      color: theme.palette.grey[500],
+      marginBottom: 1,
+      cursor: 'pointer',
+    },
   },
 })
 
@@ -115,14 +154,45 @@ interface Props {
   classes: any
 }
 
+const { keystone } = ApiClient.getInstance()
+
+enum LoginMethodTypes {
+  Local = 'local',
+  SSO = 'sso',
+}
+
+const authMethods = {
+  [LoginMethodTypes.Local]: async (username, password) => keystone.authenticate(username, password),
+  [LoginMethodTypes.SSO]: async (_u, _p) => keystone.authenticateSso(),
+}
+
 @(connect() as any)
 class LoginPage extends React.PureComponent<Props> {
   state = {
     username: '',
     password: '',
+    loginMethod: LoginMethodTypes.Local,
     MFAcheckbox: false,
     loginFailed: false,
     loading: false,
+    ssoEnabled: false,
+  }
+
+  componentDidMount() {
+    this.setSso()
+  }
+
+  setSso = async () => {
+    const features = await axios.get('/clarity/features.json').catch(() => null)
+    const sso = pathStrOr(false, 'data.experimental.sso', features)
+    if (sso) {
+      this.setState({ ssoEnabled: true })
+      this.setState({ loginMethod: LoginMethodTypes.SSO })
+    }
+  }
+
+  updateLoginMethod = (event) => {
+    this.setState({ loginMethod: event.target.value })
   }
 
   updateValue = (key) => (event) => {
@@ -132,11 +202,15 @@ class LoginPage extends React.PureComponent<Props> {
   performLogin = async (event) => {
     event.preventDefault()
     const { onAuthSuccess } = this.props
-    const { username, password } = this.state
-    const { keystone } = ApiClient.getInstance()
+    const { username: loginUsername, password, loginMethod } = this.state
 
     this.setState({ loginFailed: false, loading: true })
-    const { unscopedToken, expiresAt, issuedAt } = await keystone.authenticate(username, password)
+
+    const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[loginMethod](
+      loginUsername,
+      password,
+    )
+    const isSsoToken = loginMethod === LoginMethodTypes.SSO
 
     if (!unscopedToken) {
       return this.setState({ loading: false, loginFailed: true })
@@ -160,7 +234,7 @@ class LoginPage extends React.PureComponent<Props> {
       duDomain: window.location.origin,
     })
 
-    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
+    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt, isSsoToken })
     return this.setState(
       {
         loading: false,
@@ -261,10 +335,15 @@ class LoginPage extends React.PureComponent<Props> {
 
   render() {
     const { classes } = this.props
-    const { loginFailed, loading } = this.state
+    const { loginFailed, loading, loginMethod, ssoEnabled } = this.state
 
     return (
       <section className={clsx('login-page', classes.page)}>
+        <img
+          alt="Platform9"
+          src={pathJoin(imageUrlRoot, 'primary-logo.svg')}
+          className={classes.logo}
+        />
         <article className={classes.container}>
           <div className={clsx('left-pane', classes.managementPlane)}>
             <img
@@ -274,35 +353,60 @@ class LoginPage extends React.PureComponent<Props> {
             />
           </div>
           <div className={clsx('right-pane', classes.formPane)}>
-            <img
-              alt="Platform9"
-              src={pathJoin(imageUrlRoot, 'primary-logo.svg')}
-              className={classes.img}
-            />
             <form className={classes.form} onSubmit={this.performLogin}>
               <Text variant="h3" className={classes.formTitle} align="center">
                 Sign In
               </Text>
-              {this.renderInputfield()}
-              <Text className={classes.forgotPwd} gutterBottom>
-                <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
-                  Forgot password?
-                </SimpleLink>
-              </Text>
-              <div className={classes.mfaContainer}>
-                {this.renderMFACheckbox()}
-                {this.state.MFAcheckbox && this.renderMFAInput()}
+              {ssoEnabled && (
+                <div className={classes.loginMethods}>
+                  <Text
+                    className={clsx(
+                      classes.loginMethod,
+                      loginMethod === LoginMethodTypes.Local ? 'active' : 'inactive',
+                    )}
+                    onClick={() => this.setState({ loginMethod: LoginMethodTypes.Local })}
+                    variant="subtitle2"
+                  >
+                    Local Credentials
+                  </Text>
+                  <Text
+                    className={clsx(
+                      classes.loginMethod,
+                      loginMethod === LoginMethodTypes.SSO ? 'active' : 'inactive',
+                    )}
+                    onClick={() => this.setState({ loginMethod: LoginMethodTypes.SSO })}
+                    variant="subtitle2"
+                  >
+                    Single Sign On
+                  </Text>
+                </div>
+              )}
+              <div className={classes.fields}>
+                {loginMethod === LoginMethodTypes.Local && (
+                  <>
+                    {this.renderInputfield()}
+                    <Text className={classes.forgotPwd} gutterBottom>
+                      <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
+                        Forgot password?
+                      </SimpleLink>
+                    </Text>
+                    <div className={classes.mfaContainer}>
+                      {this.renderMFACheckbox()}
+                      {this.state.MFAcheckbox && this.renderMFAInput()}
+                    </div>
+                  </>
+                )}
+                {loginFailed && <Alert small variant="error" message="Login failed" />}
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className={classes.signinButton}
+                  variant="light"
+                  color="primary"
+                >
+                  {loading ? 'Attempting login...' : 'Sign In'}
+                </Button>
               </div>
-              {loginFailed && <Alert small variant="error" message="Login failed" />}
-              <Button
-                type="submit"
-                disabled={loading}
-                className={classes.signinButton}
-                variant="light"
-                color="primary"
-              >
-                {loading ? 'Attempting login...' : 'Sign In'}
-              </Button>
             </form>
             {this.renderFooter()}
           </div>
