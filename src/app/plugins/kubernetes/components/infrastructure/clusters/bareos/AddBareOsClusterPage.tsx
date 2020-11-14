@@ -14,6 +14,10 @@ import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import { CloudProviders } from '../../cloudProviders/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import { getFormTitle } from '../helpers'
+import { useSelector } from 'react-redux'
+import { RootState } from 'app/store'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { prop } from 'ramda'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -53,6 +57,8 @@ const AddBareOsClusterPage = () => {
   const [activeView, setActiveView] = useState<{ ViewComponent: FC<any> }>(null)
   const [formTitle, setFormTitle] = useState<string>('')
   const [initialContext, setInitialContext] = useState(null)
+
+  const { features } = useSelector<RootState, SessionState>(prop(sessionStoreKey)) || {}
 
   useEffect(() => {
     async function loadFile(name, provider) {
@@ -111,6 +117,7 @@ const AddBareOsClusterPage = () => {
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
                   onNext={onNext}
+                  experimentalFeatures={features?.experimental?.earlyAccessEnabled === true}
                 />
               )}
             </WizardMeta>
