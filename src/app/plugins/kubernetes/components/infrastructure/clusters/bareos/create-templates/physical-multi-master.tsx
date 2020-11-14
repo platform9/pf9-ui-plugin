@@ -117,7 +117,13 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
             <AddonTogglers
               wizardContext={wizardContext}
               setWizardContext={setWizardContext}
-              addons={['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled']}
+              addons={[
+                'etcdBackup',
+                'enableMetallbLayer2',
+                'prometheusMonitoringEnabled',
+                'networkPluginOperator',
+                'kubevirtPluginOperator',
+              ]}
             />
           </FormFieldCard>
         </ValidatedForm>

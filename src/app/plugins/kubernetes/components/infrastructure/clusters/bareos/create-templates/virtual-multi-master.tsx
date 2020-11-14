@@ -115,9 +115,15 @@ const VirtualMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Add-Ons</Text>
             <AddonTogglers
+              addons={[
+                'etcdBackup',
+                'enableMetallbLayer2',
+                'prometheusMonitoringEnabled',
+                'networkPluginOperator',
+                'kubevirtPluginOperator',
+              ]}
               wizardContext={wizardContext}
               setWizardContext={setWizardContext}
-              addons={['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled']}
             />
           </FormFieldCard>
         </ValidatedForm>
