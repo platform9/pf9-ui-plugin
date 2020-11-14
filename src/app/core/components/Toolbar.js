@@ -38,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
   logo: {
     height: 29,
     marginLeft: 25,
+    cursor: 'pointer',
   },
 }))
 
