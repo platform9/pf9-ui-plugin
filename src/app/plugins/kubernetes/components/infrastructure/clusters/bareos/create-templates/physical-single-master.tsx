@@ -69,11 +69,20 @@ interface Props {
   wizardContext: any
   setWizardContext: any
   onNext: any
+  experimentalFeatures?: boolean
 }
 
-const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
+const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled']
+const clusterEarlyAccessAddons = ['networkPluginOperator', 'kubevirtPluginOperator']
+
+const PhysicalSingleMasterCluster: FC<Props> = ({
+  onNext,
+  experimentalFeatures = false,
+  ...props
+}) => {
   const { wizardContext, setWizardContext } = props
   const classes = useStyles({})
+  const addons = [].concat(clusterAddons, experimentalFeatures ? clusterEarlyAccessAddons : [])
   return (
     <>
       <WizardStep stepId="basic" label="Initial Setup" onNext={basicOnNext}>
@@ -102,9 +111,13 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           <FormFieldCard title="Cluster Settings">
             <KubernetesVersion />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Network Stack</Text>
-            <NetworkStack {...props} />
+            {experimentalFeatures && (
+              <>
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Network Stack</Text>
+                <NetworkStack {...props} />
+              </>
+            )}
 
             <Divider className={classes.divider} />
             <Text variant="caption1">Application & Container Settings</Text>
@@ -114,13 +127,7 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Add-Ons</Text>
             <AddonTogglers
-              addons={[
-                'etcdBackup',
-                'enableMetallbLayer2',
-                'prometheusMonitoringEnabled',
-                'networkPluginOperator',
-                'kubevirtPluginOperator',
-              ]}
+              addons={addons}
               wizardContext={wizardContext}
               setWizardContext={setWizardContext}
             />
