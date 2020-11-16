@@ -38,7 +38,7 @@ export const AddNamespaceForm = ({ onComplete }) => {
 export const options = {
   cacheKey: ActionDataKeys.Namespaces, // TODO I think this is namespaces
   FormComponent: AddNamespaceForm,
-  listUrl: '/ui/kubernetes/namespaces',
+  listUrl: '/ui/kubernetes/pods#namespaces',
   name: 'AddNamespace',
   title: 'Add Namespace',
 }
