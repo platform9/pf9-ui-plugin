@@ -34,6 +34,7 @@ import {
   canUpgradeCluster,
   notBusy,
 } from './helpers'
+import { IClusterSelector } from './model'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -73,7 +74,13 @@ const renderHealthStatus = (_, cluster) => (
 )
 const renderClusterLink = (links, { usage }) => <ClusterLinks links={links} usage={usage} />
 
-const ClusterLinks = ({ links, usage }) => {
+const ClusterLinks = ({
+  links,
+  usage,
+}: {
+  links: IClusterSelector['links']
+  usage: IClusterSelector['usage']
+}) => {
   const classes = useStyles()
   const hasGrafanaLink = !!usage && usage.grafanaLink
   if (!links && !hasGrafanaLink) {

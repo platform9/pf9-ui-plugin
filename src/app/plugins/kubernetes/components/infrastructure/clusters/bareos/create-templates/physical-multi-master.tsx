@@ -72,8 +72,10 @@ interface Props {
   onNext: any
   experimentalFeatures?: boolean
 }
+
 const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled']
 const clusterEarlyAccessAddons = ['networkPluginOperator', 'kubevirtPluginOperator']
+
 const PhysicalMultiMasterCluster: FC<Props> = ({
   onNext,
   experimentalFeatures = false,

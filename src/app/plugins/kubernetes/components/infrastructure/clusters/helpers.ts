@@ -55,13 +55,13 @@ export const getProgressPercent = async (clusterId) => {
 }
 
 export const getKubernetesVersion = async (clusterId) => {
-  // try {
-  //   const version = await qbert.getKubernetesVersion(clusterId)
-  //   return version && version.gitVersion && version.gitVersion.substr(1)
-  // } catch (e) {
-  //   console.warn(e)
-  //   return null
-  // }
+  try {
+    const version = await qbert.getKubernetesVersion(clusterId)
+    return version && version.gitVersion && version.gitVersion.substr(1)
+  } catch (e) {
+    console.warn(e)
+    return null
+  }
 }
 export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
   const matches = /(?<major>\d+).(?<minor>\d+).(?<patch>\d+)/.exec(version)

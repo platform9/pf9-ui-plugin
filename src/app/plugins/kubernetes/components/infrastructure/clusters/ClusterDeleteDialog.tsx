@@ -68,7 +68,6 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
                 variant="contained"
                 color="primary"
                 disabled={values?.clusterName !== cluster?.name}
-                onClick={handleDelete}
               >
                 Delete this cluster
               </Button>
