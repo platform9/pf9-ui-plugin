@@ -24,33 +24,27 @@ const ListPage = ({ ListContainer }) => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [namespaces, loading, reload] = useDataLoader(namespaceActions.list, params)
     return (
-      <PageContainer>
-        <Tabs>
-          <Tab value="namespace" label="Namespaces">
-            <ListContainer
-              loading={loading}
-              reload={reload}
-              data={namespaces}
-              getParamsUpdater={getParamsUpdater}
-              filters={
-                <ClusterPicklist
-                  selectFirst={false}
-                  onChange={getParamsUpdater('clusterId')}
-                  value={params.clusterId}
-                  onlyMasterNodeClusters
-                />
-              }
-              {...pick(listTablePrefs, params)}
-            />
-          </Tab>
-        </Tabs>
-      </PageContainer>
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={namespaces}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <ClusterPicklist
+            selectFirst={false}
+            onChange={getParamsUpdater('clusterId')}
+            value={params.clusterId}
+            onlyMasterNodeClusters
+          />
+        }
+        {...pick(listTablePrefs, params)}
+      />
     )
   }
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/namespaces/add',
+  addUrl: '/ui/kubernetes/pods/namespaces/add',
   addText: 'Add Namespace',
   columns: [
     { id: 'name', label: 'Name' },
