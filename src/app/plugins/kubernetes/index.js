@@ -359,7 +359,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
         { name: 'Pods', ...clarityLink('/podsK8s#pods') },
         { name: 'Deployments', ...clarityLink('/podsK8s#deployments') },
         { name: 'Services', ...clarityLink('/podsK8s#services') },
-        { name: 'Namespaces', ...clarityLink('//kubernetes/namespaces') },
+        { name: 'Namespaces', ...clarityLink('/kubernetes/namespaces') },
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
