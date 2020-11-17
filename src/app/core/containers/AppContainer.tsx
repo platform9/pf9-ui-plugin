@@ -82,7 +82,7 @@ const restoreSession = async (
 }
 
 const getUserDetails = async (activeTenant, isSsoToken) => {
-  const { user, role, scopedToken } = await keystone.changeProjectScope(activeTenant.id, isSsoToken)
+  const { user, scopedToken } = await keystone.changeProjectScope(activeTenant.id, isSsoToken)
   await keystone.resetCookie()
 
   /* eslint-disable */
@@ -99,7 +99,7 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
       window.analytics.identify()
     } else {
       window.analytics.identify(user.id, {
-        email: user.name,
+        email: user.email,
       })
     }
   }
@@ -108,12 +108,8 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
   if (sandbox) {
     injectDrift()
   }
-
   return {
-    userDetails: {
-      ...user,
-      role,
-    },
+    userDetails: user,
     scopedToken,
   }
 }

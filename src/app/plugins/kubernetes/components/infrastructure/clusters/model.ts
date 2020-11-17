@@ -66,14 +66,14 @@ export interface IClusterSelector extends IClusterAction {
   hasMasterNode: boolean
   highlyAvailable: boolean
   links: {
-    dashboard: string
+    dashboard: string | null
     kubeconfig: {
       cluster: IClusterAction
-    }
+    } | null
     cli: {
       host: string
       cluster: IClusterAction
-    }
+    } | null
   }
 }
 // export interface IClusterSelector {

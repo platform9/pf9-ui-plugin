@@ -83,7 +83,9 @@ export class Route<T extends OptionalGenericKVP = null> {
       const matches = url.pathname.match(/:([0-9_a-z]+)/gi) || []
       matches.forEach((match) => {
         const key = match.replace(':', '')
-        url.pathname = url.pathname.replace(match, fields[key])
+
+        // dont replace if there isn't a substitution
+        url.pathname = url.pathname.replace(match, fields[key] || match)
         delete fields[key]
       })
     }

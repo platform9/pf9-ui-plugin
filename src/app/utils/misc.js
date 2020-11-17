@@ -208,3 +208,12 @@ export const cleanupStacktrace = (stacktrace = '') =>
     .split('\n')
     .filter((res) => !!res.trim())
     .join('\n\n')
+
+export const compareArrByValue = (key, order = 'asc') => (a, b) => {
+  if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+    return 0
+  }
+  const comparison = a[key].localeCompare(b[key])
+
+  return order === 'desc' ? comparison * -1 : comparison
+}

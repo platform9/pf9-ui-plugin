@@ -6,6 +6,7 @@ import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withF
 import useDataLoader from 'core/hooks/useDataLoader'
 import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
+import { compareArrByValue } from 'utils/misc'
 
 const AzureSkuPicklist = forwardRef(
   ({ cloudProviderId, cloudProviderRegionId, selectedZones, filterByZones, ...rest }, ref) => {
@@ -20,6 +21,7 @@ const AzureSkuPicklist = forwardRef(
     const options = skus
       .filter(filterByZones ? zonesFilter : identity)
       .map((x) => ({ label: x.name, value: x.name }))
+      .sort(compareArrByValue('value'))
 
     return <Picklist {...rest} ref={ref} loading={loading} options={options} />
   },

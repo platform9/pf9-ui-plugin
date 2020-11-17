@@ -19,6 +19,7 @@ const useStyles = makeStyles<Theme, Partial<Props>>((theme: Theme) => ({
     alignItems: 'center',
     textTransform: 'uppercase',
     fontWeight: 600,
+    lineHeight: ({ fontSize }) => fontSize,
     height: ({ diameter }) => diameter,
     width: ({ diameter }) => diameter,
     fontSize: ({ fontSize }) => fontSize,

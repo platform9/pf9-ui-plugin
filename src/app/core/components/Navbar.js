@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   Button,
+  Tooltip,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
@@ -47,8 +48,14 @@ const styles = (theme) => ({
       margin: theme.spacing(2, 0),
       textDecorationColor: '#e6e6e6 !important',
     },
-    '& span, & i': {
+    '& h6, & span, & i': {
       color: '#e6e6e6',
+    },
+    '& h6': {
+      width: '100%',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
     },
     '& button': {
       backgroundColor: '#f3f3f4',
@@ -634,9 +641,11 @@ class Navbar extends PureComponent {
           <SimpleLink src={helpUrl} className={classes.helpLink}>
             <FontAwesomeIcon>question-circle</FontAwesomeIcon> <span>Need Help?</span>
           </SimpleLink>
-          <Text variant="caption2" component="span">
-            Version {version}
-          </Text>
+          <Tooltip title={version}>
+            <Text variant="caption2" component="h6">
+              Version {version}
+            </Text>
+          </Tooltip>
         </div>
       </Drawer>
     )
