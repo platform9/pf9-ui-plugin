@@ -10,6 +10,7 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import DateCell from 'core/components/listTable/cells/DateCell'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -44,7 +45,7 @@ const ListPage = ({ ListContainer }) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/pods/namespaces/add',
+  addUrl: routes.namespaces.add.path(),
   addText: 'Add Namespace',
   columns: [
     { id: 'name', label: 'Name' },

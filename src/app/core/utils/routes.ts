@@ -332,7 +332,7 @@ export const routes = {
   },
   pods: {
     list: Route.register({
-      url: `${pluginRoutePrefix}/pods#pods`,
+      url: `${pluginRoutePrefix}/workloads/#pods`,
       name: 'Pods:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
@@ -340,7 +340,7 @@ export const routes = {
     }),
 
     add: Route.register({
-      url: `${pluginRoutePrefix}/pods/add`,
+      url: `${pluginRoutePrefix}/workloads/pods/add`,
       name: 'Pods:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
@@ -349,14 +349,14 @@ export const routes = {
   },
   services: {
     list: Route.register({
-      url: `${pluginRoutePrefix}/pods#services`,
+      url: `${pluginRoutePrefix}/workloads#services`,
       name: 'Services:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
     }),
     add: Route.register({
-      url: `${pluginRoutePrefix}/pods/services/add`,
+      url: `${pluginRoutePrefix}/workloads/services/add`,
       name: 'Services:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
@@ -365,15 +365,31 @@ export const routes = {
   },
   deployments: {
     list: Route.register({
-      url: `${pluginRoutePrefix}/pods#deployments`,
+      url: `${pluginRoutePrefix}/workloads#deployments`,
       name: 'Deployments:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
     }),
     add: Route.register({
-      url: `${pluginRoutePrefix}/pods/deployments/add`,
+      url: `${pluginRoutePrefix}/workloads/deployments/add`,
       name: 'Deployments:Add',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+  },
+  namespaces: {
+    list: Route.register({
+      url: `${pluginRoutePrefix}/workloads/#namespaces`,
+      name: 'Namespaces:List',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/workloads/namespaces/add`,
+      name: 'Namespaces:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
@@ -413,22 +429,6 @@ export const routes = {
     edit: Route.register({
       url: `${pluginRoutePrefix}/logging/edit/:id`,
       name: 'Logging:Edit',
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-    }),
-  },
-  namespaces: {
-    list: Route.register({
-      url: `${pluginRoutePrefix}/namespaces`,
-      name: 'Namespaces:List',
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-    }),
-    add: Route.register({
-      url: `${pluginRoutePrefix}/namespaces/add`,
-      name: 'Namespaces:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },

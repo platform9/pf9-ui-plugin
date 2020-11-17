@@ -159,27 +159,27 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'Workloads',
-      link: { path: '/pods', exact: true },
+      link: { path: '/workloads', exact: true },
       component: PodsIndexPage,
     },
     {
       name: 'Add Pod',
-      link: { path: '/pods/add', exact: true },
+      link: { path: '/workloads/pods/add', exact: true },
       component: () => <AddResourcePage resourceType="pod" />,
     },
     {
       name: 'Add Deployment',
-      link: { path: '/pods/deployments/add', exact: true },
+      link: { path: '/workloads/deployments/add', exact: true },
       component: () => <AddResourcePage resourceType="deployment" />,
     },
     {
       name: 'Add Service',
-      link: { path: '/pods/services/add', exact: true },
+      link: { path: '/workloads/services/add', exact: true },
       component: () => <AddResourcePage resourceType="service" />,
     },
     {
       name: 'Add Namespace',
-      link: { path: '/pods/namespaces/add', exact: true },
+      link: { path: '/workloads/namespaces/add', exact: true },
       component: AddNamespacePage,
     },
     {
@@ -402,13 +402,13 @@ Kubernetes.registerPlugin = (pluginManager) => {
     // },
     {
       name: 'Workloads',
-      link: { path: '/pods' },
+      link: { path: '/workloads' },
       icon: 'cubes',
       nestedLinks: [
-        { name: 'Pods', link: { path: '/pods#pods' } },
-        { name: 'Deployments', link: { path: '/pods#deployments' } },
-        { name: 'Services', link: { path: '/pods#services' } },
-        { name: 'Namespaces', link: { path: '/pods#namespaces' } },
+        { name: 'Pods', link: { path: '/workloads#pods' } },
+        { name: 'Deployments', link: { path: '/workloads#deployments' } },
+        { name: 'Services', link: { path: '/worloads#services' } },
+        { name: 'Namespaces', link: { path: '/workloads#namespaces' } },
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },

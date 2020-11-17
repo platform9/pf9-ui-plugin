@@ -8,6 +8,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import useParams from 'core/hooks/useParams'
 import { namespaceValidator } from 'core/utils/fieldValidators'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -38,7 +39,7 @@ export const AddNamespaceForm = ({ onComplete }) => {
 export const options = {
   cacheKey: ActionDataKeys.Namespaces, // TODO I think this is namespaces
   FormComponent: AddNamespaceForm,
-  listUrl: '/ui/kubernetes/pods#namespaces',
+  listUrl: routes.namespaces.list.path(),
   name: 'AddNamespace',
   title: 'Add Namespace',
 }
