@@ -1,8 +1,6 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import PicklistField from 'core/components/validatedForm/PicklistField'
-import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import ExternalLink from 'core/components/ExternalLink'
 import { azurePrerequisitesLink } from 'k8s/links'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -10,6 +8,8 @@ import { loadCloudProviderDetails } from './actions'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
 import { RegionAvailability } from './helpers'
+import { CloudProviders } from './model'
+import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
 
 const useStyles = makeStyles((theme: Theme) => ({
   spaceRight: {
@@ -57,13 +57,10 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
         <Text variant="body2">
           Platform9 deploys Kubernetes clusters into specified Azure Regions.
         </Text>
-        <PicklistField
-          DropdownComponent={CloudProviderRegionPicklist}
-          id="region"
-          label="Region"
-          cloudProviderId={wizardContext.cloudProviderId}
+        <CloudProviderRegionField
+          cloudProviderType={CloudProviders.Azure}
           onChange={(region) => setWizardContext({ cloudProviderRegionId: region })}
-          value={wizardContext.cloudProviderRegionId}
+          values={wizardContext}
         />
       </FormFieldCard>
     </>
