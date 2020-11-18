@@ -149,7 +149,7 @@ export const options = {
   FormComponent: UpdateCloudProviderForm,
   updateFn: cloudProviderActions.update,
   loaderFn: cloudProviderActions.list,
-  listUrl: routes.cloudProviders.list,
+  listUrl: routes.cloudProviders.list.path(),
   name: 'UpdateCloudProvider',
   title: 'Update Cloud Provider',
   uniqueIdentifier: 'uuid',
