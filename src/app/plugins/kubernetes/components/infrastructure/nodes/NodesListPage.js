@@ -261,7 +261,7 @@ const isAdmin = (selected, store) => {
 
 export const options = {
   addText: 'Onboard a Node',
-  addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
+  addUrl: routes.nodes.add.path(),
   columns,
   cacheKey: ActionDataKeys.Nodes,
   name: 'Nodes',
