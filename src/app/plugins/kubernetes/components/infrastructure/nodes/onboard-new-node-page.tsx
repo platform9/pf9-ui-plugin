@@ -6,26 +6,33 @@ import Tab from 'core/components/tabs/Tab'
 import DownloadCliPage from './DownloadCliPage'
 import Tabs from 'core/components/tabs/Tabs'
 import DownloadHostAgentPage from './download-host-agent-page'
+import SimpleLink from 'core/components/SimpleLink'
+import { routes } from 'core/utils/routes'
+import { makeStyles, Theme } from '@material-ui/core'
 
-// const useStyles = makeStyles((theme: Theme) => ({
-//   onBoardNodeContainer: {
-//     maxWidth: '850px',
-//   },
-//   backLink: {
-//     marginLeft: 'auto',
-//   },
-// }))
+const useStyles = makeStyles((theme: Theme) => ({
+  onBoardNodeContainer: {
+    maxWidth: '850px',
+  },
+  backLink: {
+    marginLeft: 'auto',
+  },
+  header: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    alignItems: 'flex-end',
+  },
+}))
 
 const OnboardNewNodePage = () => {
-  // const classes = useStyles()
+  const classes = useStyles()
   return (
-    <PageContainer
-    // header={
-    //   <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
-    //     « Back to Node List
-    //   </SimpleLink>
-    // }
-    >
+    <PageContainer>
+      <div className={classes.header}>
+        <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
+          « Back to Node List
+        </SimpleLink>
+      </div>
       <Tabs>
         <Tab value="downloadCLI" label="Download PF9 CLI">
           <DownloadCliPage />

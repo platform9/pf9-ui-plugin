@@ -119,7 +119,6 @@ const DownloadHostAgentPage = () => {
   const classes = useStyles()
   return (
     <div className={classes.downloadHostAgent}>
-      <Text variant="h5">Onboard a new node</Text>
       <DownloadHostAgentWalkthrough />
       <p></p>
       <Text>
