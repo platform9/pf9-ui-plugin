@@ -332,7 +332,7 @@ export const routes = {
   },
   pods: {
     list: Route.register({
-      url: `${pluginRoutePrefix}/workloads/#pods`,
+      url: `${pluginRoutePrefix}/workloads#pods`,
       name: 'Pods:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
@@ -381,7 +381,7 @@ export const routes = {
   },
   namespaces: {
     list: Route.register({
-      url: `${pluginRoutePrefix}/workloads/#namespaces`,
+      url: `${pluginRoutePrefix}/workloads#namespaces`,
       name: 'Namespaces:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
