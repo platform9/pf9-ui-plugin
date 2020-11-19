@@ -33,6 +33,7 @@ import {
   canScaleWorkers,
   canUpgradeCluster,
   notBusy,
+  isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
 
@@ -266,6 +267,10 @@ export const options = {
       icon: 'expand-alt',
       label: 'Scale Workers',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/scaleWorkers/${rows[0].uuid}`,
+      disabledInfo: ([cluster]) =>
+        !!cluster && isAzureAutoscalingCluster(cluster)
+          ? 'Scaling Azure autoscaling clusters is not yet supported'
+          : 'Cannot scale workers: cluster is busy',
     },
     {
       cond: both(isAdmin, canUpgradeCluster),
