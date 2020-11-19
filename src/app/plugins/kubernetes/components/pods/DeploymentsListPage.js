@@ -10,6 +10,7 @@ import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import ExternalLink from 'core/components/ExternalLink'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -71,7 +72,7 @@ export const options = {
   deleteFn: deploymentActions.delete,
   deleteCond: () => false,
   deleteDisabledInfo: 'Feature not yet implemented',
-  addUrl: '/ui/kubernetes/pods/deployments/add',
+  addUrl: routes.deployments.add.path(),
   addText: 'Add Deployment',
   columns: [
     { id: 'name', label: 'Name', render: renderName },
