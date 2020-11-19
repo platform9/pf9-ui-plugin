@@ -1,18 +1,17 @@
 import React from 'react'
 import DownloadHostAgentWalkthrough from 'openstack/components/hosts/DownloadHostAgentWalkthrough'
 import Theme from 'core/themes/model'
-import { Accordion, AccordionDetails, AccordionSummary, makeStyles } from '@material-ui/core'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import { makeStyles } from '@material-ui/core'
 import Text from 'core/elements/text'
-import SimpleLink from 'core/components/SimpleLink'
-import { routes } from 'core/utils/routes'
-import ExternalLink from 'core/components/ExternalLink'
-import { nodePrerequisitesDocumentationLink } from 'k8s/links'
 import CodeBlock from 'core/components/CodeBlock'
+import Info from 'core/components/validatedForm/Info'
 
 const useStyles = makeStyles((theme: Theme) => ({
   downloadHostAgent: {
     maxWidth: '850px',
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    position: 'relative',
     margin: theme.spacing(3, 2, 2, 2),
   },
   collapsedContainer: {
@@ -21,80 +20,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginLeft: theme.spacing(2),
   },
   spacer: {
-    height: theme.spacing(2),
-    width: theme.spacing(2),
+    height: theme.spacing(0.5),
   },
   infoContainer: {
     marginLeft: theme.spacing(2),
     marginTop: theme.spacing(1),
   },
 }))
-
-const SupportedDistributionsAndPrerequisitesInfo = () => {
-  const classes = useStyles()
-  return (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Text variant="h6">Supported Distributions and Prerequisites</Text>
-      </AccordionSummary>
-      <AccordionDetails>
-        <div className={classes.collapsedContainer}>
-          <Text>We currently support the following:</Text>
-          <ul>
-            <li key="linux">Enterprise Linux (CentOS/RedHat) 7.6 - 64-bit (x86_64)</li>
-            <li key="ubuntu">Ubuntu 16.04 LTS and 18.04 LTS -64-bit (x86_64)</li>
-          </ul>
-          <Text>
-            If your node operating system isn't supported, please email us at{' '}
-            <a href={'www.google.com'}>support@platform9.com</a>
-          </Text>
-          <p></p>
-          <Text>Folow these prerequisites to prepare your nodes: </Text>
-          <ul>
-            <li key="kubernetes">
-              Managaged Kubernetes:{' '}
-              <ExternalLink url={nodePrerequisitesDocumentationLink}>
-                Managed Kubernetes Prerequisite
-              </ExternalLink>
-            </li>
-          </ul>
-        </div>
-      </AccordionDetails>
-    </Accordion>
-  )
-}
-
-const TipsAndTroubleshootingInfo = () => {
-  const classes = useStyles()
-  return (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Text variant="h6">Tips and Troubleshooting</Text>
-      </AccordionSummary>
-      <AccordionDetails>
-        <div className={classes.collapsedContainer}>
-          <Text variant="subtitle2">Tips</Text>
-          <div className={classes.infoContainer}>
-            <Text>
-              The host agent package is personalized for your account. Do not share it with anyone
-              outside your organization.
-            </Text>
-          </div>
-          <p></p>
-          <Text variant="subtitle2">Troubleshooting</Text>
-          <div className={classes.infoContainer}>
-            <Text>Here are some quick tips if you don't see your node:</Text>
-            <TroubleshootingTipsList />
-            <Text>
-              If these tips do not resolve the issue, please contact us for support. We're here to
-              help!
-            </Text>
-          </div>
-        </div>
-      </AccordionDetails>
-    </Accordion>
-  )
-}
 
 const TroubleshootingTipsList = () => (
   <ul>
@@ -115,19 +47,77 @@ const TroubleshootingTipsList = () => (
   </ul>
 )
 
+const SupportedDistributionsAndPrerequisitesInfo = () => {
+  const classes = useStyles()
+
+  return (
+    <Info title="Supported Distributions and Prerequisites" expanded={false}>
+      <div className={classes.collapsedContainer}>
+        <Text variant="subtitle2">Tips</Text>
+        <div className={classes.infoContainer}>
+          <Text>
+            The host agent package is personalized for your account. Do not share it with anyone
+            outside your organization.
+          </Text>
+        </div>
+        <p></p>
+        <Text variant="subtitle2">Troubleshooting</Text>
+        <div className={classes.infoContainer}>
+          <Text>Here are some quick tips if you don't see your node:</Text>
+          <TroubleshootingTipsList />
+          <Text>
+            If these tips do not resolve the issue, please contact us for support. We're here to
+            help!
+          </Text>
+        </div>
+      </div>
+    </Info>
+  )
+}
+
+const TipsAndTroubleshootingInfo = () => {
+  const classes = useStyles()
+  return (
+    <Info title="Tips and Troubleshooting" expanded={false}>
+      <div className={classes.collapsedContainer}>
+        <Text variant="subtitle2">Tips</Text>
+        <div className={classes.infoContainer}>
+          <Text>
+            The host agent package is personalized for your account. Do not share it with anyone
+            outside your organization.
+          </Text>
+        </div>
+        <p className={classes.spacer}></p>
+        <Text variant="subtitle2">Troubleshooting</Text>
+        <div className={classes.infoContainer}>
+          <Text>Here are some quick tips if you don't see your node:</Text>
+          <TroubleshootingTipsList />
+          <Text>
+            If these tips do not resolve the issue, please contact us for support. We're here to
+            help!
+          </Text>
+        </div>
+      </div>
+    </Info>
+  )
+}
+
 const DownloadHostAgentPage = () => {
   const classes = useStyles()
   return (
     <div className={classes.downloadHostAgent}>
+      <Text variant="h5">Onboard new nodes using the HostAgent</Text>
+      <p>
+        <Text component="span">
+          The Platform9 HostAgent can be used to manually connect physical servers and virtual
+          machines to the SaaS Management plane. Once the HostAgent is installed each node must be
+          authorized on the Nodes dashboard.
+        </Text>
+      </p>
       <DownloadHostAgentWalkthrough />
-      <p></p>
-      <Text>
-        Once the host agent is installed, you will see an alert in the{' '}
-        <SimpleLink src={routes.dashboard.path()}>Dashboard</SimpleLink> asking you to authorize the
-        node.
-      </Text>
-      <p className={classes.spacer} />
+      <p className={classes.spacer}></p>
       <SupportedDistributionsAndPrerequisitesInfo />
+      <p className={classes.spacer}></p>
       <TipsAndTroubleshootingInfo />
     </div>
   )

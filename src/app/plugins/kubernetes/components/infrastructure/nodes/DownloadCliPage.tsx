@@ -3,7 +3,6 @@ import React, { FunctionComponent } from 'react'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 // Components
-// import SimpleLink from 'core/components/SimpleLink'
 import { DownloadCliOnboardNodeWalkthrough } from './DownloadCliWalkthrough'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import CodeBlock from 'core/components/CodeBlock'
@@ -31,7 +30,7 @@ const DownloadCliPage: FunctionComponent = () => {
   const classes = useStyles()
   return (
     <div className={classes.downloadCLIContainer}>
-      <Text variant="h5">Onboard a new node</Text>
+      <Text variant="h5">Onboard new nodes using the PF9 CLI</Text>
       <p> </p>
       <Text component="span">
         In order to add a physical or virtual node to your BareOS cluster, you need to first
