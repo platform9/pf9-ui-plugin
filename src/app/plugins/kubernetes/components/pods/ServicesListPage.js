@@ -11,6 +11,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -86,7 +87,7 @@ const renderEndpoints = (endpoints) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/pods/services/add',
+  addUrl: routes.services.add.path(),
   addText: 'Add Service',
   deleteFn: serviceActions.delete,
   columns: [
