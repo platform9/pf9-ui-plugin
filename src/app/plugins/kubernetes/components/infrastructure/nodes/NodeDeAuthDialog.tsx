@@ -12,7 +12,7 @@ const NodeDeAuthDialog = ({ rows: [node], onClose }) => {
       title="De-authorize node"
       text={
         <>
-          You are about to de-authorize the node {node?.name} ({node?.primaryIp})
+          You are about to de-authorize the node {node?.name} ({node?.primaryIp}).
           <br />
           Are you sure?
         </>

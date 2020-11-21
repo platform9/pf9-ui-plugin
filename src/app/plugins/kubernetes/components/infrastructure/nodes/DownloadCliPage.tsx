@@ -7,29 +7,23 @@ import { DownloadCliOnboardNodeWalkthrough } from './DownloadCliWalkthrough'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
+import PageContainer from 'core/components/pageContainer/PageContainer'
 
 const useStyles = makeStyles((theme: Theme) => ({
   downloadCLIContainer: {
     maxWidth: '850px',
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    position: 'relative',
     margin: theme.spacing(3, 2, 2, 2),
   },
   spacer: {
     height: theme.spacing(2),
     width: theme.spacing(2),
   },
-  backLink: {
-    marginBottom: theme.spacing(2),
-    marginLeft: 'auto',
-  },
 }))
 
 const DownloadCliPage: FunctionComponent = () => {
   const classes = useStyles()
   return (
-    <div className={classes.downloadCLIContainer}>
+    <PageContainer className={classes.downloadCLIContainer}>
       <Text variant="h5">Onboard new nodes using the PF9 CLI</Text>
       <p> </p>
       <Text component="span">
@@ -62,7 +56,7 @@ const DownloadCliPage: FunctionComponent = () => {
         See <SimpleLink src="">CLI Documentation</SimpleLink> for more info on whats supported with the
         CLI
       </Text> */}
-    </div>
+    </PageContainer>
   )
 }
 export default DownloadCliPage

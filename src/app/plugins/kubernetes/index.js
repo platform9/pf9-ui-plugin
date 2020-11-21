@@ -46,7 +46,6 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import OnboardingBanner from './components/onboarding/OnboardingBanner'
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
-import OnboardNewNode from './components/infrastructure/nodes/onboard-new-node-page'
 import OnboardNewNodePage from './components/infrastructure/nodes/onboard-new-node-page'
 
 class Kubernetes extends React.PureComponent {
@@ -123,11 +122,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/clusters/:id', exact: true },
       component: ClusterDetailsPage,
     },
-    // {
-    //   name: 'Onboard a Node',
-    //   link: { path: '/infrastructure/nodes/cli/download', exact: true },
-    //   component: DownloadCliPage,
-    // },
     {
       name: 'Onboard a Node',
       link: { path: '/infrastructure/nodes/add', exact: true },

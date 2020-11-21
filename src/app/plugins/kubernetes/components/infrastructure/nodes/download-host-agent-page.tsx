@@ -5,6 +5,8 @@ import Text from 'core/elements/text'
 import CodeBlock from 'core/components/CodeBlock'
 import Info from 'core/components/validatedForm/Info'
 import DownloadHostAgentWalkthrough from 'core/components/DownloadHostAgentWalkthrough'
+import ExternalLink from 'core/components/ExternalLink'
+import { nodePrerequisitesDocumentationLink } from 'k8s/links'
 
 const useStyles = makeStyles((theme: Theme) => ({
   downloadHostAgent: {
@@ -53,23 +55,24 @@ const SupportedDistributionsAndPrerequisitesInfo = () => {
   return (
     <Info title="Supported Distributions and Prerequisites" expanded={false}>
       <div className={classes.collapsedContainer}>
-        <Text variant="subtitle2">Tips</Text>
-        <div className={classes.infoContainer}>
-          <Text>
-            The host agent package is personalized for your account. Do not share it with anyone
-            outside your organization.
-          </Text>
-        </div>
+        <Text>We currently support the following:</Text>
+        <ul>
+          <li key="linux">Enterprise Linux (CentOS/RedHat) 7.6 - 64-bit (x86_64)</li>
+          <li key="ubuntu">Ubuntu 16.04 LTS and 18.04 LTS - 64-bit (x86_64)</li>
+        </ul>
+        <Text>
+          If your node operating system isn't supported, please email us at support@platform9.com.
+        </Text>
         <p></p>
-        <Text variant="subtitle2">Troubleshooting</Text>
-        <div className={classes.infoContainer}>
-          <Text>Here are some quick tips if you don't see your node:</Text>
-          <TroubleshootingTipsList />
-          <Text>
-            If these tips do not resolve the issue, please contact us for support. We're here to
-            help!
-          </Text>
-        </div>
+        <Text>Follow these prerequisites to prepare your nodes: </Text>
+        <ul>
+          <li key="kubernetes">
+            Managaged Kubernetes:{' '}
+            <ExternalLink url={nodePrerequisitesDocumentationLink}>
+              Managed Kubernetes Prerequisite
+            </ExternalLink>
+          </li>
+        </ul>
       </div>
     </Info>
   )

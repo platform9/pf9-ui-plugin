@@ -57,17 +57,6 @@ class ResMgr extends ApiService {
     })
   }
 
-  async getHost(hostId) {
-    const url = `/host/${hostId}`
-    return this.client.basicGet<Host[]>({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getHost',
-      },
-    })
-  }
-
   async addRole(hostId, role, body) {
     const url = `/hosts/${hostId}/roles/${role}`
     return this.client.basicPut({

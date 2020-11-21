@@ -8,8 +8,8 @@ import { hexToRGBA } from 'core/utils/colorHelpers'
 import Button from '@material-ui/core/Button'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import SimpleLink from 'core/components/SimpleLink'
-import { getDownloadLinks } from '../../plugins/openstack/components/hosts/actions'
 import clsx from 'clsx'
+import { getDownloadLinks } from 'openstack/components/hosts/actions'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -77,7 +77,7 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
   const [downloadLink, setDownloadLink] = useState('')
   useEffect(() => {
     const loadDownloadLink = async () => {
-      const links: any = await getDownloadLinks()
+      const links = await getDownloadLinks()
       // In the future when supporting openstack, will want to show all download links
       setDownloadLink(links.rpm_install)
     }

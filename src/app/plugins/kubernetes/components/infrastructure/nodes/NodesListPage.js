@@ -66,18 +66,16 @@ const ListPage = ({ ListContainer }) => {
       }
     }
 
-    const filterByState = (node) => {
+    const filterByNodeState = (node) => {
       if (params.state === allKey) {
         return true
-      } else if (params.state === NodeState.Authorized) {
-        return node.isAuthorized
       } else {
-        return !node.isAuthorized
+        return params.state === NodeState.Authorized ? node.isAuthorized : !node.isAuthorized
       }
     }
 
     const filteredNodes = nodes.filter((node) => {
-      return filterByCluster(node) && filterByState(node)
+      return filterByCluster(node) && filterByNodeState(node)
     })
 
     return (

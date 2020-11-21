@@ -12,7 +12,7 @@ const NodeAuthDialog = ({ rows: [node], onClose }) => {
       title="Authorize node"
       text={
         <>
-          You are about to authorize the node {node?.name}
+          You are about to authorize the node {node?.name}.
           <br />
           Are you sure?
         </>
