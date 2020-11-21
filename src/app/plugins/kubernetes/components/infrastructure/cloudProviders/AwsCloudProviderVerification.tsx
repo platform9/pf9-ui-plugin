@@ -97,8 +97,6 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
     cloudProviderRegionId: wizardContext.region,
   })
 
-  console.log('region', details)
-
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
