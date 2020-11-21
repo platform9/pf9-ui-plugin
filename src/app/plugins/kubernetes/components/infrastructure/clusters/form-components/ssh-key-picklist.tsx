@@ -8,11 +8,11 @@ export default ({ dropdownComponent, values, info = additionalInfo }) => {
   return (
     <PicklistField
       DropdownComponent={dropdownComponent}
-      disabled={!(values.cloudProviderId && (values.region || values.cloudProviderRegionId))}
+      disabled={!(values.cloudProviderId && values.region)}
       id="sshKey"
       label="SSH Key"
       cloudProviderId={values.cloudProviderId}
-      cloudProviderRegionId={values.region ? values.region : values.cloudProviderRegionId}
+      cloudProviderRegionId={values.region}
       info={info}
       required
     />

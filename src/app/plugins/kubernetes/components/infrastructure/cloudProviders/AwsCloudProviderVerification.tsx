@@ -94,8 +94,10 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
 
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
-    cloudProviderRegionId: wizardContext.cloudProviderRegionId,
+    cloudProviderRegionId: wizardContext.region,
   })
+
+  console.log('region', details)
 
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
@@ -122,7 +124,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         </Text>
         <CloudProviderRegionField
           cloudProviderType={CloudProviders.Aws}
-          onChange={(region) => setWizardContext({ cloudProviderRegionId: region })}
+          onChange={(value) => setWizardContext({ region: value })}
           values={wizardContext}
         />
       </FormFieldCard>
@@ -131,7 +133,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         middleHeader={
           <Route53Availability
             loading={loading}
-            regionId={wizardContext.cloudProviderRegionId}
+            regionId={wizardContext.region}
             domains={domains}
           />
         }
@@ -149,10 +151,10 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
           id="awsDomain"
           label="Route 53 Domain"
           cloudProviderId={wizardContext.cloudProviderId}
-          cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-          disabled={!(wizardContext.cloudProviderId && wizardContext.cloudProviderRegionId)}
+          cloudProviderRegionId={wizardContext.region}
+          disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
         />
-        {wizardContext.cloudProviderRegionId && !loading && !domains.length && (
+        {wizardContext.region && !loading && !domains.length && (
           <Info>
             <div>No registered Route53 Domains have been detected.</div>
             <div>Please register at least one domain with AWS Route53 to use Platform9.</div>
@@ -169,7 +171,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         middleHeader={
           <SshKeyAvailability
             loading={loading}
-            regionId={wizardContext.cloudProviderRegionId}
+            regionId={wizardContext.region}
             keypairs={keypairs}
           />
         }
