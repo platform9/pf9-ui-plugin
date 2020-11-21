@@ -1,10 +1,10 @@
 import React from 'react'
-import DownloadHostAgentWalkthrough from 'openstack/components/hosts/DownloadHostAgentWalkthrough'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/core'
 import Text from 'core/elements/text'
 import CodeBlock from 'core/components/CodeBlock'
 import Info from 'core/components/validatedForm/Info'
+import DownloadHostAgentWalkthrough from 'core/components/DownloadHostAgentWalkthrough'
 
 const useStyles = makeStyles((theme: Theme) => ({
   downloadHostAgent: {

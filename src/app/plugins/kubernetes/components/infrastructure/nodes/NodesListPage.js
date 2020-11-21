@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { localizeRoles } from 'api-client/ResMgr'
 import { pathStrOr } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
@@ -28,9 +28,9 @@ import { routes } from 'core/utils/routes'
 import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import ResourceUsageTables from '../common/ResourceUsageTables'
-import ApiClient from 'api-client/'
-import { loadResMgrHosts } from '../common/actions'
 import NodesStatePicklist from './nodes-state-picklist'
+import NodeAuthDialog from './NodeAuthDialog'
+import { NodeState } from './model'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -54,25 +54,14 @@ const usePrefParams = createUsePrefParamsHook('Nodes', listTablePrefs)
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(loadNodes, params)
-    const [hosts] = useDataLoader(loadResMgrHosts)
-
-    const isUnauthorizedNode = useCallback(
-      (node) => {
-        const host = hosts.find((host) => host.id === node.uuid)
-        return (
-          host.roles.length === 0 || (host.roles.length === 1 && host.roles.includes('pf9-support'))
-        )
-      },
-      [hosts],
-    )
+    const [nodes, loading, reload] = useDataLoader(loadNodes, params)
 
     const filterByCluster = (node) => {
       if (params.clusterId === allKey) {
         return true
       } else if (params.clusterId === '') {
         return !node.clusterUuid
-      } else if (params.clusterId) {
+      } else {
         return node.clusterUuid === params.clusterId
       }
     }
@@ -80,15 +69,14 @@ const ListPage = ({ ListContainer }) => {
     const filterByState = (node) => {
       if (params.state === allKey) {
         return true
-      } else if (params.state === 'authorized') {
-        return !isUnauthorizedNode(node)
-      } else if (params.state === 'unauthorized') {
-        return isUnauthorizedNode(node)
+      } else if (params.state === NodeState.Authorized) {
+        return node.isAuthorized
+      } else {
+        return !node.isAuthorized
       }
     }
 
-    // Filter nodes based on cluster
-    const filteredNodes = data.filter((node) => {
+    const filteredNodes = nodes.filter((node) => {
       return filterByCluster(node) && filterByState(node)
     })
 
@@ -107,7 +95,7 @@ const ListPage = ({ ListContainer }) => {
               selectFirst={false}
               showNone
             />
-            <NodesStatePicklist onChange={getParamsUpdater('state')} selectedFirst={false} />
+            <NodesStatePicklist onChange={getParamsUpdater('state')} value={params.state} />
           </>
         }
         {...pick(listTablePrefs, params)}
@@ -307,12 +295,13 @@ export const options = {
       dialog: RemoteSupportDialog,
     },
     {
-      cond: ([node]) => !node.clusterUuid,
+      cond: ([node]) => !node.isAuthorized,
       icon: 'plus-circle',
       label: 'Authorize',
+      dialog: NodeAuthDialog,
     },
     {
-      cond: ([node]) => !node.clusterUuid,
+      cond: ([node]) => node.isAuthorized && !node.clusterUuid,
       icon: 'trash-alt',
       label: 'Deauthorize',
       dialog: NodeDeAuthDialog,

@@ -12,18 +12,37 @@ const { qbert, resMgr } = ApiClient.getInstance()
 export const loadNodes = createContextLoader(
   ActionDataKeys.Nodes,
   async () => {
-    const [rawNodes] = await Promise.all([
+    const [rawNodes, , hosts] = await Promise.all([
       qbert.getNodes(),
       // Fetch dependent caches
       loadServiceCatalog(),
       loadResMgrHosts(),
     ])
-    return rawNodes
+
+    const unauthorizedNodes = hosts.filter(
+      (host) => rawNodes.find((node) => node.uuid === host.id) === undefined,
+    )
+
+    return [...rawNodes, ...unauthorizedNodes]
   },
   {
     uniqueIdentifier: 'uuid',
     selector: nodesSelector,
     selectorCreator: makeParamsNodesSelector,
+  },
+)
+
+export const authNode = createContextUpdater(
+  ActionDataKeys.Nodes,
+  async (node) => {
+    await resMgr.addRole(node.uuid, 'pf9-kube', {})
+    trackEvent('Authorize Node', {
+      node_name: node.name,
+    })
+    return loadNodes()
+  },
+  {
+    operation: 'authNode',
   },
 )
 
