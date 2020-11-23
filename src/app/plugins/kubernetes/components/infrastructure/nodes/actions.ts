@@ -6,6 +6,8 @@ import createContextUpdater from 'core/helpers/createContextUpdater'
 import { trackEvent } from 'utils/tracking'
 import { nodesSelector, makeParamsNodesSelector } from './selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { Resmgr } from './model'
+import { Node } from 'api-client/qbert.model'
 
 const { qbert, resMgr } = ApiClient.getInstance()
 
@@ -19,9 +21,16 @@ export const loadNodes = createContextLoader(
       loadResMgrHosts(),
     ])
 
-    const unauthorizedNodes = hosts.filter(
-      (host) => rawNodes.find((node) => node.uuid === host.id) === undefined,
+    const unauthorizedHosts: Resmgr[] = hosts.filter(
+      (host: Resmgr) => rawNodes.find((node) => node.uuid === host.id) === undefined,
     )
+    const unauthorizedNodes: Node[] = unauthorizedHosts.map((host: Resmgr) => {
+      return {
+        name: host.info.hostname,
+        uuid: host.id,
+        isAuthorized: false,
+      }
+    })
 
     return [...rawNodes, ...unauthorizedNodes]
   },

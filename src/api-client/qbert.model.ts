@@ -994,20 +994,21 @@ export interface GetKubernetesVersion {
 export interface Node {
   name: string
   uuid: string
-  primaryIp: string
-  isMaster: number
-  masterless: number
-  status: string
-  api_responding: number
-  projectId: string
-  startKube: number
-  actualKubeRoleVersion: string
-  nodePoolUuid: string
-  nodePoolName: string
-  clusterUuid: null | string
-  clusterName: null | string
-  cloudProviderType: string
-  clusterKubeRoleVersion: string
+  primaryIp?: string
+  isMaster?: number
+  masterless?: number
+  status?: string
+  api_responding?: number
+  projectId?: string
+  startKube?: number
+  actualKubeRoleVersion?: string
+  nodePoolUuid?: string
+  nodePoolName?: string
+  clusterUuid?: null | string
+  clusterName?: null | string
+  cloudProviderType?: string
+  clusterKubeRoleVersion?: string
+  isAuthorized?: boolean
 }
 
 export interface GetPrometheusAlerts {

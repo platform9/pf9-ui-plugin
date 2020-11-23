@@ -7,8 +7,6 @@ import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { ICombinedHost } from 'k8s/components/infrastructure/common/model'
 import { calculateNodeUsages } from '../common/helpers'
-import { Resmgr } from './model'
-import { Node } from 'api-client/qbert.model'
 
 export const nodesSelector = createSelector(
   [
@@ -16,7 +14,7 @@ export const nodesSelector = createSelector(
     combinedHostsSelector,
     getDataSelector<DataKeys.ServiceCatalog>(DataKeys.ServiceCatalog),
   ],
-  (rawNodes: any, combinedHosts: any, rawServiceCatalog: any) => {
+  (rawNodes, combinedHosts, rawServiceCatalog) => {
     const combinedHostsObj = combinedHosts.reduce((accum, host) => {
       const id = host?.resmgr?.id || host?.qbert?.uuid || null
       accum[id] = host
@@ -28,31 +26,20 @@ export const nodesSelector = createSelector(
       pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
 
     // associate nodes with the combinedHost entry
-    const finalNodes = rawNodes.map((node: Node | Resmgr) => {
-      const isResmgr = (node: any): node is Resmgr => (node as Resmgr).id != undefined
-      const nodeUuid = isResmgr(node) ? node.id : node.uuid
-      const usage = calculateNodeUsages([combinedHostsObj[nodeUuid]]) // expects array
-
+    return rawNodes.map((node) => {
+      const usage = calculateNodeUsages([combinedHostsObj[node.uuid]]) // expects array
       return {
-        ...(isResmgr(node) ? {} : node),
-        name: isResmgr(node) ? node.info?.hostname : node.name,
-        uuid: nodeUuid,
-        isAuthorized: !isResmgr(node),
+        ...node,
+        isAuthorized: node.isAuthorized === undefined ? true : false,
         // if hostagent is not responding, then the nodes info is outdated
         // set the status to disconnected manually
-        status: isResmgr(node)
-          ? undefined
-          : combinedHostsObj[nodeUuid].responding
-          ? node.status
-          : 'disconnected',
-        combined: combinedHostsObj[nodeUuid],
+        status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
+        combined: combinedHostsObj[node.uuid],
         // qbert v3 link fails authorization so we have to use v1 link for logs
-        logs: `${qbertUrl}/logs/${nodeUuid}`.replace(/v3/, 'v1'),
+        logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
         usage,
       }
     })
-
-    return finalNodes
   },
 )
 
