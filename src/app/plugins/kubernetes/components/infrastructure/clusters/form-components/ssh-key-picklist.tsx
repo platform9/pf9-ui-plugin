@@ -1,7 +1,10 @@
 import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 
-export default ({ dropdownComponent, values }) => {
+const additionalInfo =
+  'Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes.'
+
+export default ({ dropdownComponent, values, info = additionalInfo }) => {
   return (
     <PicklistField
       DropdownComponent={dropdownComponent}
@@ -10,7 +13,7 @@ export default ({ dropdownComponent, values }) => {
       label="SSH Key"
       cloudProviderId={values.cloudProviderId}
       cloudProviderRegionId={values.region}
-      info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
+      info={info}
       required
     />
   )
