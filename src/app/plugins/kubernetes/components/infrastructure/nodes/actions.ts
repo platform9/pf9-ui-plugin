@@ -21,16 +21,15 @@ export const loadNodes = createContextLoader(
       loadResMgrHosts(),
     ])
 
-    const unauthorizedHosts: Resmgr[] = hosts.filter(
-      (host: Resmgr) => rawNodes.find((node) => node.uuid === host.id) === undefined,
-    )
-    const unauthorizedNodes: Node[] = unauthorizedHosts.map((host: Resmgr) => {
-      return {
-        name: host.info.hostname,
-        uuid: host.id,
-        isAuthorized: false,
-      }
-    })
+    const unauthorizedNodes: Node[] = hosts
+      .filter((host: Resmgr) => rawNodes.find((node) => node.uuid === host.id) === undefined)
+      .map((host: Resmgr) => {
+        return {
+          name: host.info.hostname,
+          uuid: host.id,
+          isAuthorized: false,
+        }
+      })
 
     return [...rawNodes, ...unauthorizedNodes]
   },
