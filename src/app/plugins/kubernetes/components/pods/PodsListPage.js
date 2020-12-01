@@ -81,9 +81,16 @@ const PodLinks = ({ pod }) => {
   return (
     <div className={classes.links}>
       <ExternalLink url={pod.dashboardUrl}>dashboard</ExternalLink>
-      <SimpleLink src={pod.logs || ''} target="_blank" rel="noopener" onClick={openLogsWindow(pod)}>
-        View Container Logs
-      </SimpleLink>
+      {pod.logs && (
+        <SimpleLink
+          src={pod.logs || ''}
+          target="_blank"
+          rel="noopener"
+          onClick={openLogsWindow(pod)}
+        >
+          View Container Logs
+        </SimpleLink>
+      )}
     </div>
   )
 }

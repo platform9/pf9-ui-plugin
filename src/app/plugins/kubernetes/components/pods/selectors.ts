@@ -14,8 +14,10 @@ import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
 const getLogsUrl = (pod, cluster, rawServiceCatalog) => {
-  const qbertUrl =
-    pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
+  const qbertUrl = pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog)
+  if (!qbertUrl) return null
+
+  // qbert v3 link fails authorization so we have to use v1 link for logs
   return `${qbertUrl}/clusters/${cluster?.uuid}/k8sapi/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`.replace(
     /v3/,
     'v1',
