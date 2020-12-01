@@ -12,6 +12,16 @@ import renderLabels from 'k8s/components/pods/renderLabels'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
 import { routes } from 'core/utils/routes'
+import { trackEvent } from 'utils/tracking'
+import SimpleLink from 'core/components/SimpleLink'
+import { makeStyles } from '@material-ui/styles'
+
+const useStyles = makeStyles((theme) => ({
+  links: {
+    display: 'grid',
+    width: 'max-content',
+  },
+}))
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -57,13 +67,24 @@ const ListPage = ({ ListContainer }) => {
     )
   }
 }
-const renderName = (name, { dashboardUrl }) => {
+const openLogsWindow = ({ name, id, clusterName, clusterId, logs }) => () => {
+  trackEvent('View Pod Logs', { name, id, clusterName, clusterId })
+  window.open(logs)
+}
+
+const renderLinks = (links, pod) => {
+  return <PodLinks pod={pod} />
+}
+
+const PodLinks = ({ pod }) => {
+  const classes = useStyles()
   return (
-    <span>
-      {name}
-      <br />
-      <ExternalLink url={dashboardUrl}>dashboard</ExternalLink>
-    </span>
+    <div className={classes.links}>
+      <ExternalLink url={pod.dashboardUrl}>dashboard</ExternalLink>
+      <SimpleLink src={pod.logs || ''} target="_blank" rel="noopener" onClick={openLogsWindow(pod)}>
+        View Container Logs
+      </SimpleLink>
+    </div>
   )
 }
 
@@ -86,17 +107,26 @@ export const options = {
   deleteFn: podActions.delete,
   addUrl: routes.pods.add.path(),
   addText: 'Create New Pod',
+  multiSelection: false,
   columns: [
-    { id: 'name', label: 'Name', render: renderName },
+    { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'namespace', label: 'Namespace' },
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
+    { id: 'links', label: 'Links', render: renderLinks },
     { id: 'status.phase', label: 'Status', render: renderStatus },
     { id: 'status.hostIP', label: 'Node IP' },
     {
       id: 'created',
       label: 'Age',
       render: (value) => <DateAndTime value={value} />,
+    },
+  ],
+  batchActions: [
+    {
+      icon: 'info-circle',
+      label: 'View Container Logs',
+      action: ([pod]) => openLogsWindow(pod)(),
     },
   ],
   name: 'Pods',
