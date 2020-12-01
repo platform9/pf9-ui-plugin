@@ -107,7 +107,6 @@ export const options = {
   deleteFn: podActions.delete,
   addUrl: routes.pods.add.path(),
   addText: 'Create New Pod',
-  multiSelection: false,
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },
