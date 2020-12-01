@@ -13,6 +13,15 @@ import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
+const getLogsUrl = (pod, cluster, rawServiceCatalog) => {
+  const qbertUrl =
+    pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
+  return `${qbertUrl}/clusters/${cluster?.uuid}/k8sapi/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`.replace(
+    /v3/,
+    'v1',
+  )
+}
+
 export const podsSelector = createSelector(
   [
     getDataSelector<DataKeys.Pods>(DataKeys.Pods, ['clusterId']),
@@ -33,8 +42,6 @@ export const podsSelector = createSelector(
           pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
           pod?.metadata?.name, // pathStr('metadata.name', pod),
         )
-        const qbertUrl =
-          pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
 
         return {
           ...pod,
@@ -44,10 +51,7 @@ export const podsSelector = createSelector(
           namespace: pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
           labels: pod?.metadata?.labels, // pathStr('metadata.labels', pod),
           clusterName: cluster?.name,
-          logs: `${qbertUrl}/clusters/${cluster?.uuid}/k8sapi/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`.replace(
-            /v3/,
-            'v1',
-          ),
+          logs: getLogsUrl(pod, cluster, rawServiceCatalog),
         }
       }),
     )(rawPods)

@@ -122,13 +122,6 @@ export const options = {
       render: (value) => <DateAndTime value={value} />,
     },
   ],
-  batchActions: [
-    {
-      icon: 'info-circle',
-      label: 'View Container Logs',
-      action: ([pod]) => openLogsWindow(pod)(),
-    },
-  ],
   name: 'Pods',
   title: 'Pods',
   ListPage,
