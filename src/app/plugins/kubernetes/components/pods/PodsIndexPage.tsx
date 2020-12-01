@@ -5,6 +5,7 @@ import PodsListPage from './PodsListPage'
 import DeploymentsListPage from './DeploymentsListPage'
 import ServicesListPage from './ServicesListPage'
 import PageContainer from 'core/components/pageContainer/PageContainer'
+import NamespacesListPage from '../namespaces/NamespacesListPage'
 
 const PodsIndexPage = () => (
   <PageContainer>
@@ -17,6 +18,9 @@ const PodsIndexPage = () => (
       </Tab>
       <Tab value="services" label="Services">
         <ServicesListPage />
+      </Tab>
+      <Tab value="namespaces" label="Namespaces">
+        <NamespacesListPage />
       </Tab>
     </Tabs>
   </PageContainer>

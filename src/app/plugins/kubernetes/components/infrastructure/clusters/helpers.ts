@@ -21,10 +21,14 @@ export const clusterNotBusy = (cluster) =>
 export const isBareOsMultiMasterCluster = (cluster) =>
   cluster.cloudProviderType === CloudProviders.BareOS && !!cluster.masterVipIpv4
 
+export const isAzureAutoscalingCluster = (cluster) =>
+  cluster.cloudProviderType === CloudProviders.Azure && cluster.enableCAS
+
 export const canScaleMasters = ([cluster]) =>
   isBareOsMultiMasterCluster(cluster) && clusterIsHealthy(cluster) && clusterNotBusy(cluster)
 
-export const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
+export const canScaleWorkers = ([cluster]) =>
+  clusterNotBusy(cluster) && !isAzureAutoscalingCluster(cluster)
 
 export const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
 

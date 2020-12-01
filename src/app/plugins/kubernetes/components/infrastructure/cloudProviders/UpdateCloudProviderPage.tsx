@@ -19,6 +19,7 @@ import { CloudProviders, ICloudProvidersSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { pick } from 'ramda'
+import { routes } from 'core/utils/routes'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -148,7 +149,7 @@ export const options = {
   FormComponent: UpdateCloudProviderForm,
   updateFn: cloudProviderActions.update,
   loaderFn: cloudProviderActions.list,
-  listUrl: '/ui/kubernetes/infrastructure#cloudProviders',
+  listUrl: routes.cloudProviders.list.path(),
   name: 'UpdateCloudProvider',
   title: 'Update Cloud Provider',
   uniqueIdentifier: 'uuid',

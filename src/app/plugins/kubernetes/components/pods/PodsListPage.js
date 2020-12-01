@@ -11,6 +11,7 @@ import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -83,7 +84,7 @@ const renderStatus = (phase) => {
 
 export const options = {
   deleteFn: podActions.delete,
-  addUrl: '/ui/kubernetes/pods/add',
+  addUrl: routes.pods.add.path(),
   addText: 'Create New Pod',
   columns: [
     { id: 'name', label: 'Name', render: renderName },

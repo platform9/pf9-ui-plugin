@@ -27,7 +27,7 @@ const useStyles = makeStyles<Theme, Partial<Props>>((theme: Theme) => ({
   },
 }))
 
-const Avatar = ({ displayName, diameter = 48, fontSize = 18, onClick, className }: Props) => {
+const Avatar = ({ displayName = '', diameter = 48, fontSize = 18, onClick, className }: Props) => {
   const { avatar } = useStyles({ diameter, fontSize, onClick })
 
   return (

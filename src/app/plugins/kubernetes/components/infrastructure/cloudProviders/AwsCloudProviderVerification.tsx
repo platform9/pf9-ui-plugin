@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import ClusterDomainPicklist from '../clusters/ClusterDomainPicklist'
 import AwsClusterSshKeyPicklist from '../clusters/aws/AwsClusterSshKeyPicklist'
 import Info from 'core/components/validatedForm/Info'
@@ -15,6 +14,9 @@ import { pathStrOr } from 'utils/fp'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
 import { getIcon, getIconClass, RegionAvailability } from './helpers'
+import { CloudProviders } from './model'
+import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
+import SshKeyField from '../clusters/form-components/ssh-key-picklist'
 
 const useStyles = makeStyles((theme: Theme) => ({
   spaceRight: {
@@ -92,7 +94,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
 
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
-    cloudProviderRegionId: wizardContext.cloudProviderRegionId,
+    cloudProviderRegionId: wizardContext.region,
   })
 
   const domains = pathStrOr([], '0.domains', details)
@@ -118,13 +120,10 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         <Text variant="body2">
           Platform9 deploys Kubernetes clusters into specified AWS Regions.
         </Text>
-        <PicklistField
-          DropdownComponent={CloudProviderRegionPicklist}
-          id="region"
-          label="Region"
-          cloudProviderId={wizardContext.cloudProviderId}
-          onChange={(region) => setWizardContext({ cloudProviderRegionId: region })}
-          value={wizardContext.cloudProviderRegionId}
+        <CloudProviderRegionField
+          cloudProviderType={CloudProviders.Aws}
+          onChange={(value) => setWizardContext({ region: value })}
+          values={wizardContext}
         />
       </FormFieldCard>
       <FormFieldCard
@@ -132,7 +131,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         middleHeader={
           <Route53Availability
             loading={loading}
-            regionId={wizardContext.cloudProviderRegionId}
+            regionId={wizardContext.region}
             domains={domains}
           />
         }
@@ -150,10 +149,10 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
           id="awsDomain"
           label="Route 53 Domain"
           cloudProviderId={wizardContext.cloudProviderId}
-          cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-          disabled={!(wizardContext.cloudProviderId && wizardContext.cloudProviderRegionId)}
+          cloudProviderRegionId={wizardContext.region}
+          disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
         />
-        {wizardContext.cloudProviderRegionId && !loading && !domains.length && (
+        {wizardContext.region && !loading && !domains.length && (
           <Info>
             <div>No registered Route53 Domains have been detected.</div>
             <div>Please register at least one domain with AWS Route53 to use Platform9.</div>
@@ -170,7 +169,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         middleHeader={
           <SshKeyAvailability
             loading={loading}
-            regionId={wizardContext.cloudProviderRegionId}
+            regionId={wizardContext.region}
             keypairs={keypairs}
           />
         }
@@ -181,14 +180,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         }
       >
         <Text variant="body2">SSH Keys are required for access to manage EC2 Instances.</Text>
-        <PicklistField
-          DropdownComponent={AwsClusterSshKeyPicklist}
-          disabled={!(wizardContext.cloudProviderId && wizardContext.cloudProviderRegionId)}
-          id="sshKey"
-          label="SSH Key"
-          cloudProviderId={wizardContext.cloudProviderId}
-          cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-        />
+        <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={wizardContext} info="" />
       </FormFieldCard>
     </>
   )

@@ -14,7 +14,6 @@ import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDeta
 import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
-import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
@@ -160,24 +159,29 @@ Kubernetes.registerPlugin = (pluginManager) => {
       component: AppDetailsPage,
     },
     {
-      name: 'Pods, Deployments, Services',
-      link: { path: '/pods', exact: true },
+      name: 'Workloads',
+      link: { path: '/workloads', exact: true },
       component: PodsIndexPage,
     },
     {
       name: 'Add Pod',
-      link: { path: '/pods/add', exact: true },
+      link: { path: '/workloads/pods/add', exact: true },
       component: () => <AddResourcePage resourceType="pod" />,
     },
     {
       name: 'Add Deployment',
-      link: { path: '/pods/deployments/add', exact: true },
+      link: { path: '/workloads/deployments/add', exact: true },
       component: () => <AddResourcePage resourceType="deployment" />,
     },
     {
       name: 'Add Service',
-      link: { path: '/pods/services/add', exact: true },
+      link: { path: '/workloads/services/add', exact: true },
       component: () => <AddResourcePage resourceType="service" />,
+    },
+    {
+      name: 'Add Namespace',
+      link: { path: '/workloads/namespaces/add', exact: true },
+      component: AddNamespacePage,
     },
     {
       name: 'Storage Classes',
@@ -188,11 +192,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Add Storage Class',
       link: { path: '/storage_classes/add', exact: true },
       component: StorageClassesAddPage,
-    },
-    {
-      name: 'Namespaces',
-      link: { path: '/namespaces', exact: true },
-      component: NamespacesListPage,
     },
     {
       name: 'Monitoring (beta)',
@@ -213,11 +212,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Edit Logging',
       link: { path: '/logging/edit/:id', exact: true },
       component: LoggingEditPage,
-    },
-    {
-      name: 'Add Namespace',
-      link: { path: '/namespaces/add', exact: true },
-      component: AddNamespacePage,
     },
     {
       name: 'API Access',
@@ -359,17 +353,17 @@ Kubernetes.registerPlugin = (pluginManager) => {
     //   ],
     // },
     {
-      name: 'Pods, Deployments, Services',
+      name: 'Workloads',
       ...clarityLink('/podsK8s'),
       icon: 'cubes',
       nestedLinks: [
         { name: 'Pods', ...clarityLink('/podsK8s#pods') },
         { name: 'Deployments', ...clarityLink('/podsK8s#deployments') },
         { name: 'Services', ...clarityLink('/podsK8s#services') },
+        { name: 'Namespaces', ...clarityLink('/kubernetes/namespaces') },
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
-    { name: 'Namespaces', icon: 'object-group', ...clarityLink('/kubernetes/namespaces') },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
     { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
@@ -408,17 +402,17 @@ Kubernetes.registerPlugin = (pluginManager) => {
     //   ],
     // },
     {
-      name: 'Pods, Deployments, Services',
-      link: { path: '/pods' },
+      name: 'Workloads',
+      link: { path: '/workloads' },
       icon: 'cubes',
       nestedLinks: [
-        { name: 'Pods', link: { path: '/pods#pods' } },
-        { name: 'Deployments', link: { path: '/pods#deployments' } },
-        { name: 'Services', link: { path: '/pods#services' } },
+        { name: 'Pods', link: { path: '/workloads#pods' } },
+        { name: 'Deployments', link: { path: '/workloads#deployments' } },
+        { name: 'Services', link: { path: '/worloads#services' } },
+        { name: 'Namespaces', link: { path: '/workloads#namespaces' } },
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
-    { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
     // TODO: Disabled till all CRUD operations are implemented
     // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
     // { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
