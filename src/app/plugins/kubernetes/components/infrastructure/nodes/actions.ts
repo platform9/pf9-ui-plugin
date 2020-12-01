@@ -11,6 +11,8 @@ import { Node } from 'api-client/qbert.model'
 
 const { qbert, resMgr } = ApiClient.getInstance()
 
+const isUnauthorizedHost = (host) => !host.roles.includes('pf9-kube')
+
 export const loadNodes = createContextLoader(
   ActionDataKeys.Nodes,
   async () => {
@@ -23,11 +25,7 @@ export const loadNodes = createContextLoader(
 
     // Find the unauthorized nodes from Resmgr
     const unauthorizedNodes: Node[] = hosts
-      .filter(
-        (host: Resmgr) =>
-          host.roles.length === 0 ||
-          (host.roles.length === 1 && host.roles.includes('pf9-support')),
-      )
+      .filter((host: Resmgr) => isUnauthorizedHost(host))
       .map((host) => {
         return {
           name: host.info.hostname,
