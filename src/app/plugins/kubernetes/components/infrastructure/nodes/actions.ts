@@ -8,10 +8,9 @@ import { nodesSelector, makeParamsNodesSelector } from './selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { Resmgr } from './model'
 import { Node } from 'api-client/qbert.model'
+import { isUnauthorizedHost } from './helper'
 
 const { qbert, resMgr } = ApiClient.getInstance()
-
-const isUnauthorizedHost = (host) => !host.roles.includes('pf9-kube')
 
 export const loadNodes = createContextLoader(
   ActionDataKeys.Nodes,
