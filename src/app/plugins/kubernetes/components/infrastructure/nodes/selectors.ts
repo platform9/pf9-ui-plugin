@@ -30,7 +30,6 @@ export const nodesSelector = createSelector(
       const usage = calculateNodeUsages([combinedHostsObj[node.uuid]]) // expects array
       return {
         ...node,
-        isAuthorized: node.isAuthorized === undefined ? true : false,
         // if hostagent is not responding, then the nodes info is outdated
         // set the status to disconnected manually
         status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',

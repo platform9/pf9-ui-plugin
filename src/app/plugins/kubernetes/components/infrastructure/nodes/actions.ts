@@ -21,9 +21,14 @@ export const loadNodes = createContextLoader(
       loadResMgrHosts(),
     ])
 
+    // Find the unauthorized nodes from Resmgr
     const unauthorizedNodes: Node[] = hosts
-      .filter((host: Resmgr) => rawNodes.find((node) => node.uuid === host.id) === undefined)
-      .map((host: Resmgr) => {
+      .filter(
+        (host: Resmgr) =>
+          host.roles.length === 0 ||
+          (host.roles.length === 1 && host.roles.includes('pf9-support')),
+      )
+      .map((host) => {
         return {
           name: host.info.hostname,
           uuid: host.id,
@@ -31,7 +36,14 @@ export const loadNodes = createContextLoader(
         }
       })
 
-    return [...rawNodes, ...unauthorizedNodes]
+    const authorizedNodes: Node[] = rawNodes.map((node) => {
+      return {
+        ...node,
+        isAuthorized: true, // all nodes that are obtained from Qbert are authorized
+      }
+    })
+
+    return [...authorizedNodes, ...unauthorizedNodes]
   },
   {
     uniqueIdentifier: 'uuid',
