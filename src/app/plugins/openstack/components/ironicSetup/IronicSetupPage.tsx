@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
-import DownloadHostAgentWalkthrough from 'openstack/components/hosts/DownloadHostAgentWalkthrough'
 import BareMetalNetworkStep from './BareMetalNetworkStep'
 import AuthorizeHostStep from './AuthorizeHostStep'
 import ControllerNetworkingStep from './ControllerNetworkingStep'
@@ -22,6 +21,7 @@ import { IPf9IronicInspector, IPf9NeutronOvsAgent, IPf9GlanceRole } from './mode
 import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
 import { Host } from 'api-client/resmgr.model'
 import DocumentMeta from 'core/components/DocumentMeta'
+import DownloadHostAgentWalkthrough from 'core/components/DownloadHostAgentWalkthrough'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const getProvisioningNetwork = (networks) =>

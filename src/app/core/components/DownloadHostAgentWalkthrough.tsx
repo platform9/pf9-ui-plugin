@@ -5,11 +5,11 @@ import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import { hexToRGBA } from 'core/utils/colorHelpers'
-import Button from '@material-ui/core/Button'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import SimpleLink from 'core/components/SimpleLink'
-import { getDownloadLinks } from './actions'
 import clsx from 'clsx'
+import { getDownloadLinks } from 'openstack/components/hosts/actions'
+import SubmitButton from './buttons/SubmitButton'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -55,15 +55,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexWrap: 'wrap',
   },
-  download: {
-    border: `1px solid ${theme.palette.primary.main}`,
-    letterSpacing: '1.25px',
-    fontWeight: 500,
-    color: theme.palette.primary.main,
-    background: theme.palette.primary.contrastText,
-    padding: theme.spacing(1, 2),
-    textTransform: 'uppercase',
-  },
   downloadIcon: {
     marginLeft: theme.spacing(1),
   },
@@ -99,12 +90,12 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
               src={downloadLink}
               variant="primary"
             >
-              <Button className={classes.download}>
+              <SubmitButton>
                 Download Installer
                 <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
                   download
                 </FontAwesomeIcon>
-              </Button>
+              </SubmitButton>
             </SimpleLink>
           </div>
         }

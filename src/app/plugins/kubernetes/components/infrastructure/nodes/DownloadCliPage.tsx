@@ -3,41 +3,28 @@ import React, { FunctionComponent } from 'react'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 // Components
-import PageContainer from 'core/components/pageContainer/PageContainer'
-// import SimpleLink from 'core/components/SimpleLink'
 import { DownloadCliOnboardNodeWalkthrough } from './DownloadCliWalkthrough'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import CodeBlock from 'core/components/CodeBlock'
-import SimpleLink from 'core/components/SimpleLink'
-import { routes } from 'core/utils/routes'
 import Theme from 'core/themes/model'
+import PageContainer from 'core/components/pageContainer/PageContainer'
 
 const useStyles = makeStyles((theme: Theme) => ({
-  onBoardNodeContainer: {
+  downloadCLIContainer: {
     maxWidth: '850px',
+    margin: theme.spacing(3, 2, 2, 2),
   },
   spacer: {
     height: theme.spacing(2),
     width: theme.spacing(2),
   },
-  backLink: {
-    marginBottom: theme.spacing(2),
-    marginLeft: 'auto',
-  },
 }))
 
 const DownloadCliPage: FunctionComponent = () => {
-  const { spacer, backLink, onBoardNodeContainer } = useStyles({})
+  const classes = useStyles()
   return (
-    <PageContainer
-      className={onBoardNodeContainer}
-      header={
-        <SimpleLink src={routes.nodes.list.path()} className={backLink}>
-          « Back to Node List
-        </SimpleLink>
-      }
-    >
-      <Text variant="h5">Onboard a new node</Text>
+    <PageContainer className={classes.downloadCLIContainer}>
+      <Text variant="h5">Onboard new nodes using the PF9 CLI</Text>
       <p> </p>
       <Text component="span">
         In order to add a physical or virtual node to your BareOS cluster, you need to first
@@ -46,7 +33,7 @@ const DownloadCliPage: FunctionComponent = () => {
       </Text>
       <DownloadCliOnboardNodeWalkthrough />
 
-      <p className={spacer} />
+      <p className={classes.spacer} />
       <Text variant="h6">CLI Advanced Options</Text>
       <p> </p>
       <Text component="p" variant="subtitle2">
