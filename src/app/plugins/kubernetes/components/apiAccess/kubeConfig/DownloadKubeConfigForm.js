@@ -28,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
   errorContainer: {
     paddingLeft: '12px',
   },
+  inputFields: {
+    width: '100% !important',
+  },
 }))
 
 const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
@@ -99,7 +102,7 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
         </Grid>
         {authMethod === 'password' && (
           <Grid item xs={12} zeroMinWidth>
-            <PasswordForm classes={classes} />
+            <PasswordForm />
           </Grid>
         )}
         {!!errorMessage && (
@@ -121,21 +124,30 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
   )
 }
 
-const PasswordForm = ({ classes }) => (
-  <Grid container item xs={12}>
-    <Grid item xs={4} zeroMinWidth>
-      <h4>Username</h4>
+const PasswordForm = () => {
+  const classes = useStyles()
+  return (
+    <Grid container item xs={12}>
+      <Grid item xs={4} zeroMinWidth>
+        <h4>Username</h4>
+      </Grid>
+      <Grid item xs={8} zeroMinWidth>
+        <TextField className={classes.inputFields} id="username" label="username" required />
+      </Grid>
+      <Grid item xs={4} zeroMinWidth>
+        <h4>Password</h4>
+      </Grid>
+      <Grid item xs={8} zeroMinWidth>
+        <TextField
+          className={classes.inputFields}
+          id="password"
+          label="password"
+          type="password"
+          required
+        />
+      </Grid>
     </Grid>
-    <Grid item xs={8} zeroMinWidth>
-      <TextField id="username" label="username" required />
-    </Grid>
-    <Grid item xs={4} zeroMinWidth>
-      <h4>Password</h4>
-    </Grid>
-    <Grid item xs={8} zeroMinWidth>
-      <TextField id="password" label="password" type="password" required />
-    </Grid>
-  </Grid>
-)
+  )
+}
 
 export default DownloadKubeConfigForm
