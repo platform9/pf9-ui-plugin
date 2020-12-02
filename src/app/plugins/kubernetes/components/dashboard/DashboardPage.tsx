@@ -120,7 +120,7 @@ export const nodeStatusCardProps: IStatusCardWithFilterProps = {
   entity: 'node',
   permissions: ['admin'],
   route: routes.nodes.list.path(),
-  addRoute: routes.nodes.download.path(),
+  addRoute: routes.nodes.add.path(),
   title: 'Nodes',
   icon: 'ball-pile',
   dataLoader: [loadNodes, {}],

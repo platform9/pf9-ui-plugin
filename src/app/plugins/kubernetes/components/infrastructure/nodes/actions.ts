@@ -6,24 +6,60 @@ import createContextUpdater from 'core/helpers/createContextUpdater'
 import { trackEvent } from 'utils/tracking'
 import { nodesSelector, makeParamsNodesSelector } from './selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { Resmgr } from './model'
+import { Node } from 'api-client/qbert.model'
+import { isUnauthorizedHost } from './helper'
 
 const { qbert, resMgr } = ApiClient.getInstance()
 
 export const loadNodes = createContextLoader(
   ActionDataKeys.Nodes,
   async () => {
-    const [rawNodes] = await Promise.all([
+    const [rawNodes, , hosts] = await Promise.all([
       qbert.getNodes(),
       // Fetch dependent caches
       loadServiceCatalog(),
       loadResMgrHosts(),
     ])
-    return rawNodes
+
+    // Find the unauthorized nodes from Resmgr
+    const unauthorizedNodes: Node[] = hosts
+      .filter((host: Resmgr) => isUnauthorizedHost(host))
+      .map((host) => {
+        return {
+          name: host.info.hostname,
+          uuid: host.id,
+          isAuthorized: false,
+        }
+      })
+
+    const authorizedNodes: Node[] = rawNodes.map((node) => {
+      return {
+        ...node,
+        isAuthorized: true, // all nodes that are obtained from Qbert are authorized
+      }
+    })
+
+    return [...authorizedNodes, ...unauthorizedNodes]
   },
   {
     uniqueIdentifier: 'uuid',
     selector: nodesSelector,
     selectorCreator: makeParamsNodesSelector,
+  },
+)
+
+export const authNode = createContextUpdater(
+  ActionDataKeys.Nodes,
+  async (node) => {
+    await resMgr.addRole(node.uuid, 'pf9-kube', {})
+    trackEvent('Authorize Node', {
+      node_name: node.name,
+    })
+    return loadNodes()
+  },
+  {
+    operation: 'authNode',
   },
 )
 
