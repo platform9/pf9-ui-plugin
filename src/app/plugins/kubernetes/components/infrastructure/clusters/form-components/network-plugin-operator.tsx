@@ -5,7 +5,7 @@ const NetworkPluginOperator = () => (
   <CheckboxField
     id="deployLuigiOperator"
     label="Network Plugin Operator"
-    info="The netowrk plugin operator will deploy Platform9 CRDs to enable multiple CNIs and features such as SR-IOV"
+    info="The network plugin operator will deploy Platform9 CRDs to enable multiple CNIs and features such as SR-IOV"
   />
 )
 
