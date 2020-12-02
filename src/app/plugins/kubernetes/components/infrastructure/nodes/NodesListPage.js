@@ -28,6 +28,9 @@ import { routes } from 'core/utils/routes'
 import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import ResourceUsageTables from '../common/ResourceUsageTables'
+import NodesStatePicklist from './nodes-state-picklist'
+import NodeAuthDialog from './NodeAuthDialog'
+import { NodeState } from './model'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -44,22 +47,35 @@ const useStyles = makeStyles((theme) => ({
 
 const defaultParams = {
   clusterId: allKey,
+  state: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Nodes', listTablePrefs)
 
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(loadNodes, params)
-    // Filter nodes based on cluster
-    const filteredNodes = data.filter((node) => {
+    const [nodes, loading, reload] = useDataLoader(loadNodes, params)
+
+    const filterByCluster = (node) => {
       if (params.clusterId === allKey) {
         return true
       } else if (params.clusterId === '') {
         return !node.clusterUuid
-      } else if (params.clusterId) {
+      } else {
         return node.clusterUuid === params.clusterId
       }
+    }
+
+    const filterByNodeState = (node) => {
+      if (params.state === allKey) {
+        return true
+      } else {
+        return params.state === NodeState.Authorized ? node.isAuthorized : !node.isAuthorized
+      }
+    }
+
+    const filteredNodes = nodes.filter((node) => {
+      return filterByCluster(node) && filterByNodeState(node)
     })
 
     return (
@@ -77,6 +93,7 @@ const ListPage = ({ ListContainer }) => {
               selectFirst={false}
               showNone
             />
+            <NodesStatePicklist onChange={getParamsUpdater('state')} value={params.state} />
           </>
         }
         {...pick(listTablePrefs, params)}
@@ -261,7 +278,7 @@ const isAdmin = (selected, store) => {
 
 export const options = {
   addText: 'Onboard a Node',
-  addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
+  addUrl: routes.nodes.add.path(),
   columns,
   cacheKey: ActionDataKeys.Nodes,
   name: 'Nodes',
@@ -276,7 +293,13 @@ export const options = {
       dialog: RemoteSupportDialog,
     },
     {
-      cond: ([node]) => !node.clusterUuid,
+      cond: ([node]) => !node.isAuthorized,
+      icon: 'plus-circle',
+      label: 'Authorize',
+      dialog: NodeAuthDialog,
+    },
+    {
+      cond: ([node]) => node.isAuthorized && !node.clusterUuid,
       icon: 'trash-alt',
       label: 'Deauthorize',
       dialog: NodeDeAuthDialog,

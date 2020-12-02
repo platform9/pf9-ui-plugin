@@ -276,12 +276,12 @@ export const routes = {
         plugin: AppPlugins.Kubernetes,
       },
     }),
-    download: Route.register({
-      url: `${pluginRoutePrefix}/infrastructure/nodes/cli/download`,
+    add: Route.register({
+      url: `${pluginRoutePrefix}/infrastructure/nodes/add`,
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
-      name: 'Nodes:Download',
+      name: 'Nodes:Add',
     }),
   },
   cloudProviders: {

@@ -23,6 +23,7 @@ import {
   IInterfaceByName,
 } from './keystone.model'
 import DataKeys from 'k8s/DataKeys'
+import ApiClient from './ApiClient'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -367,8 +368,9 @@ class Keystone extends ApiService {
       this.client.activeProjectId = projectId
       this.client.scopedToken = scopedToken
       await this.getServiceCatalog()
-
       const user = await this.getUser(_user.id)
+      ApiClient.refreshApiEndpoints()
+
       return {
         user: {
           ...user,
@@ -536,6 +538,7 @@ class Keystone extends ApiService {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'internal')
       const { links } = await this.client.basicGet<any>({
+        endpoint: null,
         url: linksUrl,
         options: {
           clsName: this.getClassName(),
