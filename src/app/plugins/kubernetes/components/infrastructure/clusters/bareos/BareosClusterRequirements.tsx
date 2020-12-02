@@ -100,7 +100,6 @@ interface Props {
 
 const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
   const classes = useStyles({})
-  const [showDialog, setShowDialog] = useState(false)
   const [createType, setCreateType] = useState('')
   const [availableNodes, setAvailableNodes] = useState(0)
   const [requiredNodes, setRequiredNodes] = useState(0)
@@ -116,12 +115,11 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
   const handleClick = useCallback(
     (type: ClusterCreateTypes) => () => {
       setRequiredNodes(BareOsRequiredNodes[type])
-      const hasAvailableNodes = availableNodes >= requiredNodes
+      setCreateType(type)
 
-      if (!hasAvailableNodes) {
-        setCreateType(type)
-        setShowDialog(true)
-      } else {
+      const hasAvailableNodes = availableNodes >= BareOsRequiredNodes[type]
+
+      if (hasAvailableNodes) {
         onComplete(routes.cluster.addBareOs[provider][type].path())
       }
     },
@@ -130,13 +128,12 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
 
   return (
     <>
-      {showDialog && (
+      {availableNodes < requiredNodes && (
         <InsufficientNodesNodesDialog
           createType={createType}
           availableNodes={availableNodes}
           requiredNodes={requiredNodes}
-          showDialog={showDialog}
-          setShowDialog={setShowDialog}
+          setRequiredNodes={setRequiredNodes}
         />
       )}
       <FormFieldCard
