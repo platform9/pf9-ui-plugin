@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
-import { any, head, map, mergeLeft, pathEq, pipe, pluck, propEq, toPairs } from 'ramda'
-import { emptyArr, emptyObj, filterIf } from 'utils/fp'
+import { any, find, head, map, mergeLeft, pathEq, pipe, pluck, prop, propEq, toPairs } from 'ramda'
+import { emptyArr, emptyObj, filterIf, pipeWhenTruthy } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
@@ -13,9 +13,24 @@ import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
+const getLogsUrl = (pod, cluster, rawServiceCatalog) => {
+  const qbertUrl = pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog)
+  if (!qbertUrl) return null
+
+  // qbert v3 link fails authorization so we have to use v1 link for logs
+  return `${qbertUrl}/clusters/${cluster?.uuid}/k8sapi/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`.replace(
+    /v3/,
+    'v1',
+  )
+}
+
 export const podsSelector = createSelector(
-  [getDataSelector<DataKeys.Pods>(DataKeys.Pods, ['clusterId']), clustersSelector],
-  (rawPods, clusters) => {
+  [
+    getDataSelector<DataKeys.Pods>(DataKeys.Pods, ['clusterId']),
+    clustersSelector,
+    getDataSelector<DataKeys.ServiceCatalog>(DataKeys.ServiceCatalog),
+  ],
+  (rawPods, clusters, rawServiceCatalog) => {
     // associate nodes with the combinedHost entry
     return pipe<IDataKeys[DataKeys.Pods], IPodSelector[]>(
       // Filter by namespace
@@ -29,6 +44,7 @@ export const podsSelector = createSelector(
           pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
           pod?.metadata?.name, // pathStr('metadata.name', pod),
         )
+
         return {
           ...pod,
           dashboardUrl,
@@ -37,6 +53,7 @@ export const podsSelector = createSelector(
           namespace: pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
           labels: pod?.metadata?.labels, // pathStr('metadata.labels', pod),
           clusterName: cluster?.name,
+          logs: getLogsUrl(pod, cluster, rawServiceCatalog),
         }
       }),
     )(rawPods)
