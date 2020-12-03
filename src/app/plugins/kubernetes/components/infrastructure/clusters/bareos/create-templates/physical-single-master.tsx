@@ -47,7 +47,7 @@ export const initialContext = {
   networkPlugin: 'calico',
   calicoIpIpMode: 'Always',
   calicoNatOutgoing: true,
-  calicoV4BlockSize: '24',
+  calicoBlockSize: '24',
   runtimeConfigOption: 'default',
   mtuSize: 1440,
   privileged: true,
@@ -263,7 +263,7 @@ const reviewTableColumns = [
   },
   { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
   { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
-  { id: 'calicoV4BlockSize', label: 'Block Size' },
+  { id: 'calicoBlockSize', label: 'Block Size' },
   { id: 'mtuSize', label: 'MTU Size' },
   {
     id: 'privileged',
