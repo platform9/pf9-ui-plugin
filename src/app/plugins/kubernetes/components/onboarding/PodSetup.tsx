@@ -98,7 +98,7 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
           hidden
           loading={loadingPods}
           onReload={handleReload}
-          refreshDuration={oneSecond * 10}
+          refreshDuration={oneSecond * 30}
         />
       )}
       <OnboardWizard
