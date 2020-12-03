@@ -21,8 +21,12 @@ import { IPf9IronicInspector, IPf9NeutronOvsAgent, IPf9GlanceRole } from './mode
 import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
 import { Host } from 'api-client/resmgr.model'
 import DocumentMeta from 'core/components/DocumentMeta'
-import DownloadHostAgentWalkthrough from 'core/components/DownloadHostAgentWalkthrough'
+import DownloadHostAgentWalkthrough, {
+  OsOptions,
+} from 'core/components/DownloadHostAgentWalkthrough'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
+
+const hostAgentDownloadOsOptions = [OsOptions.Linux]
 
 const getProvisioningNetwork = (networks) =>
   networks.find((network) => network['provider:physical_network'] === 'provisioning')
@@ -221,7 +225,7 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
                   Install the Platform9 Host Agent on the node that will become the controller for
                   Bare Metal.
                 </div>
-                <DownloadHostAgentWalkthrough />
+                <DownloadHostAgentWalkthrough osOptions={hostAgentDownloadOsOptions} />
               </WizardStep>
               <WizardStep stepId="step3" label="Authorize Host Agent" keepContentMounted={false}>
                 <AuthorizeHostStep
