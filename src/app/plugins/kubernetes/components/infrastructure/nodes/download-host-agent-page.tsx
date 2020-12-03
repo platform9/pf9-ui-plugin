@@ -4,9 +4,13 @@ import { makeStyles } from '@material-ui/core'
 import Text from 'core/elements/text'
 import CodeBlock from 'core/components/CodeBlock'
 import Info from 'core/components/validatedForm/Info'
-import DownloadHostAgentWalkthrough from 'core/components/DownloadHostAgentWalkthrough'
+import DownloadHostAgentWalkthrough, {
+  OsOptions,
+} from 'core/components/DownloadHostAgentWalkthrough'
 import ExternalLink from 'core/components/ExternalLink'
 import { nodePrerequisitesDocumentationLink } from 'k8s/links'
+
+const hostAgentDownloadOsOptions = [OsOptions.Linux, OsOptions.Ubuntu]
 
 const useStyles = makeStyles((theme: Theme) => ({
   downloadHostAgent: {
@@ -117,7 +121,7 @@ const DownloadHostAgentPage = () => {
           authorized on the Nodes dashboard.
         </Text>
       </p>
-      <DownloadHostAgentWalkthrough />
+      <DownloadHostAgentWalkthrough osOptions={hostAgentDownloadOsOptions} />
       <p className={classes.spacer}></p>
       <SupportedDistributionsAndPrerequisitesInfo />
       <p className={classes.spacer}></p>
