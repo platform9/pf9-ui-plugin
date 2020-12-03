@@ -68,7 +68,12 @@ const styles = (theme) => ({
   textField: {
     width: 280,
     '& input': {
+      height: 54,
       backgroundColor: `${theme.palette.grey[800]} !important`,
+      fontSize: 18,
+    },
+    '& .MuiInputLabel-outlined': {
+      top: 2,
     },
   },
   emailInput: {
@@ -233,7 +238,7 @@ class LoginPage extends React.PureComponent<Props> {
       username,
       duDomain: window.location.origin,
     })
-
+    console.log('right before onAuthSuccess')
     await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt, isSsoToken })
     return this.setState(
       {

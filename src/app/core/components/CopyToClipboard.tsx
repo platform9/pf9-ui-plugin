@@ -15,6 +15,7 @@ interface Props {
   // icon inline
   fill?: boolean
   copyIcon?: any
+  triggerWithChild?: boolean
 }
 
 interface State {
@@ -110,6 +111,7 @@ const CopyToClipboard: FunctionComponent<Props> = ({
   header = undefined,
   fill = false,
   copyIcon,
+  triggerWithChild = false,
 }) => {
   const { params, updateParams } = useParams<State>(defaultParams)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -151,7 +153,12 @@ const CopyToClipboard: FunctionComponent<Props> = ({
   )
 
   // readOnly is needed in textarea to silence React warning about missing onChange
-  return (
+  return triggerWithChild ? (
+    <div onClick={handleCopy}>
+      <textarea ref={textAreaRef} value={copyText} className={classes.textArea} readOnly />
+      {children}
+    </div>
+  ) : (
     <div className={classes.copyContainer}>
       <textarea ref={textAreaRef} value={copyText} className={classes.textArea} readOnly />
       {!!header && (

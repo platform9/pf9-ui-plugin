@@ -68,7 +68,7 @@ class Wizard extends PureComponent {
   }
 
   handleNext = async () => {
-    const { onComplete } = this.props
+    const { onComplete, singleStep } = this.props
     const { steps, activeStep, wizardContext } = this.state
 
     // This is triggerSubmit in the ValidatedForm
@@ -77,6 +77,11 @@ class Wizard extends PureComponent {
       if (!ok) {
         return
       }
+    }
+
+    if (singleStep) {
+      onComplete(this.state.wizardContext)
+      return
     }
 
     this.setState(
@@ -155,6 +160,7 @@ class Wizard extends PureComponent {
       onCancel,
       showFinishAndReviewButton,
       hideAllButtons,
+      showButtonsIfProp,
     } = this.props
     const shouldShowFinishAndReview =
       typeof showFinishAndReviewButton === 'function'
@@ -171,13 +177,17 @@ class Wizard extends PureComponent {
           onNext: this.onNext,
           handleNext: this.handleNext,
         })}
-        {!hideAllButtons && (
+        {!hideAllButtons && (!showButtonsIfProp || wizardContext[showButtonsIfProp]) && (
           <WizardButtons hasCalloutFields={this.state.calloutFields}>
             {onCancel && <CancelButton onClick={onCancel} />}
             {this.hasBack() && <PrevButton onClick={this.handleBack} />}
             {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
             {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
-            {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+            {this.isLastStep() && (
+              <NextButton onClick={this.handleNext} showForward={false}>
+                {submitLabel}
+              </NextButton>
+            )}
             {shouldShowFinishAndReview && this.isFinishAndReviewVisible() && (
               <NextButton onClick={this.onFinishAndReview} showForward={false}>
                 {finishAndReviewLabel}
@@ -204,6 +214,8 @@ Wizard.propTypes = {
   startingStep: PropTypes.number,
   hideBack: PropTypes.bool,
   hideAllButtons: PropTypes.bool,
+  showButtonsIfProp: PropTypes.string,
+  singleStep: PropTypes.bool,
 }
 
 Wizard.defaultProps = {
@@ -217,6 +229,7 @@ Wizard.defaultProps = {
   startingStep: 0,
   hideBack: false,
   hideAllButtons: false,
+  singleStep: false,
 }
 
 export default withRouter(Wizard)
