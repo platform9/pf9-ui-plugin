@@ -66,7 +66,7 @@ export const AddRoleForm = ({ onComplete }) => {
 }
 
 export const options = {
-  cacheKey: ActionDataKeys.Roles,
+  cacheKey: ActionDataKeys.KubeRoles,
   FormComponent: AddRoleForm,
   listUrl: '/ui/kubernetes/rbac',
   name: 'AddRole',
