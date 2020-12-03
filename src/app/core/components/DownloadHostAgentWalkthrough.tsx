@@ -1,15 +1,30 @@
 import React, { FC, useEffect, useState } from 'react'
-import { Paper } from '@material-ui/core'
+import { Paper, Menu, MenuItem } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import SimpleLink from 'core/components/SimpleLink'
 import clsx from 'clsx'
 import { getDownloadLinks } from 'openstack/components/hosts/actions'
 import SubmitButton from './buttons/SubmitButton'
+import SimpleLink from './SimpleLink'
+
+export enum OsOptions {
+  Linux = 'Linux',
+  Ubuntu = 'Ubuntu',
+}
+
+enum OsDownloadLabel {
+  Linux = 'for Enterprise Linux (CentOs/Redhat) 7.6 (64-bit)',
+  Ubuntu = 'for Ubuntu 16.04 LTS and Ubuntu 18.04 LTS (64-bit)',
+}
+
+enum osDownloadLinkName {
+  Linux = 'rpm_install',
+  Ubuntu = 'deb_install',
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -61,19 +76,40 @@ const useStyles = makeStyles((theme: Theme) => ({
   spaceAbove: {
     marginTop: theme.spacing(2),
   },
+  dropdown: {
+    position: 'relative',
+  },
 }))
 
-const DownloadHostAgentWalkthrough = (): JSX.Element => {
+const DownloadHostAgentWalkthrough = ({ osOptions }): JSX.Element => {
   const classes = useStyles({})
-  const [downloadLink, setDownloadLink] = useState('')
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [downloadOptions, setDownloadOptions] = useState([])
+
   useEffect(() => {
-    const loadDownloadLink = async () => {
+    const loadDownloadLinks = async () => {
       const links = await getDownloadLinks()
+      if (!links) return
+
       // In the future when supporting openstack, will want to show all download links
-      setDownloadLink(links.rpm_install)
+      const options = osOptions.map((os) => {
+        return {
+          label: OsDownloadLabel[os],
+          link: links[osDownloadLinkName[os]],
+        }
+      })
+      setDownloadOptions(options)
     }
-    loadDownloadLink()
-  }, [setDownloadLink])
+    loadDownloadLinks()
+  }, [osOptions, downloadOptions])
+
+  const handleDownloadClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
 
   return (
     <Paper className={classes.paper} elevation={0}>
@@ -85,18 +121,26 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
             <Text className={classes.fullRow}>
               Download the host agent installer for your host operating system version:
             </Text>
-            <SimpleLink
-              className={clsx(classes.fullRow, classes.spaceAbove)}
-              src={downloadLink}
-              variant="primary"
+            <SubmitButton onClick={handleDownloadClick}>
+              Download Installer
+              <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
+                download
+              </FontAwesomeIcon>
+            </SubmitButton>
+            <Menu
+              id="download-options"
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              getContentAnchorEl={null}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             >
-              <SubmitButton>
-                Download Installer
-                <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
-                  download
-                </FontAwesomeIcon>
-              </SubmitButton>
-            </SimpleLink>
+              {downloadOptions.map((option) => (
+                <SimpleLink src={option.link} key={option.label}>
+                  <MenuItem onClick={handleMenuClose}>{option.label}</MenuItem>
+                </SimpleLink>
+              ))}
+            </Menu>
           </div>
         }
       />
