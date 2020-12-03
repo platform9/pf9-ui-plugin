@@ -101,7 +101,7 @@ const DownloadHostAgentWalkthrough = ({ osOptions }): JSX.Element => {
       setDownloadOptions(options)
     }
     loadDownloadLinks()
-  }, [downloadOptions])
+  }, [osOptions, downloadOptions])
 
   const handleDownloadClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -137,7 +137,7 @@ const DownloadHostAgentWalkthrough = ({ osOptions }): JSX.Element => {
             >
               {downloadOptions.map((option) => (
                 <SimpleLink src={option.link} key={option.label}>
-                  <MenuItem>{option.label}</MenuItem>
+                  <MenuItem onClick={handleMenuClose}>{option.label}</MenuItem>
                 </SimpleLink>
               ))}
             </Menu>
