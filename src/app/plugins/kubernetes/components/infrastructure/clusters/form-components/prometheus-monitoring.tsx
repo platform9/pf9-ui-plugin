@@ -2,7 +2,7 @@ import Alert from 'core/components/Alert'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import React from 'react'
 
-const PrometheusMonitoringField = ({ wizardContext = {} as any, setWizardContext }) => (
+const PrometheusMonitoringField = () => (
   <>
     <CheckboxField
       id="prometheusMonitoringEnabled"
