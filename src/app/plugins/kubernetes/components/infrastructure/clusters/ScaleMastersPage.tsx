@@ -17,6 +17,7 @@ import ClusterHostChooser, {
   isUnassignedNode,
   inCluster,
   isMaster,
+  isConnected,
 } from './bareos/ClusterHostChooser'
 import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
@@ -205,7 +206,9 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
             id="nodes"
             selection="single"
             filterFn={
-              scaleType === 'add' ? isUnassignedNode : allPass([isMaster, inCluster(cluster.uuid)])
+              scaleType === 'add'
+                ? allPass([isUnassignedNode, isConnected])
+                : allPass([isMaster, inCluster(cluster.uuid)])
             }
             validations={[
               clusterAndNodeStatusValidator,
