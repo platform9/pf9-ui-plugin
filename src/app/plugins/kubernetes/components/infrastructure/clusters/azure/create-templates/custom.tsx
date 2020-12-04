@@ -66,6 +66,8 @@ export const initialContext = {
   tags: [],
   appCatalogEnabled: false,
   networkStack: 'ipv4',
+  privileged: false,
+  allowWorkloadsOnMaster: false,
 }
 
 const columns = [
