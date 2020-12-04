@@ -63,15 +63,14 @@ const InsufficientNodesNodesDialog = ({
   createType,
   availableNodes,
   requiredNodes,
-  showDialog,
-  setShowDialog,
+  setRequiredNodes,
 }) => {
   const classes = useStyles()
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
 
   return (
-    <Dialog fullWidth maxWidth="md" open={showDialog}>
+    <Dialog fullWidth maxWidth="md" open={availableNodes < requiredNodes}>
       <FormFieldCard
         className={classes.formCard}
         title={
@@ -153,7 +152,7 @@ const InsufficientNodesNodesDialog = ({
         />
       </FormFieldCard>
       <DialogActions className={classes.dialogButtons}>
-        <SubmitButton onClick={() => setShowDialog(false)}>Close</SubmitButton>
+        <SubmitButton onClick={() => setRequiredNodes(0)}>Close</SubmitButton>
       </DialogActions>
     </Dialog>
   )

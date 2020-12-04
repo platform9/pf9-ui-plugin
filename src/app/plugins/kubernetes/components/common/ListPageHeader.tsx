@@ -44,7 +44,7 @@ function ListPageHeader<T>({
   return (
     <>
       {documentMeta && documentMeta}
-      <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 10} />
+      <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 30} />
       <div className={classes.container}>
         <ListPageHeaderCard {...report} className={classes.card} />
         <UsageWidget title="Compute" stats={totals.compute} units="GHz" />
