@@ -197,7 +197,7 @@ const ClusterDetailsPage = () => {
   )
   return (
     <PageContainer className={classes.pageContainer}>
-      <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
+      <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 30} />
       <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
         « Back to Cluster List
       </SimpleLink>

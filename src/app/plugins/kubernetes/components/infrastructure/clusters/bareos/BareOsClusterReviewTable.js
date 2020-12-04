@@ -9,7 +9,7 @@ const getFilteredNodesFormattedName = (nodes, filterList = []) =>
     .filter((node) => filterList.includes(node.uuid))
     .map((node) => `${node.name} - ${node.primaryIp}`)
 
-const calicoFields = ['calicoIpIpMode', 'calicoNatOutgoing', 'calicoV4BlockSize']
+const calicoFields = ['calicoIpIpMode', 'calicoNatOutgoing', 'calicoBlockSize']
 const BareOsClusterReviewTable = ({ wizardContext, columns }) => {
   const [nodes] = useDataLoader(loadNodes)
   let reviewTableColumns = columns
