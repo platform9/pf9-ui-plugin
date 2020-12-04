@@ -64,7 +64,7 @@ export const initialContext = {
   tags: [],
   appCatalogEnabled: false,
   networkStack: 'ipv4',
-  privileged: false,
+  privileged: true,
   allowWorkloadsOnMaster: false,
 }
 
