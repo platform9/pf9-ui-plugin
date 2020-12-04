@@ -43,10 +43,10 @@ const DataRow = ({ label, value, renderArray = false, render = identity }) => {
           {!renderArray && Array.isArray(value)
             ? value.map((val, idx) => (
                 <Text key={idx} variant="caption1">
-                  {render(val || '-')}
+                  {render(val || val === false ? val : '-')}
                 </Text>
               ))
-            : render(value || '-')}
+            : render(value || value === false ? value : '-')}
         </Text>
       </td>
     </tr>
