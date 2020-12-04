@@ -58,7 +58,9 @@ export const apiGroupsLoader = createContextLoader(
   ActionDataKeys.ApiGroups,
   async ({ clusterId }) => {
     const apiGroups = await qbert.getApiGroupList(clusterId)
-    const groupVersions = uniq(apiGroups.map((apiGroup) => apiGroup.preferredVersion.groupVersion))
+    const groupVersions = uniq(
+      apiGroups.groups.map((apiGroup) => apiGroup.preferredVersion.groupVersion),
+    )
     await Promise.all([
       loadCoreApiResources({ clusterId }),
       ...groupVersions.map((apiGroup) => loadApiResources({ clusterId, apiGroup })),

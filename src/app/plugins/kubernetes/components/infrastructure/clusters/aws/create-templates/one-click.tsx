@@ -32,7 +32,7 @@ export const initialContext = {
   ami: 'ubuntu',
   calicoIpIpMode: 'Always',
   calicoNatOutgoing: true,
-  calicoV4BlockSize: '24',
+  calicoBlockSize: '24',
   mtuSize: 1440,
   etcdBackup: true,
   etcdStoragePath: defaultEtcBackupPath,
@@ -57,7 +57,7 @@ const columns = [
   { id: 'network', label: 'Network' },
   { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
   { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
-  { id: 'calicoV4BlockSize', label: 'Block Size' },
+  { id: 'calicoBlockSize', label: 'Block Size' },
   { id: 'mtuSize', label: 'Block Size' },
   {
     id: 'etcdBackup',
