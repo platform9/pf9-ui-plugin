@@ -93,6 +93,12 @@ export const scaleConstraints: IConstraint[] = [
 
   // grow
   {
+    startNum: 0,
+    desiredNum: 1,
+    relation: 'allow',
+    message: oneMasterMsg,
+  },
+  {
     startNum: 1,
     desiredNum: 2,
     relation: 'allow',
