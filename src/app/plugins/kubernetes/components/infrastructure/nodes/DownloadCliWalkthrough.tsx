@@ -118,11 +118,11 @@ const DownloadCliWalkthrough = (): JSX.Element => {
       <NumberedSteps
         step={2}
         title={
-          'Run the PF9 CLI using ‘prep-node’ to attach the Node to the Platform9 Management plane'
+          'Using a user with SUDO privileges, run the PF9 CLI command Prep-Node to attach the node to Platform9.'
         }
         description={
           <CopyToClipboard copyText="pf9ctl cluster prep-node">
-            <CodeBlock>pf9ctl cluster prep-node</CodeBlock>
+            <CodeBlock>sudo pf9ctl cluster prep-node</CodeBlock>
           </CopyToClipboard>
         }
       />
