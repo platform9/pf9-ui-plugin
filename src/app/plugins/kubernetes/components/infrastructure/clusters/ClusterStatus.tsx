@@ -67,13 +67,14 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
 
 type StatusVariant = 'table' | 'header'
 
-const iconMap = new Map([
+const iconMap = new Map<IClusterStatus, { icon: string; classes: string }>([
   ['fail', { icon: 'times', classes: '' }],
   ['ok', { icon: 'check', classes: '' }],
   ['pause', { icon: 'pause-circle', classes: '' }],
   ['unknown', { icon: 'question-circle', classes: '' }],
   ['error', { icon: 'exclamation-triangle', classes: '' }],
   ['loading', { icon: 'sync', classes: 'fa-spin' }],
+  ['upgrade', { icon: 'arrow-circle-up', classes: '' }],
 ])
 
 interface Props {
