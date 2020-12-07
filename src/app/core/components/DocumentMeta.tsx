@@ -77,7 +77,11 @@ export interface IDocumentMetaProps {
   bodyClasses?: any[]
 }
 
-class DocumentMeta extends React.Component<IDocumentMetaProps, {}> {
+export class DocumentMeta extends React.Component<IDocumentMetaProps, {}> {
+  static addElementToDomBody(element) {
+    document.body.appendChild(element)
+  }
+
   render() {
     return null
   }
