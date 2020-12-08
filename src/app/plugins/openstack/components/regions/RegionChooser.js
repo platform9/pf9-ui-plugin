@@ -51,10 +51,15 @@ const RegionChooser = (props) => {
       setActiveRegion(regionId)
       await keystone.resetCookie()
 
+      // Clearing the cache will cause all the current loaders to reload its data
+      await dispatch(cacheActions.clearCache())
+
       updateClarityStore(
         'regionObj',
         regions.find((r) => regionId === r.id),
       )
+
+      ApiClient.refreshApiEndpoints()
 
       // Redirect to the root of the current section (there's no need to reload all the app)
       // Must be done prior to updatePrefs until improved url management system is in place
@@ -62,8 +67,6 @@ const RegionChooser = (props) => {
       history.push(currentSection)
 
       updatePrefs({ currentRegion: regionId })
-      // Clearing the cache will cause all the current loaders to reload its data
-      await dispatch(cacheActions.clearCache())
 
       setLoading(false)
     },

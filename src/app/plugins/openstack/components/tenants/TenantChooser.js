@@ -59,6 +59,8 @@ const TenantChooser = (props) => {
     if (!tenant) {
       return
     }
+    // Clearing the cache will cause all the current loaders to reload its data
+    dispatch(cacheActions.clearCache())
 
     const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id, isSsoToken)
     dispatch(
@@ -70,8 +72,6 @@ const TenantChooser = (props) => {
     updatePrefs({
       currentTenant: tenant.id,
     })
-    // Clearing the cache will cause all the current loaders to reload its data
-    dispatch(cacheActions.clearCache())
 
     setLoading(false)
   }
