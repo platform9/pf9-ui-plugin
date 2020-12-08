@@ -108,13 +108,20 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
 
   // Segment tracking
   if (!analyticsOff) {
-    DocumentMeta.addElementToDomBody(createSegmentScript())
+    const segmentScript = createSegmentScript()
+    if (segmentScript) {
+      DocumentMeta.addElementToDomBody(segmentScript)
+    }
   }
 
   // Drift tracking code for live demo
   if (sandbox) {
-    DocumentMeta.addElementToDomBody(createDriftScript())
+    const driftScript = createDriftScript()
+    if (driftScript) {
+      DocumentMeta.addElementToDomBody(driftScript)
+    }
   }
+
   return {
     userDetails: user,
     scopedToken,
