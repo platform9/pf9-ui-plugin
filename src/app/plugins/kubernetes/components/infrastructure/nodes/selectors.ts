@@ -21,7 +21,6 @@ export const nodesSelector = createSelector(
       return accum
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     }, {} as { [key: string]: ICombinedHost })
-
     const qbertUrl =
       pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
 

@@ -1,15 +1,15 @@
-import { isNilOrEmpty, emptyArr, emptyObj } from 'app/utils/fp'
-import PropTypes from 'prop-types'
-import React, { useState, useMemo, useCallback, useRef } from 'react'
-import ConfirmationDialog from './ConfirmationDialog'
-import useToggler from 'core/hooks/useToggler'
 import { defaultUniqueIdentifier } from 'app/constants'
-import { pluck, path } from 'ramda'
+import { emptyArr, emptyObj, isNilOrEmpty } from 'app/utils/fp'
+import CreateButton from 'core/components/buttons/CreateButton'
+import PageContainerHeader from 'core/components/pageContainer/PageContainerHeader'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import useToggler from 'core/hooks/useToggler'
+import PropTypes from 'prop-types'
+import { path, pluck } from 'ramda'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import useReactRouter from 'use-react-router'
 import { pathJoin } from 'utils/misc'
-import PageContainerHeader from 'core/components/pageContainer/PageContainerHeader'
-import CreateButton from 'core/components/buttons/CreateButton'
-import useDataUpdater from 'core/hooks/useDataUpdater'
+import ConfirmationDialog from './ConfirmationDialog'
 
 const CRUDListContainer = ({
   children,
@@ -22,7 +22,6 @@ const CRUDListContainer = ({
   DeleteDialog,
   addUrl,
   editUrl,
-  customEditUrlFn,
   deleteFn,
   uniqueIdentifier,
 }) => {
@@ -84,9 +83,11 @@ const CRUDListContainer = ({
         )
         return
       }
-      history.push(
-        customEditUrlFn ? customEditUrlFn(selectedRow, selectedId) : pathJoin(editUrl, selectedId),
-      )
+      const urlResult =
+        typeof editUrl === 'function'
+          ? editUrl(selectedRow, selectedId)
+          : pathJoin(editUrl, selectedId)
+      history.push(urlResult)
     } else if (EditDialog) {
       setSelectedItems(selected)
       toggleEditDialog()
