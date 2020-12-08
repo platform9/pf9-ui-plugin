@@ -145,7 +145,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         map(mergeLeft(providedIndexedParams), ensureArray(items)),
       )
 
-      // Perfom the cache update operations
+      // Perform the cache update operations
       if (!cache || invalidateCache || refetch) {
         dispatch(
           cacheActions.replaceAll({

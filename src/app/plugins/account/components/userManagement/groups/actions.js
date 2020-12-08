@@ -10,7 +10,7 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
     const [groups] = await Promise.all([
       keystone.getGroups(),
       // Fetch dependent caches
-      mngmGroupMappingActions.list(),
+      mngmGroupMappingActions,
     ])
     return groups
   },
