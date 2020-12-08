@@ -238,7 +238,6 @@ class LoginPage extends React.PureComponent<Props> {
       username,
       duDomain: window.location.origin,
     })
-    console.log('right before onAuthSuccess')
     await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt, isSsoToken })
     return this.setState(
       {

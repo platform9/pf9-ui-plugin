@@ -5,6 +5,7 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import { always, isNil, keys, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, pathStr } from 'utils/fp'
+import { formMappingRule } from './helpers'
 import { makeGroupsSelector } from './selectors'
 
 const { keystone } = ApiClient.getInstance()
@@ -129,3 +130,61 @@ export const loadGroupRoleAssignments = async (groupId) => keystone.getGroupRole
 //     cache: false,
 //   },
 // )
+
+export const groupFormSubmission = async ({ params, existingMapping, operation }) => {
+  // Create/update the group and get the group id
+  const groupBody = {
+    name: params.name,
+    description: params.description,
+  }
+  const groupOperationMap = {
+    create: mngmGroupActions.create,
+    update: mngmGroupActions.update,
+  }
+  const groupOperation = groupOperationMap[operation]
+
+  const [success, group] = await groupOperation({
+    groupId: params.groupId,
+    roleAssignments: params.roleAssignments,
+    prevRoleAssignmentsArr: params.prevRoleAssignmentsArr,
+    ...groupBody,
+  })
+
+  if (!success) {
+    console.log('group operation failed')
+    return false
+  }
+
+  const groupId = group.id
+
+  // Add group to the mapping
+  const ruleBody = formMappingRule(params, groupId)
+
+  const mappingBody =
+    operation === 'update'
+      ? {
+          rules: existingMapping.rules.map((rule) => {
+            if (rule.local[0].group.id === params.groupId) {
+              return ruleBody
+            }
+            return rule
+          }),
+        }
+      : existingMapping
+      ? {
+          rules: [...existingMapping.rules, ruleBody],
+        }
+      : {
+          rules: [ruleBody],
+        }
+
+  const [updateMappingSuccess] = existingMapping
+    ? await mngmGroupMappingActions.update({ id: existingMapping.id, ...mappingBody })
+    : await mngmGroupMappingActions.create(mappingBody)
+
+  if (!updateMappingSuccess) {
+    console.log('group mapping operation failed')
+  }
+
+  return true
+}

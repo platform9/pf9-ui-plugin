@@ -27,7 +27,6 @@ interface Props {
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const SsoProviderPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
-  // ( name = 'severity', label = 'Severity', onChange, selectFirst = true, ...rest }, ref) => {
   (props, ref) => {
     const {
       onChange,

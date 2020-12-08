@@ -160,7 +160,6 @@ class Wizard extends PureComponent {
       onCancel,
       showFinishAndReviewButton,
       hideAllButtons,
-      showButtonsIfProp,
     } = this.props
     const shouldShowFinishAndReview =
       typeof showFinishAndReviewButton === 'function'
@@ -177,7 +176,7 @@ class Wizard extends PureComponent {
           onNext: this.onNext,
           handleNext: this.handleNext,
         })}
-        {!hideAllButtons && (!showButtonsIfProp || wizardContext[showButtonsIfProp]) && (
+        {!hideAllButtons && (
           <WizardButtons hasCalloutFields={this.state.calloutFields}>
             {onCancel && <CancelButton onClick={onCancel} />}
             {this.hasBack() && <PrevButton onClick={this.handleBack} />}
@@ -214,7 +213,6 @@ Wizard.propTypes = {
   startingStep: PropTypes.number,
   hideBack: PropTypes.bool,
   hideAllButtons: PropTypes.bool,
-  showButtonsIfProp: PropTypes.string,
   singleStep: PropTypes.bool,
 }
 

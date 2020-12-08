@@ -15,11 +15,9 @@ import { requiredValidator } from 'core/utils/fieldValidators'
 import { mngmTenantActions } from '../../userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
-import { mngmGroupActions, mngmGroupMappingActions } from './actions'
-import useDataUpdater from 'core/hooks/useDataUpdater'
+import { groupFormSubmission, mngmGroupMappingActions } from './actions'
 import GroupSettingsFields from './GroupSettingsFields'
 import GroupCustomMappingsFields from './GroupCustomMappingsFields'
-import { formMappingRule } from './helpers'
 import GroupsTips from './GroupsTips'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 const TenantRolesTableField: any = TenantRolesTableFieldDefault // types on forward ref .js file dont work well.
@@ -40,52 +38,15 @@ const AddGroupPage = () => {
   const classes = useStyles({})
   const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
   const [groupMappings, loadingGroupMappings] = useDataLoader(mngmGroupMappingActions.list)
-  const [handleAddGroup, addingGroup] = useDataUpdater(mngmGroupActions.create)
-  const [addGroupMapping, addingGroupMapping] = useDataUpdater(mngmGroupMappingActions.create)
-  const [updateGroupMapping, updatingGroupMapping] = useDataUpdater(mngmGroupMappingActions.update)
   const [submitting, updateSubmitting] = useState(false)
   const existingMapping = groupMappings[0]
 
-  const loadingSomething =
-    loadingGroupMappings || addingGroup || addingGroupMapping || updatingGroupMapping
-
   const submitForm = async (params) => {
     updateSubmitting(true)
-
-    // Create the group and get the group id
-    const groupBody = {
-      name: params.name,
-      description: params.description,
-    }
-    const [success, group] = await handleAddGroup({
-      roleAssignments: params.roleAssignments,
-      ...groupBody,
-    })
-
-    // Better way to handle this failure?
+    const success = await groupFormSubmission({ params, existingMapping, operation: 'create' })
     if (!success) {
-      console.log('group creation failed')
       updateSubmitting(false)
       return
-    }
-    const groupId = group.id
-
-    // Add group to the mapping
-    const ruleBody = formMappingRule(params, groupId)
-    const mappingBody = existingMapping
-      ? {
-          rules: [...existingMapping.rules, ruleBody],
-        }
-      : {
-          rules: [ruleBody],
-        }
-    const [updateMappingSuccess] = existingMapping
-      ? await updateGroupMapping({ id: existingMapping.id, ...mappingBody })
-      : await addGroupMapping(mappingBody)
-
-    // Better way to handle this failure?
-    if (!updateMappingSuccess) {
-      console.log('mapping was not added appropriately')
     }
     history.push(routes.sso.groups.path())
   }
@@ -99,7 +60,7 @@ const AddGroupPage = () => {
           context={initialContext}
           hideBack={true}
           finishAndReviewLabel="Done"
-          loading={loadingSomething || submitting}
+          loading={loadingGroupMappings || submitting}
           message={submitting ? 'Submitting form...' : 'Loading...'}
         >
           {({ wizardContext, setWizardContext, onNext }) => {

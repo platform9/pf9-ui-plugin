@@ -16,19 +16,17 @@ import { mngmTenantActions } from '../../userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
 import {
+  groupFormSubmission,
   loadGroupRoleAssignments,
   mngmGroupActions,
   mngmGroupMappingActions,
-  // mngmGroupRoleAssignmentsLoader,
 } from './actions'
-import useDataUpdater from 'core/hooks/useDataUpdater'
 import GroupSettingsFields from './GroupSettingsFields'
 import GroupCustomMappingsFields from './GroupCustomMappingsFields'
 import { propEq } from 'ramda'
 import { emptyObj, pathStr } from 'utils/fp'
 import uuid from 'uuid'
 import { Criteria } from './CriteriaPicklist'
-import { formMappingRule } from './helpers'
 import GroupsTips from './GroupsTips'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 const TenantRolesTableField: any = TenantRolesTableFieldDefault // types on forward ref .js file dont work well.
@@ -60,8 +58,6 @@ const EditGroupPage = () => {
     }
     return null
   }, [groupMappings])
-  const [handleUpdateGroup, updatingGroup] = useDataUpdater(mngmGroupActions.update)
-  const [updateGroupMapping, updatingGroupMapping] = useDataUpdater(mngmGroupMappingActions.update)
   const [submitting, updateSubmitting] = useState(false)
   const existingMapping = groupMappings[0]
   // const [roleAssignments, loadingRoleAssignments] = useDataLoader(
@@ -80,13 +76,14 @@ const EditGroupPage = () => {
       firstNameKey: mappingRule?.remote[0].type,
       lastNameKey: mappingRule?.remote[1].type,
       emailKey: mappingRule?.remote[2].type,
-      customMappings: mappingRule?.remote.slice(3).map((mapping) => ({
-        id: uuid.v4(),
-        attribute: mapping.type,
-        criteria: getMappingCriteria(mapping),
-        values: mapping[getMappingCriteria(mapping)]?.join(', ') || '',
-        regexMatching: mapping.regex,
-      })),
+      customMappings:
+        mappingRule?.remote.slice(3).map((mapping) => ({
+          id: uuid.v4(),
+          attribute: mapping.type,
+          criteria: getMappingCriteria(mapping),
+          values: mapping[getMappingCriteria(mapping)]?.join(', ') || '',
+          regexMatching: mapping.regex,
+        })) || [],
       roleAssignments: roleAssignments?.reduce(
         (acc, roleAssignment) => ({
           ...acc,
@@ -111,8 +108,6 @@ const EditGroupPage = () => {
   const loadingSomething =
     loadingGroups ||
     loadingGroupMappings ||
-    updatingGroup ||
-    updatingGroupMapping ||
     // loadingRoleAssignments ||
     !roleAssignments
 
@@ -125,42 +120,10 @@ const EditGroupPage = () => {
 
   const submitForm = async (params) => {
     updateSubmitting(true)
-    // Create the group and get the group id
-    const groupBody = {
-      name: params.name,
-      description: params.description,
-    }
-    const [success, group] = await handleUpdateGroup({
-      groupId: params.groupId,
-      roleAssignments: params.roleAssignments,
-      prevRoleAssignmentsArr: params.prevRoleAssignmentsArr,
-      ...groupBody,
-    })
-    // Better way to handle this failure?
+    const success = await groupFormSubmission({ params, existingMapping, operation: 'update' })
     if (!success) {
-      console.log('group creation failed')
       updateSubmitting(false)
       return
-    }
-    const groupId = group.id
-
-    // Add group to the mapping
-    const ruleBody = formMappingRule(params, groupId)
-    const mappingBody = {
-      rules: existingMapping.rules.map((rule) => {
-        if (rule.local[0].group.id === params.groupId) {
-          return ruleBody
-        }
-        return rule
-      }),
-    }
-    const [updateMappingSuccess] = await updateGroupMapping({
-      id: existingMapping.id,
-      ...mappingBody,
-    })
-    // Better way to handle this failure?
-    if (!updateMappingSuccess) {
-      console.log('mapping was not updated successfully')
     }
     history.push(routes.sso.groups.path())
   }

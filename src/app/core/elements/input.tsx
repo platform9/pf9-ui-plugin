@@ -87,7 +87,6 @@ const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
     },
     '& input': {
       ...theme.typography.inputPlaceholder,
-      fontSize: 14,
       minHeight: 40,
       padding: theme.spacing(0, 2),
       color: ({ variant }) => getColor(theme, 'default', variant).color,

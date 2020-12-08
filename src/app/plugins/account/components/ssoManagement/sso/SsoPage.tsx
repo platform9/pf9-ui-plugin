@@ -64,7 +64,6 @@ const updateSsoSettings = (data) => {
   const sendRequests = async () => {
     // If SSO config already exists, delete old one and create a new one
     // Otherwise just create a new one
-    console.log(data, 'data')
     const body = {
       provider: data.provider,
       entity_id: data.entityId,
@@ -73,7 +72,7 @@ const updateSsoSettings = (data) => {
       attr_map_xml: data.defaultAttributeMap,
     }
     console.log(body)
-    console.log('update the sso stuff here')
+    // Todo: update SSO config here
     // Need some kind of indication that the save was successful. Maybe alter the save button to say saved and then disable it?
   }
 
@@ -90,9 +89,11 @@ const SsoPage = () => {
 
   const [initialContext] = useState<any>({ enableSso: false })
 
+  // Todo:
   // Query for sso config and prepopulate it here
-  // Need a loader for this... wrap it in a Progress component
+  // Need a loading signal for this... wrap it in a Progress component
   // Add a modal for verifying turning off SSO when flipping switch off when a config is present
+  // Do not use Wizard here, just use ValidatedForm by itself
 
   return (
     <div className={classes.ssoPage}>
@@ -104,7 +105,6 @@ const SsoPage = () => {
           submitLabel="Save"
           showSteps={false}
           showFinishAndReviewButton={false}
-          showButtonsIfProp="enableSso"
           singleStep
         >
           {({ wizardContext, setWizardContext, onNext, handleNext }) => {

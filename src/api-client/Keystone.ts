@@ -528,7 +528,6 @@ class Keystone extends ApiService {
       })
       const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
-      console.log(unscopedToken)
       this.client.unscopedToken = unscopedToken
       return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
