@@ -49,7 +49,9 @@ const ValidatedFormInput = ({
   const getCurrentFieldValue = getFieldValue(id)
   const validateCurrentField = validateField(id)
   const currentInitialValue = initialValue !== undefined ? initialValue : initialValues[id]
-  const currentValue = isNil(value) ? values[id] : value
+  const currentValue = value
+  // Is below line needed? This causes desync between useParams and the picklist components
+  // const currentValue = isNil(value) ? values[id] : value
   const hasError = pathOr(null, [id, 'hasError'], errors)
   const errorMessage = pathOr(null, [id, 'errorMessage'], errors)
 

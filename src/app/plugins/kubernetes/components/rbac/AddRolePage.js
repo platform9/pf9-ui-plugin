@@ -29,8 +29,6 @@ export const AddRoleForm = ({ onComplete }) => {
   const classes = useStyles({})
   const { params, getParamsUpdater } = useParams(defaultParams)
 
-  console.log(params, 'params')
-
   return (
     <>
       <DocumentMeta title="Add Role" bodyClasses={['form-view']} />
