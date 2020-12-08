@@ -115,6 +115,7 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
   if (sandbox) {
     DocumentMeta.addElementToDomBody(createDriftScript())
   }
+
   return {
     userDetails: user,
     scopedToken,
