@@ -1137,3 +1137,19 @@ export interface Status {
   silencedBy: any[]
   state: string
 }
+
+export interface SupportedRoleVersions {
+  count: number
+  roles: Role[]
+}
+
+export interface Role {
+  uuid: string
+  k8sMajorVersion: number
+  k8sMinorVersion: number
+  k8sPatchVersion: number
+  pf9PatchVersion: number
+  roleVersion: string
+  addonsDetails: string
+  metadata: string
+}

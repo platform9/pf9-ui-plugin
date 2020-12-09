@@ -37,7 +37,7 @@ export class Route<T extends OptionalGenericKVP = null> {
   public path: RouterPathFn<T> = (params: OptionalParamType<T>) => {
     // @ts-ignore
     const allParams = { ...this.defaultParams, ...(params || {}) }
-    return this.createUrlWithQueryString(new URL(this.url, window.location.origin), allParams)
+    return createUrlWithQueryString(new URL(this.url, window.location.origin), allParams)
   }
 
   public toString(prefix = ''): string {
@@ -65,39 +65,46 @@ export class Route<T extends OptionalGenericKVP = null> {
   static find(pathname: string = location.pathname): Route | null {
     return Route.getRoutes().find((r) => !!r.pattern.match(pathname))
   }
+}
 
-  /*
+/*
     createUrlWithQueryString(routes.cluster.edit, {id: 'asdf', name: 'fdsa'})
     produces /ui/kubernetes/infrastructure/clusters/edit/asdf?name=fdsa`,
   */
-  private createUrlWithQueryString(url: URL, params: OptionalParamType<T>) {
-    if (!params || Object.keys(params || []).length === 0) {
-      return this.url
+export function createUrlWithQueryString(url: URL | string, params?: GenericKVP) {
+  if (!params || Object.keys(params || {}).length === 0) {
+    if (typeof url === 'string') {
+      return url
     }
-
-    const fields: GenericKVP = { ...(params as any) }
-
-    // nice utility to reconstruct urls from objects / models
-    // replace pathname variables (e.g. '/:id') with params when applicable
-    if (url.pathname.includes(':')) {
-      const matches = url.pathname.match(/:([0-9_a-z]+)/gi) || []
-      matches.forEach((match) => {
-        const key = match.replace(':', '')
-
-        // dont replace if there isn't a substitution
-        url.pathname = url.pathname.replace(match, fields[key] || match)
-        delete fields[key]
-      })
-    }
-
-    // Tack on the remaining key values from our params to the URL's searchParams
-    for (const [key, value] of Object.entries(fields)) {
-      url.searchParams.append(key, value)
-    }
-
-    // URL requires an origin, but these routes need to omit the origin
-    return `${url.toString().replace(url.origin, '')}`
+    return url.toString().replace(url.origin, '')
   }
+  if (typeof url === 'string') {
+    url = new URL(url, window.location.origin)
+  }
+
+  const fields: GenericKVP = { ...params }
+
+  // nice utility to reconstruct urls from objects / models
+  // replace pathname variables (e.g. '/:id') with params when applicable
+  if (url.pathname.includes(':')) {
+    const matches = url.pathname.match(/:([0-9_a-z]+)/gi) || []
+    matches.forEach((match) => {
+      const key = match.replace(':', '')
+
+      // dont replace if there isn't a substitution
+      // @ts-ignore
+      url.pathname = url.pathname.replace(match, fields[key] || match)
+      delete fields[key]
+    })
+  }
+
+  // Tack on the remaining key values from our params to the URL's searchParams
+  for (const [key, value] of Object.entries(fields)) {
+    url.searchParams.append(key, value)
+  }
+
+  // URL requires an origin, but these routes need to omit the origin
+  return `${url.toString().replace(url.origin, '')}`
 }
 
 /* eslint-disable max-len */

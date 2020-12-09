@@ -38,7 +38,6 @@ export const initialContext = {
   allowWorkloadsOnMaster: true,
   tags: [],
   appCatalogEnabled: false,
-  kubernetesVersion: 'v1.19',
   networkStack: 'ipv4',
   calicoIPv4: 'autodetect',
   calicoIPv6: 'none',

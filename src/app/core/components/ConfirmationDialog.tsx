@@ -10,6 +10,7 @@ import { withProgress } from 'core/components/progress/Progress'
 import Button from 'core/elements/button'
 
 interface IConfirmationDialog {
+  loading?: boolean
   open: boolean
   title?: string
   text?: JSX.Element

@@ -1,5 +1,6 @@
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
+import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
   createAwsCluster,
@@ -16,9 +17,9 @@ import {
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { mergeLeft, pathOr, pick, propEq } from 'ramda'
+import { pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
-import { adjustWith, updateWith } from 'utils/fp'
+import { updateWith } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 
 const { appbert, qbert } = ApiClient.getInstance()
@@ -123,18 +124,13 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         prevItems,
       )
     },
-    upgradeCluster: async ({ uuid }, prevItems) => {
-      await qbert.upgradeCluster(uuid)
-      trackEvent('Upgrade Cluster', { clusterUuid: uuid })
+    upgradeCluster: async ({ cluster, upgradeType }, prevItems) => {
+      await qbert.upgradeCluster(cluster.uuid, upgradeType)
+      trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
 
-      // Update the cluster in the cache
-      return adjustWith(
-        propEq('uuid', uuid),
-        mergeLeft({
-          canUpgrade: false,
-        }),
-        prevItems,
-      )
+      // Multiple fields change on cluster upgrade, best to reload the entity to get updated values
+      // Ideally the upgrade cluster call would return the updated entity
+      return qbert.getClusterDetails(cluster.uuid)
     },
     updateTag: async ({ cluster, key, val }, prevItems) => {
       const body = {
@@ -184,3 +180,15 @@ export const parseClusterParams = async (params) => {
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
   return [clusterId, clusters]
 }
+
+export const loadSupportedRoleVersions = createContextLoader(
+  ActionDataKeys.SupportedRoleVersions,
+  async () => {
+    const response = await qbert.getK8sSupportedRoleVersions()
+    return response.roles
+  },
+  {
+    uniqueIdentifier: 'uuid',
+    cache: false,
+  },
+)
