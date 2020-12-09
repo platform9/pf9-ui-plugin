@@ -15,6 +15,7 @@ import { defaultEtcBackupPath } from 'app/constants'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
+import KubernetesVersion from '../../form-components/kubernetes-version'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -124,6 +125,8 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
 
               {/* SSH Key */}
               <SshKeyTextField />
+
+              <KubernetesVersion />
             </FormFieldCard>
 
             <FormFieldCard title="Default Settings for New Cluster">
