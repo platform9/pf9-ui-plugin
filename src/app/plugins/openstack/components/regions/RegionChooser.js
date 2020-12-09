@@ -10,6 +10,7 @@ import ApiClient from 'api-client/ApiClient'
 import { appUrlRoot } from 'app/constants'
 import { useDispatch } from 'react-redux'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { tryCatchAsync } from 'utils/async'
 import { updateClarityStore } from 'utils/clarityHelper'
 
 const currentSectionRegex = new RegExp(`^${appUrlRoot}/[^/]+/?[^/]*`, 'i')
@@ -58,7 +59,14 @@ const RegionChooser = (props) => {
         setActiveRegion(regionId)
 
         await keystone.resetCookie()
-        await ApiClient.refreshApiEndpoints()
+
+        // Bypass any error when refreshing api endpoints to prevent a global error
+        await tryCatchAsync(
+          async () => ApiClient.refreshApiEndpoints(),
+          (err) => {
+            console.error(err)
+          },
+        )(null)
 
         await dispatch(cacheActions.clearCache())
 
