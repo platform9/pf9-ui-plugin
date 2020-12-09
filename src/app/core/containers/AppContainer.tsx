@@ -25,12 +25,13 @@ import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
 import { isNilOrEmpty, pathStrOr } from 'utils/fp'
 import { getCookieValue } from 'utils/misc'
-import { injectDrift, trackPage } from 'utils/tracking'
+import { createDriftScript, createSegmentScript, trackPage } from 'utils/tracking'
 import moment from 'moment'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import axios from 'axios'
 import { updateClarityStore } from 'utils/clarityHelper'
+import { DocumentMeta } from 'core/components/DocumentMeta'
 
 const { keystone, setActiveRegion } = ApiClient.getInstance()
 
@@ -93,6 +94,7 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
   // Ignore exception if features.json not found (for local development)
   const features = await axios.get('/clarity/features.json').catch(() => null)
   const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
+  const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', features)
   // Identify the user in Segment using Keystone ID
   if (typeof window.analytics !== 'undefined') {
     if (sandbox) {
@@ -104,10 +106,16 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
     }
   }
 
+  // Segment tracking
+  if (!analyticsOff) {
+    DocumentMeta.addElementToDomBody(createSegmentScript())
+  }
+
   // Drift tracking code for live demo
   if (sandbox) {
-    injectDrift()
+    DocumentMeta.addElementToDomBody(createDriftScript())
   }
+
   return {
     userDetails: user,
     scopedToken,
