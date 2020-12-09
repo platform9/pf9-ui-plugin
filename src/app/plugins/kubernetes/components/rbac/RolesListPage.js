@@ -50,9 +50,7 @@ export const options = {
   cacheKey: ActionDataKeys.KubeRoles,
   actions: roleActions,
   deleteFn: roleActions.delete,
-  editUrl: '/ui/kubernetes/rbac/roles/edit',
-  customEditUrlFn: (item, itemId) =>
-    `/ui/kubernetes/rbac/roles/edit/${itemId}/cluster/${item.clusterId}`,
+  editUrl: (item, itemId) => `/ui/kubernetes/rbac/roles/edit/${itemId}/cluster/${item.clusterId}`,
   name: 'Roles',
   title: 'Roles',
   ListPage,

@@ -83,17 +83,19 @@ class ApiClient {
     return client
   }
 
-  static refreshApiEndpoints(instance = ApiClient.getInstance()) {
-    instance.keystone.initialize()
-    instance.cinder.initialize()
-    instance.glance.initialize()
-    instance.appbert.initialize()
-    instance.neutron.initialize()
-    instance.nova.initialize()
-    instance.murano.initialize()
-    instance.resMgr.initialize()
-    instance.qbert.initialize()
-    instance.clemency.initialize()
+  static async refreshApiEndpoints(instance = ApiClient.getInstance()) {
+    await Promise.all([
+      instance.keystone.initialize(),
+      instance.cinder.initialize(),
+      instance.glance.initialize(),
+      instance.appbert.initialize(),
+      instance.neutron.initialize(),
+      instance.nova.initialize(),
+      instance.murano.initialize(),
+      instance.resMgr.initialize(),
+      instance.qbert.initialize(),
+      instance.clemency.initialize(),
+    ])
   }
 
   apiServices = {}

@@ -55,7 +55,6 @@ const createCRUDComponents = (options) => {
     editUrl,
     editCond,
     editDisabledInfo,
-    customEditUrlFn,
     debug,
     name,
     nameProp,
@@ -139,7 +138,6 @@ const createCRUDComponents = (options) => {
         addText={addText}
         addButton={addButton}
         editUrl={editUrl}
-        customEditUrlFn={customEditUrlFn}
         addUrl={addUrl}
         deleteFn={deleteFn}
         uniqueIdentifier={uniqueIdentifier}
