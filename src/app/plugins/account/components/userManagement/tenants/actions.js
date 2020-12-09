@@ -51,7 +51,7 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
     }
   },
   updateFn: async ({ id: tenantId, name, description, roleAssignments }) => {
-    const [prevRoleAssignmentsArr] = await mngmTenantRoleAssignmentsLoader({
+    const prevRoleAssignmentsArr = await mngmTenantRoleAssignmentsLoader({
       tenantId,
     })
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
