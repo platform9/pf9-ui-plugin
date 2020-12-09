@@ -6,7 +6,7 @@ export default function KubernetesVersion() {
   return (
     <PicklistField
       DropdownComponent={KubernetesVersionPicklist}
-      id="kubernetesVersion"
+      id="kubeRoleVersion"
       label="Kubernetes Version"
       required
     />

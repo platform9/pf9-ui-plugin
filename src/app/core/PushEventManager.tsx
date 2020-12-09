@@ -3,9 +3,11 @@ import { except } from 'utils/fp'
 
 type SubscriberFnType = (event: Object) => void
 
-const getWebSocketUrl = () => {
-  const client = ApiClient.getInstance()
-  const catalog = client.serviceCatalog
+const client = ApiClient.getInstance()
+const { keystone } = client
+
+const getWebSocketUrl = async () => {
+  const catalog = await keystone.getServiceCatalog()
 
   if (!catalog) return console.error('Error loading serviceCatalog from ApiClient')
 
@@ -72,8 +74,8 @@ class PushEventManager {
     }
   }
 
-  public readonly connect = () => {
-    const wsUrl = getWebSocketUrl()
+  public readonly connect = async () => {
+    const wsUrl = await getWebSocketUrl()
     if (!wsUrl) {
       this.handleClose()
       return this

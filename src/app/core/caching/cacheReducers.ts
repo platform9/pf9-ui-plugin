@@ -172,9 +172,10 @@ const reducers = {
   clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKeys }>>) => {
     const cacheKey = action?.payload?.cacheKey
     return cacheKey
-      ? pipe<CacheState, CacheState, CacheState>(
+      ? pipe<CacheState, CacheState, CacheState, CacheState>(
           assocPath([dataStoreKey, cacheKey], emptyArr),
           assocPath([paramsStoreKey, cacheKey], emptyArr),
+          assocPath([loadingStoreKey, cacheKey], emptyArr),
         )(state)
       : initialState
   },

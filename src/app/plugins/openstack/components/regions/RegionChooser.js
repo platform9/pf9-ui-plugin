@@ -45,25 +45,32 @@ const RegionChooser = (props) => {
 
   const handleRegionSelect = useCallback(
     async (regionId) => {
-      const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
       setLoading(true)
-      setRegion(regionId)
-      setActiveRegion(regionId)
-      await keystone.resetCookie()
 
-      updateClarityStore(
-        'regionObj',
-        regions.find((r) => regionId === r.id),
-      )
+      try {
+        const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
 
-      // Redirect to the root of the current section (there's no need to reload all the app)
-      // Must be done prior to updatePrefs until improved url management system is in place
-      // bc of listener in AuthenticatedContainer which may also redirect
-      history.push(currentSection)
+        updateClarityStore(
+          'regionObj',
+          regions.find((r) => regionId === r.id),
+        )
+        setRegion(regionId)
+        setActiveRegion(regionId)
 
-      updatePrefs({ currentRegion: regionId })
-      // Clearing the cache will cause all the current loaders to reload its data
-      await dispatch(cacheActions.clearCache())
+        await keystone.resetCookie()
+        await ApiClient.refreshApiEndpoints()
+
+        await dispatch(cacheActions.clearCache())
+
+        // Redirect to the root of the current section (there's no need to reload all the app)
+        // Must be done prior to updatePrefs until improved url management system is in place
+        // bc of listener in AuthenticatedContainer which may also redirect
+        history.push(currentSection)
+
+        updatePrefs({ currentRegion: regionId })
+      } catch (err) {
+        console.error(err)
+      }
 
       setLoading(false)
     },

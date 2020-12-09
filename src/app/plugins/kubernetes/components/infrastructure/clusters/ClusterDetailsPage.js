@@ -228,7 +228,7 @@ const ClusterDetailsPage = () => {
 export default ClusterDetailsPage
 
 const ClusterStatusAndUsage = ({ cluster, loading }) => {
-  const { usage = emptyObj, name, links = emptyObj, cloudProviderType, version } = cluster
+  const { usage = emptyObj, name, links = emptyObj, cloudProviderType = '', version } = cluster
   const classes = useStyles()
   const clusterLinks = {
     grafana: usage.grafanaLink,
