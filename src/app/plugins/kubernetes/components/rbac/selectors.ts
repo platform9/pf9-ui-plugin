@@ -88,8 +88,8 @@ export const makeRolesSelector = (
 
 export const roleActionsSelector = createSelector(
   [getDataSelector<DataKeys.ClusterRoles>(DataKeys.ClusterRoles, ['clusterId']), clustersSelector],
-  (items) => {
-    return items.map((item, clusters) => ({
+  (items, clusters) => {
+    return items.map((item) => ({
       ...item,
       id: item?.metadata?.uid,
       name: item?.metadata?.name,
@@ -108,7 +108,7 @@ export const makeRoleActionsSelector = (
   },
 ) => {
   return createSelector(
-    [rolesSelector, (_, params) => mergeLeft(params, defaultParams)],
+    [roleActionsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (items, params) => {
       const { orderBy, orderDirection } = params
       return pipe(createSorter({ orderBy, orderDirection }))(items)

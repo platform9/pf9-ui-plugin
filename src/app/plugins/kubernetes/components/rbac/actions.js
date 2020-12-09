@@ -4,6 +4,8 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import {
+  apiGroupsSelector,
+  makeApiGroupsSelector,
   makeRoleActionsSelector,
   makeRoleBindingActionssSelector,
   makeRoleBindingsSelector,
@@ -35,7 +37,8 @@ const rbacApiGroupsToRules = (apiGroups) => {
 const loadCoreApiResources = createContextLoader(
   ActionDataKeys.CoreApiResources,
   async ({ clusterId }) => {
-    return qbert.getCoreApiResourcesList(clusterId)
+    const response = await qbert.getCoreApiResourcesList(clusterId)
+    return response.resources
   },
   {
     indexBy: 'clusterId',
@@ -46,7 +49,13 @@ const loadCoreApiResources = createContextLoader(
 const loadApiResources = createContextLoader(
   ActionDataKeys.ApiResources,
   async ({ clusterId, apiGroup }) => {
-    return qbert.getApiResourcesList({ clusterId, apiGroup })
+    try {
+      const response = await qbert.getApiResourcesList({ clusterId, apiGroup })
+      return response.resources
+    } catch (err) {
+      console.log(err, 'error')
+      return []
+    }
   },
   {
     indexBy: ['clusterId', 'apiGroup'],
@@ -57,10 +66,9 @@ const loadApiResources = createContextLoader(
 export const apiGroupsLoader = createContextLoader(
   ActionDataKeys.ApiGroups,
   async ({ clusterId }) => {
-    const apiGroups = await qbert.getApiGroupList(clusterId)
-    const groupVersions = uniq(
-      apiGroups.groups.map((apiGroup) => apiGroup.preferredVersion.groupVersion),
-    )
+    const response = await qbert.getApiGroupList(clusterId)
+    const apiGroups = response.groups
+    const groupVersions = uniq(apiGroups.map((apiGroup) => apiGroup.preferredVersion.groupVersion))
     await Promise.all([
       loadCoreApiResources({ clusterId }),
       ...groupVersions.map((apiGroup) => loadApiResources({ clusterId, apiGroup })),
@@ -72,6 +80,8 @@ export const apiGroupsLoader = createContextLoader(
     defaultOrderDirection: 'asc',
     uniqueIdentifier: ['name', 'clusterId'],
     indexBy: 'clusterId',
+    selector: apiGroupsSelector,
+    selectorCreator: makeApiGroupsSelector,
   },
 )
 

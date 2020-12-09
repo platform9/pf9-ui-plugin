@@ -10,14 +10,14 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
     const [groups] = await Promise.all([
       keystone.getGroups(),
       // Fetch dependent caches
-      mngmGroupMappingActions.list(),
+      mngmGroupMappingLoader(),
     ])
     return groups
   },
   entityName: 'Group',
 })
 
-export const mngmGroupMappingActions = createContextLoader(
+export const mngmGroupMappingLoader = createContextLoader(
   ActionDataKeys.ManagementGroupsMappings,
   async () => keystone.getGroupMappings(),
 )

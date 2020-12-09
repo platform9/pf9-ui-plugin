@@ -18,6 +18,7 @@ const ClusterPicklist = forwardRef(
       onlyMasterNodeClusters,
       onlyAppCatalogEnabled,
       onlyHealthyClusters,
+      value,
       ...rest
     },
     ref,
@@ -33,7 +34,7 @@ const ClusterPicklist = forwardRef(
 
     // Select the first cluster as soon as clusters are loaded
     useEffect(() => {
-      if (!isEmpty(options) && selectFirst) {
+      if (!isEmpty(options) && selectFirst && !value) {
         onChange(propOr(allKey, 'value', head(options)))
       }
     }, [options])
@@ -45,6 +46,7 @@ const ClusterPicklist = forwardRef(
         onChange={onChange}
         loading={loading || clustersLoading}
         options={options}
+        value={value}
       />
     )
   },
