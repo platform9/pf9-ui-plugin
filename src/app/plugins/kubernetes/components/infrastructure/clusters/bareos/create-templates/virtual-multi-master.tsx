@@ -59,7 +59,6 @@ export const initialContext = {
   allowWorkloadsOnMaster: true,
   tags: [],
   appCatalogEnabled: false,
-  kubernetesVersion: 'v1.19',
   networkStack: 'ipv4',
   calicoIPv4: 'autodetect',
   calicoIPv6: 'none',
@@ -253,7 +252,7 @@ export default VirtualMultiMasterCluster
 
 const reviewTableColumns = [
   { id: 'name', label: 'Cluster Name' },
-  { id: 'kubernetesVersion', label: 'Kubernetes Version', insertDivider: true },
+  { id: 'kubeRoleVersion', label: 'Kubernetes Version', insertDivider: true },
   { id: 'masterNodes', label: 'Master Nodes' },
   { id: 'workerNodes', label: 'Worker Nodes' },
   { id: 'masterVipIpv4', label: 'Virtual IP address for cluster' },

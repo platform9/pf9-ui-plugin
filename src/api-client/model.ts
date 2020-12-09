@@ -10,6 +10,7 @@ interface IRequestOptions {
 }
 export interface IRawRequestGetParams {
   url: string
+  version?: string
   endpoint?: string
   config?: AxiosRequestConfig
   options: IRequestOptions
@@ -20,6 +21,7 @@ export interface IRawRequestPostParams extends IRawRequestGetParams {
 
 export interface IBasicRequestGetParams {
   url: string
+  version?: string
   params?: AxiosRequestConfig['params']
   endpoint?: string
   config?: AxiosRequestConfig
@@ -28,6 +30,7 @@ export interface IBasicRequestGetParams {
 
 export interface IBasicRequestPostParams {
   url: string
+  version?: string
   body?: any
   endpoint?: string
   config?: AxiosRequestConfig
