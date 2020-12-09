@@ -11,7 +11,7 @@ enum UpgradeTypes {
 }
 
 function getUpgradeTarget(cluster) {
-  if ((cluster.canMinorUpgrade && cluster.canPatchUpgrade) || cluster.canMinorUpgrade) {
+  if (cluster.canMinorUpgrade) {
     return UpgradeTypes.Minor
   }
   return UpgradeTypes.Patch
