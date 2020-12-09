@@ -240,7 +240,6 @@ class Qbert extends ApiService {
       },
     })
     const baseUrl = await this.getApiEndpoint()
-    debugger
     return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
   }
 
@@ -248,7 +247,7 @@ class Qbert extends ApiService {
     const url = `/clusters/${clusterId}`
     const cluster = await this.client.basicGet({
       url,
-      // version: 'v4',
+      // version: 'v4', // TODO update to v4 when backend releases 5.1
       options: {
         clsName: this.getClassName(),
         mthdName: 'getClusterDetails',

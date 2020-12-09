@@ -124,7 +124,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         prevItems,
       )
     },
-    upgradeCluster: async ({ cluster, upgradeType }, type, prevItems) => {
+    upgradeCluster: async ({ cluster, upgradeType }, prevItems) => {
       await qbert.upgradeCluster(cluster.uuid, upgradeType)
       trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
 
