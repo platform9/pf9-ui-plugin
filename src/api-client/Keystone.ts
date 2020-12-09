@@ -24,7 +24,6 @@ import {
 } from './keystone.model'
 import DataKeys from 'k8s/DataKeys'
 import ApiClient from 'api-client/ApiClient'
-import { tryCatchAsync } from 'utils/async'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -371,13 +370,7 @@ class Keystone extends ApiService {
       await this.getServiceCatalog()
       const user = await this.getUser(_user.id)
 
-      // Bypass any error when refreshing api endpoints to prevent a global error by using userDetails
-      await tryCatchAsync(
-        async () => ApiClient.refreshApiEndpoints(),
-        (err) => {
-          console.error(err)
-        },
-      )(null)
+      await ApiClient.refreshApiEndpoints()
 
       return {
         user: {
