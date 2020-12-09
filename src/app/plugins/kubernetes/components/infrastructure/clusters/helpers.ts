@@ -280,6 +280,10 @@ const createGenericCluster = async (body, data) => {
     body.httpProxy = data.httpProxy
   }
 
+  if (data.kubeRoleVersion) {
+    body.kubeRoleVersion = data.kubeRoleVersion
+  }
+
   // Calico is required when ipv6 is selected
   if (data.networkStack === NetworkStackTypes.IPv6) {
     body.calicoIPv6PoolCidr = body.containersCidr

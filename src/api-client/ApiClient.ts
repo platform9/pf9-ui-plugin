@@ -175,15 +175,25 @@ class ApiClient {
     return { headers }
   }
 
+  async getEndpoint({ version, endpoint, clsName }) {
+    if (endpoint === undefined) {
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
+    }
+    if (version !== undefined) {
+      return endpoint.replace('v3', version)
+    }
+    return endpoint
+  }
+
   rawGet = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
+
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -191,14 +201,13 @@ class ApiClient {
 
   rawPost = async <T extends any>({
     url,
+    version,
     data,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.post<T>(pathJoin(endpoint, url), data, config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -206,14 +215,13 @@ class ApiClient {
 
   rawPut = async <T extends any>({
     url,
+    version,
     data,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.put<T>(pathJoin(endpoint, url), data, config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -221,14 +229,13 @@ class ApiClient {
 
   rawPatch = async <T extends any>({
     url,
+    version,
     data,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.patch<T>(pathJoin(endpoint, url), data, config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -236,13 +243,12 @@ class ApiClient {
 
   rawDelete = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.delete<T>(pathJoin(endpoint, url), config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -250,13 +256,12 @@ class ApiClient {
 
   basicGet = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     params = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), {
       params,
       ...this.getAuthHeaders(),
@@ -267,13 +272,12 @@ class ApiClient {
 
   basicPost = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.post<T>(
       pathJoin(endpoint, url),
       body,
@@ -285,13 +289,12 @@ class ApiClient {
 
   basicPatch = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.patch<T>(
       pathJoin(endpoint, url),
       body,
@@ -303,13 +306,12 @@ class ApiClient {
 
   basicPut = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.put<T>(
       pathJoin(endpoint, url),
       body,
@@ -321,12 +323,11 @@ class ApiClient {
 
   basicDelete = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.delete<T>(
       pathJoin(endpoint, url),
       this.getAuthHeaders(),

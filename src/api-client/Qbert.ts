@@ -28,9 +28,11 @@ import {
   IGetPrometheusAlertsOverTime,
   GetPrometheusAlertRules,
   AlertManagerAlert,
+  SupportedRoleVersions,
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
+import { createUrlWithQueryString } from 'core/utils/routes'
 
 type AlertManagerRaw = Omit<Omit<AlertManagerAlert, 'clusterId'>, 'id'>
 
@@ -245,6 +247,7 @@ class Qbert extends ApiService {
     const url = `/clusters/${clusterId}`
     const cluster = await this.client.basicGet({
       url,
+      // version: 'v4', // TODO update to v4 when backend releases 5.1
       options: {
         clsName: this.getClassName(),
         mthdName: 'getClusterDetails',
@@ -269,12 +272,26 @@ class Qbert extends ApiService {
     })
   }
 
+  getK8sSupportedRoleVersions = async (body) => {
+    const url = '/clusters/supportedRoleVersions'
+    const supportedRoleVersions = await this.client.basicGet<SupportedRoleVersions>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterDetails',
+      },
+    })
+    return supportedRoleVersions
+  }
+
   createCluster = async (body) => {
     // Note: This API response only returns new `uuid` in the response.
     // You might want to do a GET afterwards if you need any of the cluster information.
     const url = `/clusters`
     return this.client.basicPost<ClusterElement>({
       url,
+      version: 'v4',
       body,
       options: {
         clsName: this.getClassName(),
@@ -295,10 +312,11 @@ class Qbert extends ApiService {
     })
   }
 
-  upgradeCluster = async (clusterId) => {
-    const url = `/clusters/${clusterId}/upgrade`
+  upgradeCluster = async (clusterId, type) => {
+    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade`, { type })
     return this.client.basicPost({
       url,
+      version: 'v4',
       options: {
         clsName: this.getClassName(),
         mthdName: 'upgradeCluster',

@@ -15,11 +15,14 @@ import { capitalizeString } from 'utils/misc'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
+  if (!qbertEndpoint) return null
   return `${qbertEndpoint.match(/(.*?)\/qbert/)[1]}/k8s/v1/clusters/`
 }
 
-const getGrafanaUrl = (baseUrl: string) => ({ clusterId }: AlertManagerAlert) =>
-  `${baseUrl}${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+const getGrafanaUrl = (baseUrl: string) => ({ clusterId }: AlertManagerAlert) => {
+  if (!baseUrl) return null
+  return `${baseUrl}${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+}
 
 // Used to calculate the timestamps on the chart
 // Each period (represented by key name) is split into
