@@ -53,7 +53,6 @@ const TenantChooser = (props) => {
 
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
-    setSelectedTenantName(tenantName)
 
     const tenant = tenants.find(propEq('name', tenantName))
     if (!tenant) {
@@ -61,17 +60,16 @@ const TenantChooser = (props) => {
     }
 
     const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id, isSsoToken)
+
+    setSelectedTenantName(tenantName)
+
+    dispatch(cacheActions.clearCache())
     dispatch(
       sessionActions.updateSession({
         userDetails: { ...user, role },
         scopedToken,
       }),
     )
-    updatePrefs({
-      currentTenant: tenant.id,
-    })
-    // Clearing the cache will cause all the current loaders to reload its data
-    dispatch(cacheActions.clearCache())
 
     setLoading(false)
   }
@@ -80,8 +78,8 @@ const TenantChooser = (props) => {
     async (currentTenant) => {
       const fullTenantObj = tenants.find(propEq('name', currentTenant))
       updateClarityStore('tenantObj', fullTenantObj)
-      updatePrefs({ currentTenant: fullTenantObj.id })
       await updateCurrentTenant(currentTenant)
+      updatePrefs({ currentTenant: fullTenantObj.id })
     },
     [tenants],
   )

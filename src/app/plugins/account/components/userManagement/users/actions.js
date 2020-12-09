@@ -129,6 +129,9 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       )(null),
     ])
     mngmTenantActions.invalidateCache()
+    // Refresh the user/roles cache
+    await mngmUserRoleAssignmentsLoader({ userId }, true)
+
     return updatedUser
   },
   entityName: 'User',

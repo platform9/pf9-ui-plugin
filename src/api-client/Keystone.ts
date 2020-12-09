@@ -1,29 +1,30 @@
-import { pluck, pipe, values, head } from 'ramda'
+import { head, pipe, pluck, values } from 'ramda'
 import { getHighestRole } from './helpers'
-import { pathJoin, capitalizeString } from 'utils/misc'
+import { capitalizeString, pathJoin } from 'utils/misc'
 import { pathStr } from 'utils/fp'
 import ApiService from 'api-client/ApiService'
 import {
   AuthToken,
-  GetProjectsAuth,
-  GetServiceCatalog,
-  GetRegions,
+  Catalog,
+  GetAllTenantsAllUsers,
+  GetCredentials,
   GetFeatureLinks,
   GetFeatures,
-  GetAllTenantsAllUsers,
-  GetUsers,
-  GetCredentials,
+  GetProjectsAuth,
+  GetRegions,
   GetRoles,
+  GetServiceCatalog,
   GetUserRoleAssignments,
+  GetUsers,
+  IInterfaceByName,
+  ServicesByName,
+  ServicesByRegion,
   UpdateProject,
   UpdateUser,
-  Catalog,
-  ServicesByRegion,
-  ServicesByName,
-  IInterfaceByName,
 } from './keystone.model'
 import DataKeys from 'k8s/DataKeys'
-import ApiClient from './ApiClient'
+import ApiClient from 'api-client/ApiClient'
+import { tryCatchAsync } from 'utils/async'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -369,7 +370,14 @@ class Keystone extends ApiService {
       this.client.scopedToken = scopedToken
       await this.getServiceCatalog()
       const user = await this.getUser(_user.id)
-      ApiClient.refreshApiEndpoints()
+
+      // Bypass any error when refreshing api endpoints to prevent a global error by using userDetails
+      await tryCatchAsync(
+        async () => ApiClient.refreshApiEndpoints(),
+        (err) => {
+          console.error(err)
+        },
+      )(null)
 
       return {
         user: {
