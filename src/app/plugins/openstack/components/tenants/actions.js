@@ -29,7 +29,7 @@ const tenantActions = createCRUDActions(tenantsCacheKey, {
       id: tenant.id,
       name: tenant.name,
     })
-    return result
+    return tenant
   },
   deleteFn: async ({ id }) => {
     const result = await keystone.deleteTenant(id)
