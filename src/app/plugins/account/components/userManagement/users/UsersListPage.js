@@ -1,15 +1,15 @@
-import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { isSystemUser } from 'account/components/userManagement/users/actions'
-import { listTablePrefs } from 'app/constants'
 import SystemUsersToggle from 'account/components/userManagement/users/SystemUsersToggle'
-import React, { useMemo } from 'react'
-import useToggler from 'core/hooks/useToggler'
+import { listTablePrefs } from 'app/constants'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { mngmUserActions } from './actions'
-import { pipe, pluck, join, pick } from 'ramda'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
-import { arrayIfNil } from 'utils/fp'
+import useToggler from 'core/hooks/useToggler'
 import { routes } from 'core/utils/routes'
+import { join, pick, pipe, pluck } from 'ramda'
+import React, { useMemo } from 'react'
+import { arrayIfNil } from 'utils/fp'
+import { mngmUserActions } from './actions'
 
 const defaultParams = { systemUsers: true }
 const usePrefParams = createUsePrefParamsHook('ManagementUsers', listTablePrefs)
@@ -50,8 +50,7 @@ export const options = {
   addText: 'Create a new User',
   addUrl: routes.userManagement.addUser.path(),
   deleteFn: mngmUserActions.delete,
-  customEditUrlFn: (_, id) => routes.userManagement.editUser.path({ id }),
-  editUrl: true,
+  editUrl: (_, id) => routes.userManagement.editUser.path({ id }),
   name: 'Users',
   title: 'Users',
   uniqueIdentifier: 'id',

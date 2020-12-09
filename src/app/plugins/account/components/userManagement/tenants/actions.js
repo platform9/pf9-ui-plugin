@@ -1,13 +1,13 @@
+import { makeFilteredTenantsSelector } from 'account/components/userManagement/tenants/selectors'
+import { mngmUserActions } from 'account/components/userManagement/users/actions'
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import namespaceActions from 'k8s/components/namespaces/actions'
-import { makeFilteredTenantsSelector } from 'account/components/userManagement/tenants/selectors'
-import { mngmUserActions } from 'account/components/userManagement/users/actions'
+import DataKeys from 'k8s/DataKeys'
 import { always, find, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
-import DataKeys from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -51,12 +51,9 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
     }
   },
   updateFn: async ({ id: tenantId, name, description, roleAssignments }) => {
-    const [users, prevRoleAssignmentsArr] = await Promise.all([
-      mngmUserActions.list(DataKeys.ManagementUsers),
-      mngmTenantRoleAssignmentsLoader({
-        tenantId,
-      }),
-    ])
+    const [prevRoleAssignmentsArr] = await mngmTenantRoleAssignmentsLoader({
+      tenantId,
+    })
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
       (acc, roleAssignment) => ({
         ...acc,
@@ -99,6 +96,17 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
         },
       )(null),
     ])
+    const [users] = await Promise.all([
+      mngmUserActions.list(DataKeys.ManagementUsers),
+      // Refresh the tenant/roles cache
+      mngmTenantRoleAssignmentsLoader(
+        {
+          tenantId,
+        },
+        true,
+      ),
+    ])
+
     const userKeys = Object.keys(roleAssignments)
     return {
       ...updatedTenant,
