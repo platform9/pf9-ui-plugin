@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const defaultParams = {
+  clusterId: '', // Initialize here to prevent desync with formContext
   rbac: {},
 }
 export const AddClusterRoleForm = ({ onComplete }) => {
