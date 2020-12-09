@@ -395,7 +395,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 )}
 
                 {/* API FQDN */}
-                <ApiFqdnField />
+                <ApiFqdnField setWizardContext={setWizardContext} wizardContext={wizardContext} />
 
                 {/* Containers CIDR and Services CIDR */}
                 <ContainerAndServicesCidrField values={values} />
