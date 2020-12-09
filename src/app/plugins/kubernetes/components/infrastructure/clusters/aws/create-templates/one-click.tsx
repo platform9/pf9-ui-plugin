@@ -17,6 +17,7 @@ import SshKeyField from '../../form-components/ssh-key-picklist'
 import ClusterDomainField from '../../form-components/cluster-domain'
 import AwsAvailabilityZoneField from '../aws-availability-zone'
 import { castBoolToStr } from 'utils/misc'
+import KubernetesVersion from '../../form-components/kubernetes-version'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -155,6 +156,8 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 required={!wizardContext.usePf9Domain}
                 disabled={wizardContext.usePf9Domain}
               />
+
+              <KubernetesVersion />
             </FormFieldCard>
 
             <FormFieldCard title="Default Settings for New Cluster">
