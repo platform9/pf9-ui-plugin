@@ -143,7 +143,7 @@ CRUDListContainer.propTypes = {
   EditDialog: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 
   addUrl: PropTypes.string,
-  editUrl: PropTypes.string,
+  editUrl: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 
   /**
    * Handler that is responsible for deleting the entity.
