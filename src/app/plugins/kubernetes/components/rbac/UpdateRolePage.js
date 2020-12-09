@@ -12,10 +12,21 @@ import FormWrapper from 'core/components/FormWrapper'
 import PresetField from 'core/components/PresetField'
 import { k8sPrefix } from 'app/constants'
 import { pathJoin } from 'utils/misc'
+import { makeStyles } from '@material-ui/styles'
+import DocumentMeta from 'core/components/DocumentMeta'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+
+const useStyles = makeStyles((theme) => ({
+  validatedFormContainer: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+}))
 
 const backUrl = pathJoin(k8sPrefix, 'rbac')
 
 const UpdateRolePage = () => {
+  const classes = useStyles({})
   const { match, history } = useReactRouter()
   const roleId = match.params.id
   const clusterId = match.params.clusterId
@@ -23,27 +34,36 @@ const UpdateRolePage = () => {
   const [roles, loading] = useDataLoader(roleActions.list, { clusterId })
   const role = useMemo(() => roles.find(propEq('id', roleId)) || emptyObj, [roles, roleId])
   const [updateRoleAction, updating] = useDataUpdater(roleActions.update, onComplete)
-  // I have to look into why this update action does not work
-  // with the new architecture suggested in the role update pages
   const handleSubmit = useCallback((data) => updateRoleAction({ ...role, ...data }), [role])
 
   return (
-    <FormWrapper
-      title="Edit Role"
-      backUrl={backUrl}
-      loading={loading || updating}
-      message={loading ? 'Loading role...' : 'Submitting form...'}
-    >
-      <ValidatedForm onSubmit={handleSubmit} title="API Permissions">
-        <PresetField label="Name" value={role.name} />
-        <PresetField label="Cluster" value={role.clusterName} />
-        <PresetField label="Namespace" value={role.namespace} />
-        {role.clusterId && (
-          <RbacChecklist id="rbac" clusterId={role.clusterId} initialRules={role.rules} />
-        )}
-        <SubmitButton>Update Role</SubmitButton>
-      </ValidatedForm>
-    </FormWrapper>
+    <>
+      <DocumentMeta title="Update Role" bodyClasses={['form-view']} />
+      <FormWrapper
+        title="Edit Role"
+        backUrl={backUrl}
+        loading={loading || updating}
+        message={loading ? 'Loading role...' : 'Submitting form...'}
+      >
+        <ValidatedForm
+          elevated={false}
+          onSubmit={handleSubmit}
+          formActions={<SubmitButton>Update Role</SubmitButton>}
+          classes={{ root: classes.validatedFormContainer }}
+        >
+          <FormFieldCard title="Basic Details">
+            <PresetField label="Name" value={role.name} />
+            <PresetField label="Cluster" value={role.clusterName} />
+            <PresetField label="Namespace" value={role.namespace} />
+          </FormFieldCard>
+          {role.clusterId && (
+            <FormFieldCard title="API Access / Permissions">
+              <RbacChecklist id="rbac" clusterId={role.clusterId} initialRules={role.rules} />
+            </FormFieldCard>
+          )}
+        </ValidatedForm>
+      </FormWrapper>
+    </>
   )
 }
 

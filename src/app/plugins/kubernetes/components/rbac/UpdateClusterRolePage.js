@@ -10,8 +10,19 @@ import { propEq } from 'ramda'
 import RbacChecklist from './RbacChecklist'
 import FormWrapper from 'core/components/FormWrapper'
 import PresetField from 'core/components/PresetField'
+import { makeStyles } from '@material-ui/styles'
+import DocumentMeta from 'core/components/DocumentMeta'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+
+const useStyles = makeStyles((theme) => ({
+  validatedFormContainer: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+}))
 
 const UpdateClusterRolePage = () => {
+  const classes = useStyles({})
   const { match, history } = useReactRouter()
   const clusterRoleId = match.params.id
   const clusterId = match.params.clusterId
@@ -36,18 +47,29 @@ const UpdateClusterRolePage = () => {
       loading={loading || updating}
       message={loading ? 'Loading cluster role...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit} title="API Permissions">
-        <PresetField label="Name" value={clusterRole.name} />
-        <PresetField label="Cluster" value={clusterRole.clusterName} />
-        {clusterRole.clusterId && (
-          <RbacChecklist
-            id="rbac"
-            clusterId={clusterRole.clusterId}
-            initialRules={clusterRole.rules}
-          />
-        )}
-        <SubmitButton>Update Cluster Role</SubmitButton>
-      </ValidatedForm>
+      <>
+        <DocumentMeta title="Update Cluster Role" bodyClasses={['form-view']} />
+        <ValidatedForm
+          elevated={false}
+          onSubmit={handleSubmit}
+          formActions={<SubmitButton>Update Cluster Role</SubmitButton>}
+          classes={{ root: classes.validatedFormContainer }}
+        >
+          <FormFieldCard title="Basic Details">
+            <PresetField label="Name" value={clusterRole.name} />
+            <PresetField label="Cluster" value={clusterRole.clusterName} />
+          </FormFieldCard>
+          {clusterRole.clusterId && (
+            <FormFieldCard title="API Access / Permissions">
+              <RbacChecklist
+                id="rbac"
+                clusterId={clusterRole.clusterId}
+                initialRules={clusterRole.rules}
+              />
+            </FormFieldCard>
+          )}
+        </ValidatedForm>
+      </>
     </FormWrapper>
   )
 }

@@ -103,6 +103,7 @@ const RbacChecklist = ({ clusterId, onChange, value, initialRules, ...rest }) =>
   const classes = useStyles({})
   const [editingGroup, setEditingGroup] = useState<IRbacChecklistState>(null)
   const [checkedItems, setCheckedItems] = useState<IApiGroupWithRoles>(emptyObj)
+
   const [apiGroups, loadingApiGroups]: IUseDataLoader<IRbacAPIGroup> = useDataLoader(
     apiGroupsLoader,
     {
@@ -201,7 +202,7 @@ const AddRbacApiGroup: FC<IAddRbacApiGroupProps> = ({
     if (groups.length === 0) {
       return
     }
-    if (!selectedGroup.name) {
+    if (!selectedGroup.name || !selectedGroup.resources.length) {
       const selectedApiGroup = groups[0]
       const selectedGroupResource = (selectedApiGroup.resources || [])[0]
 
@@ -242,7 +243,7 @@ const AddRbacApiGroup: FC<IAddRbacApiGroupProps> = ({
           ref={resourceRef}
           label="Resources"
           name="selectedResource"
-          value={selectedResource.name}
+          value={selectedResource?.name}
           onChange={handleResourceChange}
           options={resourceOptions}
           showAll={false}
