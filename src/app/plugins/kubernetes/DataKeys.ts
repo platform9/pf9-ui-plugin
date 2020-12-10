@@ -108,6 +108,7 @@ export const ActionDataKeys = {
   ManagementRoles: 'ManagementRoles',
   ManagementTenantsRoleAssignments: 'ManagementTenantsRoleAssignments',
   ManagementUsersRoleAssignments: 'ManagementUsersRoleAssignments',
+  ManagementGroupsRoleAssignments: 'ManagementGroupsRoleAssignments',
   ManagementGroups: 'ManagementGroups',
   ManagementGroupsMappings: 'ManagementGroupsMappings',
   ManagementCredentials: 'ManagementCredentials',

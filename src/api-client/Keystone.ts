@@ -242,6 +242,22 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  getGroupRoleAssignments = async (groupId) => {
+    // Todo: typings for this API
+    const data = await this.client.basicGet<any>({
+      url: this.roleAssignments,
+      params: {
+        'group.id': groupId,
+        include_names: true,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getGroupRoleAssignments',
+      },
+    })
+    return data.role_assignments
+  }
+
   addUserRole = async ({ tenantId, userId, roleId }) => {
     await this.client.basicPut<string>({
       url: pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
@@ -280,6 +296,74 @@ class Keystone extends ApiService {
     return data.groups
   }
 
+  createGroup = async (params) => {
+    const body = { group: params }
+    const data = await this.client.basicPost<any>({
+      url: this.groupsUrl,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createGroup',
+      },
+    })
+    return data.group
+  }
+
+  updateGroup = async (id, params) => {
+    const body = { group: params }
+    const url = `${this.groupsUrl}/${id}`
+    const data = await this.client.basicPatch<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateGroup',
+      },
+    })
+    return data.group
+  }
+
+  deleteGroup = async (groupId) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: `${this.groupsUrl}/${groupId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteGroup',
+        },
+      })
+      return groupId
+    } catch (err) {
+      throw new Error('Unable to delete non-existant group')
+    }
+  }
+
+  addGroupRole = async ({ tenantId, groupId, roleId }) => {
+    await this.client.basicPut<string>({
+      url: pathJoin(this.projectsUrl, `${tenantId}/groups/${groupId}/roles/${roleId}`),
+      body: null,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addGroupRole',
+      },
+    })
+  }
+
+  deleteGroupRole = async ({ tenantId, groupId, roleId }) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: pathJoin(this.projectsUrl, `${tenantId}/groups/${groupId}/roles/${roleId}`),
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteGroupRole',
+        },
+      })
+      return { tenantId, groupId, roleId }
+    } catch (err) {
+      throw new Error('Unable to delete non-existant role')
+    }
+  }
+
   getGroupMappings = async () => {
     const data = await this.client.basicGet<any>({
       url: this.groupMappingsUrl,
@@ -289,6 +373,48 @@ class Keystone extends ApiService {
       },
     })
     return data.mappings
+  }
+
+  createGroupMapping = async (params) => {
+    const body = { mapping: params }
+    const data = await this.client.basicPost<any>({
+      url: this.groupMappingsUrl,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createGroupMapping',
+      },
+    })
+    return data.mapping
+  }
+
+  updateGroupMapping = async (id, params) => {
+    const body = { mapping: params }
+    const url = `${this.groupMappingsUrl}/${id}`
+    const data = await this.client.basicPatch<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateGroupMapping',
+      },
+    })
+    return data.mapping
+  }
+
+  deleteGroupMapping = async (mappingId) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: `${this.groupMappingsUrl}/${mappingId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteGroupMapping',
+        },
+      })
+      return mappingId
+    } catch (err) {
+      throw new Error('Unable to delete non-existant group mapping')
+    }
   }
 
   getRoles = async () => {
@@ -406,6 +532,7 @@ class Keystone extends ApiService {
       return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
       // authentication failed
+      console.log(err)
       return {}
     }
   }

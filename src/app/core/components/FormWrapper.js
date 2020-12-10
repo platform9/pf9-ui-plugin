@@ -37,7 +37,7 @@ const FormWrapper = ({
   return (
     <Grid container>
       <Grid item xs={11}>
-        <Grid container justify="space-between" className={isUpdateForm && classes.gridHeader}>
+        <Grid container justify="space-between" className={isUpdateForm ? classes.gridHeader : ''}>
           <Grid item>
             <Text variant="subtitle1" className={classes.title}>
               {title}

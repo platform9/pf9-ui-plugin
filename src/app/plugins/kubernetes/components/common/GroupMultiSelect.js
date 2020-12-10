@@ -6,7 +6,7 @@ import withFormContext, {
 } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
-import { mngmGroupActions } from 'account/components/userManagement/groups/actions'
+import { mngmGroupActions } from 'account/components/ssoManagement/groups/actions'
 
 const GroupMultiSelect = forwardRef(({ onChange, value, ...rest }, ref) => {
   const [groups, loadingGroups] = useDataLoader(mngmGroupActions.list, { orderBy: 'name' })

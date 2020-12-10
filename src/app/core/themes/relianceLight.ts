@@ -178,7 +178,7 @@ export const typography = {
   },
   inputPlaceholder: {
     fontFamily: 'Eina04',
-    fontSize: '18px',
+    fontSize: '14px',
     fontWeight: 'normal',
     fontStretch: 'normal',
     fontStyle: 'normal',

@@ -88,7 +88,6 @@ const TenantChooser = (props) => {
     const isUserTenant = (x) => x.description !== 'Heat stack user project'
     return (tenants || []).filter(isUserTenant).map((x) => x.name)
   }, [tenants])
-
   const handleTooltipClose = useCallback(() => setTooltipOpen(false))
   const handleTooltipOpen = useCallback(() => setTooltipOpen(true))
 

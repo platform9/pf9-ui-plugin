@@ -5,8 +5,11 @@ import EditTenantPage from 'account/components/userManagement/tenants/EditTenant
 import AddUserPage from 'account/components/userManagement/users/AddUserPage'
 import EditUserPage from 'account/components/userManagement/users/EditUserPage'
 import MyAccountHeader from 'account/components/secondaryHeaders/MyAccountHeader'
+import SsoManagementPage from 'account/components/ssoManagement/SsoManagementPage'
 import { routes } from 'core/utils/routes'
 import { AppPlugins, userAccountPrefix } from 'app/constants'
+import AddGroupPage from './components/ssoManagement/groups/AddGroupPage'
+import EditGroupPage from './components/ssoManagement/groups/EditGroupPage'
 
 class MyAccount extends React.PureComponent {
   render() {
@@ -56,6 +59,27 @@ MyAccount.registerPlugin = (pluginManager) => {
       link: { path: routes.userManagement.editUser.toString(userAccountPrefix), exact: true },
       component: EditUserPage,
     },
+    {
+      name: 'Enterprise SSO',
+      requiredRoles: 'admin',
+      link: {
+        path: routes.sso.root.toString(userAccountPrefix),
+        exact: true,
+      },
+      component: SsoManagementPage,
+    },
+    {
+      name: 'Add Group',
+      requiredRoles: 'admin',
+      link: { path: routes.sso.addGroup.toString(userAccountPrefix), exact: true },
+      component: AddGroupPage,
+    },
+    {
+      name: 'Edit Group',
+      requiredRoles: 'admin',
+      link: { path: routes.sso.editGroup.toString(userAccountPrefix), exact: true },
+      component: EditGroupPage,
+    },
   ])
 
   // These nav items are in active development but not shown in production.
@@ -77,6 +101,12 @@ MyAccount.registerPlugin = (pluginManager) => {
         { name: 'Groups', link: { path: '/user_management#userGroups' } },
         { name: 'Roles', link: { path: '/user_management#roles' } },
       ],
+    },
+    {
+      name: 'Enterprise SSO',
+      link: { path: routes.sso.root.toString(userAccountPrefix) },
+      icon: 'key',
+      requiredRoles: 'admin',
     },
   ]
 
