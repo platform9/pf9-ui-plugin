@@ -55,7 +55,7 @@ const MyAccountHeader = ({ className }) => {
     features,
   } = session
 
-  const customerTier = pathOr(CustomerTiers.Enterprise, ['customer_tier'], features)
+  const customerTier = pathOr(CustomerTiers.Freedom, ['customer_tier'], features)
   const upgradeable = [CustomerTiers.Growth, CustomerTiers.Freedom].includes(customerTier)
 
   return (
