@@ -1,12 +1,15 @@
 import React from 'react'
-import { makeStyles, Theme } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
+import Theme from 'core/themes/model'
 import clsx from 'clsx'
 import { useSelector } from 'react-redux'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { RootState } from 'app/store'
-import { prop } from 'ramda'
+import { pathOr, prop } from 'ramda'
 import Text from 'core/elements/text'
 import Avatar from 'core/components/Avatar'
+import { CustomerTiers } from 'app/constants'
+import UpgradeButton from './UpgradeButton'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   myAccountHeader: {
@@ -17,6 +20,10 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
   },
   upgrade: {
     width: 180,
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingBottom: theme.spacing(2),
   },
   userDetails: {
     paddingBottom: theme.spacing(2),
@@ -45,11 +52,17 @@ const MyAccountHeader = ({ className }) => {
   const {
     username,
     userDetails: { displayName },
+    features,
   } = session
+
+  const customerTier = pathOr(CustomerTiers.Freedom, ['customer_tier'], features)
+  const upgradeable = [CustomerTiers.Growth, CustomerTiers.Freedom].includes(customerTier)
 
   return (
     <div className={clsx(classes.myAccountHeader, className)}>
-      <div className={classes.upgrade}></div>
+      <div className={classes.upgrade}>
+        {upgradeable && <UpgradeButton username={username} customerTier={customerTier} />}
+      </div>
       <div className={classes.userDetails}>
         <Avatar
           displayName={displayName}

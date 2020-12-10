@@ -9,7 +9,7 @@ interface Props extends Omit<ButtonProps, 'variant'> {
   color?: 'primary' | 'secondary'
   variant?: 'light' | 'dark'
   textVariant?: TextVariant
-  children: string
+  children: string | React.ReactNode
   disabled?: boolean
 }
 
