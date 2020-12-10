@@ -46,6 +46,17 @@ export const appPlugins = [
   AppPlugins.OpenStack,
 ]
 
+export enum CustomerTiers {
+  Enterprise = 'enterprise',
+  Freedom = 'freedom',
+  Growth = 'growth',
+}
+
+export const upgradeLinks = {
+  [CustomerTiers.Freedom]: 'https://platform9.com/signup/growth/',
+  [CustomerTiers.Growth]: 'https://platform9.com/pricing/request/',
+}
+
 export const onboardingAccessSetup = 'onboarding/api-access'
 export const onboardingMonitoringSetup = 'onboarding/monitoring-enabled'
 export const onboardingPodSetup = 'onboarding/pod-setup'
