@@ -167,8 +167,9 @@ enum LoginMethodTypes {
 }
 
 const authMethods = {
-  [LoginMethodTypes.Local]: async (username, password) => keystone.authenticate(username, password),
-  [LoginMethodTypes.SSO]: async (_u, _p) => keystone.authenticateSso(),
+  [LoginMethodTypes.Local]: async (username, password, totp) =>
+    keystone.authenticate(username, password, totp),
+  [LoginMethodTypes.SSO]: async (_u, _p, _t) => keystone.authenticateSso(),
 }
 
 @(connect() as any)
@@ -178,6 +179,7 @@ class LoginPage extends React.PureComponent<Props> {
     password: '',
     loginMethod: LoginMethodTypes.Local,
     MFAcheckbox: false,
+    mfa: '',
     loginFailed: false,
     loading: false,
     ssoEnabled: false,
@@ -207,13 +209,15 @@ class LoginPage extends React.PureComponent<Props> {
   performLogin = async (event) => {
     event.preventDefault()
     const { onAuthSuccess } = this.props
-    const { username: loginUsername, password, loginMethod } = this.state
+    const { username: loginUsername, password, loginMethod, MFAcheckbox, mfa } = this.state
+    const totp = MFAcheckbox ? mfa : ''
 
     this.setState({ loginFailed: false, loading: true })
 
     const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[loginMethod](
       loginUsername,
       password,
+      totp,
     )
     const isSsoToken = loginMethod === LoginMethodTypes.SSO
 
@@ -313,11 +317,12 @@ class LoginPage extends React.PureComponent<Props> {
       <Input
         required={this.state.MFAcheckbox}
         variant="dark"
-        id="MFA"
+        id="mfa"
         label="MFA Code"
         className={classes.textField}
         placeholder="MFA Code"
         margin="normal"
+        onChange={this.updateValue('mfa')}
       />
     )
   }
