@@ -72,6 +72,30 @@ const constructAuthFromCredentials = (username, password) => {
   }
 }
 
+const constructAuthFromCredentialsTotp = (username, password, totp) => {
+  return {
+    auth: {
+      identity: {
+        methods: ['password', 'totp'],
+        password: {
+          user: {
+            name: username,
+            domain: { id: 'default' },
+            password,
+          },
+        },
+        totp: {
+          user: {
+            name: username,
+            domain: { id: 'default' },
+            passcode: totp,
+          },
+        },
+      },
+    },
+  }
+}
+
 const groupByRegion = (catalog: Catalog[]): ServicesByRegion => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const regions = {} as ServicesByRegion
@@ -515,8 +539,10 @@ class Keystone extends ApiService {
     }
   }
 
-  authenticate = async (username, password) => {
-    const body = constructAuthFromCredentials(username, password)
+  authenticate = async (username, password, totp = '') => {
+    const body = totp
+      ? constructAuthFromCredentialsTotp(username, password, totp)
+      : constructAuthFromCredentials(username, password)
     try {
       const response = await this.client.rawPost<AuthToken>({
         url: this.tokensUrl,
