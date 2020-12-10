@@ -27,28 +27,43 @@ const CheckListItem = ({ children, checked }) => (
   </ListItem>
 )
 
-const UserPasswordField = ({ value }) => (
+const UserPasswordField = ({
+  value,
+  label = 'Password',
+  className = '',
+  showPasswordRequirements = true,
+}: Props) => (
   <>
     <TextField
       id="password"
-      label="Password"
+      label={label}
       value={value}
       type="password"
       validations={passwordValidators}
+      className={className}
     />
-    <Text variant="body1" component="div">
-      Password must contain the following:
-      <List dense>
-        <CheckListItem checked={hasMinLength(8)(value)}>At least 8 characters long</CheckListItem>
-        <CheckListItem checked={hasOneLowerChar(value)}>1 Lowercase letter</CheckListItem>
-        <CheckListItem checked={hasOneUpperChar(value)}>1 Uppercase letter</CheckListItem>
-        <CheckListItem checked={hasOneNumber(value)}>1 Number</CheckListItem>
-        <CheckListItem checked={hasOneSpecialChar(value)}>
-          1 Special character - {specialChars}
-        </CheckListItem>
-      </List>
-    </Text>
+    {showPasswordRequirements && (
+      <Text variant="body1" component="div">
+        Password must contain the following:
+        <List dense>
+          <CheckListItem checked={hasMinLength(8)(value)}>At least 8 characters long</CheckListItem>
+          <CheckListItem checked={hasOneLowerChar(value)}>1 Lowercase letter</CheckListItem>
+          <CheckListItem checked={hasOneUpperChar(value)}>1 Uppercase letter</CheckListItem>
+          <CheckListItem checked={hasOneNumber(value)}>1 Number</CheckListItem>
+          <CheckListItem checked={hasOneSpecialChar(value)}>
+            1 Special character - {specialChars}
+          </CheckListItem>
+        </List>
+      </Text>
+    )}
   </>
 )
+
+interface Props {
+  value: string
+  label?: string
+  className?: string
+  showPasswordRequirements?: boolean
+}
 
 export default UserPasswordField

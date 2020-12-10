@@ -441,6 +441,15 @@ export const routes = {
       },
     }),
   },
+  userSettings: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/user_settings`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'UserSettings:Root',
+    }),
+  },
   userManagement: {
     root: Route.register({
       url: `${pluginRoutePrefix}/user_management`,
