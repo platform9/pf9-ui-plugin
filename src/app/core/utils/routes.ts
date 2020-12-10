@@ -604,5 +604,12 @@ export const routes = {
   password: {
     reset: Route.register({ url: `${appUrlRoot}/reset/password/:id`, name: 'Password:Reset' }),
   },
+  ironicSetup: Route.register({
+    url: `${pluginRoutePrefix}/setup`,
+    defaultParams: {
+      plugin: AppPlugins.BareMetal,
+    },
+    name: 'BareMetal:Setup',
+  }),
 }
 /* eslint-enable max-len */
