@@ -13,11 +13,7 @@ import { useSelector } from 'react-redux'
 import { prop } from 'ramda'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { ClusterCreateTypeNames } from '../model'
-
-const downloadCliCommand =
-  'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
-const installCliCommand = 'bash ./cli-setup.sh'
-const runCliCommand = 'pf9ctl cluster prep-node'
+import { downloadPf9CliCommand, installPf9CliCommand, runPf9CliCommand } from '../constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   formCard: {
@@ -112,8 +108,8 @@ const InsufficientNodesNodesDialog = ({
           step={1}
           title="Download the CLI for each node"
           description={
-            <CopyToClipboard copyText={downloadCliCommand}>
-              <CodeBlock>{downloadCliCommand}</CodeBlock>
+            <CopyToClipboard copyText={downloadPf9CliCommand}>
+              <CodeBlock>{downloadPf9CliCommand}</CodeBlock>
             </CopyToClipboard>
           }
         />
@@ -121,8 +117,8 @@ const InsufficientNodesNodesDialog = ({
           step={2}
           title="Install the CLI"
           description={
-            <CopyToClipboard copyText={installCliCommand}>
-              <CodeBlock>{installCliCommand}</CodeBlock>
+            <CopyToClipboard copyText={installPf9CliCommand}>
+              <CodeBlock>{installPf9CliCommand}</CodeBlock>
             </CopyToClipboard>
           }
         />
@@ -143,10 +139,10 @@ const InsufficientNodesNodesDialog = ({
         </div>
         <NumberedStep
           step={3}
-          title="Run the Platform9 CLI using ‘prep-node’ to attach the node to the Platform9 Management plane"
+          title="Using a user with SUDO privileges, run the PF9 CLI command Prep-Node to attach the node to Platform9."
           description={
-            <CopyToClipboard copyText={runCliCommand}>
-              <CodeBlock>{runCliCommand}</CodeBlock>
+            <CopyToClipboard copyText={runPf9CliCommand}>
+              <CodeBlock>{runPf9CliCommand}</CodeBlock>
             </CopyToClipboard>
           }
         />
