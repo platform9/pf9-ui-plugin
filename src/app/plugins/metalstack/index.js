@@ -17,7 +17,7 @@ MetalStack.registerPlugin = (pluginManager) => {
   plugin.registerRoutes([
     {
       name: 'IronicSetup',
-      link: { path: '/setup', exact: true },
+      link: { path: '/setup', exact: true, default: true },
       component: IronicSetupPage,
     },
   ])
