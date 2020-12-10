@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, makeStyles } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
 import Theme from 'core/themes/model'
 import clsx from 'clsx'
 import { useSelector } from 'react-redux'
@@ -8,10 +8,8 @@ import { RootState } from 'app/store'
 import { pathOr, prop } from 'ramda'
 import Text from 'core/elements/text'
 import Avatar from 'core/components/Avatar'
-import { CustomerTiers, upgradeLinks } from 'app/constants'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import ExternalLink from 'core/components/ExternalLink'
-import { trackEvent } from 'utils/tracking'
+import { CustomerTiers } from 'app/constants'
+import UpgradeButton from './UpgradeButton'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   myAccountHeader: {
@@ -46,23 +44,6 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
     display: 'inline-block',
     color: theme.palette.grey['000'],
   },
-  noUnderline: {
-    '&:hover': {
-      textDecoration: 'none',
-    },
-  },
-  upgradeButton: {
-    background: theme.palette.pink[500],
-    color: theme.palette.grey['000'],
-    textTransform: 'none',
-    padding: theme.spacing(1, 3),
-    '&:hover': {
-      background: theme.palette.pink[500],
-    },
-  },
-  upgradeBtnText: {
-    marginLeft: theme.spacing(0.5),
-  },
 }))
 
 const MyAccountHeader = ({ className }) => {
@@ -77,23 +58,10 @@ const MyAccountHeader = ({ className }) => {
   const customerTier = pathOr(CustomerTiers.Enterprise, ['customer_tier'], features)
   const upgradeable = [CustomerTiers.Growth, CustomerTiers.Freedom].includes(customerTier)
 
-  const trackUpgrade = () => {
-    trackEvent(`Upgrade from ${customerTier}`, { username, du: window.location.host })
-  }
-
   return (
     <div className={clsx(classes.myAccountHeader, className)}>
       <div className={classes.upgrade}>
-        {upgradeable && (
-          <ExternalLink url={upgradeLinks[customerTier]} className={classes.noUnderline}>
-            <Button className={classes.upgradeButton} onClick={trackUpgrade}>
-              <FontAwesomeIcon size="xs">crown</FontAwesomeIcon>
-              <Text variant="caption1" className={classes.upgradeBtnText}>
-                Upgrade Now
-              </Text>
-            </Button>
-          </ExternalLink>
-        )}
+        {upgradeable && <UpgradeButton username={username} customerTier={customerTier} />}
       </div>
       <div className={classes.userDetails}>
         <Avatar
