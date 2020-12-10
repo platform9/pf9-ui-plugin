@@ -17,9 +17,9 @@ import {
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { pathOr, pick, propEq } from 'ramda'
+import { mergeLeft, pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
-import { updateWith } from 'utils/fp'
+import { adjustWith, updateWith } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 
 const { appbert, qbert } = ApiClient.getInstance()
@@ -130,7 +130,8 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 
       // Multiple fields change on cluster upgrade, best to reload the entity to get updated values
       // Ideally the upgrade cluster call would return the updated entity
-      return qbert.getClusterDetails(cluster.uuid)
+      const updatedCluster = await qbert.getClusterDetails(cluster.uuid)
+      return adjustWith(propEq('uuid', cluster.uuid), mergeLeft(updatedCluster), prevItems)
     },
     updateTag: async ({ cluster, key, val }, prevItems) => {
       const body = {
