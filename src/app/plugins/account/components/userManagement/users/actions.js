@@ -156,6 +156,5 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
   {
     uniqueIdentifier: ['user.id', 'role.id'],
     indexBy: 'userId',
-    cache: false,
   },
 )
