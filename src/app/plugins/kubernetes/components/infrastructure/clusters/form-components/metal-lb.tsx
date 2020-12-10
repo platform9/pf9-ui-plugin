@@ -87,7 +87,7 @@ export const MetalLbAddonCard = ({ children }) => {
       <IconInfo icon="info-circle" title="MetalLB is a software load balancer." spacer={false}>
         <BulletList
           items={[
-            'Ensure virtual machine port security & firewalls are configured to allow ingress and egress traffic.',
+            'Ensure firewalls are configured to allow ingress and egress traffic for the virtual IP.',
             'Ensure the Address Pool is a reserved Network IP Range to avoid IP Conflicts',
           ]}
         />

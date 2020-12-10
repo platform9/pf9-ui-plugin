@@ -380,3 +380,15 @@ export enum UserDomainID {
   Default = 'default',
   The4Dd438F93338497Cb2B08A3F16992B26 = '4dd438f93338497cb2b08a3f16992b26',
 }
+
+export interface Group {
+  name: string
+  id: string
+  domain_id: ParentIDEnum | null
+  description: string
+  links: GroupLinks
+}
+
+export interface GroupLinks {
+  self: string
+}

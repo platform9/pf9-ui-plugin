@@ -58,6 +58,7 @@ const RegionChooser = (props) => {
         setActiveRegion(regionId)
 
         await keystone.resetCookie()
+
         await ApiClient.refreshApiEndpoints()
 
         await dispatch(cacheActions.clearCache())

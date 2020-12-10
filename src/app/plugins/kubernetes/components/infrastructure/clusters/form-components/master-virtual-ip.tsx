@@ -17,7 +17,7 @@ const MasterVipFields = ({ withInfo = false, wizardContext }) => (
       >
         <BulletList
           items={[
-            'Ensure virtual machine port security & firewalls are configured to allow ingress and egress traffic.',
+            'Ensure firewalls are configured to allow ingress and egress traffic for the virtual IP.',
             'Ensure the Virtual IP is a reserved Network IP to avoid IP Conflicts',
           ]}
         />

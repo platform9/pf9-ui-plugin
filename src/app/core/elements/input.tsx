@@ -62,7 +62,7 @@ const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
   input: {
     '& .MuiInputLabel-outlined': {
       textTransform: 'uppercase',
-      top: 3,
+      top: -3,
       ...theme.typography.inputLabel,
       color: theme.palette.grey[500],
       backgroundColor: ({ variant }) => getColor(theme, 'default', variant).background,
@@ -75,8 +75,8 @@ const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
       color: ({ variant }) => getColor(theme, 'default', variant).color,
     },
     '& .MuiSelect-selectMenu': {
-      minHeight: 54,
-      lineHeight: '54px',
+      minHeight: 40,
+      lineHeight: '40px',
       padding: theme.spacing(0, 2),
       color: ({ variant }) => getColor(theme, 'default', variant).color,
       background: ({ variant }) => getColor(theme, 'default', variant).background,
@@ -87,7 +87,7 @@ const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
     },
     '& input': {
       ...theme.typography.inputPlaceholder,
-      minHeight: 54,
+      minHeight: 40,
       padding: theme.spacing(0, 2),
       color: ({ variant }) => getColor(theme, 'default', variant).color,
       background: ({ variant }) => getColor(theme, 'default', variant).background,

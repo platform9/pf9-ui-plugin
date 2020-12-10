@@ -11,6 +11,7 @@ import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import ExternalLink from 'core/components/ExternalLink'
 import { nodePrerequisitesDocumentationLink } from 'k8s/links'
+import { downloadAndInstallPf9CliCommand, runPf9CliCommand } from '../clusters/constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -58,8 +59,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const downloadAndInstallCommand = 'bash <(curl -sL http://pf9.io/get_cli)'
-
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
 export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
@@ -97,8 +96,8 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         step={1}
         title="Download and install the CLI"
         description={
-          <CopyToClipboard copyText={downloadAndInstallCommand}>
-            <CodeBlock>{downloadAndInstallCommand}</CodeBlock>
+          <CopyToClipboard copyText={downloadAndInstallPf9CliCommand}>
+            <CodeBlock>{downloadAndInstallPf9CliCommand}</CodeBlock>
           </CopyToClipboard>
         }
       />
@@ -121,8 +120,8 @@ const DownloadCliWalkthrough = (): JSX.Element => {
           'Using a user with SUDO privileges, run the PF9 CLI command Prep-Node to attach the node to Platform9.'
         }
         description={
-          <CopyToClipboard copyText="pf9ctl cluster prep-node">
-            <CodeBlock>sudo pf9ctl cluster prep-node</CodeBlock>
+          <CopyToClipboard copyText={runPf9CliCommand}>
+            <CodeBlock>{runPf9CliCommand}</CodeBlock>
           </CopyToClipboard>
         }
       />

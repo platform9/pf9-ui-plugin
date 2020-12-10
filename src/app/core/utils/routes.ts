@@ -501,6 +501,43 @@ export const routes = {
       name: 'UserManagement:User:Edit',
     }),
   },
+  sso: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/sso`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'SsoManagement:Root',
+    }),
+    sso: Route.register({
+      url: `${pluginRoutePrefix}/sso#sso`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'SsoManagement:Sso',
+    }),
+    groups: Route.register({
+      url: `${pluginRoutePrefix}/sso#groups`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'SsoManagement:Groups',
+    }),
+    addGroup: Route.register({
+      url: `${pluginRoutePrefix}/sso/groups/add`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'SsoManagement:Group:Add',
+    }),
+    editGroup: Route.register({
+      url: `${pluginRoutePrefix}/sso/groups/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'SsoManagement:Group:Edit',
+    }),
+  },
   prometheus: {
     list: Route.register({
       url: `${pluginRoutePrefix}/prometheus`,
@@ -613,5 +650,12 @@ export const routes = {
   password: {
     reset: Route.register({ url: `${appUrlRoot}/reset/password/:id`, name: 'Password:Reset' }),
   },
+  ironicSetup: Route.register({
+    url: `${pluginRoutePrefix}/setup`,
+    defaultParams: {
+      plugin: AppPlugins.BareMetal,
+    },
+    name: 'BareMetal:Setup',
+  }),
 }
 /* eslint-enable max-len */

@@ -2,8 +2,10 @@ import { createSelector } from 'reselect'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
 import { emptyArr } from 'utils/fp'
-import { any, find, flatten, pathEq, pipe, pluck } from 'ramda'
+import { any, find, flatten, mergeLeft, pathEq, pipe, pluck } from 'ramda'
 import { tryJsonParse } from 'utils/misc'
+import createSorter from 'core/helpers/createSorter'
+import { Group } from 'api-client/keystone.model'
 
 export const groupsSelector = createSelector(
   [
@@ -22,7 +24,7 @@ export const groupsSelector = createSelector(
       const mappingRules = tryJsonParse(groupMapping.rules)
       const groupRules = mappingRules.reduce((groupRules, rule) => {
         if (any(pathEq(['group', 'id'], group.id), rule.local)) {
-          // Remove FirsName & LastName mapping from remote attribute array.
+          // Remove FirstName & LastName mapping from remote attribute array.
           return groupRules.concat(rule.remote.slice(2))
         }
         return groupRules
@@ -46,3 +48,18 @@ export const groupsSelector = createSelector(
     })
   },
 )
+
+export const makeGroupsSelector = (
+  defaultParams = {
+    orderBy: 'name',
+    orderDirection: 'asc',
+  },
+) => {
+  return createSelector(
+    [groupsSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (groups, params) => {
+      const { orderBy, orderDirection } = params
+      return pipe<Group[], Group[]>(createSorter({ orderBy, orderDirection }))(groups)
+    },
+  )
+}

@@ -55,7 +55,7 @@ const CalicoDetectionMethods = ({ values }) => (
       <TextField
         id="calicoDetectionMethodValue"
         info="Use the first valid IP address on the first enumerated interface (same logic as first-found above) that does NOT match with any of the specified interface name regexes. Regexes are separated by commas (e.g. eth.,enp0s.)."
-        label={detectionMethodLabels[values.calicoDetectionMethod]}
+        label={detectionMethodLabels[values.calicoDetectionMethod] || ''}
         required
       />
     )}

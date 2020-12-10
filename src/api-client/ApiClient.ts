@@ -28,6 +28,7 @@ import {
 } from './model'
 import ApiService from 'api-client/ApiService'
 import Bugsnag from '@bugsnag/js'
+import { someAsync } from 'utils/async'
 
 interface ApiClientOptions {
   [key: string]: any
@@ -84,7 +85,7 @@ class ApiClient {
   }
 
   static async refreshApiEndpoints(instance = ApiClient.getInstance()) {
-    await Promise.all([
+    await someAsync([
       instance.keystone.initialize(),
       instance.cinder.initialize(),
       instance.glance.initialize(),

@@ -152,14 +152,14 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
         </Text>
         <br />
         <Text variant="body2" className={classes.text}>
-          Cluster comes built in with:
+          Optional Cluster Add-Ons:
         </Text>
         <BulletList className={classes.bulletList} items={nodeServices} />
         <IconInfo icon="info-circle" title="Minimum Hardware Requirements:">
           <div className={classes.requirements}>
             <HardwareSpec title="2 VCPUs" icon="microchip" />
-            <HardwareSpec title="5GB RAM" icon="memory" />
-            <HardwareSpec title="20GB HDD" icon="hdd" />
+            <HardwareSpec title="8GB RAM" icon="memory" />
+            <HardwareSpec title="30GB HDD" icon="hdd" />
           </div>
         </IconInfo>
 

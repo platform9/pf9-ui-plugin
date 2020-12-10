@@ -1,5 +1,7 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { mngmGroupActions } from 'account/components/ssoManagement/groups/actions'
+import { routes } from 'core/utils/routes'
 
 export const options = {
   columns: [
@@ -9,12 +11,15 @@ export const options = {
     { id: 'samlAttributesString', label: 'SAML Attributes Mapped' },
   ],
   cacheKey: ActionDataKeys.ManagementGroups,
-  // editUrl: '/ui/kubernetes/infrastructure/groups/edit',
+  editUrl: (_, id) => routes.sso.editGroup.path({ id }),
   name: 'Groups',
   title: 'Groups',
   uniqueIdentifier: 'id',
+  addUrl: routes.sso.addGroup.path(),
+  addText: 'New Group',
+  loaderFn: mngmGroupActions.list,
 }
 
-const { ListPage: UserGroupsListPage } = createCRUDComponents(options)
+const { ListPage: GroupsListPage } = createCRUDComponents(options)
 
-export default UserGroupsListPage
+export default GroupsListPage
