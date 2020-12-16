@@ -40,7 +40,7 @@ const TroubleshootingTipsList = () => (
       Verify that the node has outbound network connectivity to the internet and to the Platform9
       controller:
     </li>
-    <CodeBlock>{'ping www.google.com \ntelnet pmkft-1584219278-18238.platform9.io 443'}</CodeBlock>
+    <CodeBlock>{`ping www.google.com \ntelnet ${window.location.origin} 443`}</CodeBlock>
     <li>
       If you have a proxy server set up, make sure to configure the host agent to route traffic via
       the proxy:
