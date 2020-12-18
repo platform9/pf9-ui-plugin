@@ -106,7 +106,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   },
   contentMain: {
     padding: ({ showNavBar }) =>
-      showNavBar ? theme.spacing(3, 3, 3, 3.5) : theme.spacing(3, 3, 3, 22.5),
+      showNavBar ? theme.spacing(3, 3, 3, 3.5) : theme.spacing(3, 3, 3, 25),
   },
   sandboxBanner: {
     display: 'flex',
