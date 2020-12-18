@@ -29,13 +29,14 @@ const CheckListItem = ({ children, checked }) => (
 
 const UserPasswordField = ({
   value,
+  id = 'password',
   label = 'Password',
   className = '',
   showPasswordRequirements = true,
 }: Props) => (
   <>
     <TextField
-      id="password"
+      id={id}
       label={label}
       value={value}
       type="password"
@@ -61,6 +62,7 @@ const UserPasswordField = ({
 
 interface Props {
   value: string
+  id?: string
   label?: string
   className?: string
   showPasswordRequirements?: boolean

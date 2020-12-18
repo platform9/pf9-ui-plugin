@@ -8,12 +8,9 @@ import MyAccountHeader from 'account/components/secondaryHeaders/MyAccountHeader
 import SsoManagementPage from 'account/components/ssoManagement/SsoManagementPage'
 import { routes } from 'core/utils/routes'
 import { AppPlugins, userAccountPrefix } from 'app/constants'
-<<<<<<< HEAD
 import UserSettingsIndexPage from './components/user-settings/user-settings-index-page'
-=======
 import AddGroupPage from './components/ssoManagement/groups/AddGroupPage'
 import EditGroupPage from './components/ssoManagement/groups/EditGroupPage'
->>>>>>> 26d107a024b49d945e2f428ab36795efc4f81220
 
 class MyAccount extends React.PureComponent {
   render() {
@@ -100,12 +97,12 @@ MyAccount.registerPlugin = (pluginManager) => {
     {
       name: 'User Settings',
       link: { path: routes.userSettings.root.toString(userAccountPrefix) },
-      icon: 'user',
+      icon: 'users-cog',
     },
     {
       name: 'Tenants & Users',
       link: { path: routes.userManagement.root.toString(userAccountPrefix) },
-      icon: 'building',
+      icon: 'users',
       requiredRoles: 'admin',
       nestedLinks: [
         {

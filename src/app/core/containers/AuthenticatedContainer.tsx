@@ -50,6 +50,7 @@ const { keystone } = ApiClient.getInstance()
 interface StyleProps {
   path?: string
   hasSecondaryHeader?: boolean
+  showNavBar?: boolean
 }
 
 const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
@@ -104,7 +105,8 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     minHeight: theme.spacing(6),
   },
   contentMain: {
-    padding: theme.spacing(3, 3, 3, 3.5),
+    padding: ({ showNavBar }) =>
+      showNavBar ? theme.spacing(3, 3, 3, 3.5) : theme.spacing(3, 3, 3, 22.5),
   },
   sandboxBanner: {
     display: 'flex',
@@ -314,12 +316,16 @@ const AuthenticatedContainer = () => {
   } = session
   const plugins = pluginManager.getPlugins()
   const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
+  const showNavBar =
+    currentStack !== AppPlugins.MyAccount ||
+    (currentStack === AppPlugins.MyAccount && role === 'admin')
 
   const dispatch = useDispatch()
   const showToast = useToast()
   const classes = useStyles({
     path: history.location.pathname,
     hasSecondaryHeader: !!SecondaryHeader,
+    showNavBar: showNavBar,
   })
 
   useEffect(() => {
@@ -367,17 +373,19 @@ const AuthenticatedContainer = () => {
       <div className={classes.appFrame}>
         <Toolbar />
         {SecondaryHeader && <SecondaryHeader className={classes.secondaryHeader} />}
-        <Navbar
-          withStackSlider={withStackSlider}
-          drawerWidth={drawerWidth}
-          sections={sections}
-          open={drawerOpen}
-          stack={currentStack}
-          setStack={setStack}
-          handleDrawerToggle={toggleDrawer}
-          stacks={stacks}
-          hasSecondaryHeader={!!SecondaryHeader}
-        />
+        {showNavBar && (
+          <Navbar
+            withStackSlider={withStackSlider}
+            drawerWidth={drawerWidth}
+            sections={sections}
+            open={drawerOpen}
+            stack={currentStack}
+            setStack={setStack}
+            handleDrawerToggle={toggleDrawer}
+            stacks={stacks}
+            hasSecondaryHeader={!!SecondaryHeader}
+          />
+        )}
         <PushEventsProvider>
           <main
             id="main"

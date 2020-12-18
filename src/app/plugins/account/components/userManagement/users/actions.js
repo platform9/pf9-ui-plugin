@@ -8,8 +8,16 @@ import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { useDispatch } from 'react-redux'
+import store from 'app/store'
+import moment from 'moment'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { loadUserTenants } from 'openstack/components/tenants/actions'
+import { isNilOrEmpty } from 'utils/fp'
+import { preferencesStoreKey } from 'core/session/preferencesReducers'
 
-const { keystone, clemency } = ApiClient.getInstance()
+const { keystone, clemency, setActiveRegion } = ApiClient.getInstance()
 
 export const isSystemUser = ({ username }) => {
   const { groups = {} } = originUsernameRegex.exec(window.location.origin) || {}
@@ -28,6 +36,43 @@ export const loadCredentials = createContextLoader(
     requiredRoles: 'admin',
   },
 )
+
+const updateSession = async (username, displayName, activeUser) => {
+  store.dispatch(
+    sessionActions.updateSession({
+      username,
+      userDetails: { ...activeUser, username, displayName },
+    }),
+  )
+}
+
+const authenticateUser = async (loginUsername, password) => {
+  const { username, unscopedToken, expiresAt, issuedAt } = await keystone.authenticate(
+    loginUsername,
+    password,
+    '',
+  )
+  const timeDiff = moment(expiresAt).diff(issuedAt)
+  const localExpiresAt = moment()
+    .add(timeDiff)
+    .format()
+
+  const state = store.getState()
+  const currentTenant = state[preferencesStoreKey][username].root.currentTenant
+  const currentRegion = state[preferencesStoreKey][username].root.currentRegion
+  if (currentRegion) {
+    setActiveRegion(currentRegion)
+  }
+  const { scopedToken } = await keystone.changeProjectScope(currentTenant, false)
+  store.dispatch(
+    sessionActions.updateSession({
+      username,
+      unscopedToken,
+      scopedToken,
+      expiresAt: localExpiresAt,
+    }),
+  )
+}
 
 export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers, {
   listFn: async () => {
@@ -83,6 +128,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
       userId,
     })
+
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
       (acc, roleAssignment) => ({
         ...acc,
@@ -90,15 +136,28 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       }),
       {},
     )
+
     const mergedTenantIds = keys({ ...prevRoleAssignments, ...roleAssignments })
 
     // Perform the api calls to update the user and the tenant/role assignments
-    const updatedUserPromise = keystone.updateUser(userId, {
+    const updatedUser = await keystone.updateUser(userId, {
       name: username,
       email: username,
       displayname,
       password: password || undefined,
     })
+
+    // Update session if updating active user
+    const state = store.getState()
+    const activeUser = state[sessionStoreKey].userDetails
+    if (userId === activeUser.id) {
+      await updateSession(username, displayname, activeUser)
+      // If updating password of active user, reauthenticate the user
+      if (password != undefined) {
+        await authenticateUser(username, password)
+      }
+    }
+
     const updateTenantRolesPromises = mergedTenantIds.map((tenantId) => {
       const prevRoleId = prevRoleAssignments[tenantId]
       const currRoleId = roleAssignments[tenantId]
@@ -118,20 +177,17 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     }, [])
 
     // Resolve tenant and user/roles operation promises and filter out null responses
-    const [updatedUser] = await Promise.all([
-      updatedUserPromise,
-      tryCatchAsync(
-        () => Promise.all(updateTenantRolesPromises).then(reject(isNil)),
-        (err) => {
-          console.warn(err.message)
-          return emptyArr
-        },
-      )(null),
-    ])
+    await tryCatchAsync(
+      () => Promise.all(updateTenantRolesPromises).then(reject(isNil)),
+      (err) => {
+        console.warn(err.message)
+        return emptyArr
+      },
+    )(null)
+
     mngmTenantActions.invalidateCache()
     // Refresh the user/roles cache
-    await mngmUserRoleAssignmentsLoader({ userId }, true)
-
+    const currentRoleAssignments = await mngmUserRoleAssignmentsLoader({ userId }, true)
     return updatedUser
   },
   entityName: 'User',
@@ -154,7 +210,7 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
   ActionDataKeys.ManagementUsersRoleAssignments,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
-    uniqueIdentifier: ['user.id', 'role.id'],
+    uniqueIdentifier: ['user.id', 'scope.project.id', 'role.id'],
     indexBy: 'userId',
   },
 )
