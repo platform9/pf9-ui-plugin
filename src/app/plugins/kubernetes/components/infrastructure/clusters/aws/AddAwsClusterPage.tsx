@@ -44,7 +44,8 @@ const AddAwsClusterPage = () => {
     })
   }, [])
 
-  const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
+  const onComplete = (_, cluster) =>
+    history.push(routes.cluster.nodeHealth.path({ id: cluster?.uuid }))
 
   const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(
     clusterActions.create,
