@@ -113,3 +113,9 @@ export const createDriftScript = () => {
   `
   return script
 }
+
+export const appCuesSetAnonymous = () => {
+  if (window.Appcues) {
+    window.Appcues.anonymous()
+  }
+}
