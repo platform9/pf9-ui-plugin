@@ -81,7 +81,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
 
     const body = pick(updateableParams, params)
-    if (params.etcdBackup !== undefined) {
+    if (params.etcdBackup) {
       body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
     }
 
