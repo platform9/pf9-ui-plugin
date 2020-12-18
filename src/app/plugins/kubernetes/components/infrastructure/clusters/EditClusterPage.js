@@ -11,12 +11,20 @@ import { k8sPrefix, defaultEtcBackupPath } from 'app/constants'
 import { clusterActions } from './actions'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
-import EtcdBackupFields from './form-components/etcd-backup'
 import Name from './form-components/name'
 import TagsField from './form-components/tags'
 import DocumentMeta from 'core/components/DocumentMeta'
+import { AddonTogglers } from './form-components/cluster-addon-manager'
+import { makeStyles } from '@material-ui/styles'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
+
+const useStyles = makeStyles((theme) => ({
+  validatedFormContainer: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+}))
 
 // Hide pf9-system:monitoring tag from the display
 // bc that tag should be handled completely by appbert.
@@ -26,6 +34,7 @@ const tagsToOmit = ['pf9-system:monitoring']
 
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
+  const classes = useStyles()
   const clusterId = match.params.id
   const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
@@ -80,18 +89,23 @@ const EditClusterPage = () => {
       >
         <ValidatedForm
           title="Basic Details"
+          classes={{ root: classes.validatedFormContainer }}
           formActions={<SubmitButton>Update Cluster</SubmitButton>}
           initialValues={initialValues}
           onSubmit={handleSubmit}
+          withAddonManager
         >
           {/* Cluster Name */}
           <Name setWizardContext={getParamsUpdater} />
 
-          {/* Etcd Backup */}
-          <EtcdBackupFields wizardContext={params} setWizardContext={getParamsUpdater} />
-
           {/* Tags */}
           <TagsField info="Edit tag metadata on this cluster" blacklistedTags={tagsToOmit} />
+
+          <AddonTogglers
+            wizardContext={params}
+            setWizardContext={getParamsUpdater}
+            addons={['etcdBackup']}
+          />
         </ValidatedForm>
       </FormWrapper>
     </>
