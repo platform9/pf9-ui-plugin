@@ -25,7 +25,12 @@ import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
 import { isNilOrEmpty, pathStrOr } from 'utils/fp'
 import { getCookieValue } from 'utils/misc'
-import { createDriftScript, createSegmentScript, trackPage } from 'utils/tracking'
+import {
+  appCuesSetAnonymous,
+  createDriftScript,
+  createSegmentScript,
+  trackPage,
+} from 'utils/tracking'
 import moment from 'moment'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
@@ -134,17 +139,23 @@ const AppContainer = () => {
   const [sessionChecked, setSessionChecked] = useState(false)
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const { isSsoToken } = session
+  const { features, isSsoToken } = session
   const [, , getUserPrefs] = useScopedPreferences()
   const dispatch = useDispatch()
 
   useEffect(() => {
     const unlisten = history.listen((location) => {
       trackPage(`${location.pathname}${location.hash}`)
+      if (features?.experimental?.sandbox) {
+        appCuesSetAnonymous()
+      }
     })
 
     // This is to send page event for the first page the user lands on
     trackPage(`${pathname}${hash}`)
+    if (features?.experimental?.sandbox) {
+      appCuesSetAnonymous()
+    }
 
     const validateSession = async () => {
       // Bypass the session check if we are accessing a whitelisted url
