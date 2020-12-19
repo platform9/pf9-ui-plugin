@@ -10,6 +10,7 @@ import {
   helpUrl,
   ironicWizardUrl,
   logoutUrl,
+  pmkftSignupLink,
 } from 'app/constants'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
@@ -403,9 +404,9 @@ const AuthenticatedContainer = () => {
                     <Button
                       component="a"
                       target="_blank"
-                      href={getSandboxUrl('signup')}
+                      href={pmkftSignupLink}
                       onClick={() =>
-                        trackEvent('CTA Deploy a Cluster Now', { 'CTA-Page': 'PMK Live Demo' })
+                        trackEvent('Live Demo - Signup Request', { 'CTA-Page': 'PMK Live Demo' })
                       }
                     >
                       Start your Free Plan Now
