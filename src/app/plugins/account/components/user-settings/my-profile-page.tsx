@@ -21,6 +21,7 @@ import ApiClient from 'api-client/ApiClient'
 import { useSelector } from 'react-redux'
 import Progress from 'core/components/progress/Progress'
 import { RootState } from 'app/store'
+import { emailValidator } from 'core/utils/fieldValidators'
 
 const useStyles = makeStyles((theme: Theme) => ({
   userProfile: {
@@ -109,7 +110,7 @@ const MyProfilePage = () => {
   const userIdFormFieldSetter = useRef(null)
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const {
-    userDetails: { id: userId, username, displayName, email },
+    userDetails: { id: userId, displayName, email },
   } = session
   const [userTenants, loadingUserTenants] = useDataLoader(loadUserTenants)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
@@ -119,8 +120,9 @@ const MyProfilePage = () => {
   const userDetails = useMemo(
     () => ({
       id: userId,
-      username: username || email,
+      username: email,
       displayname: displayName || '',
+      email,
       roleAssignments: roleAssignments.reduce(
         (acc, roleAssignment) => ({
           ...acc,
@@ -129,7 +131,7 @@ const MyProfilePage = () => {
         {},
       ),
     }),
-    [username, displayName, roleAssignments],
+    [displayName, email, roleAssignments],
   )
   const tenantsAndRoles = useMemo(
     () =>
@@ -147,10 +149,9 @@ const MyProfilePage = () => {
   const loadingSomething = loadingUserTenants || loadingRoleAssignments || updatingUser
 
   useEffect(() => {
-    const usernameValue = username ? username : email
-    userIdFormFieldSetter.current.setField('username')(usernameValue)
+    userIdFormFieldSetter.current.setField('email')(email)
     userIdFormFieldSetter.current.setField('displayName')(displayName)
-  }, [username, displayName])
+  }, [displayName, email])
 
   const setupUserIdFieldSetter = (setField) => {
     userIdFormFieldSetter.current = { setField }
@@ -159,15 +160,14 @@ const MyProfilePage = () => {
   const handleUserIdUpdate = async (values) => {
     const user = {
       ...userDetails,
-      username: values.username || userDetails.username,
+      username: values.email || userDetails.email,
       displayname: values.displayname || userDetails.displayname,
     }
-    update(user)
+    await update(user)
   }
 
   const handlePasswordUpdate = async ({ currentPassword, newPassword, confirmedPassword }) => {
-    const username = userDetails.username
-    const { unscopedToken } = await keystone.authenticate(username, currentPassword, '')
+    const { unscopedToken } = await keystone.authenticate(email, currentPassword, '')
     if (!unscopedToken) {
       setErrorMessage('Your current password is invalid.')
       return
@@ -184,7 +184,7 @@ const MyProfilePage = () => {
     }
 
     setErrorMessage('')
-    update(user)
+    await update(user)
   }
 
   return (
@@ -206,7 +206,12 @@ const MyProfilePage = () => {
                 <Avatar displayName={displayName} diameter={80} fontSize={18} />
               </div>
               <div>
-                <TextField className={classes.inputField} id="username" label="Username" />
+                <TextField
+                  className={classes.inputField}
+                  id="email"
+                  label="Email"
+                  validations={[emailValidator]}
+                />
                 <TextField className={classes.inputField} id="displayname" label="Display Name" />
                 <SubmitButton className={classes.button}>Update</SubmitButton>
               </div>

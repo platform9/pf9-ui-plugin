@@ -15,7 +15,7 @@ import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { isNilOrEmpty } from 'utils/fp'
-import { preferencesStoreKey } from 'core/session/preferencesReducers'
+import { preferencesStoreKey, preferencesActions } from 'core/session/preferencesReducers'
 
 const { keystone, clemency, setActiveRegion } = ApiClient.getInstance()
 
@@ -37,11 +37,20 @@ export const loadCredentials = createContextLoader(
   },
 )
 
-const updateSession = async (username, displayName, activeUser) => {
+const updateSession = (username, displayName, activeUser) => {
   store.dispatch(
     sessionActions.updateSession({
       username,
-      userDetails: { ...activeUser, username, displayName },
+      userDetails: { ...activeUser, username, name: username, email: username, displayName },
+    }),
+  )
+}
+
+const updateUserPrefs = (newUsername, oldUserPrefs) => {
+  store.dispatch(
+    preferencesActions.updateAllPrefs({
+      username: newUsername,
+      ...oldUserPrefs,
     }),
   )
 }
@@ -139,19 +148,25 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
 
     const mergedTenantIds = keys({ ...prevRoleAssignments, ...roleAssignments })
 
+    // Get the user's current preferences to transfer to the new username later
+    const state = store.getState()
+    const oldUsername = state[sessionStoreKey].username
+    const oldUserPrefs = state[preferencesStoreKey][oldUsername]
+
     // Perform the api calls to update the user and the tenant/role assignments
     const updatedUser = await keystone.updateUser(userId, {
+      username,
       name: username,
       email: username,
       displayname,
       password: password || undefined,
     })
 
-    // Update session if updating active user
-    const state = store.getState()
+    // If updating active user, must update the session and user preferences as well
     const activeUser = state[sessionStoreKey].userDetails
     if (userId === activeUser.id) {
       await updateSession(username, displayname, activeUser)
+      await updateUserPrefs(username, oldUserPrefs)
       // If updating password of active user, reauthenticate the user
       if (password != undefined) {
         await authenticateUser(username, password)
@@ -187,7 +202,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
 
     mngmTenantActions.invalidateCache()
     // Refresh the user/roles cache
-    const currentRoleAssignments = await mngmUserRoleAssignmentsLoader({ userId }, true)
+    await mngmUserRoleAssignmentsLoader({ userId }, true)
     return updatedUser
   },
   entityName: 'User',
