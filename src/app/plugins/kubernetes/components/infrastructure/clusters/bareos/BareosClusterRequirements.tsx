@@ -157,8 +157,8 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
         <BulletList className={classes.bulletList} items={nodeServices} />
         <IconInfo icon="info-circle" title="Minimum Hardware Requirements:">
           <div className={classes.requirements}>
-            <HardwareSpec title="2 VCPUs" icon="microchip" />
-            <HardwareSpec title="8GB RAM" icon="memory" />
+            <HardwareSpec title="4 VCPUs" icon="microchip" />
+            <HardwareSpec title="16GB RAM" icon="memory" />
             <HardwareSpec title="30GB HDD" icon="hdd" />
           </div>
         </IconInfo>
