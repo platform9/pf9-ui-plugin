@@ -23,7 +23,6 @@ import Progress from 'core/components/progress/Progress'
 import { RootState } from 'app/store'
 import { emailValidator } from 'core/utils/fieldValidators'
 import useScopedPreferences from 'core/session/useScopedPreferences'
-import { preferencesActions, PreferencesState } from 'core/session/preferencesReducers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   userProfile: {
@@ -106,15 +105,20 @@ const TenantsTable = ({ data }) => {
   )
 }
 
+const { setActiveRegion } = ApiClient.getInstance()
+
 const MyProfilePage = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const [, , getUserPrefs] = useScopedPreferences()
+  const [prefs, updatePrefs] = useScopedPreferences()
   const [errorMessage, setErrorMessage] = useState('')
+  const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
   const userIdFormFieldSetter = useRef(null)
+
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { userDetails } = session
   const { id: userId, displayName, email } = userDetails
+
   const [userTenants, loadingUserTenants] = useDataLoader(loadUserTenants)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
     userId,
@@ -152,23 +156,30 @@ const MyProfilePage = () => {
   const loadingSomething = loadingUserTenants || loadingRoleAssignments || updatingUser
 
   useEffect(() => {
+    // Reset the initial values for the user ID form with the new updated values
     userIdFormFieldSetter.current.setField('email')(email)
     userIdFormFieldSetter.current.setField('displayName')(displayName)
   }, [displayName, email])
+
+  useEffect(() => {
+    // Whenever the user's email gets updated, transfer their old prefs over to the new email
+    updatePrefs(oldUserPrefs)
+    setActiveRegion(oldUserPrefs.currentRegion)
+    setOldUserPrefs(prefs)
+  }, [email])
 
   const setupUserIdFieldSetter = (setField) => {
     userIdFormFieldSetter.current = { setField }
   }
 
   const handleUserIdUpdate = async (values) => {
-    // Get user prefs associated with the old username
-    const { currentTenant, currentRegion } = getUserPrefs(userInfo.username)
-
+    setOldUserPrefs(prefs)
     const user = {
       ...userInfo,
       username: values.email || userInfo.email,
       displayname: values.displayname || userInfo.displayname,
     }
+
     const [updated, updatedUser] = await update(user)
 
     if (updated) {
@@ -180,17 +191,10 @@ const MyProfilePage = () => {
             username: updatedUser.username,
             name: updatedUser.username,
             email: updatedUser.username,
-            displayName: updatedUser.displayname,
-            displayname: updatedUser.displayname,
+            displayName: updatedUser.displayname, // displayName is a UI variable
+            displayname: updatedUser.displayname, // displayname is what we get from the api
           },
         }),
-      )
-      dispatch(
-        preferencesActions.updatePrefs({
-          username: updatedUser.username,
-          key: 'root',
-          prefs: { currentTenant, currentRegion },
-        } as PreferencesState),
       )
     }
   }

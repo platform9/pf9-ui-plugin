@@ -18,10 +18,6 @@ const {
     updatePrefs: (state, { payload }: PayloadAction<PreferencesState>) => {
       return over(lensPath([payload.username, payload.key]), mergeLeft(payload.prefs), state)
     },
-    updateAllPrefs: (state, { payload }: PayloadAction<PreferencesState>) => {
-      const { username, ...prefs } = payload
-      return over(lensPath([payload.username]), mergeLeft(prefs), state)
-    },
   },
 })
 
