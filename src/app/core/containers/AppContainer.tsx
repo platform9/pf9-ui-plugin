@@ -201,7 +201,6 @@ const AppContainer = () => {
       }
 
       // Order matters
-      setSessionChecked(true)
       const user = await updateSession({
         username,
         unscopedToken,
@@ -210,7 +209,7 @@ const AppContainer = () => {
         isSsoToken,
         currentTenantId: activeTenantId,
       })
-
+      setSessionChecked(true)
       if (user) {
         await getUserDetails(user)
       }
