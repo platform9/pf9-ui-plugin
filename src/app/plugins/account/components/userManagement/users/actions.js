@@ -16,17 +16,96 @@ import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { isNilOrEmpty } from 'utils/fp'
 import { preferencesStoreKey, preferencesActions } from 'core/session/preferencesReducers'
+import { LoginMethodTypes } from './helpers'
 
 const { keystone, clemency, setActiveRegion } = ApiClient.getInstance()
 
-export const isSystemUser = ({ username }) => {
-  const { groups = {} } = originUsernameRegex.exec(window.location.origin) || {}
-  const { originUsername = null } = groups
-  const isOriginUsername = username.includes(originUsername)
-
-  const isUuid = uuidRegex.test(username)
-  return isOriginUsername || isUuid || username === 'kplane-clustmgr'
+const authMethods = {
+  [LoginMethodTypes.Local]: async (username, password, totp) =>
+    keystone.authenticate(username, password, totp),
+  [LoginMethodTypes.SSO]: async (_u, _p, _t) => keystone.authenticateSso(),
 }
+
+export const authenticateUser = async ({
+  loginUsername,
+  password,
+  loginMethod,
+  MFAcheckbox,
+  mfa,
+  reauthenticating = false,
+}) => {
+  const totp = MFAcheckbox ? mfa : ''
+  const isSsoToken = loginMethod === LoginMethodTypes.SSO
+
+  const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[loginMethod](
+    loginUsername,
+    password,
+    totp,
+  )
+
+  if (unscopedToken) {
+    const timeDiff = moment(expiresAt).diff(issuedAt)
+    const localExpiresAt = moment()
+      .add(timeDiff)
+      .format()
+
+    if (reauthenticating) {
+      store.dispatch(
+        sessionActions.updateSession({
+          username,
+          unscopedToken,
+          expiresAt: localExpiresAt,
+        }),
+      )
+    } else {
+      store.dispatch(
+        sessionActions.initSession({
+          username,
+          unscopedToken,
+          expiresAt: localExpiresAt,
+        }),
+      )
+    }
+  }
+
+  return { username, unscopedToken, expiresAt, issuedAt, isSsoToken }
+}
+
+export const updateSession = async ({
+  username,
+  unscopedToken,
+  expiresAt,
+  issuedAt,
+  isSsoToken,
+  currentTenantId,
+}) => {
+  const timeDiff = moment(expiresAt).diff(issuedAt)
+  const localExpiresAt = moment()
+    .add(timeDiff)
+    .format()
+
+  const { user, scopedToken } = await keystone.changeProjectScope(currentTenantId, isSsoToken)
+
+  if (scopedToken) {
+    await keystone.resetCookie()
+
+    store.dispatch(
+      sessionActions.updateSession({
+        username,
+        unscopedToken,
+        scopedToken,
+        expiresAt: localExpiresAt,
+        userDetails: { ...user },
+        isSsoToken,
+      }),
+    )
+
+    return user
+  }
+
+  return null
+}
+
 export const loadCredentials = createContextLoader(
   ActionDataKeys.ManagementCredentials,
   () => {
@@ -36,52 +115,6 @@ export const loadCredentials = createContextLoader(
     requiredRoles: 'admin',
   },
 )
-
-const updateSession = (username, displayName, activeUser) => {
-  store.dispatch(
-    sessionActions.updateSession({
-      username,
-      userDetails: { ...activeUser, username, name: username, email: username, displayName },
-    }),
-  )
-}
-
-const updateUserPrefs = (newUsername, oldUserPrefs) => {
-  store.dispatch(
-    preferencesActions.updateAllPrefs({
-      username: newUsername,
-      ...oldUserPrefs,
-    }),
-  )
-}
-
-const authenticateUser = async (loginUsername, password) => {
-  const { username, unscopedToken, expiresAt, issuedAt } = await keystone.authenticate(
-    loginUsername,
-    password,
-    '',
-  )
-  const timeDiff = moment(expiresAt).diff(issuedAt)
-  const localExpiresAt = moment()
-    .add(timeDiff)
-    .format()
-
-  const state = store.getState()
-  const currentTenant = state[preferencesStoreKey][username].root.currentTenant
-  const currentRegion = state[preferencesStoreKey][username].root.currentRegion
-  if (currentRegion) {
-    setActiveRegion(currentRegion)
-  }
-  const { scopedToken } = await keystone.changeProjectScope(currentTenant, false)
-  store.dispatch(
-    sessionActions.updateSession({
-      username,
-      unscopedToken,
-      scopedToken,
-      expiresAt: localExpiresAt,
-    }),
-  )
-}
 
 export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers, {
   listFn: async () => {
@@ -137,7 +170,6 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
       userId,
     })
-
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
       (acc, roleAssignment) => ({
         ...acc,
@@ -145,13 +177,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       }),
       {},
     )
-
     const mergedTenantIds = keys({ ...prevRoleAssignments, ...roleAssignments })
-
-    // Get the user's current preferences to transfer to the new username later
-    const state = store.getState()
-    const oldUsername = state[sessionStoreKey].username
-    const oldUserPrefs = state[preferencesStoreKey][oldUsername]
 
     // Perform the api calls to update the user and the tenant/role assignments
     const updatedUser = await keystone.updateUser(userId, {
@@ -162,15 +188,25 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       password: password || undefined,
     })
 
-    // If updating active user, must update the session and user preferences as well
+    // If updating password of active user, reauthenticate the user
+    const state = store.getState()
     const activeUser = state[sessionStoreKey].userDetails
-    if (userId === activeUser.id) {
-      await updateSession(username, displayname, activeUser)
-      await updateUserPrefs(username, oldUserPrefs)
-      // If updating password of active user, reauthenticate the user
-      if (password != undefined) {
-        await authenticateUser(username, password)
-      }
+    if (userId === activeUser.id && password != undefined) {
+      const userAuthInfo = await authenticateUser({
+        loginUsername: username,
+        password,
+        loginMethod: LoginMethodTypes.Local,
+        MFAcheckbox: false,
+        mfa: '',
+        reauthenticating: true,
+      })
+
+      const currentTenantId = state[preferencesStoreKey][username].root.currentTenant
+
+      await updateSession({
+        ...userAuthInfo,
+        currentTenantId,
+      })
     }
 
     const updateTenantRolesPromises = mergedTenantIds.map((tenantId) => {

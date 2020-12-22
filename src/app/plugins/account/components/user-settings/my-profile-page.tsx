@@ -8,7 +8,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Text from 'core/elements/text'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { sessionActions, SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { prop } from 'ramda'
 import { mngmUserActions, mngmUserRoleAssignmentsLoader } from '../userManagement/users/actions'
@@ -18,10 +18,12 @@ import Avatar from 'core/components/Avatar'
 import { pathStr } from 'utils/fp'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import ApiClient from 'api-client/ApiClient'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Progress from 'core/components/progress/Progress'
 import { RootState } from 'app/store'
 import { emailValidator } from 'core/utils/fieldValidators'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { preferencesActions, PreferencesState } from 'core/session/preferencesReducers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   userProfile: {
@@ -106,18 +108,19 @@ const TenantsTable = ({ data }) => {
 
 const MyProfilePage = () => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const [, , getUserPrefs] = useScopedPreferences()
   const [errorMessage, setErrorMessage] = useState('')
   const userIdFormFieldSetter = useRef(null)
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
-  const {
-    userDetails: { id: userId, displayName, email },
-  } = session
+  const { userDetails } = session
+  const { id: userId, displayName, email } = userDetails
   const [userTenants, loadingUserTenants] = useDataLoader(loadUserTenants)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
     userId,
   })
   const [update, updatingUser] = useDataUpdater(mngmUserActions.update)
-  const userDetails = useMemo(
+  const userInfo = useMemo(
     () => ({
       id: userId,
       username: email,
@@ -158,12 +161,38 @@ const MyProfilePage = () => {
   }
 
   const handleUserIdUpdate = async (values) => {
+    // Get user prefs associated with the old username
+    const { currentTenant, currentRegion } = getUserPrefs(userInfo.username)
+
     const user = {
-      ...userDetails,
-      username: values.email || userDetails.email,
-      displayname: values.displayname || userDetails.displayname,
+      ...userInfo,
+      username: values.email || userInfo.email,
+      displayname: values.displayname || userInfo.displayname,
     }
-    await update(user)
+    const [updated, updatedUser] = await update(user)
+
+    if (updated) {
+      dispatch(
+        sessionActions.updateSession({
+          username: updatedUser.username,
+          userDetails: {
+            ...userDetails,
+            username: updatedUser.username,
+            name: updatedUser.username,
+            email: updatedUser.username,
+            displayName: updatedUser.displayname,
+            displayname: updatedUser.displayname,
+          },
+        }),
+      )
+      dispatch(
+        preferencesActions.updatePrefs({
+          username: updatedUser.username,
+          key: 'root',
+          prefs: { currentTenant, currentRegion },
+        } as PreferencesState),
+      )
+    }
   }
 
   const handlePasswordUpdate = async ({ currentPassword, newPassword, confirmedPassword }) => {
@@ -179,7 +208,7 @@ const MyProfilePage = () => {
     }
 
     const user = {
-      ...userDetails,
+      ...userInfo,
       password: newPassword,
     }
 
@@ -196,7 +225,7 @@ const MyProfilePage = () => {
       >
         <ValidatedForm
           fullWidth
-          initialValues={userDetails}
+          initialValues={userInfo}
           onSubmit={handleUserIdUpdate}
           fieldSetter={setupUserIdFieldSetter}
         >

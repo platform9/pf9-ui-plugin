@@ -31,14 +31,14 @@ import {
   createSegmentScript,
   trackPage,
 } from 'utils/tracking'
-import moment from 'moment'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import axios from 'axios'
 import { updateClarityStore } from 'utils/clarityHelper'
 import { DocumentMeta } from 'core/components/DocumentMeta'
+import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 
-const { keystone, setActiveRegion } = ApiClient.getInstance()
+const { setActiveRegion } = ApiClient.getInstance()
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -87,10 +87,7 @@ const restoreSession = async (
   return {}
 }
 
-const getUserDetails = async (activeTenant, isSsoToken) => {
-  const { user, scopedToken } = await keystone.changeProjectScope(activeTenant.id, isSsoToken)
-  await keystone.resetCookie()
-
+const getUserDetails = async (user) => {
   /* eslint-disable */
   // Check for sandbox flag, if false identify the user in Segment using Keystone ID
   // This needs to be done here bc this needs to be done before login.
@@ -119,11 +116,6 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
   // Drift tracking code for live demo
   if (sandbox) {
     DocumentMeta.addElementToDomBody(createDriftScript())
-  }
-
-  return {
-    userDetails: user,
-    scopedToken,
   }
 }
 
@@ -193,11 +185,6 @@ const AppContainer = () => {
 
   const setupSession = useCallback(
     async ({ username, unscopedToken, expiresAt, issuedAt, isSsoToken }) => {
-      const timeDiff = moment(expiresAt).diff(issuedAt)
-      const localExpiresAt = moment()
-        .add(timeDiff)
-        .format()
-
       const { currentTenant, currentRegion } = getUserPrefs(username)
       const tenants = await loadUserTenants()
       if (isNilOrEmpty(tenants)) {
@@ -207,23 +194,26 @@ const AppContainer = () => {
       if (!currentTenant && activeTenant) {
         updateClarityStore('tenantObj', activeTenant)
       }
+      const activeTenantId = activeTenant.id
+
       if (currentRegion) {
         setActiveRegion(currentRegion)
       }
-      const { scopedToken, userDetails } = await getUserDetails(activeTenant, isSsoToken)
 
       // Order matters
       setSessionChecked(true)
-      dispatch(
-        sessionActions.updateSession({
-          username,
-          unscopedToken,
-          scopedToken,
-          expiresAt: localExpiresAt,
-          userDetails,
-          isSsoToken,
-        }),
-      )
+      const user = await updateSession({
+        username,
+        unscopedToken,
+        expiresAt,
+        issuedAt,
+        isSsoToken,
+        currentTenantId: activeTenantId,
+      })
+
+      if (user) {
+        await getUserDetails(user)
+      }
     },
     [],
   )
