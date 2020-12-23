@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const { keystone } = ApiClient.getInstance()
+const { keystone, setActiveRegion } = ApiClient.getInstance()
 
 const TenantsTable = ({ data }) => {
   const classes = useStyles()
@@ -104,8 +104,6 @@ const TenantsTable = ({ data }) => {
     </Table>
   )
 }
-
-const { setActiveRegion } = ApiClient.getInstance()
 
 const MyProfilePage = () => {
   const classes = useStyles()
@@ -173,7 +171,6 @@ const MyProfilePage = () => {
   }
 
   const handleUserIdUpdate = async (values) => {
-    setOldUserPrefs(prefs)
     const user = {
       ...userInfo,
       username: values.email || userInfo.email,
@@ -185,12 +182,12 @@ const MyProfilePage = () => {
     if (updated) {
       dispatch(
         sessionActions.updateSession({
-          username: updatedUser.username,
+          username: updatedUser.email,
           userDetails: {
             ...userDetails,
-            username: updatedUser.username,
-            name: updatedUser.username,
-            email: updatedUser.username,
+            username: updatedUser.email,
+            name: updatedUser.email,
+            email: updatedUser.email,
             displayName: updatedUser.displayname, // displayName is a UI variable
             displayname: updatedUser.displayname, // displayname is what we get from the api
           },
