@@ -13,7 +13,6 @@ import { azurePrerequisitesLink } from 'k8s/links'
 import React, { FC } from 'react'
 import { pathStrOr } from 'utils/fp'
 import { castBoolToStr } from 'utils/misc'
-import { trackEvent } from 'utils/tracking'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
 import AllowWorkloadsOnMasterField from '../../form-components/allow-workloads-on-master'
 import ApiFqdnField from '../../form-components/api-fqdn'
@@ -44,6 +43,8 @@ import AzureSubnetPicklist from '../AzureSubnetPicklist'
 import AzureVnetPicklist from '../AzureVnetPicklist'
 import Text from 'core/elements/text'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
+import { azureClusterTracking } from '../../tracking'
+import { ClusterCreateTypes } from '../../model'
 
 export const initialContext = {
   template: 'small',
@@ -107,52 +108,9 @@ const columns = [
   },
 ]
 
-const configOnNext = (context) => {
-  trackEvent('WZ New Azure Cluster 1 Master Nodes', {
-    wizard_step: 'Cluster Configuration',
-    wizard_state: 'In-Progress',
-    wizard_progress: '1 of 4',
-    wizard_name: 'Add New Azure Cluster',
-    cluster_name: context.name,
-    cluster_region: context.location,
-    cluster_template: context.template,
-    allow_workloads_on_master: context.allowWorkloadsOnMaster,
-    master_nodes: context.numMasters,
-    worker_nodes: context.numWorkers,
-    master_sku: context.masterSku,
-    worker_sku: context.workerSku,
-  })
-}
-
-const networkOnNext = (context) => {
-  trackEvent('WZ New Azure Cluster 2 Networking Details', {
-    wizard_step: 'Network Info',
-    wizard_state: 'In-Progress',
-    wizard_progress: '2 of 4',
-    wizard_name: 'Add New Azure Cluster',
-    network_configuration: context.network,
-    network_backend: context.networkPlugin,
-  })
-}
-
-const advancedOnNext = (context) => {
-  trackEvent('WZ New Azure Cluster 3 Advanced Configuration', {
-    wizard_step: 'Advanced Configuration',
-    wizard_state: 'In-Progress',
-    wizard_progress: '3 of 4',
-    wizard_name: 'Add New Azure Cluster',
-    enable_etcd_backup: !!context.enableEtcdBackup,
-    enable_monitoring: !!context.prometheusMonitoringEnabled,
-  })
-}
-
-const reviewOnNext = (context) => {
-  trackEvent('WZ New Azure Cluster 4 Review', {
-    wizard_step: 'Review',
-    wizard_state: 'Finished',
-    wizard_progress: '4 of 4',
-    wizard_name: 'Add New Azure Cluster',
-  })
+const trackingFields = {
+  platform: CloudProviders.Azure,
+  target: ClusterCreateTypes.Custom,
 }
 
 const networkOptions = [
@@ -243,7 +201,11 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
   return (
     <>
       {/* Step 1 - Cluster Configuration */}
-      <WizardStep stepId="config" label="Cluster Configuration" onNext={configOnNext}>
+      <WizardStep
+        stepId="config"
+        label="Initial Setup"
+        onNext={azureClusterTracking.wZStepOne(trackingFields)}
+      >
         <ValidatedForm
           fullWidth
           classes={{ root: classes.validatedFormContainer }}
@@ -343,7 +305,11 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
       </WizardStep>
 
       {/* Step 2 - Network Info */}
-      <WizardStep stepId="network" label="Network Info" onNext={networkOnNext}>
+      <WizardStep
+        stepId="network"
+        label="Network Info"
+        onNext={azureClusterTracking.wZStepTwo(trackingFields)}
+      >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
           fullWidth
@@ -409,7 +375,11 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
       </WizardStep>
 
       {/* Step 3 - Advanced Configuration */}
-      <WizardStep stepId="advanced" label="Advanced Configuration" onNext={advancedOnNext}>
+      <WizardStep
+        stepId="advanced"
+        label="Advanced Configuration"
+        onNext={azureClusterTracking.wZStepThree(trackingFields)}
+      >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
           fullWidth
@@ -440,7 +410,11 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
       </WizardStep>
 
       {/* Step 4 - Review */}
-      <WizardStep stepId="review" label="Review" onNext={reviewOnNext}>
+      <WizardStep
+        stepId="review"
+        label="Review"
+        onNext={azureClusterTracking.wZStepFour(trackingFields)}
+      >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
           fullWidth

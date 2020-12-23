@@ -7,7 +7,6 @@ import ExternalLink from 'core/components/ExternalLink'
 import { awsPrerequisitesLink } from 'k8s/links'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import ClusterNameField from '../../form-components/name'
-import { trackEvent } from 'utils/tracking'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
 import AwsAvailabilityZoneField from '../aws-availability-zone'
@@ -40,6 +39,8 @@ import KubernetesVersion from '../../form-components/kubernetes-version'
 import Text from 'core/elements/text'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import WorkerNodeInstanceTypeField from '../../form-components/worker-node-instance-type'
+import { ClusterCreateTypes } from '../../model'
+import { awsClusterTracking } from '../../tracking'
 
 export const initialContext = {
   template: 'small',
@@ -110,54 +111,9 @@ const columns = [
   },
 ]
 
-// Segment tracking for wizard steps
-const configOnNext = (context) => {
-  trackEvent('WZ New AWS Cluster 1 Master Nodes', {
-    wizard_step: 'Cluster Configuration',
-    wizard_state: 'In-Progress',
-    wizard_progress: '1 of 4',
-    wizard_name: 'Add New AWS Cluster',
-    cluster_name: context.name,
-    cluster_region: context.region,
-    cluster_azs: context.azs,
-    cluster_template: context.template,
-    allow_workloads_on_master: context.allowWorkloadsOnMaster,
-    master_nodes: context.numMasters,
-    worker_nodes: context.numWorkers,
-    master_flavor: context.masterFlavor,
-    worker_flavor: context.workerFlavor,
-  })
-}
-
-const networkOnNext = (context) => {
-  trackEvent('WZ New AWS Cluster 2 Networking Details', {
-    wizard_step: 'Network Info',
-    wizard_state: 'In-Progress',
-    wizard_progress: '2 of 4',
-    wizard_name: 'Add New AWS Cluster',
-    network_configuration: context.network,
-    network_backend: context.networkPlugin,
-  })
-}
-
-const advancedOnNext = (context) => {
-  trackEvent('WZ New AWS Cluster 3 Advanced Configuration', {
-    wizard_step: 'Advanced Configuration',
-    wizard_state: 'In-Progress',
-    wizard_progress: '3 of 4',
-    wizard_name: 'Add New AWS Cluster',
-    enable_etcd_backup: !!context.enableEtcdBackup,
-    enable_monitoring: !!context.prometheusMonitoringEnabled,
-  })
-}
-
-const reviewOnNext = (context) => {
-  trackEvent('WZ New AWS Cluster 4 Review', {
-    wizard_step: 'Review',
-    wizard_state: 'Finished',
-    wizard_progress: '4 of 4',
-    wizard_name: 'Add New AWS Cluster',
-  })
+const trackingFields = {
+  platform: CloudProviders.Aws,
+  target: ClusterCreateTypes.Custom,
 }
 
 const templateOptions = [
@@ -236,7 +192,11 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
   return (
     <>
       {/* Step 1 - Cluster Configuration */}
-      <WizardStep stepId="config" label="Network Configuration" onNext={configOnNext}>
+      <WizardStep
+        stepId="config"
+        label="Initial Setup"
+        onNext={awsClusterTracking.wZStepOne(trackingFields)}
+      >
         <ValidatedForm
           fullWidth
           classes={{ root: classes.validatedFormContainer }}
@@ -348,7 +308,11 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
       </WizardStep>
 
       {/* Step 2 - Network Info */}
-      <WizardStep stepId="network" label="Network Info" onNext={networkOnNext}>
+      <WizardStep
+        stepId="network"
+        label="Network Info"
+        onNext={awsClusterTracking.wZStepTwo(trackingFields)}
+      >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
           fullWidth
@@ -423,7 +387,11 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
       </WizardStep>
 
       {/* Step 3 - Advanced Configuration */}
-      <WizardStep stepId="advanced" label="Advanced Configuration" onNext={advancedOnNext}>
+      <WizardStep
+        stepId="advanced"
+        label="Advanced Configuration"
+        onNext={awsClusterTracking.wZStepThree(trackingFields)}
+      >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
           fullWidth
@@ -458,7 +426,11 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
       </WizardStep>
 
       {/* Step 4 - Review */}
-      <WizardStep stepId="review" label="Review" onNext={reviewOnNext}>
+      <WizardStep
+        stepId="review"
+        label="Review"
+        onNext={awsClusterTracking.wZStepFour(trackingFields)}
+      >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
           fullWidth

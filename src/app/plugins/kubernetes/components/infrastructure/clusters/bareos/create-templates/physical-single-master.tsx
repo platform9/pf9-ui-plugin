@@ -16,7 +16,6 @@ import ClusterNameField from '../../form-components/name'
 import KubernetesVersion from '../../form-components/kubernetes-version'
 
 import Theme from 'core/themes/model'
-import { trackEvent } from 'utils/tracking'
 import { Divider } from '@material-ui/core'
 import Text from 'core/elements/text'
 import NetworkStack from '../../form-components/network-stack'
@@ -40,6 +39,8 @@ import CalicoNetworkFields, {
 import TagsField, { FormattedTags } from '../../form-components/tags'
 import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
+import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { bareOSClusterTracking } from '../../tracking'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -73,6 +74,10 @@ interface Props {
 
 const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled']
 const clusterEarlyAccessAddons = ['networkPluginOperator', 'kubevirtPluginOperator']
+const trackingFields = {
+  platform: CloudProviders.PhysicalMachine,
+  target: ClusterCreateTypes.SingleMaster,
+}
 
 const PhysicalSingleMasterCluster: FC<Props> = ({
   onNext,
@@ -84,7 +89,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({
   const addons = [].concat(clusterAddons, experimentalFeatures ? clusterEarlyAccessAddons : [])
   return (
     <>
-      <WizardStep stepId="basic" label="Initial Setup" onNext={basicOnNext}>
+      <WizardStep
+        stepId="basic"
+        label="Initial Setup"
+        onNext={bareOSClusterTracking.wZStepOne(trackingFields)}
+      >
         <ValidatedForm
           fullWidth
           classes={{ root: classes.validatedFormContainer }}
@@ -133,7 +142,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({
           </FormFieldCard>
         </ValidatedForm>
       </WizardStep>
-      <WizardStep stepId="masters" label="Master Node" onNext={mastersOnNext}>
+      <WizardStep
+        stepId="masters"
+        label="Master Node"
+        onNext={bareOSClusterTracking.wZStepTwo(trackingFields)}
+      >
         <ValidatedForm
           fullWidth
           initialValues={wizardContext}
@@ -156,7 +169,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({
           />
         </ValidatedForm>
       </WizardStep>
-      <WizardStep stepId="workers" label="Worker Nodes" onNext={workersOnNext}>
+      <WizardStep
+        stepId="workers"
+        label="Worker Nodes"
+        onNext={bareOSClusterTracking.wZStepThree(trackingFields)}
+      >
         <ValidatedForm
           fullWidth
           initialValues={wizardContext}
@@ -182,7 +199,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({
           />
         </ValidatedForm>
       </WizardStep>
-      <WizardStep stepId="network" label="Network" onNext={networkOnNext}>
+      <WizardStep
+        stepId="network"
+        label="Network"
+        onNext={bareOSClusterTracking.wZStepFour(trackingFields)}
+      >
         <ValidatedForm
           initialValues={wizardContext}
           onSubmit={setWizardContext}
@@ -214,7 +235,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({
           )}
         </ValidatedForm>
       </WizardStep>
-      <WizardStep stepId="advanced" label="Advanced" onNext={advancedOnNext}>
+      <WizardStep
+        stepId="advanced"
+        label="Advanced"
+        onNext={bareOSClusterTracking.wZStepFive(trackingFields)}
+      >
         <ValidatedForm
           initialValues={wizardContext}
           onSubmit={setWizardContext}
@@ -229,7 +254,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({
           )}
         </ValidatedForm>
       </WizardStep>
-      <WizardStep stepId="review" label="Finalize & Review" onNext={reviewOnNext}>
+      <WizardStep
+        stepId="review"
+        label="Finalize & Review"
+        onNext={bareOSClusterTracking.wZStepSix(trackingFields)}
+      >
         <ValidatedForm
           initialValues={wizardContext}
           onSubmit={setWizardContext}
@@ -292,67 +321,6 @@ const reviewTableColumns = [
     render: (value) => <FormattedTags tags={value} />,
   },
 ]
-
-const basicOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 1 Nodes Connected', {
-    wizard_step: 'Initial Setup',
-    wizard_state: 'In-Progress',
-    wizard_progress: '1 of 6',
-    wizard_name: 'Add New BareOS Cluster',
-    cluster_name: context.name,
-  })
-}
-const mastersOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 2 Master Nodes', {
-    wizard_step: 'Select Master Nodes',
-    wizard_state: 'In-Progress',
-    wizard_progress: '2 of 6',
-    wizard_name: 'Add New BareOS Cluster',
-    master_nodes: (context.masterNodes && context.masterNodes.length) || 0,
-    allow_workloads_on_master: context.allowWorkloadsOnMaster,
-    privileged: context.privileged,
-  })
-}
-
-const workersOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 3 Worker Nodes', {
-    wizard_step: 'Select Worker Nodes',
-    wizard_state: 'In-Progress',
-    wizard_progress: '3 of 6',
-    wizard_name: 'Add New BareOS Cluster',
-    worker_nodes: (context.workerNodes && context.workerNodes.length) || 0,
-  })
-}
-
-const networkOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 4 Networking Details', {
-    wizard_step: 'Configure Network',
-    wizard_state: 'In-Progress',
-    wizard_progress: '4 of 6',
-    wizard_name: 'Add New BareOS Cluster',
-    network_backend: context.networkPlugin,
-  })
-}
-
-const advancedOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 5 Advanced Configuration', {
-    wizard_step: 'Advanced Configuration',
-    wizard_state: 'In-Progress',
-    wizard_progress: '5 of 6',
-    wizard_name: 'Add New BareOS Cluster',
-    enable_etcd_backup: !!context.enableEtcdBackup,
-    enable_monitoring: !!context.prometheusMonitoringEnabled,
-  })
-}
-
-const reviewOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 6 Review', {
-    wizard_step: 'Review',
-    wizard_state: 'Finished',
-    wizard_progress: '6 of 6',
-    wizard_name: 'Add New BareOS Cluster',
-  })
-}
 
 const useStyles = makeStyles<Theme>((theme) => ({
   validatedFormContainer: {
