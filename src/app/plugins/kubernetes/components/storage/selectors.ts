@@ -14,14 +14,14 @@ export const storageClassSelector = createSelector(
     return map(
       (storageClass) => ({
         // ...storageClass,
-        id: storageClass?.metadata.uid,
-        name: storageClass?.metadata.name,
+        id: storageClass?.metadata?.uid,
+        name: storageClass?.metadata?.name,
         clusterName: pipe<IClusterSelector[], IClusterSelector, string>(
           find<IClusterSelector>(propEq('uuid', storageClass.clusterId)),
           prop('name'),
         )(clusters),
-        type: storageClass?.parameters.type,
-        created: storageClass?.metadata.creationTimestamp,
+        type: storageClass?.parameters?.type,
+        created: storageClass?.metadata?.creationTimestamp,
       }),
       rawStorageClasses,
     )

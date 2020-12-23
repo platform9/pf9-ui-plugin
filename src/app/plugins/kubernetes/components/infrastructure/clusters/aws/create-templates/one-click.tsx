@@ -18,6 +18,8 @@ import ClusterDomainField from '../../form-components/cluster-domain'
 import AwsAvailabilityZoneField from '../aws-availability-zone'
 import { castBoolToStr } from 'utils/misc'
 import KubernetesVersion from '../../form-components/kubernetes-version'
+import { awsClusterTracking } from '../../tracking'
+import { ClusterCreateTypes } from '../../model'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -75,6 +77,11 @@ const columns = [
   },
 ]
 
+const trackingFields = {
+  platform: CloudProviders.Aws,
+  target: ClusterCreateTypes.OneClick,
+}
+
 const useStyles = makeStyles<Theme>((theme) => ({
   validatedFormContainer: {
     display: 'grid',
@@ -104,7 +111,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
   const handleClusterDomainUpdate = (values) => updateFqdns(values)
 
   return (
-    <WizardStep stepId="one-click" onNext={onNext}>
+    <WizardStep stepId="one-click" onNext={awsClusterTracking.oneClick(trackingFields)}>
       <ValidatedForm
         classes={{ root: classes.validatedFormContainer }}
         fullWidth

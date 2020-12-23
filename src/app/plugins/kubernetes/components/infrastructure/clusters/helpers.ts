@@ -5,12 +5,12 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { compose, path, pick, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
-import { trackEvent } from 'utils/tracking'
 import { CloudProviders } from '../cloudProviders/model'
 import { hasConvergingNodes } from './ClusterStatusUtils'
 import { NetworkStackTypes } from './constants'
 import { CalicoDetectionTypes } from './form-components/calico-network-fields'
 import { ClusterCreateTypes } from './model'
+import { awsClusterTracking, azureClusterTracking, bareOSClusterTracking } from './tracking'
 
 export const clusterIsHealthy = (cluster) =>
   cluster.status === 'ok' && cluster.masterNodesHealthStatus === 'healthy'
@@ -165,9 +165,7 @@ export const createAwsCluster = async (data) => {
   const cluster = createGenericCluster(body, data)
 
   // Placed beneath API call -- send the tracking when the request is successful
-  trackEvent('WZ New AWS Cluster Finished', {
-    cluster_name: data.name,
-  })
+  awsClusterTracking.createFinished(data.segmentTrackingFields)(data)
 
   return cluster
 }
@@ -211,9 +209,7 @@ export const createAzureCluster = async (data) => {
   const cluster = createGenericCluster(body, data)
 
   // Placed beneath API call -- send the tracking when the request is successful
-  trackEvent('WZ New Azure Cluster Finished', {
-    cluster_name: data.name,
-  })
+  azureClusterTracking.createFinished(data.segmentTrackingFields)(data)
 
   return cluster
 }
@@ -250,9 +246,7 @@ export const createBareOSCluster = async (data) => {
   const cluster = await createGenericCluster(body, data)
 
   // Placed beneath API call -- send the tracking when the request is successful
-  trackEvent('WZ New BareOS Cluster Finished', {
-    cluster_name: data.name,
-  })
+  bareOSClusterTracking.createFinished(data.segmentTrackingFields)(data)
 
   // 3. Attach the nodes
   const { masterNodes, workerNodes = [] } = data

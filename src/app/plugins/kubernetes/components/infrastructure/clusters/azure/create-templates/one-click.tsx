@@ -16,6 +16,8 @@ import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
 import KubernetesVersion from '../../form-components/kubernetes-version'
+import { azureClusterTracking } from '../../tracking'
+import { ClusterCreateTypes } from '../../model'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -72,6 +74,11 @@ const columns = [
   },
 ]
 
+const trackingFields = {
+  platform: CloudProviders.Azure,
+  target: ClusterCreateTypes.OneClick,
+}
+
 const useStyles = makeStyles<Theme>((theme) => ({
   validatedFormContainer: {
     display: 'grid',
@@ -91,7 +98,7 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
   const handleRegionChange = (regionName) => setWizardContext({ location: regionName })
 
   return (
-    <WizardStep stepId="one-click" onNext={onNext}>
+    <WizardStep stepId="one-click" onNext={azureClusterTracking.oneClick(trackingFields)}>
       <ValidatedForm
         classes={{ root: classes.validatedFormContainer }}
         fullWidth

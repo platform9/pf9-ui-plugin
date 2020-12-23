@@ -7,7 +7,6 @@ import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import { routes } from 'core/utils/routes'
-import { trackEvent } from 'utils/tracking'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../model'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
@@ -18,6 +17,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from 'app/store'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
+import { bareOSClusterTracking } from '../tracking'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -58,6 +58,11 @@ const AddBareOsClusterPage = () => {
   const [formTitle, setFormTitle] = useState<string>('')
   const [initialContext, setInitialContext] = useState(null)
 
+  const segmentTrackingFields = {
+    platform: providerType,
+    target: createType,
+  }
+
   const { features } = useSelector<RootState, SessionState>(prop(sessionStoreKey)) || {}
 
   useEffect(() => {
@@ -71,12 +76,7 @@ const AddBareOsClusterPage = () => {
   }, [createType, providerType])
 
   useEffect(() => {
-    trackEvent('WZ New BareOS Cluster 0 Started', {
-      wizard_step: 'Start',
-      wizard_state: 'Started',
-      wizard_progress: '0 of 6',
-      wizard_name: 'Add New BareOS Cluster',
-    })
+    bareOSClusterTracking.createStarted(segmentTrackingFields)()
   }, [])
 
   const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
@@ -90,6 +90,7 @@ const AddBareOsClusterPage = () => {
     createBareOSClusterAction({
       ...data,
       clusterType: 'local',
+      segmentTrackingFields,
     })
 
   const title = getFormTitle(formTitle, createType)
