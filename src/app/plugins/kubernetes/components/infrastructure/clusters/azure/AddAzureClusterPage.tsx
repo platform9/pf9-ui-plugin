@@ -14,7 +14,7 @@ import WizardMeta from 'core/components/wizard/WizardMeta'
 import { getFormTitle } from '../helpers'
 import DocumentMeta from 'core/components/DocumentMeta'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
-import { trackEvent } from 'utils/tracking'
+import { azureClusterTracking } from '../tracking'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -24,6 +24,10 @@ const AddAzureClusterPage = () => {
   const [activeView, setActiveView] = useState<{ ViewComponent: FC<any> }>(null)
   const [formTitle, setFormTitle] = useState<string>('')
   const [initialContext, setInitialContext] = useState(null)
+  const segmentTrackingFields = {
+    platform: CloudProviders.Azure,
+    target: createType,
+  }
 
   useEffect(() => {
     async function loadFile(name) {
@@ -36,12 +40,7 @@ const AddAzureClusterPage = () => {
   }, [createType])
 
   useEffect(() => {
-    trackEvent('WZ New Azure Cluster 0 Started', {
-      wizard_step: 'Start',
-      wizard_state: 'Started',
-      wizard_progress: '0 of 4',
-      wizard_name: 'Add New Azure Cluster',
-    })
+    azureClusterTracking.createStarted(segmentTrackingFields)()
   }, [])
 
   const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
@@ -50,7 +49,7 @@ const AddAzureClusterPage = () => {
     onComplete,
   )
   const handleSubmit = (data) =>
-    createAzureClusterAction({ ...data, clusterType: CloudProviders.Azure })
+    createAzureClusterAction({ ...data, clusterType: CloudProviders.Azure, segmentTrackingFields })
 
   const ViewComponent = activeView?.ViewComponent
   return (

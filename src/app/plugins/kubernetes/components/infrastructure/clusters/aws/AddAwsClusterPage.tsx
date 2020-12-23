@@ -14,7 +14,7 @@ import { routes } from 'core/utils/routes'
 import { ClusterCreateTypes, ClusterCreateTypeNames } from '../model'
 import { getFormTitle } from '../helpers'
 import DocumentMeta from 'core/components/DocumentMeta'
-import { trackEvent } from 'utils/tracking'
+import { awsClusterTracking } from '../tracking'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -24,6 +24,10 @@ const AddAwsClusterPage = () => {
   const [activeView, setActiveView] = useState<{ ViewComponent: FC<any> }>(null)
   const [formTitle, setFormTitle] = useState<string>('')
   const [initialContext, setInitialContext] = useState(null)
+  const segmentTrackingFields = {
+    platform: CloudProviders.Aws,
+    target: createType,
+  }
 
   useEffect(() => {
     async function loadFile(name) {
@@ -36,12 +40,7 @@ const AddAwsClusterPage = () => {
   }, [createType])
 
   useEffect(() => {
-    trackEvent('WZ New AWS Cluster 0 Started', {
-      wizard_step: 'Start',
-      wizard_state: 'Started',
-      wizard_progress: '0 of 4',
-      wizard_name: 'Add New AWS Cluster',
-    })
+    awsClusterTracking.createStarted(segmentTrackingFields)()
   }, [])
 
   const onComplete = (_, cluster) =>
@@ -52,7 +51,7 @@ const AddAwsClusterPage = () => {
     onComplete,
   )
   const handleSubmit = (data) =>
-    createAwsClusterAction({ ...data, clusterType: CloudProviders.Aws })
+    createAwsClusterAction({ ...data, clusterType: CloudProviders.Aws, segmentTrackingFields })
 
   const ViewComponent = activeView?.ViewComponent
   return (

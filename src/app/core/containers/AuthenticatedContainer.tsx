@@ -38,7 +38,7 @@ import useScopedPreferences from 'core/session/useScopedPreferences'
 import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
 import { trackEvent } from 'utils/tracking'
-import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
+// import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
 import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
@@ -416,8 +416,8 @@ const AuthenticatedContainer = () => {
                 </BannerContent>
               </>
             )}
-            {pathStrOr(false, 'experimental.containervisor', features) &&
-              currentStack === 'kubernetes' && <ClusterUpgradeBanner />}
+            {/* {pathStrOr(false, 'experimental.containervisor', features) &&
+              currentStack === 'kubernetes' && <ClusterUpgradeBanner />} */}
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}
               <Switch>

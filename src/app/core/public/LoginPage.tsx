@@ -3,7 +3,7 @@ import ApiClient from 'api-client/ApiClient'
 import { Checkbox, FormControlLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
-import { compose, pathStrOr } from 'utils/fp'
+import { compose } from 'utils/fp'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
@@ -19,7 +19,6 @@ import { sessionActions } from 'core/session/sessionReducers'
 import clsx from 'clsx'
 import Input from 'core/elements/input'
 import Button from 'core/elements/button'
-import axios from 'axios'
 
 const styles = (theme) => ({
   page: {
@@ -157,6 +156,7 @@ interface Props {
   onAuthSuccess: any
   history: any
   classes: any
+  ssoEnabled: boolean
 }
 
 const { keystone } = ApiClient.getInstance()
@@ -186,14 +186,7 @@ class LoginPage extends React.PureComponent<Props> {
   }
 
   componentDidMount() {
-    this.setSso()
-  }
-
-  setSso = async () => {
-    const features = await axios.get('/clarity/features.json').catch(() => null)
-    const sso = pathStrOr(false, 'data.experimental.sso', features)
-    if (sso) {
-      this.setState({ ssoEnabled: true })
+    if (this.props.ssoEnabled) {
       this.setState({ loginMethod: LoginMethodTypes.SSO })
     }
   }
@@ -343,8 +336,8 @@ class LoginPage extends React.PureComponent<Props> {
   }
 
   render() {
-    const { classes } = this.props
-    const { loginFailed, loading, loginMethod, ssoEnabled } = this.state
+    const { classes, ssoEnabled } = this.props
+    const { loginFailed, loading, loginMethod } = this.state
 
     return (
       <section className={clsx('login-page', classes.page)}>
