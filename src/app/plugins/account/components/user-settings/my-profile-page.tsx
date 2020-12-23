@@ -111,6 +111,7 @@ const MyProfilePage = () => {
   const [prefs, updatePrefs] = useScopedPreferences()
   const [errorMessage, setErrorMessage] = useState('')
   const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
+  const [userUpdated, setUserUpdated] = useState(false)
   const userIdFormFieldSetter = useRef(null)
 
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
@@ -161,9 +162,13 @@ const MyProfilePage = () => {
 
   useEffect(() => {
     // Whenever the user's email gets updated, transfer their old prefs over to the new email
-    updatePrefs(oldUserPrefs)
-    setActiveRegion(oldUserPrefs.currentRegion)
-    setOldUserPrefs(prefs)
+    if (userUpdated) {
+      updatePrefs(oldUserPrefs)
+      if (oldUserPrefs.currentRegion) {
+        setActiveRegion(oldUserPrefs.currentRegion)
+      }
+      setUserUpdated(false)
+    }
   }, [email])
 
   const setupUserIdFieldSetter = (setField) => {
@@ -171,15 +176,19 @@ const MyProfilePage = () => {
   }
 
   const handleUserIdUpdate = async (values) => {
+    // Save the prefs under the old email to transfer to the new email
+    setOldUserPrefs(prefs)
+
     const user = {
       ...userInfo,
       username: values.email || userInfo.email,
       displayname: values.displayname || userInfo.displayname,
     }
-
     const [updated, updatedUser] = await update(user)
 
     if (updated) {
+      setUserUpdated(true)
+
       dispatch(
         sessionActions.updateSession({
           username: updatedUser.email,

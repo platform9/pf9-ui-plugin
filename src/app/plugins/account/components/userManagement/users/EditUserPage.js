@@ -98,7 +98,7 @@ const EditUserPage = () => {
   const { id: activeUserId, email: activeUserEmail } = userDetails
   const [prefs, updatePrefs, getUserPrefs] = useScopedPreferences()
   const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
-  const [userUpdated, setUserUpdated] = useState(false)
+  const [activeUserUpdated, setActiveUserUpdated] = useState(false)
 
   const initialContext = useMemo(
     () => ({
@@ -118,19 +118,20 @@ const EditUserPage = () => {
   const loadingSomething = loadingUsers || loadingTenants || loadingRoleAssignments || updating
 
   useEffect(() => {
-    if (userUpdated) {
-      if (userId === activeUserId) {
-        updatePrefs(oldUserPrefs)
+    // When the active user's email gets updated, transfer their old prefs over to the new email
+    if (activeUserUpdated) {
+      updatePrefs(oldUserPrefs)
+      if (oldUserPrefs.currentRegion) {
         setActiveRegion(oldUserPrefs.currentRegion)
       }
       history.push(listUrl)
     }
-  }, [userUpdated])
+  }, [activeUserEmail])
 
   const handleUserUpdate = async (values) => {
     const [updated, updatedUser] = await update(values)
-
     if (updated && userId === activeUserId) {
+      setActiveUserUpdated(true)
       dispatch(
         sessionActions.updateSession({
           username: updatedUser.email,
@@ -144,8 +145,9 @@ const EditUserPage = () => {
           },
         }),
       )
+    } else {
+      history.push(listUrl)
     }
-    setUserUpdated(true)
   }
 
   return (
