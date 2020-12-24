@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const { keystone, setActiveRegion } = ApiClient.getInstance()
+const { setActiveRegion } = ApiClient.getInstance()
 
 const TenantsTable = ({ data }) => {
   const classes = useStyles()
@@ -206,12 +206,6 @@ const MyProfilePage = () => {
   }
 
   const handlePasswordUpdate = async ({ currentPassword, newPassword, confirmedPassword }) => {
-    const { unscopedToken } = await keystone.authenticate(email, currentPassword, '')
-    if (!unscopedToken) {
-      setErrorMessage('Your current password is invalid.')
-      return
-    }
-
     if (newPassword !== confirmedPassword) {
       setErrorMessage('New passwords do not match.')
       return
@@ -265,12 +259,6 @@ const MyProfilePage = () => {
           {({ values }) => (
             <FormFieldCard title="Password">
               <div className={classes.passwordForm}>
-                <UserPasswordField
-                  id="currentPassword"
-                  label="Current Password"
-                  value={values.currentPassword}
-                  showPasswordRequirements={false}
-                />
                 <UserPasswordField
                   id="newPassword"
                   label="New Password"

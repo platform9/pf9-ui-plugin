@@ -78,13 +78,30 @@ export const updateSession = async ({
   issuedAt,
   isSsoToken,
   currentTenantId,
+  password = '',
+  changeProjectScopeWithCredentials = false,
 }) => {
   const timeDiff = moment(expiresAt).diff(issuedAt)
   const localExpiresAt = moment()
     .add(timeDiff)
     .format()
 
-  const { user, scopedToken } = await keystone.changeProjectScope(currentTenantId, isSsoToken)
+  let user = null
+  let scopedToken = null
+
+  if (changeProjectScopeWithCredentials) {
+    const response = await keystone.changeProjectScopeWithCredentials(
+      username,
+      password,
+      currentTenantId,
+    )
+    user = response.user
+    scopedToken = response.scopedToken
+  } else {
+    const response = await keystone.changeProjectScopeWithToken(currentTenantId, isSsoToken)
+    user = response.user
+    scopedToken = response.scopedToken
+  }
 
   if (scopedToken) {
     await keystone.resetCookie()
@@ -206,6 +223,8 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       await updateSession({
         ...userAuthInfo,
         currentTenantId,
+        password,
+        changeProjectScopeWithCredentials: true,
       })
     }
 

@@ -96,9 +96,13 @@ const EditUserPage = () => {
   const session = useSelector(prop(sessionStoreKey))
   const { userDetails } = session
   const { id: activeUserId, email: activeUserEmail } = userDetails
-  const [prefs, updatePrefs, getUserPrefs] = useScopedPreferences()
+  const [prefs, updatePrefs] = useScopedPreferences()
   const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
   const [activeUserUpdated, setActiveUserUpdated] = useState(false)
+
+  const loadingSomething = loadingUsers || loadingTenants || loadingRoleAssignments || updating
+  const isActiveUser = userId === activeUserId
+  const showPasswordField = !isActiveUser
 
   const initialContext = useMemo(
     () => ({
@@ -115,7 +119,6 @@ const EditUserPage = () => {
     }),
     [user, roleAssignments],
   )
-  const loadingSomething = loadingUsers || loadingTenants || loadingRoleAssignments || updating
 
   useEffect(() => {
     // When the active user's email gets updated, transfer their old prefs over to the new email
@@ -130,7 +133,7 @@ const EditUserPage = () => {
 
   const handleUserUpdate = async (values) => {
     const [updated, updatedUser] = await update(values)
-    if (updated && userId === activeUserId) {
+    if (updated && isActiveUser) {
       setActiveUserUpdated(true)
       dispatch(
         sessionActions.updateSession({
@@ -180,13 +183,15 @@ const EditUserPage = () => {
                       label="Display Name"
                       initialValue={user.displayname}
                     />
-                    <TogglableTextField
-                      id="password"
-                      label="Password"
-                      initialValue={'********'}
-                      value={values.password}
-                      TextFieldComponent={UserPasswordField}
-                    />
+                    {showPasswordField && (
+                      <TogglableTextField
+                        id="password"
+                        label="Password"
+                        initialValue={'********'}
+                        value={values.password}
+                        TextFieldComponent={UserPasswordField}
+                      />
+                    )}
                   </>
                 )}
               </ValidatedForm>
