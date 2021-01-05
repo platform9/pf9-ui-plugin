@@ -34,11 +34,11 @@ enum OsDownloadLinkName {
 const deccoDownloadOptions = [
   {
     label: OsDownloadLabel[OsOptions.Linux],
-    link: 'https://pmkft-1584219278-18238.platform9.io/clarity/platform9-install-redhat.sh',
+    link: `${window.location.origin}/clarity/platform9-install-redhat.sh`,
   },
   {
     label: OsDownloadLabel[OsOptions.Ubuntu],
-    link: 'https://pmkft-1584219278-18238.platform9.io/clarity/platform9-install-debian.sh',
+    link: `${window.location.origin}/clarity/platform9-install-debian.sh`,
   },
 ]
 
@@ -107,24 +107,24 @@ const DownloadHostAgentWalkthrough = ({ osOptions }): JSX.Element => {
 
   useEffect(() => {
     const loadDownloadLinks = async () => {
+      if (isDecco) {
+        setDownloadOptions(deccoDownloadOptions)
+        return
+      }
+
       const links = await getDownloadLinks()
       if (!links) return
 
       // In the future when supporting openstack, will want to show all download links
-      const options = osOptions.map((os) => {
-        return {
-          label: OsDownloadLabel[os],
-          link: links[OsDownloadLinkName[os]],
-        }
-      })
+      const options = osOptions.map((os) => ({
+        label: OsDownloadLabel[os],
+        link: links[OsDownloadLinkName[os]],
+      }))
+
       setDownloadOptions(options)
     }
 
-    if (isDecco) {
-      setDownloadOptions(deccoDownloadOptions)
-    } else {
-      loadDownloadLinks()
-    }
+    loadDownloadLinks()
   }, [osOptions])
 
   const handleDownloadClick = (event) => {
