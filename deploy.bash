@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+SSH_USER=${SSH_USER:-tcbuilder}
+
 if [ "${TEAMCITY_BUILD_BRANCH}" != "<default>" ]; then
     echo "INFO: Skipping $(basename $0) for branch ${TEAMCITY_BUILD_BRANCH}"
     exit 0
@@ -29,8 +31,8 @@ pushd ${WORKSPACE}/pf9-ui-plugin/build
     for du in ${TARGET_DUS}; do
         echo "INFO: Starting to update DU ${du}"
         # TODO: Need a dedicated login to target DU that can modify files owned by root
-        scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no /tmp/ui.tgz centos@${du}:/tmp/ui.tgz
-        ssh -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no centos@${du} "cd /opt/pf9/www/public; sudo tar xvzpf /tmp/ui.tgz && \rm /tmp/ui.tgz"
+        scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no /tmp/ui.tgz ${SSH_USER}@${du}:/tmp/ui.tgz
+        ssh -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${SSH_USER}@${du} "cd /opt/pf9/www/public; tar xvzpf /tmp/ui.tgz && \rm /tmp/ui.tgz"
         echo "INFO: Update completed for DU ${du}"
     done
     IFS=${OLD_IFS}

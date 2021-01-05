@@ -20,6 +20,8 @@ import KubernetesVersion from '../../form-components/kubernetes-version'
 import Theme from 'core/themes/model'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { CalicoDetectionTypes } from '../../form-components/calico-network-fields'
+import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { bareOSClusterTracking } from '../../tracking'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -78,10 +80,15 @@ const columns = [
   { id: 'etcdBackupInterval', label: 'Backup Interval (minutes)' },
 ]
 
+const trackingFields = {
+  platform: CloudProviders.VirtualMachine,
+  target: ClusterCreateTypes.OneClick,
+}
+
 const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles({})
   return (
-    <WizardStep stepId="virtual-one-click" onNext={onNext}>
+    <WizardStep stepId="virtual-one-click" onNext={bareOSClusterTracking.oneClick(trackingFields)}>
       <ValidatedForm
         classes={{ root: classes.validatedFormContainer }}
         fullWidth

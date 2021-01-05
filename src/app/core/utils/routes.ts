@@ -109,6 +109,10 @@ export function createUrlWithQueryString(url: URL | string, params?: GenericKVP)
 
 /* eslint-disable max-len */
 export const routes = {
+  login: Route.register({
+    url: `${appUrlRoot}/login`,
+    name: 'Login',
+  }),
   cluster: {
     list: Route.register({
       url: `${pluginRoutePrefix}/infrastructure#clusters`,

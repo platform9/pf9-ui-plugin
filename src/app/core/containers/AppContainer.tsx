@@ -87,16 +87,16 @@ const restoreSession = async (
   return {}
 }
 
-const getUserDetails = async (user) => {
-  /* eslint-disable */
-  // Check for sandbox flag, if false identify the user in Segment using Keystone ID
-  // This needs to be done here bc this needs to be done before login.
-  // Features are requested again later for the specific logged-in region,
-  // whereas this one is done on the master DU from which the UI is served.
-  // Ignore exception if features.json not found (for local development)
+const getUserDetails = async (activeTenant, isSsoToken) => {
+  const { user, scopedToken } = await keystone.changeProjectScope(activeTenant.id, isSsoToken)
+  await keystone.resetCookie()
+
+  // Need this here again bc not able to use AppContainer state and ensure
+  // that sandbox state would be set on time for both users logging in for
+  // first time and for users who are already logged in
   const features = await axios.get('/clarity/features.json').catch(() => null)
   const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
-  const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', features)
+
   // Identify the user in Segment using Keystone ID
   if (typeof window.analytics !== 'undefined') {
     if (sandbox) {
@@ -108,14 +108,9 @@ const getUserDetails = async (user) => {
     }
   }
 
-  // Segment tracking
-  if (!analyticsOff) {
-    DocumentMeta.addElementToDomBody(createSegmentScript())
-  }
-
-  // Drift tracking code for live demo
-  if (sandbox) {
-    DocumentMeta.addElementToDomBody(createDriftScript())
+  return {
+    userDetails: user,
+    scopedToken,
   }
 }
 
@@ -134,6 +129,7 @@ const AppContainer = () => {
   const { features, isSsoToken } = session
   const [, , getUserPrefs] = useScopedPreferences()
   const dispatch = useDispatch()
+  const [loginFeatures, setLoginFeatures] = useState({ loaded: false, sso: false })
 
   useEffect(() => {
     const unlisten = history.listen((location) => {
@@ -147,6 +143,34 @@ const AppContainer = () => {
     trackPage(`${pathname}${hash}`)
     if (features?.experimental?.sandbox) {
       appCuesSetAnonymous()
+    }
+
+    const loadLoginFeaturesAndTracking = async () => {
+      /* eslint-disable */
+      // Check for sandbox flag, if false identify the user in Segment using Keystone ID
+      // This needs to be done here bc this needs to be done before login.
+      // Features are requested again later for the specific logged-in region,
+      // whereas this one is done on the master DU from which the UI is served.
+      // Ignore exception if features.json not found (for local development)
+
+      const initialFeatures = await axios.get('/clarity/features.json').catch(() => null)
+      const sandboxFlag = pathStrOr(false, 'data.experimental.sandbox', initialFeatures)
+      const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', initialFeatures)
+
+      // Segment tracking
+      if (!analyticsOff) {
+        DocumentMeta.addElementToDomBody(createSegmentScript())
+      }
+
+      // Drift tracking code for live demo
+      if (sandboxFlag) {
+        DocumentMeta.addElementToDomBody(createDriftScript())
+      }
+
+      setLoginFeatures({
+        loaded: true,
+        sso: pathStrOr(false, 'data.experimental.sso', initialFeatures),
+      })
     }
 
     const validateSession = async () => {
@@ -173,7 +197,12 @@ const AppContainer = () => {
         dispatch(notificationActions.clearNotifications())
       }
     }
-    validateSession()
+
+    const initialize = async () => {
+      await loadLoginFeaturesAndTracking()
+      validateSession()
+    }
+    initialize()
 
     // TODO: Need to fix this code after synching up with backend.
     if (hash.includes(resetPasswordThroughEmailUrl)) {
@@ -232,7 +261,9 @@ const AppContainer = () => {
         <Route path={forgotPasswordUrl} component={ForgotPasswordPage} />
         <Route path={activateUserUrl} component={ActivateUserPage} />
         <Route path={loginUrl}>
-          <LoginPage onAuthSuccess={setupSession} />
+          {loginFeatures.loaded && (
+            <LoginPage onAuthSuccess={setupSession} ssoEnabled={loginFeatures.sso} />
+          )}
         </Route>
         <Route>
           {sessionChecked ? (

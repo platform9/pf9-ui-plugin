@@ -4,8 +4,7 @@ import { Route } from 'core/utils/routes'
 
 // name & body are both optional for both page & event
 export const trackPage = (location, body = {}) => {
-  // TODO @john fix the location string thats passed to Route.find()
-  const route = Route.find(location.pathname + location.hash)
+  const route = Route.find(location)
   if (window.analytics && route) {
     return window.analytics.page(route.name)
   }

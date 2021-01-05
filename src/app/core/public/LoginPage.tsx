@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import { Checkbox, FormControlLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
-import { compose, pathStrOr } from 'utils/fp'
+import { compose } from 'utils/fp'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
@@ -17,7 +17,6 @@ import { MFAHelpLink } from 'k8s/links'
 import clsx from 'clsx'
 import Input from 'core/elements/input'
 import Button from 'core/elements/button'
-import axios from 'axios'
 import { LoginMethodTypes } from 'app/plugins/account/components/userManagement/users/helpers'
 import { authenticateUser } from 'app/plugins/account/components/userManagement/users/actions'
 
@@ -157,6 +156,7 @@ interface Props {
   onAuthSuccess: any
   history: any
   classes: any
+  ssoEnabled: boolean
 }
 
 @(connect() as any)
@@ -173,14 +173,7 @@ class LoginPage extends React.PureComponent<Props> {
   }
 
   componentDidMount() {
-    this.setSso()
-  }
-
-  setSso = async () => {
-    const features = await axios.get('/clarity/features.json').catch(() => null)
-    const sso = pathStrOr(false, 'data.experimental.sso', features)
-    if (sso) {
-      this.setState({ ssoEnabled: true })
+    if (this.props.ssoEnabled) {
       this.setState({ loginMethod: LoginMethodTypes.SSO })
     }
   }
@@ -316,8 +309,8 @@ class LoginPage extends React.PureComponent<Props> {
   }
 
   render() {
-    const { classes } = this.props
-    const { loginFailed, loading, loginMethod, ssoEnabled } = this.state
+    const { classes, ssoEnabled } = this.props
+    const { loginFailed, loading, loginMethod } = this.state
 
     return (
       <section className={clsx('login-page', classes.page)}>
