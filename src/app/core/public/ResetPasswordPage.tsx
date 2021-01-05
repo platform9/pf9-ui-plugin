@@ -155,11 +155,14 @@ const renderPasswordValidationCheck: IPasswordValidationCheck = (passwordValue) 
 
 const ResetPasswordPage: React.FC = () => {
   const classes = useStyles({})
-  const { history, match, location } = useReactRouter()
+  const { history, location } = useReactRouter()
   const searchParams = new URLSearchParams(location.search)
+  const emailId = searchParams.get('username')
+  const token = searchParams.get('token')
+
   const { params, updateParams, getParamsUpdater } = useParams({
     ...initialState,
-    emailId: searchParams.get('username'),
+    emailId,
   })
   const togglePasswordMask: ITogglePasswordMask = (key) => () =>
     updateParams({ [key]: !params[key] })
@@ -190,7 +193,7 @@ const ResetPasswordPage: React.FC = () => {
 
     try {
       const options: IApiData = {
-        secret: match.params.id,
+        secret: token,
         username: params.emailId,
         password: params.confirmPassword,
       }
