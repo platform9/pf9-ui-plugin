@@ -87,10 +87,7 @@ const restoreSession = async (
   return {}
 }
 
-const getUserDetails = async (activeTenant, isSsoToken) => {
-  const { user, scopedToken } = await keystone.changeProjectScope(activeTenant.id, isSsoToken)
-  await keystone.resetCookie()
-
+const getUserDetails = async (user) => {
   // Need this here again bc not able to use AppContainer state and ensure
   // that sandbox state would be set on time for both users logging in for
   // first time and for users who are already logged in
@@ -106,11 +103,6 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
         email: user.email,
       })
     }
-  }
-
-  return {
-    userDetails: user,
-    scopedToken,
   }
 }
 
