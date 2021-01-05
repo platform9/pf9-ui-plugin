@@ -19,7 +19,7 @@ import { sessionStoreKey, sessionActions, SessionState } from 'core/session/sess
 import { cacheActions } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { prop, propEq, head } from 'ramda'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
@@ -212,42 +212,43 @@ const AppContainer = () => {
     return unlisten
   }, [])
 
-  const setupSession = useCallback(
-    async ({ username, unscopedToken, expiresAt, issuedAt, isSsoToken }) => {
-      const timeDiff = moment(expiresAt).diff(issuedAt)
-      const localExpiresAt = moment()
-        .add(timeDiff)
-        .format()
+  const setupSession = async ({ username, unscopedToken, expiresAt, issuedAt, isSsoToken }) => {
+    const timeDiff = moment(expiresAt).diff(issuedAt)
+    const localExpiresAt = moment()
+      .add(timeDiff)
+      .format()
 
-      const { currentTenant, currentRegion } = getUserPrefs(username)
-      const tenants = await loadUserTenants()
-      if (isNilOrEmpty(tenants)) {
-        throw new Error('No tenants found, please contact support')
-      }
-      const activeTenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
-      if (!currentTenant && activeTenant) {
-        updateClarityStore('tenantObj', activeTenant)
-      }
-      if (currentRegion) {
-        setActiveRegion(currentRegion)
-      }
-      const { scopedToken, userDetails } = await getUserDetails(activeTenant, isSsoToken)
+    const { currentTenant, currentRegion } = getUserPrefs(username)
+    const tenants = await loadUserTenants()
+    if (isNilOrEmpty(tenants)) {
+      throw new Error('No tenants found, please contact support')
+    }
 
-      // Order matters
-      setSessionChecked(true)
-      dispatch(
-        sessionActions.updateSession({
-          username,
-          unscopedToken,
-          scopedToken,
-          expiresAt: localExpiresAt,
-          userDetails,
-          isSsoToken,
-        }),
-      )
-    },
-    [],
-  )
+    const activeTenant =
+      tenants.find(propEq('id', currentTenant)) ||
+      tenants.find(propEq('name', 'service')) ||
+      head(tenants)
+    if (!currentTenant && activeTenant) {
+      updateClarityStore('tenantObj', activeTenant)
+    }
+    if (currentRegion) {
+      setActiveRegion(currentRegion)
+    }
+    const { scopedToken, userDetails } = await getUserDetails(activeTenant, isSsoToken)
+
+    // Order matters
+    setSessionChecked(true)
+    dispatch(
+      sessionActions.updateSession({
+        username,
+        unscopedToken,
+        scopedToken,
+        expiresAt: localExpiresAt,
+        userDetails,
+        isSsoToken,
+      }),
+    )
+  }
 
   const authContent =
     isNilOrEmpty(session) || !session.username ? (
