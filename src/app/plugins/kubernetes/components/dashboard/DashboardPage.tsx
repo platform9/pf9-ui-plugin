@@ -1,5 +1,7 @@
 // libs
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
+import { prop } from 'ramda'
+import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/styles'
 // Constants
 import { allKey } from 'app/constants'
@@ -13,22 +15,10 @@ import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
 import StatusCard, { StatusCardProps } from './StatusCard'
 import Text from 'core/elements/text'
-
-import ClusterSetup, {
-  clustersHaveAccess,
-  clustersHaveMonitoring,
-} from 'k8s/components/onboarding/ClusterSetup'
-import PodSetup, { podSetupComplete } from 'k8s/components/onboarding/PodSetup'
-import useDataLoader from 'core/hooks/useDataLoader'
-import Progress from 'core/components/progress/Progress'
-import identity from 'ramda/es/identity'
-import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import Theme from 'core/themes/model'
-import { prop } from 'ramda'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
-import { useSelector } from 'react-redux'
 import {
   isHealthyStatus,
   isTransientStatus,
@@ -273,11 +263,7 @@ const reportsWithPerms = (reports, role) => {
     return report.permissions.includes(role) ? report : { ...report, addRoute: '' }
   })
 }
-const promptOnboardingSetup = (items: boolean[]) => {
-  const isComplete = items.every(identity)
-  // If any step is not ready then we need to return true to prompt for it.
-  return !isComplete
-}
+
 const nodeHealthStatus = ({ status }) => {
   if (status === 'converging') {
     return status
@@ -286,45 +272,14 @@ const nodeHealthStatus = ({ status }) => {
 }
 
 const DashboardPage = () => {
-  // need to be able to force update because states are captured in local storage :(
-  const [, updateState] = React.useState({})
-  const forceUpdate = useCallback(() => updateState({}), [])
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const displayName = session?.userDetails?.displayName
-  const isAdmin = isAdminRole(session)
-
-  const [clusters, loadingClusters] = useDataLoader(clusterActions.list, { loadingFeedback: false })
-  const [pods, loadingPods] = useDataLoader(podActions.list, { loadingFeedback: false })
-  const hasClusters = !!clusters.length
-  const hasMonitoring = clustersHaveMonitoring(clusters)
-  const hasAccess = clustersHaveAccess()
-  const isLoading = loadingClusters || loadingPods
-
-  const showClusters = promptOnboardingSetup([hasClusters, hasAccess, hasMonitoring])
-  const showPods = !podSetupComplete(pods)
-  const showOnboarding = isAdmin && (showClusters || showPods)
-
-  const handleComplete = useCallback(() => {
-    forceUpdate()
-  }, [])
-
-  const initialExpandedClusterPanel = useMemo(() => {
-    return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
-  }, [hasClusters, hasMonitoring, hasAccess])
 
   return (
     <section className={classes.cardColumn}>
       <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
-
-      {false && isLoading && <Progress loading={isLoading} overlay />}
-      {false && showOnboarding && !isLoading && (
-        <>
-          <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
-          <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
-        </>
-      )}
       <div className={classes.dashboardMosaic}>
         {reportsWithPerms(reports, session.userDetails.role).map((report) => (
           <StatusCard key={report.route} {...report} className={classes[report.entity]} />

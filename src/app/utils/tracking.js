@@ -8,7 +8,9 @@ export const trackPage = (location, body = {}) => {
   if (window.analytics && route) {
     return window.analytics.page(route.name)
   }
-  console.info(`No route found for '${location}'.  Consider adding route to 'routes.ts'.`)
+  if (!route) {
+    console.info(`No route found for '${location}'. Consider registering it as a Route.`)
+  }
 }
 
 export const trackEvent = (name, body = {}) => {

@@ -48,7 +48,7 @@ export const ActivateUserPage = (props) => {
     const validateSecret = async () => {
       try {
         const response = await clemency.verifyActivateLink(username, otp)
-        history.push(routes.password.reset.path({ id: response.value, username }))
+        history.push(routes.password.reset.path({ token: response.value, username }))
       } catch (e) {
         setLoading(false)
       }
