@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { RootState } from 'app/store'
 import { prop } from 'ramda'
-import { pathStrOr } from 'utils/fp'
+import { isDecco } from 'core/utils/helpers'
 
 export enum OsOptions {
   Linux = 'Linux',
@@ -103,11 +103,11 @@ const DownloadHostAgentWalkthrough = ({ osOptions }): JSX.Element => {
   const [downloadOptions, setDownloadOptions] = useState([])
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { features } = session
-  const isDecco = pathStrOr(false, 'experimental.kplane', features)
+  const isDeccoDU = isDecco(features)
 
   useEffect(() => {
     const loadDownloadLinks = async () => {
-      if (isDecco) {
+      if (isDeccoDU) {
         setDownloadOptions(deccoDownloadOptions)
         return
       }
