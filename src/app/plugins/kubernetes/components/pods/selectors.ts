@@ -10,9 +10,8 @@ import { clustersSelector } from 'k8s/components/infrastructure/clusters/selecto
 import { IDeploymentSelector, IPodSelector, IServicesSelector } from './model'
 import { IDataKeys } from 'k8s/datakeys.model'
 import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
+import { getK8sDashboardLinkFromVersion } from '../infrastructure/clusters/helpers'
 import { clientStoreKey } from 'core/client/clientReducers'
-
-const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
 export const podsSelector = createSelector(
   [
@@ -29,13 +28,12 @@ export const podsSelector = createSelector(
         const cluster = clusters.find(propEq('uuid', clusterId))
         const name = pod?.metadata?.name // pathStr('metadata.name', pod),
         const namespace = pod?.metadata?.namespace // pathStr('metadata.namespace', pod),
-        const dashboardUrl = pathJoin(
-          cluster?.baseUrl,
-          k8sDocUrl,
-          'pod',
-          pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
-          pod?.metadata?.name, // pathStr('metadata.name', pod),
+        const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
+          cluster.version,
+          qbertEndpoint,
+          cluster,
         )
+        const dashboardUrl = `${k8sDashboardUrl}#/pod/${namespace}/${name}?namespace=${namespace}`
         const containers = pod?.spec?.containers
         const logUrls = containers.map((container) => {
           const logsEndpoint = pathJoin(
@@ -87,21 +85,23 @@ export const deploymentsSelector = createSelector(
     getDataSelector<DataKeys.Deployments>(DataKeys.Deployments, ['clusterId']),
     podsSelector,
     clustersSelector,
+    (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawDeployments, pods, clusters) => {
+  (rawDeployments, pods, clusters, qbertEndpoint) => {
     return rawDeployments.map((rawDeployment) => {
       const { clusterId } = rawDeployment
       const cluster = clusters.find(propEq('uuid', clusterId))
-      const dashboardUrl = pathJoin(
-        cluster?.baseUrl,
-        k8sDocUrl,
-        'deployment',
-        rawDeployment?.metadata?.namespace || '',
-        rawDeployment?.metadata?.name || '',
-      )
       const selectors = rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
+      const name = rawDeployment?.metadata?.name
       const namespace = rawDeployment?.metadata?.namespace
       const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
+
+      const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
+        cluster.version,
+        qbertEndpoint,
+        cluster,
+      )
+      const dashboardUrl = `${k8sDashboardUrl}#/deployment/${namespace}/${name}?namespace=${namespace}`
 
       // Check if any pod label matches the first deployment match label key
       // Note: this logic should probably be revised (copied from Clarity UI)
@@ -116,7 +116,7 @@ export const deploymentsSelector = createSelector(
         ...rawDeployment,
         dashboardUrl,
         id: rawDeployment?.metadata?.uid,
-        name: rawDeployment?.metadata?.name,
+        name,
         created: rawDeployment?.metadata?.creationTimestamp,
         labels: rawDeployment?.metadata?.labels,
         selectors,
@@ -142,22 +142,20 @@ export const makeDeploymentsSelector = (defaultParams = {}) => {
 }
 
 export const serviceSelectors = createSelector(
-  [getDataSelector<DataKeys.KubeServices>(DataKeys.KubeServices, 'clusterId'), clustersSelector],
-  (rawServices, clusters) => {
+  [
+    getDataSelector<DataKeys.KubeServices>(DataKeys.KubeServices, 'clusterId'),
+    clustersSelector,
+    (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
+  ],
+  (rawServices, clusters, qbertEndpoint) => {
     return pipe<IDataKeys[DataKeys.KubeServices], any>(
       map((service) => {
         const { clusterId } = service
         const cluster = clusters.find(propEq('uuid', clusterId))
-        const dashboardUrl = pathJoin(
-          cluster?.baseUrl,
-          k8sDocUrl,
-          'service',
-          service?.metadata?.namespace || '',
-          service?.metadata?.name || '',
-        )
         const type = service?.spec?.type // = pathStr('spec.type', service)
         const externalName = service?.spec?.externalName // pathStr('spec.externalName', service)
         const name = service?.metadata?.name // pathStr('metadata.name', service)
+        const namespace = service?.metadata?.namespace // pathStr('metadata.namespace', service)
         const ports = service?.spec?.ports || [] // pathStrOr(emptyArr, 'spec.ports', service)
         const loadBalancerEndpoints = service?.status?.loadBalancer?.ingress || emptyArr
         const internalEndpoints = ports
@@ -174,6 +172,13 @@ export const serviceSelectors = createSelector(
         const clusterIp = service?.spec?.clusterIP
         const status =
           clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0) ? 'OK' : 'Pending'
+
+        const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
+          cluster.version,
+          qbertEndpoint,
+          cluster,
+        )
+        const dashboardUrl = `${k8sDashboardUrl}#/service/${namespace}/${name}?namespace=${namespace}`
         return {
           ...service,
           dashboardUrl,
@@ -185,7 +190,7 @@ export const serviceSelectors = createSelector(
           clusterIp,
           internalEndpoints,
           externalEndpoints,
-          namespace: service?.metadata?.namespace, // pathStr('metadata.namespace', service)
+          namespace,
           clusterName: cluster?.name,
         }
       }),
