@@ -10,6 +10,11 @@ import clsx from 'clsx'
 import { getDownloadLinks } from 'openstack/components/hosts/actions'
 import SubmitButton from './buttons/SubmitButton'
 import SimpleLink from './SimpleLink'
+import { useSelector } from 'react-redux'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { RootState } from 'app/store'
+import { prop } from 'ramda'
+import { isDecco } from 'core/utils/helpers'
 
 export enum OsOptions {
   Linux = 'Linux',
@@ -21,10 +26,21 @@ enum OsDownloadLabel {
   Ubuntu = 'for Ubuntu 16.04 LTS and Ubuntu 18.04 LTS (64-bit)',
 }
 
-enum osDownloadLinkName {
+enum OsDownloadLinkName {
   Linux = 'rpm_install',
   Ubuntu = 'deb_install',
 }
+
+const deccoDownloadOptions = [
+  {
+    label: OsDownloadLabel[OsOptions.Linux],
+    link: `${window.location.origin}/clarity/platform9-install-redhat.sh`,
+  },
+  {
+    label: OsDownloadLabel[OsOptions.Ubuntu],
+    link: `${window.location.origin}/clarity/platform9-install-debian.sh`,
+  },
+]
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -85,23 +101,31 @@ const DownloadHostAgentWalkthrough = ({ osOptions }): JSX.Element => {
   const classes = useStyles({})
   const [anchorEl, setAnchorEl] = useState(null)
   const [downloadOptions, setDownloadOptions] = useState([])
+  const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
+  const { features } = session
+  const isDeccoDU = isDecco(features)
 
   useEffect(() => {
     const loadDownloadLinks = async () => {
+      if (isDeccoDU) {
+        setDownloadOptions(deccoDownloadOptions)
+        return
+      }
+
       const links = await getDownloadLinks()
       if (!links) return
 
       // In the future when supporting openstack, will want to show all download links
-      const options = osOptions.map((os) => {
-        return {
-          label: OsDownloadLabel[os],
-          link: links[osDownloadLinkName[os]],
-        }
-      })
+      const options = osOptions.map((os) => ({
+        label: OsDownloadLabel[os],
+        link: links[OsDownloadLinkName[os]],
+      }))
+
       setDownloadOptions(options)
     }
+
     loadDownloadLinks()
-  }, [osOptions, downloadOptions])
+  }, [osOptions])
 
   const handleDownloadClick = (event) => {
     setAnchorEl(event.currentTarget)
