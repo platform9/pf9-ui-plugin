@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
-import { any, find, head, map, mergeLeft, pathEq, pipe, pluck, prop, propEq, toPairs } from 'ramda'
-import { emptyArr, emptyObj, filterIf, pipeWhenTruthy } from 'utils/fp'
+import { any, head, map, mergeLeft, pathEq, pathOr, pipe, pluck, propEq, toPairs } from 'ramda'
+import { emptyArr, emptyObj, filterIf } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
@@ -10,33 +10,25 @@ import { clustersSelector } from 'k8s/components/infrastructure/clusters/selecto
 import { IDeploymentSelector, IPodSelector, IServicesSelector } from './model'
 import { IDataKeys } from 'k8s/datakeys.model'
 import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
+import { clientStoreKey } from 'core/client/clientReducers'
 
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
-
-const getLogsUrl = (pod, cluster, rawServiceCatalog) => {
-  const qbertUrl = pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog)
-  if (!qbertUrl) return null
-
-  // qbert v3 link fails authorization so we have to use v1 link for logs
-  return `${qbertUrl}/clusters/${cluster?.uuid}/k8sapi/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`.replace(
-    /v3/,
-    'v1',
-  )
-}
 
 export const podsSelector = createSelector(
   [
     getDataSelector<DataKeys.Pods>(DataKeys.Pods, ['clusterId']),
     clustersSelector,
-    getDataSelector<DataKeys.ServiceCatalog>(DataKeys.ServiceCatalog),
+    (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawPods, clusters, rawServiceCatalog) => {
+  (rawPods, clusters, qbertEndpoint) => {
     // associate nodes with the combinedHost entry
     return pipe<IDataKeys[DataKeys.Pods], IPodSelector[]>(
       // Filter by namespace
       map((pod) => {
         const { clusterId } = pod
         const cluster = clusters.find(propEq('uuid', clusterId))
+        const name = pod?.metadata?.name // pathStr('metadata.name', pod),
+        const namespace = pod?.metadata?.namespace // pathStr('metadata.namespace', pod),
         const dashboardUrl = pathJoin(
           cluster?.baseUrl,
           k8sDocUrl,
@@ -44,16 +36,33 @@ export const podsSelector = createSelector(
           pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
           pod?.metadata?.name, // pathStr('metadata.name', pod),
         )
+        const containers = pod?.spec?.containers
+        const logUrls = containers.map((container) => {
+          const logsEndpoint = pathJoin(
+            qbertEndpoint.match(/(.*?)\/qbert/)[0], // Trim the uri after "/qbert" from the qbert endpoint
+            'v1/clusters',
+            cluster?.uuid,
+            'k8sapi/api/v1/namespaces/', // qbert v3 link fails authorization so we have to use v1 link for logs
+            namespace,
+            'pods',
+            name,
+            'log',
+          )
+          return {
+            containerName: container.name,
+            url: `${logsEndpoint}?container=${container.name}`,
+          }
+        })
 
         return {
           ...pod,
           dashboardUrl,
           id: pod?.metadata?.uid, // pathStr('metadata.uid', pod),
-          name: pod?.metadata?.name, // pathStr('metadata.name', pod),
-          namespace: pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
+          name,
+          namespace,
           labels: pod?.metadata?.labels, // pathStr('metadata.labels', pod),
           clusterName: cluster?.name,
-          logs: getLogsUrl(pod, cluster, rawServiceCatalog),
+          logs: logUrls,
         }
       }),
     )(rawPods)

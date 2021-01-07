@@ -72,10 +72,11 @@ const ListPage = ({ ListContainer }) => {
     )
   }
 }
-const openLogsWindow = (containerName, pod) => () => {
-  const { name, id, clusterName, clusterId, logs } = pod
+const openLogsWindow = (log, pod) => () => {
+  const { name, id, clusterName, clusterId } = pod
+  const containerName = log.containerName
   trackEvent('View Pod Logs', { name, id, clusterName, clusterId, containerName })
-  window.open(`${logs}?container=${containerName}`)
+  window.open(log.url)
 }
 
 const renderName = (name, { dashboardUrl }) => {
@@ -92,18 +93,14 @@ const renderContainers = (value, pod) => <ContainerLogs pod={pod} />
 
 const ContainerLogs = ({ pod }) => {
   const classes = useStyles()
-  const containers = pathStrOr([], 'spec.containers', pod)
+  const logs = pod.logs || []
   return (
     <>
-      {containers.map((container) => (
-        <Text key={container.name} variant="body2" className={classes.containerLogs}>
+      {logs.map((log) => (
+        <Text key={log.containerName} variant="body2" className={classes.containerLogs}>
           <span>
-            <b>{container.name}: </b>
-            <SimpleLink
-              target="_blank"
-              rel="noopener"
-              onClick={openLogsWindow(container.name, pod)}
-            >
+            <b>{log.containerName}: </b>
+            <SimpleLink target="_blank" rel="noopener" onClick={openLogsWindow(log, pod)}>
               View Container Logs
             </SimpleLink>
           </span>
