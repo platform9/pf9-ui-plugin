@@ -15,11 +15,16 @@ import { routes } from 'core/utils/routes'
 import { trackEvent } from 'utils/tracking'
 import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
+import { pathStrOr } from 'utils/fp'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme) => ({
-  links: {
-    display: 'grid',
+  containerLogs: {
     width: 'max-content',
+    '& b': {
+      fontWeight: 600,
+      whiteSpace: 'nowrap',
+    },
   },
 }))
 
@@ -67,26 +72,39 @@ const ListPage = ({ ListContainer }) => {
     )
   }
 }
-const openLogsWindow = ({ name, id, clusterName, clusterId, logs }) => () => {
-  trackEvent('View Pod Logs', { name, id, clusterName, clusterId })
-  window.open(logs)
+const openLogsWindow = (log, pod) => () => {
+  const { name, id, clusterName, clusterId } = pod
+  const containerName = log.containerName
+  trackEvent('View Pod Logs', { name, id, clusterName, clusterId, containerName })
+  window.open(log.url, '_blank')
 }
 
-const renderLinks = (links, pod) => {
-  return <PodLinks pod={pod} />
-}
-
-const PodLinks = ({ pod }) => {
-  const classes = useStyles()
+const renderName = (name, { dashboardUrl }) => {
   return (
-    <div className={classes.links}>
-      <ExternalLink url={pod.dashboardUrl}>dashboard</ExternalLink>
-      {pod.logs && (
-        <SimpleLink src={pod.logs} target="_blank" rel="noopener" onClick={openLogsWindow(pod)}>
-          View Container Logs
-        </SimpleLink>
-      )}
-    </div>
+    <span>
+      {name}
+      <br />
+      <ExternalLink url={dashboardUrl}>dashboard</ExternalLink>
+    </span>
+  )
+}
+
+const renderContainers = (value, pod) => <ContainerLogs pod={pod} />
+
+const ContainerLogs = ({ pod }) => {
+  const classes = useStyles()
+  const logs = pod.logs || []
+  return (
+    <>
+      {logs.map((log) => (
+        <Text key={log.containerName} variant="body2" className={classes.containerLogs}>
+          <span>
+            <b>{log.containerName}: </b>
+            <SimpleLink onClick={openLogsWindow(log, pod)}>View Container Logs</SimpleLink>
+          </span>
+        </Text>
+      ))}
+    </>
   )
 }
 
@@ -110,11 +128,11 @@ export const options = {
   addUrl: routes.pods.add.path(),
   addText: 'Create New Pod',
   columns: [
-    { id: 'name', label: 'Name' },
+    { id: 'name', label: 'Name', render: renderName },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'namespace', label: 'Namespace' },
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
-    { id: 'links', label: 'Links', render: renderLinks },
+    { id: 'containers', label: 'Containers', render: renderContainers },
     { id: 'status.phase', label: 'Status', render: renderStatus },
     { id: 'status.hostIP', label: 'Node IP' },
     {

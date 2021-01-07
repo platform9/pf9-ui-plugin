@@ -34,16 +34,24 @@ export const podsSelector = createSelector(
           cluster,
         )
         const dashboardUrl = `${k8sDashboardUrl}#/pod/${namespace}/${name}?namespace=${namespace}`
-        const logsUrl = pathJoin(
-          qbertEndpoint.match(/(.*?)\/qbert/)[0], // Trim the uri after "/qbert" from the qbert endpoint
-          'v1/clusters',
-          cluster?.uuid,
-          'k8sapi/api/v1/namespaces/', // qbert v3 link fails authorization so we have to use v1 link for logs
-          namespace,
-          'pods',
-          name,
-          'log',
-        )
+        const containers = pod?.spec?.containers
+        const logUrls = containers.map((container) => {
+          const logsEndpoint = pathJoin(
+            qbertEndpoint.match(/(.*?)\/qbert/)[0], // Trim the uri after "/qbert" from the qbert endpoint
+            'v1/clusters',
+            cluster?.uuid,
+            'k8sapi/api/v1/namespaces/', // qbert v3 link fails authorization so we have to use v1 link for logs
+            namespace,
+            'pods',
+            name,
+            'log',
+          )
+          return {
+            containerName: container.name,
+            url: `${logsEndpoint}?container=${container.name}`,
+          }
+        })
+
         return {
           ...pod,
           dashboardUrl,
@@ -52,7 +60,7 @@ export const podsSelector = createSelector(
           namespace,
           labels: pod?.metadata?.labels, // pathStr('metadata.labels', pod),
           clusterName: cluster?.name,
-          logs: logsUrl,
+          logs: logUrls,
         }
       }),
     )(rawPods)
