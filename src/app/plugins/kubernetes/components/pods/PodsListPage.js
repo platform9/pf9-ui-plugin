@@ -76,7 +76,7 @@ const openLogsWindow = (log, pod) => () => {
   const { name, id, clusterName, clusterId } = pod
   const containerName = log.containerName
   trackEvent('View Pod Logs', { name, id, clusterName, clusterId, containerName })
-  window.open(log.url)
+  window.open(log.url, '_blank')
 }
 
 const renderName = (name, { dashboardUrl }) => {
@@ -100,9 +100,7 @@ const ContainerLogs = ({ pod }) => {
         <Text key={log.containerName} variant="body2" className={classes.containerLogs}>
           <span>
             <b>{log.containerName}: </b>
-            <SimpleLink target="_blank" rel="noopener" onClick={openLogsWindow(log, pod)}>
-              View Container Logs
-            </SimpleLink>
+            <SimpleLink onClick={openLogsWindow(log, pod)}>View Container Logs</SimpleLink>
           </span>
         </Text>
       ))}
