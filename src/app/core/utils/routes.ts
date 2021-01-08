@@ -118,7 +118,7 @@ export const routes = {
     defaultParams: {
       plugin: AppPlugins.Kubernetes,
     },
-    name: 'Infrastructure:Root',
+    name: 'Infrastructure:Clusters:List',
   }),
   cluster: {
     list: Route.register({
@@ -369,7 +369,7 @@ export const routes = {
     defaultParams: {
       plugin: AppPlugins.Kubernetes,
     },
-    name: 'Workloads:Root',
+    name: 'Workloads:Pods:List',
   }),
   services: {
     list: Route.register({
@@ -419,16 +419,16 @@ export const routes = {
       name: 'Namespaces:Add',
     }),
   },
-  storageClasses: {
+  storage: {
     root: Route.register({
       url: `${pluginRoutePrefix}/storage_classes`,
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
-      name: 'StorageClasses:Root',
+      name: 'StorageClasses:List',
     }),
     list: Route.register({
-      url: `${pluginRoutePrefix}/storage_classes##storage`,
+      url: `${pluginRoutePrefix}/storage_classes#storage`,
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
@@ -603,7 +603,7 @@ export const routes = {
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
-      name: 'Monitoring:Root',
+      name: 'Monitoring:Alarms:List',
     }),
     alarms: Route.register({
       url: `${pluginRoutePrefix}/alarms#alarms`,
@@ -626,7 +626,7 @@ export const routes = {
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
-      name: 'RBAC:Root',
+      name: 'RBAC:Roles:List',
     }),
     roles: Route.register({
       url: `${pluginRoutePrefix}/rbac#roles`,
