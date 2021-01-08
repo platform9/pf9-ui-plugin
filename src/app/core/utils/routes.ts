@@ -113,14 +113,14 @@ export const routes = {
     url: `${appUrlRoot}/login`,
     name: 'Login',
   }),
+  infrastructre: Route.register({
+    url: `${pluginRoutePrefix}/infrastructure`,
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+    name: 'Infrastructure:Root',
+  }),
   cluster: {
-    root: Route.register({
-      url: `${pluginRoutePrefix}/infrastructure`,
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-      name: 'Infrastructure:Root',
-    }),
     list: Route.register({
       url: `${pluginRoutePrefix}/infrastructure#clusters`,
       defaultParams: {
@@ -267,7 +267,7 @@ export const routes = {
   }),
   apiAccess: Route.register({
     url: `${pluginRoutePrefix}/api_access`,
-    name: 'APIAccess:Root',
+    name: 'APIAccess',
     defaultParams: {
       plugin: AppPlugins.Kubernetes,
     },
