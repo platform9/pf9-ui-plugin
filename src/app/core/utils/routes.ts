@@ -113,6 +113,13 @@ export const routes = {
     url: `${appUrlRoot}/login`,
     name: 'Login',
   }),
+  infrastructre: Route.register({
+    url: `${pluginRoutePrefix}/infrastructure`,
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+    name: 'Infrastructure:Clusters:List',
+  }),
   cluster: {
     list: Route.register({
       url: `${pluginRoutePrefix}/infrastructure#clusters`,
@@ -344,82 +351,95 @@ export const routes = {
   pods: {
     list: Route.register({
       url: `${pluginRoutePrefix}/workloads#pods`,
-      name: 'Pods:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Pods:List',
     }),
-
     add: Route.register({
       url: `${pluginRoutePrefix}/workloads/pods/add`,
-      name: 'Pods:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Pods:Add',
     }),
   },
+  workloads: Route.register({
+    url: `${pluginRoutePrefix}/workloads`,
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+    name: 'Workloads:Pods:List',
+  }),
   services: {
     list: Route.register({
       url: `${pluginRoutePrefix}/workloads#services`,
-      name: 'Services:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Services:List',
     }),
     add: Route.register({
       url: `${pluginRoutePrefix}/workloads/services/add`,
-      name: 'Services:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Services:Add',
     }),
   },
   deployments: {
     list: Route.register({
       url: `${pluginRoutePrefix}/workloads#deployments`,
-      name: 'Deployments:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Deployments:List',
     }),
     add: Route.register({
       url: `${pluginRoutePrefix}/workloads/deployments/add`,
-      name: 'Deployments:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Deployments:Add',
     }),
   },
   namespaces: {
     list: Route.register({
       url: `${pluginRoutePrefix}/workloads#namespaces`,
-      name: 'Namespaces:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Namespaces:List',
     }),
     add: Route.register({
       url: `${pluginRoutePrefix}/workloads/namespaces/add`,
-      name: 'Namespaces:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Namespaces:Add',
     }),
   },
   storage: {
-    list: Route.register({
+    root: Route.register({
       url: `${pluginRoutePrefix}/storage_classes`,
-      name: 'Storage:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'StorageClasses:List',
+    }),
+    list: Route.register({
+      url: `${pluginRoutePrefix}/storage_classes#storage`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'StorageClasses:List',
     }),
     add: Route.register({
       url: `${pluginRoutePrefix}/storage_classes/add`,
-      name: 'Storage:Add',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'StorageClasses:Add',
     }),
   },
   logging: {
@@ -577,20 +597,64 @@ export const routes = {
       name: 'Promtheus:AltertManagers:Edit',
     }),
   },
-  rbac: {
-    list: Route.register({
-      url: `${pluginRoutePrefix}/rbac`,
-      name: 'RBAC:List',
+  monitoring: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/alarms`,
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'Monitoring:Alarms:List',
+    }),
+    alarms: Route.register({
+      url: `${pluginRoutePrefix}/alarms#alarms`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Monitoring:Alarms:List',
+    }),
+    rules: Route.register({
+      url: `${pluginRoutePrefix}/alarms#rules`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Monitoring:Rules:List',
+    }),
+  },
+  rbac: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/rbac`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'RBAC:Roles:List',
+    }),
+    roles: Route.register({
+      url: `${pluginRoutePrefix}/rbac#roles`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'RBAC:Roles:List',
     }),
     addRoles: Route.register({
       url: `${pluginRoutePrefix}/rbac/roles/add`,
-      name: 'RBAC:List',
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+      name: 'RBAC:Roles:Add',
+    }),
+    editRoles: Route.register({
+      url: `${pluginRoutePrefix}/rbac/roles/edit/:id/cluster/:clusterId`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'RBAC:Roles:Edit',
+    }),
+    clusterRoles: Route.register({
+      url: `${pluginRoutePrefix}/rbac#clusterRoles`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'RBAC:ClusterRoles:List',
     }),
     addClusterRoles: Route.register({
       url: `${pluginRoutePrefix}/rbac/clusterroles/add`,
@@ -598,6 +662,20 @@ export const routes = {
         plugin: AppPlugins.Kubernetes,
       },
       name: 'RBAC:ClusterRoles:Add',
+    }),
+    editClusterRoles: Route.register({
+      url: `${pluginRoutePrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'RBAC:ClusterRoles:Edit',
+    }),
+    roleBindings: Route.register({
+      url: `${pluginRoutePrefix}/rbac#roleBindings`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'RBAC:RoleBindings:List',
     }),
     addRoleBindings: Route.register({
       url: `${pluginRoutePrefix}/rbac/rolebindings/add`,
@@ -613,26 +691,19 @@ export const routes = {
       },
       name: 'RBAC:RoleBindings:Edit',
     }),
+    clusterRoleBindings: Route.register({
+      url: `${pluginRoutePrefix}/rbac#clusterRoleBindings`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'RBAC:ClusterRoleBindings:List',
+    }),
     addClusterRoleBindings: Route.register({
       url: `${pluginRoutePrefix}/rbac/clusterrolebindings/add`,
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
       name: 'RBAC:ClusterRolesBindings:Add',
-    }),
-    editRoles: Route.register({
-      url: `${pluginRoutePrefix}/rbac/roles/edit/:id/cluster/:clusterId`,
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-      name: 'RBAC:Roles:Edit',
-    }),
-    editClusterRoles: Route.register({
-      url: `${pluginRoutePrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`,
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-      name: 'RBAC:ClusterRoles:Edit',
     }),
     editClusterRoleBindings: Route.register({
       url: `${pluginRoutePrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`,
@@ -645,6 +716,10 @@ export const routes = {
   password: {
     reset: Route.register({ url: `${appUrlRoot}/reset/password`, name: 'Password:Reset' }),
   },
+  help: Route.register({
+    url: `${appUrlRoot}/help`,
+    name: 'Help',
+  }),
   ironicSetup: Route.register({
     url: `${pluginRoutePrefix}/setup`,
     defaultParams: {
