@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -10,7 +10,8 @@ import { awsPrerequisitesLink, azurePrerequisitesLink } from 'k8s/links'
 import { objSwitchCase } from 'utils/fp'
 import { cloudProviderActions } from './actions'
 import Text from 'core/elements/text'
-import { CloudProviders } from './model'
+import { CloudProviders, CloudProvidersFriendlyName } from './model'
+import TestsDialog, { TestStatus } from './tests-dialog'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -31,6 +32,7 @@ interface Props {
   wizardContext: any
   setWizardContext: any
   onNext: any
+  handleNext: any
   title: string
   setSubmitting: any
 }
@@ -47,6 +49,11 @@ const links = {
     </ExternalLink>
   ),
 }
+
+const requiredTests = (provider) =>
+  new Map<string, TestStatus | null>([
+    [`${CloudProvidersFriendlyName[provider]} account access`, null],
+  ])
 
 const formCpBody = (wizardContext) => {
   if (wizardContext.provider === CloudProviders.Aws) {
@@ -73,46 +80,89 @@ const AddCloudProviderCredentialStep = ({
   wizardContext,
   setWizardContext,
   onNext,
+  handleNext,
   title,
   setSubmitting,
 }: Props) => {
   const classes = useStyles({})
   const [errorMessage, setErrorMessage] = useState('')
-
+  const [tests, setTests] = useState(requiredTests(wizardContext.provider))
+  const [showDialog, setShowDialog] = useState(false)
+  const [verified, setVerified] = useState(false)
   const validatorRef = useRef(null)
 
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
   }
 
+  const updateTestStatus = (testName: string, status: TestStatus) => {
+    const newTests = new Map(tests)
+    newTests.set(testName, status)
+    setTests(newTests)
+  }
+
+  const resetTestStatuses = () => {
+    const newTests = new Map(tests)
+    newTests.forEach((_, key) => newTests.set(key, null))
+    setTests(newTests)
+  }
+
   const submitStep = useCallback(async () => {
     const isValid = validatorRef.current.validate()
     if (!isValid) {
-      // don't let the user progress to next step
       return false
     }
+
+    const provider = CloudProvidersFriendlyName[wizardContext.provider]
+    setSubmitting(true)
+    setShowDialog(true)
+    const body = formCpBody(wizardContext)
+
     try {
-      setSubmitting(true)
-      const body = formCpBody(wizardContext)
+      updateTestStatus(`${provider} account access`, TestStatus.Loading)
       const [success, newCp] = await cloudProviderActions.create(body)
       if (!success) {
         // TODO: surface the real API response error to get exact failure reason
         // Hopefully will be doable with Xan's error message changes
-        throw 'Error creating cloud provider'
+        throw `The provided credentials are not able to access your ${provider} account`
       }
       setWizardContext({ cloudProviderId: newCp.uuid })
     } catch (err) {
       setSubmitting(false)
       setErrorMessage(err)
+      updateTestStatus(`${provider} account access`, TestStatus.Fail)
       return false
     }
+
     setSubmitting(false)
-    return true
+    updateTestStatus(`${provider} account access`, TestStatus.Success)
+    setVerified(true)
+    return false
   }, [wizardContext])
 
   useEffect(() => {
+    // Reset the tests whenever cloud provider changes
+    setTests(requiredTests(wizardContext.provider))
+  }, [wizardContext.provider])
+
+  useEffect(() => {
+    // submitStep will always return false and prevent the user from
+    // proceeding to the next step because we only want to move on to
+    // the next step when the user closes the TestsDialog box
     onNext(submitStep)
   }, [submitStep])
+
+  const handleClose = () => {
+    if (verified) {
+      // Move on to the next step
+      onNext()
+      handleNext()
+    } else {
+      setShowDialog(false)
+      setErrorMessage('')
+      resetTestStatuses()
+    }
+  }
 
   const ActiveForm = useMemo(() => {
     return objSwitchCaseAny({
@@ -148,6 +198,15 @@ const AddCloudProviderCredentialStep = ({
         >
           {({ setFieldValue, values }) => (
             <>
+              <TestsDialog
+                title="Validating Cloud Provider Access"
+                subtitle="Testing your cloud providers access:"
+                tests={tests}
+                showDialog={showDialog}
+                onClose={handleClose}
+                errorMessage={errorMessage}
+                link={links[wizardContext.provider]}
+              />
               <ActiveForm
                 wizardContext={wizardContext}
                 setWizardContext={setWizardContext}
