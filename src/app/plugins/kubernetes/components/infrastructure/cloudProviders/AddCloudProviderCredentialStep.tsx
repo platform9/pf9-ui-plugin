@@ -201,6 +201,7 @@ const AddCloudProviderCredentialStep = ({
               <TestsDialog
                 title="Validating Cloud Provider Access"
                 subtitle="Testing your cloud providers access:"
+                testsCompletionMessage="Cloud provider access test completed."
                 tests={tests}
                 showDialog={showDialog}
                 onClose={handleClose}

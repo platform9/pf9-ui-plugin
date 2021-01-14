@@ -94,6 +94,7 @@ interface Props {
   title: string
   link?: any
   subtitle: string
+  testsCompletionMessage?: string
   tests: any
   errorMessage?: string
   showDialog: boolean
@@ -104,6 +105,7 @@ const TestsDialog = ({
   title,
   link,
   subtitle,
+  testsCompletionMessage,
   tests,
   errorMessage,
   showDialog,
@@ -112,6 +114,7 @@ const TestsDialog = ({
   const classes = useStyles()
   const [testElements, setTestElements] = useState([])
   const [showCloseButton, setShowCloseButton] = useState(false)
+  const [showTestCompletionMessage, setShowTestCompletionMessage] = useState(false)
 
   useEffect(() => {
     const elements = []
@@ -142,13 +145,16 @@ const TestsDialog = ({
     })
     setTestElements(elements)
     setShowCloseButton(!hasLoadingTests)
+    setShowTestCompletionMessage(!hasLoadingTests)
   }, [tests])
 
   return (
     <Dialog open={showDialog} fullWidth maxWidth="sm">
       <FormFieldCard title={title} link={link}>
         <div className={classes.dialogContent}>
-          <Text className={classes.subHeader}>{subtitle}</Text>
+          <Text className={classes.subHeader}>
+            {showTestCompletionMessage ? testsCompletionMessage : subtitle}
+          </Text>
           {testElements}
         </div>
         {errorMessage && (
