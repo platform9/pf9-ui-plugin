@@ -13,9 +13,11 @@ const createListTableComponent = ({
   searchTarget = 'name',
   paginate,
   showCheckboxes,
+  multiSelection,
   onReload,
   onRefresh,
   compactTable = false,
+  batchActions,
 }) => {
   const CustomListTable = ({
     data,
@@ -45,6 +47,7 @@ const createListTableComponent = ({
         rowActions={rowActions}
         paginate={paginate}
         showCheckboxes={showCheckboxes}
+        multiSelection={multiSelection}
         searchTarget={searchTarget}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
@@ -57,6 +60,7 @@ const createListTableComponent = ({
         uniqueIdentifier={uniqueIdentifier}
         loading={loading}
         compactTable={compactTable}
+        batchActions={batchActions}
       />
     )
   }
