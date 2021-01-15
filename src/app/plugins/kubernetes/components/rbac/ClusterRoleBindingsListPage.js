@@ -8,6 +8,7 @@ import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -40,7 +41,7 @@ const ListPage = ({ ListContainer }) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/rbac/clusterrolebindings/add',
+  addUrl: routes.rbac.addClusterRoleBindings.path(),
   addText: 'Add Cluster Role Binding',
   columns: [
     { id: 'name', label: 'Name' },
@@ -49,8 +50,8 @@ export const options = {
   ],
   cacheKey: ActionDataKeys.ClusterRoleBindings,
   deleteFn: clusterRoleBindingActions.delete,
-  editUrl: (item, itemId) =>
-    `/ui/kubernetes/rbac/clusterrolebindings/edit/${itemId}/cluster/${item.clusterId}`,
+  editUrl: (item, id) =>
+    routes.rbac.editClusterRoleBindings.path({ id, clusterId: item.clusterId }),
   name: 'Cluster Role Bindings',
   title: 'Cluster Role Bindings',
   ListPage,

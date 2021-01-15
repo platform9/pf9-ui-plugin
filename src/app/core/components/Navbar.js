@@ -28,6 +28,7 @@ import Text from 'core/elements/text'
 import SimpleLink from './SimpleLink'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { connect } from 'react-redux'
+import { isDecco } from 'core/utils/helpers'
 
 export const drawerWidth = 180
 
@@ -601,7 +602,7 @@ class Navbar extends PureComponent {
     const filteredSections = sections.filter(where({ id: equals(stack) }))
 
     // const { features } = getContext()
-    const isDecco = pathStrOr(false, 'experimental.kplane', features)
+    const isDeccoDU = isDecco(features)
     const isSandbox = pathStrOr(false, 'experimental.sandbox', features)
     const version = pathStrOr('4', 'releaseVersion', features)
 
@@ -632,7 +633,7 @@ class Navbar extends PureComponent {
             [classes.bottomContentClose]: !open,
           })}
         >
-          {!(isDecco || isSandbox) && (
+          {!(isDeccoDU || isSandbox) && (
             <Button onClick={this.handleNavigateToClarity}>
               <Text variant="caption2">Back to Legacy UI</Text>
               <FontAwesomeIcon size="md">undo</FontAwesomeIcon>

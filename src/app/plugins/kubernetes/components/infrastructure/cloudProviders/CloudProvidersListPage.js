@@ -3,6 +3,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import SimpleLink from 'core/components/SimpleLink'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import ResourceUsageTables from '../common/ResourceUsageTables'
+import { routes } from 'core/utils/routes'
 
 const toMHz = (bytes) => bytes / Math.pow(1024, 2)
 const toGB = (bytes) => bytes / Math.pow(1024, 3)
@@ -63,7 +64,7 @@ const NodesCell = ({ nodes }) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/infrastructure/cloudProviders/add',
+  addUrl: routes.cloudProviders.add.path(),
   addText: 'Add Cloud Provider',
   columns: [
     { id: 'name', label: 'Name' },
@@ -78,7 +79,7 @@ export const options = {
     { id: 'uuid', label: 'Unique ID' },
   ],
   cacheKey: ActionDataKeys.CloudProviders,
-  editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
+  editUrl: (_, id) => routes.cloudProviders.edit.path({ id }),
   editCond: ([selectedRow]) => selectedRow.type !== 'openstack',
   editDisabledInfo: () => 'Editing an Openstack cloud provider is not currently supported',
   deleteCond: ([selectedRow]) => selectedRow.type !== 'local',

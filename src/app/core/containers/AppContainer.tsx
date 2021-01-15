@@ -19,7 +19,7 @@ import { sessionStoreKey, sessionActions, SessionState } from 'core/session/sess
 import { cacheActions } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { prop, propEq, head } from 'ramda'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
@@ -211,7 +211,10 @@ const AppContainer = () => {
       if (isNilOrEmpty(tenants)) {
         throw new Error('No tenants found, please contact support')
       }
-      const activeTenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
+      const activeTenant =
+        tenants.find(propEq('id', currentTenant)) ||
+        tenants.find(propEq('name', 'service')) ||
+        head(tenants)
       if (!currentTenant && activeTenant) {
         updateClarityStore('tenantObj', activeTenant)
       }

@@ -243,7 +243,7 @@ export const options = {
     { id: 'tags', label: 'Metadata', render: renderMetaData },
   ],
   cacheKey: ActionDataKeys.Clusters,
-  editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
+  editUrl: (_, id) => routes.cluster.edit.path({ id }),
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
