@@ -14,11 +14,11 @@ const dockerDocBaseUrl = 'https://docs.docker.com'
 export const MFAHelpLink = `${pf9DocOrigin}/openstack/authentication/enable_mfa_for_user/`
 
 // Qbert
-export const qbertApiLink = `${k8sBaseUrl}/API-Reference/Qbert-API-Reference/`
+export const qbertApiLink = `${pf9DocOrigin}/qbert/ref`
 
 // Help
 export const gettingStartedHelpLink = `${k8sBaseUrl}/quickstart/`
-export const tutorialsHelpLink = `${k8sBaseUrl}/tutorials/virtualbox-mac/`
+export const tutorialsHelpLink = `${k8sBaseUrl}/tutorials-kubernetes-on-macos`
 export const slackLink = 'https://slack.platform9.io'
 export const forumHelpLink = `${communityBaseUrl}/`
 export const pf9PmkArchitectureDigLink = `${k8sBaseUrl}/multimaster-architecture-platform9-managed-kubernetes/`
@@ -48,7 +48,8 @@ export const kubectlInstallationDocumentationLink = `${pf9DocOrigin}/kubernetes/
 
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
-export const nodePrerequisitesDocumentationLink = 'https://platform9.com/blog/support/managed-container-cloud-requirements-checklist'
+export const nodePrerequisitesDocumentationLink =
+  'https://platform9.com/blog/support/managed-container-cloud-requirements-checklist'
 
 // CLI
 export const pmkCliOverviewLink = `${k8sBaseUrl}/PMK-CLI/`
@@ -68,7 +69,7 @@ export const createServiceLink = `${k8sDocBaselUrl}/tutorials/connecting-apps/co
 export const persistVolumesStorageClassesLink = `${k8sDocBaselUrl}/concepts/storage/persistent-volumes/#storageclasses`
 
 // Api Access
-export const kubeconfigFileLink = `${k8sBaseUrl}/kubeconfig-and-clients/introduction-to-kubeconfig/`
+export const kubeconfigFileLink = `${k8sBaseUrl}/kubeconfig-and-clients-introduction-to-kubeconfig`
 export const kubectlOverviewLink = `${k8sDocBaselUrl}/user-guide/kubectl-overview/`
 
 // Misc
