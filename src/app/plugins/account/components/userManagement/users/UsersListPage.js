@@ -5,8 +5,9 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import useToggler from 'core/hooks/useToggler'
+import { sessionStoreKey } from 'core/session/sessionReducers'
 import { routes } from 'core/utils/routes'
-import { both, join, pick, pipe, pluck } from 'ramda'
+import { join, pick, pipe, pluck, prop } from 'ramda'
 import React, { useMemo } from 'react'
 import { arrayIfNil } from 'utils/fp'
 import { mngmUserActions } from './actions'
@@ -15,7 +16,11 @@ import EnableDisableUserDialog from './enable-disable-user-dialog'
 const defaultParams = { systemUsers: true }
 const usePrefParams = createUsePrefParamsHook('ManagementUsers', listTablePrefs)
 
-const isEnabledUser = ([user]) => user.enabled
+const isEnabledUser = (user) => user.enabled
+const isActiveUser = (user, store) => {
+  const session = prop(sessionStoreKey, store)
+  return session.username === user.username
+}
 
 const ListPage = ({ ListContainer }) => {
   return () => {
@@ -62,13 +67,13 @@ export const options = {
   multiSelection: false,
   batchActions: [
     {
-      cond: (rows) => !isEnabledUser(rows),
+      cond: ([user], store) => !isActiveUser(user, store) && !isEnabledUser(user),
       label: 'Enable',
       icon: 'user-check',
       dialog: EnableDisableUserDialog,
     },
     {
-      cond: isEnabledUser,
+      cond: ([user], store) => !isActiveUser(user, store) && isEnabledUser(user),
       label: 'Disable',
       icon: 'user-times',
       dialog: EnableDisableUserDialog,
