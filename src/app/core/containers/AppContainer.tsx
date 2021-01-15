@@ -204,42 +204,39 @@ const AppContainer = () => {
     return unlisten
   }, [])
 
-  const setupSession = useCallback(
-    async ({ username, unscopedToken, expiresAt, issuedAt, isSsoToken }) => {
-      const { currentTenant, currentRegion } = getUserPrefs(username)
-      const tenants = await loadUserTenants()
-      if (isNilOrEmpty(tenants)) {
-        throw new Error('No tenants found, please contact support')
-      }
-      const activeTenant =
-        tenants.find(propEq('id', currentTenant)) ||
-        tenants.find(propEq('name', 'service')) ||
-        head(tenants)
-      if (!currentTenant && activeTenant) {
-        updateClarityStore('tenantObj', activeTenant)
-      }
-      const activeTenantId = activeTenant.id
+  const setupSession = async ({ username, unscopedToken, expiresAt, issuedAt, isSsoToken }) => {
+    const { currentTenant, currentRegion } = getUserPrefs(username)
+    const tenants = await loadUserTenants()
+    if (isNilOrEmpty(tenants)) {
+      throw new Error('No tenants found, please contact support')
+    }
+    const activeTenant =
+      tenants.find(propEq('id', currentTenant)) ||
+      tenants.find(propEq('name', 'service')) ||
+      head(tenants)
+    if (!currentTenant && activeTenant) {
+      updateClarityStore('tenantObj', activeTenant)
+    }
+    const activeTenantId = activeTenant.id
 
-      if (currentRegion) {
-        setActiveRegion(currentRegion)
-      }
+    if (currentRegion) {
+      setActiveRegion(currentRegion)
+    }
 
-      // Order matters
-      const user = await updateSession({
-        username,
-        unscopedToken,
-        expiresAt,
-        issuedAt,
-        isSsoToken,
-        currentTenantId: activeTenantId,
-      })
-      setSessionChecked(true)
-      if (user) {
-        await getUserDetails(user)
-      }
-    },
-    [],
-  )
+    // Order matters
+    const user = await updateSession({
+      username,
+      unscopedToken,
+      expiresAt,
+      issuedAt,
+      isSsoToken,
+      currentTenantId: activeTenantId,
+    })
+    setSessionChecked(true)
+    if (user) {
+      await getUserDetails(user)
+    }
+  }
 
   const authContent =
     isNilOrEmpty(session) || !session.username ? (
