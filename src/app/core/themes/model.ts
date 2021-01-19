@@ -315,6 +315,7 @@ export interface Typography {
   buttonSecondary: ITypography
   inputTable: ITypography
   body2: ITypography
+  body2Italicized: ITypography
   sidenav: ITypography
   inputLabel: ITypography
   caption2: ITypography
@@ -419,6 +420,7 @@ export interface RelienceTypography {
   ButtonSecondary: ITypography
   InputTable: ITypography
   Body2: ITypography
+  Body2Italicized: ITypography
   Sidenav: ITypography
   InputLabel: ITypography
   Caption2: ITypography

@@ -12,6 +12,7 @@ import { cloudProviderActions } from './actions'
 import Text from 'core/elements/text'
 import { CloudProviders, CloudProvidersFriendlyName } from './model'
 import TestsDialog, { TestStatus } from './tests-dialog'
+import { clone } from 'ramda'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -50,10 +51,14 @@ const links = {
   ),
 }
 
-const requiredTests = (provider) =>
-  new Map<string, TestStatus | null>([
-    [`${CloudProvidersFriendlyName[provider]} account access`, null],
-  ])
+const testsForAws = [{ name: 'AWS account access', status: null }]
+
+const testsForAzure = [{ name: 'Azure account access', status: null }]
+
+const requiredTests = {
+  [CloudProviders.Aws]: testsForAws,
+  [CloudProviders.Azure]: testsForAzure,
+}
 
 const formCpBody = (wizardContext) => {
   if (wizardContext.provider === CloudProviders.Aws) {
@@ -86,7 +91,7 @@ const AddCloudProviderCredentialStep = ({
 }: Props) => {
   const classes = useStyles({})
   const [errorMessage, setErrorMessage] = useState('')
-  const [tests, setTests] = useState(requiredTests(wizardContext.provider))
+  const [tests, setTests] = useState(requiredTests[wizardContext.provider])
   const [showDialog, setShowDialog] = useState(false)
   const [verified, setVerified] = useState(false)
   const validatorRef = useRef(null)
@@ -95,17 +100,14 @@ const AddCloudProviderCredentialStep = ({
     validatorRef.current = { validate }
   }
 
-  const updateTestStatus = (testName: string, status: TestStatus) => {
-    const newTests = new Map(tests)
-    newTests.set(testName, status)
-    setTests(newTests)
-  }
-
-  const resetTestStatuses = () => {
-    const newTests = new Map(tests)
-    newTests.forEach((_, key) => newTests.set(key, null))
-    setTests(newTests)
-  }
+  const updateTestStatus = useCallback(
+    (testIndex, status: TestStatus) => {
+      const newTests = clone(tests)
+      newTests[testIndex].status = status
+      setTests(newTests)
+    },
+    [tests],
+  )
 
   const submitStep = useCallback(async () => {
     const isValid = validatorRef.current.validate()
@@ -119,7 +121,7 @@ const AddCloudProviderCredentialStep = ({
     const body = formCpBody(wizardContext)
 
     try {
-      updateTestStatus(`${provider} account access`, TestStatus.Loading)
+      updateTestStatus(0, TestStatus.Loading)
       const [success, newCp] = await cloudProviderActions.create(body)
       if (!success) {
         // TODO: surface the real API response error to get exact failure reason
@@ -130,19 +132,18 @@ const AddCloudProviderCredentialStep = ({
     } catch (err) {
       setSubmitting(false)
       setErrorMessage(err)
-      updateTestStatus(`${provider} account access`, TestStatus.Fail)
+      updateTestStatus(0, TestStatus.Fail)
       return false
     }
 
     setSubmitting(false)
-    updateTestStatus(`${provider} account access`, TestStatus.Success)
+    updateTestStatus(0, TestStatus.Success)
     setVerified(true)
     return false
-  }, [wizardContext])
+  }, [wizardContext, tests])
 
   useEffect(() => {
-    // Reset the tests whenever cloud provider changes
-    setTests(requiredTests(wizardContext.provider))
+    setTests(requiredTests[wizardContext.provider])
   }, [wizardContext.provider])
 
   useEffect(() => {
@@ -160,7 +161,8 @@ const AddCloudProviderCredentialStep = ({
     } else {
       setShowDialog(false)
       setErrorMessage('')
-      resetTestStatuses()
+      // Reset the tests and its statuses
+      setTests(requiredTests[wizardContext.provider])
     }
   }
 

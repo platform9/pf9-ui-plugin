@@ -1,3 +1,6 @@
+// @ts-nocheck
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import Theme from 'core/themes/model'
 import React, { useEffect, useState } from 'react'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -22,9 +25,8 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
   },
   checkingText: {
     color: theme.palette.blue[500],
-    fontStyle: 'italic',
-    fontSize: '14px',
-    paddingTop: '3px',
+    paddingTop: '6px',
+    ...theme.typography.body2Italicized,
   },
   dialogActions: {
     justifyContent: 'flex-start',
@@ -83,12 +85,11 @@ const iconsMap = new Map<string, { icon: string; classes: string }>([
   ['error', { icon: 'exclamation-circle', classes: '' }],
 ])
 
-const getIconClass = (status) =>
-  ({
-    loading: 'loadingIcon',
-    success: 'successIcon',
-    fail: 'failIcon',
-  }[status])
+const getIconClass = {
+  loading: 'loadingIcon',
+  success: 'successIcon',
+  fail: 'failIcon',
+}
 
 interface Props {
   title: string
@@ -117,33 +118,22 @@ const TestsDialog = ({
   const [showTestCompletionMessage, setShowTestCompletionMessage] = useState(false)
 
   useEffect(() => {
-    const elements = []
-    let hasLoadingTests = false
-
-    tests.forEach((status, test) => {
-      const icon = iconsMap.get(status)
-      if (status === TestStatus.Loading) {
-        hasLoadingTests = true
-      }
-
-      elements.push(
-        <div key={`${test}-${status}`} className={classes.tests}>
-          {status && (
-            <FontAwesomeIcon
-              solid={status !== TestStatus.Loading}
-              className={clsx(icon.classes, classes[getIconClass(status)])}
-            >
-              {icon.icon}
-            </FontAwesomeIcon>
-          )}
-          <Text>{test}</Text>
-          {status === TestStatus.Loading && (
-            <Text className={classes.checkingText}>Checking...</Text>
-          )}
-        </div>,
-      )
-    })
+    const elements = tests.map(({ name, status }) => (
+      <div key={`${name}-${status}`} className={classes.tests}>
+        <FontAwesomeIcon
+          solid={status !== TestStatus.Loading}
+          className={
+            status ? clsx(iconsMap.get(status).classes, classes[getIconClass[status]]) : null
+          }
+        >
+          {iconsMap.get(status)?.icon}
+        </FontAwesomeIcon>
+        <Text>{name}</Text>
+        {status === TestStatus.Loading && <Text className={classes.checkingText}>Checking...</Text>}
+      </div>
+    ))
     setTestElements(elements)
+    const hasLoadingTests = tests.some((test) => test.status === TestStatus.Loading)
     setShowCloseButton(!hasLoadingTests)
     setShowTestCompletionMessage(!hasLoadingTests)
   }, [tests])
