@@ -32,8 +32,6 @@ const EnableDisableUserDialog = ({ rows: [user], onClose }) => {
 
     update({
       id: user.id,
-      username: user.username,
-      displayname: user.displayname,
       enabled: !user.enabled,
       roleAssignments: userRoleAssignments,
     })
