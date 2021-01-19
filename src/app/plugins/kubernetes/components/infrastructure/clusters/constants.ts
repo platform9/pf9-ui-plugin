@@ -20,4 +20,4 @@ export const downloadAndInstallPf9CliCommand = 'bash <(curl -sL http://pf9.io/ge
 export const downloadPf9CliCommand =
   'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
 export const installPf9CliCommand = 'bash ./cli-setup.sh'
-export const runPf9CliCommand = 'sudo pf9ctl cluster prep-node'
+export const runPf9CliCommand = 'pf9ctl cluster prep-node'
