@@ -11,11 +11,9 @@ const SsoManagementPage = () => {
     <PageContainer>
       <DocumentMeta title="SSO Management" />
       <Tabs>
-        {false && (
-          <Tab value="sso" label="SSO">
-            <SsoPage />
-          </Tab>
-        )}
+        <Tab value="sso" label="SSO">
+          <SsoPage />
+        </Tab>
         <Tab value="groups" label="Groups">
           <GroupsListPage />
         </Tab>
