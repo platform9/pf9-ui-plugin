@@ -183,7 +183,10 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     mngmTenantActions.invalidateCache()
     return createdUser
   },
-  updateFn: async ({ id: userId, username, displayname, password, roleAssignments }, prevItems) => {
+  updateFn: async (
+    { id: userId, username, displayname, password, enabled = true, roleAssignments },
+    prevItems,
+  ) => {
     const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
       userId,
     })
@@ -203,6 +206,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       email: username,
       displayname,
       password: password || undefined,
+      enabled: enabled,
     })
 
     // If updating password of active user, reauthenticate the user
