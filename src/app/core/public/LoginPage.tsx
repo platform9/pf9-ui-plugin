@@ -155,6 +155,7 @@ interface Props {
   dispatch: any
   onAuthSuccess: any
   history: any
+  location: any
   classes: any
   ssoEnabled: boolean
 }
@@ -188,6 +189,48 @@ class LoginPage extends React.PureComponent<Props> {
   componentDidMount() {
     if (this.props.ssoEnabled) {
       this.setState({ loginMethod: LoginMethodTypes.SSO })
+    }
+    const { location, onAuthSuccess } = this.props
+    const searchParams = new URLSearchParams(location.search)
+
+    const loginWithSso = async () => {
+      const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[
+        LoginMethodTypes.SSO
+      ](null, null, null)
+
+      const isSsoToken = true
+      if (!unscopedToken) {
+        return this.setState({ loading: false, loginFailed: true })
+      }
+
+      const timeDiff = moment(expiresAt).diff(issuedAt)
+      const localExpiresAt = moment()
+        .add(timeDiff)
+        .format()
+
+      this.props.dispatch(
+        sessionActions.initSession({
+          username,
+          unscopedToken,
+          expiresAt: localExpiresAt,
+        }),
+      )
+
+      trackEvent('PF9 Signed In', {
+        username,
+        duDomain: window.location.origin,
+      })
+      await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt, isSsoToken })
+      return this.setState(
+        {
+          loading: false,
+        },
+        () => this.props.history.push(dashboardUrl),
+      )
+    }
+
+    if (searchParams.get('type') === 'sso') {
+      loginWithSso()
     }
   }
 
