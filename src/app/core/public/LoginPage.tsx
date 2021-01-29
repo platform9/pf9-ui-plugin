@@ -194,6 +194,7 @@ class LoginPage extends React.PureComponent<Props> {
     const searchParams = new URLSearchParams(location.search)
 
     const loginWithSso = async () => {
+      this.setState({ loading: true })
       const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[
         LoginMethodTypes.SSO
       ](null, null, null)
