@@ -11,17 +11,17 @@ enum SsoProviders {
 }
 
 const options = [
-  { label: 'Google', value: SsoProviders.Okta },
-  { label: 'Okta', value: SsoProviders.OneLogin },
-  { label: 'OneLogin', value: SsoProviders.Google },
+  { label: 'Google', value: SsoProviders.Google },
+  { label: 'Okta', value: SsoProviders.Okta },
+  { label: 'OneLogin', value: SsoProviders.OneLogin },
 ]
 
 interface Props {
   value: string
   onChange: (value: string) => void
-  name?: string
-  label?: string
-  selectFirst?: boolean
+  name: string
+  label: string
+  selectFirst: boolean
   formField?: boolean
 }
 
@@ -35,6 +35,7 @@ const SsoProviderPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, 
       label = 'SSO Provider',
       selectFirst = false,
       formField = false,
+      ...rest
     } = props
 
     // Select the first item as soon as data is loaded
@@ -46,6 +47,7 @@ const SsoProviderPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, 
 
     return (
       <Picklist
+        {...rest}
         name={name}
         label={label}
         value={value}

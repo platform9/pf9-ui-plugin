@@ -5,6 +5,7 @@ export const imageUrlRoot = `${appUrlRoot}/images`
 export const helpUrl = `${appUrlRoot}/help`
 export const loginUrl = `${appUrlRoot}/login`
 export const loginWithCookieUrl = `${appUrlRoot}/pmkft/login`
+export const loginWithSsoUrl = `${appUrlRoot}/ssologin`
 export const resetPasswordThroughEmailUrl = '/reset/password'
 export const resetPasswordUrl = `${appUrlRoot}${resetPasswordThroughEmailUrl}`
 export const forgotPasswordUrl = `${appUrlRoot}/forgot_password`
@@ -51,6 +52,8 @@ export enum CustomerTiers {
   Freedom = 'freedom',
   Growth = 'growth',
 }
+
+export const defaultGroupMappingId = 'idp1_mapping'
 
 export const upgradeLinks = {
   [CustomerTiers.Freedom]: 'https://platform9.com/signup/growth/',
