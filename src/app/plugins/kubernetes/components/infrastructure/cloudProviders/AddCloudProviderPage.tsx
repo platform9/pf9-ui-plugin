@@ -45,7 +45,7 @@ const AddCloudProviderPage = () => {
           hideBack={true}
           finishAndReviewLabel="Done"
         >
-          {({ wizardContext, setWizardContext, onNext }) => {
+          {({ wizardContext, setWizardContext, onNext, handleNext }) => {
             return (
               <>
                 <WizardStep
@@ -57,6 +57,7 @@ const AddCloudProviderPage = () => {
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
                     onNext={onNext}
+                    handleNext={handleNext}
                     title={formTitle(wizardContext)}
                     setSubmitting={setSubmittingStep}
                   />
