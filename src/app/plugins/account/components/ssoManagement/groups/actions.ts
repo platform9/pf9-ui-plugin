@@ -1,4 +1,5 @@
 import ApiClient from 'api-client/ApiClient'
+import { defaultGroupMappingId } from 'app/constants'
 // import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
@@ -107,7 +108,7 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
 
 export const mngmGroupMappingActions = createCRUDActions(ActionDataKeys.ManagementGroupsMappings, {
   listFn: async () => keystone.getGroupMappings(),
-  createFn: async (params) => await keystone.createGroupMapping(params),
+  createFn: async ({ id, ...params }) => await keystone.createGroupMapping(id, params),
   updateFn: async ({ id, ...params }) => await keystone.updateGroupMapping(id, params),
   deleteFn: async ({ id }) => await keystone.deleteGroupMapping(id),
   entityName: 'GroupMappings',
@@ -159,7 +160,6 @@ export const groupFormSubmission = async ({ params, existingMapping, operation }
 
   // Add group to the mapping
   const ruleBody = formMappingRule(params, groupId)
-
   const mappingBody =
     operation === 'update'
       ? {
@@ -180,10 +180,15 @@ export const groupFormSubmission = async ({ params, existingMapping, operation }
 
   const [updateMappingSuccess] = existingMapping
     ? await mngmGroupMappingActions.update({ id: existingMapping.id, ...mappingBody })
-    : await mngmGroupMappingActions.create(mappingBody)
+    : await mngmGroupMappingActions.create({ id: defaultGroupMappingId, ...mappingBody })
 
   if (!updateMappingSuccess) {
     console.log('group mapping operation failed')
+  }
+
+  // Link the IDP with the newly created mapping
+  if (!existingMapping) {
+    await keystone.addIdpProtocol(defaultGroupMappingId)
   }
 
   return true
