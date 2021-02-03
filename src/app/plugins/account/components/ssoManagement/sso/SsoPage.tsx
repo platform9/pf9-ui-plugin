@@ -1,8 +1,6 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import Wizard from 'core/components/wizard/Wizard'
-import WizardStep from 'core/components/wizard/WizardStep'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
@@ -15,6 +13,12 @@ import UploadSamlMetadataLink from './UploadSamlMetadataLink'
 import Button from 'core/elements/button'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import useParams from 'core/hooks/useParams'
+import SubmitButton from 'core/components/buttons/SubmitButton'
+import PicklistField from 'core/components/validatedForm/PicklistField'
+import { createSsoConfig, deleteSsoConfig, loadSsoConfig } from './actions'
+import Progress from 'core/components/progress/Progress'
+import SsoEnabledDialog from './SsoEnabledDialog'
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -54,159 +58,209 @@ const useStyles = makeStyles((theme: Theme) => ({
   copyButton: {
     marginLeft: theme.spacing(4),
   },
+  filename: {
+    marginLeft: theme.spacing(0.5),
+  },
 }))
+
+interface State {
+  enableSso: boolean
+  ssoIsEnabled: boolean
+  defaultAttributeMap: string
+  entityId: string
+  ssoProvider: string
+  metadataUrl?: string
+  metadata?: string
+  metadataFileName?: string
+}
 
 const customCodeMirrorOptions = {
   mode: 'xml',
 }
 
-const updateSsoSettings = (data) => {
+const updateSsoSettings = (data, setLoading, setDialogOpened, updateParams) => {
   const sendRequests = async () => {
     // If SSO config already exists, delete old one and create a new one
     // Otherwise just create a new one
+    // Need to do this until backend provides an update method
+    if (data.ssoIsEnabled) {
+      await deleteSsoConfig()
+    }
+
     const body = {
-      provider: data.provider,
+      provider: data.ssoProvider,
       entity_id: data.entityId,
-      metadataUrl: data.metadataUrl,
+      metadata_url: data.metadataUrl,
       metadata: data.metadataUrl ? undefined : data.metadata,
       attr_map_xml: data.defaultAttributeMap,
     }
-    console.log(body)
-    // Todo: update SSO config here
-    // Need some kind of indication that the save was successful. Maybe alter the save button to say saved and then disable it?
+    setLoading(true)
+    try {
+      await createSsoConfig(body)
+      updateParams({ ssoIsEnabled: true })
+      // Show user a dialog saying sso configuration successful
+      setDialogOpened(true)
+    } finally {
+      setLoading(false)
+    }
   }
 
   sendRequests()
 }
 
-const updateMetadataUrl = (value, setWizardContext) => {
-  // Also need to GET the url and populate the textarea
-  setWizardContext({ metadataUrl: value })
-}
-
 const SsoPage = () => {
   const classes = useStyles({})
+  const [loading, setLoading] = useState(true)
+  const [dialogOpened, setDialogOpened] = useState(false)
+  const { params, updateParams, getParamsUpdater } = useParams<State>({
+    enableSso: false,
+    ssoIsEnabled: false,
+    defaultAttributeMap: '',
+    entityId: '',
+    ssoProvider: '',
+  })
 
-  const [initialContext] = useState<any>({ enableSso: false })
+  useEffect(() => {
+    const getSettings = async () => {
+      try {
+        const {
+          attr_map_xml: defaultAttributeMap,
+          entity_id: entityId,
+          provider: ssoProvider,
+          metadata_url: metadataUrl,
+        }: any = await loadSsoConfig()
+        updateParams({
+          defaultAttributeMap,
+          entityId,
+          ssoProvider,
+          metadataUrl,
+          enableSso: true,
+          ssoIsEnabled: true,
+        })
+      } catch (err) {
+        console.log(err, 'error')
+        updateParams({ ssoIsEnabled: false })
+      }
+      setLoading(false)
+    }
+    getSettings()
+  }, [])
 
-  // Todo:
-  // Query for sso config and prepopulate it here
-  // Need a loading signal for this... wrap it in a Progress component
-  // Add a modal for verifying turning off SSO when flipping switch off when a config is present
-  // Do not use Wizard here, just use ValidatedForm by itself
+  const toggleSso = useCallback(async () => {
+    if (params.enableSso && params.ssoIsEnabled) {
+      await deleteSsoConfig()
+      updateParams({ enableSso: false, ssoIsEnabled: false })
+      return
+    }
+    updateParams({ enableSso: !params.enableSso })
+  }, [params, updateParams, deleteSsoConfig])
 
   return (
     <div className={classes.ssoPage}>
       <DocumentMeta title="SSO Management" bodyClasses={['form-view']} />
-      {initialContext && (
-        <Wizard
-          onComplete={updateSsoSettings}
-          context={initialContext}
-          submitLabel="Save"
-          showSteps={false}
-          showFinishAndReviewButton={false}
-          singleStep
-        >
-          {({ wizardContext, setWizardContext, onNext, handleNext }) => {
-            return (
-              <WizardStep stepId="step1" label="Update Cloud Provider">
-                <div>
-                  <ValidatedForm
-                    classes={{ root: classes.validatedFormContainer }}
-                    initialValues={wizardContext}
-                    elevated={false}
-                    onSubmit={handleNext}
-                  >
-                    <FormFieldCard title="Enterprise Single Sign On">
-                      <Text variant="body2">
-                        Enterprise Single Sign On supports SAML 2.0 identity integration for
-                        seamless access to your Platform9 instance.
-                      </Text>
-                      <SsoToggle
-                        checked={wizardContext.enableSso}
-                        onClick={() => setWizardContext({ enableSso: !wizardContext.enableSso })}
-                      ></SsoToggle>
-                    </FormFieldCard>
-                    {wizardContext.enableSso && (
-                      <FormFieldCard title="Configure SSO">
-                        <SsoProviderPicklist
-                          value={wizardContext.ssoProvider}
-                          onChange={(value) => setWizardContext({ ssoProvider: value })}
-                          formField
-                        ></SsoProviderPicklist>
-                        <Text variant="caption1" className={classes.wizardLabel}>
-                          Entity Endpoint for your SSO Provider
-                        </Text>
-                        <TextField
-                          id="entityId"
-                          label="Entity ID"
-                          onChange={(value) => setWizardContext({ entityId: value })}
-                          value={wizardContext.entityId}
-                          required
-                        />
-                        <Text variant="caption1" className={classes.wizardLabel}>
-                          SAML Metadata (XML) from your SSO Provider
-                        </Text>
-                        <div className={classes.field}>
-                          <TextField
-                            id="metadataUrl"
-                            label="URL"
-                            onChange={(value) => updateMetadataUrl(value, setWizardContext)}
-                            value={wizardContext.metadataUrl}
-                          />
-                          <Text variant="body2" className={classes.orLabel}>
-                            or
-                          </Text>
-                          <UploadSamlMetadataLink setWizardContext={setWizardContext} />
-                          <Text variant="body2">{wizardContext.metadataFileName}</Text>
-                        </div>
-                        <Text variant="caption1" className={classes.wizardLabel}>
-                          SSO Provider Attribute MAP in XML
-                        </Text>
-                        <Text variant="body2">
-                          Enterprise Single Sign on supports SAML 2.0 identity integration for
-                          seamless access to your Platform9 instance.
-                        </Text>
-                        <CodeMirror
-                          id="defaultAttributeMap"
-                          label="Default Attribute Map"
-                          options={customCodeMirrorOptions}
-                          onChange={(value) => setWizardContext({ defaultAttributeMap: value })}
-                          value={wizardContext.defaultAttributeMap}
-                        />
-                        <div className={classes.attributeMapButtons}>
-                          <Button
-                            className={classes.outlinedButton}
-                            onClick={() => setWizardContext({ defaultAttributeMap: '' })}
-                          >
-                            Clear XML
-                          </Button>
-                          <CopyToClipboard
-                            copyText={wizardContext.defaultAttributeMap}
-                            copyIcon={false}
-                            inline={false}
-                            triggerWithChild
-                          >
-                            {
-                              // @ts-ignore
-                              <Button>
-                                <FontAwesomeIcon size="sm" className={classes.copyIcon}>
-                                  copy
-                                </FontAwesomeIcon>
-                                Copy Attribute Map
-                              </Button>
-                            }
-                          </CopyToClipboard>
-                        </div>
-                      </FormFieldCard>
-                    )}
-                  </ValidatedForm>
-                </div>
-              </WizardStep>
-            )
-          }}
-        </Wizard>
-      )}
+      <ValidatedForm
+        classes={{ root: classes.validatedFormContainer }}
+        elevated={false}
+        formActions={<>{params.enableSso && <SubmitButton>Save</SubmitButton>}</>}
+        onSubmit={() => updateSsoSettings(params, setLoading, setDialogOpened, updateParams)}
+      >
+        <Progress loading={loading}>
+          <FormFieldCard title="Enterprise Single Sign On">
+            <Text variant="body2">
+              Enterprise Single Sign On supports SAML 2.0 identity integration for seamless access
+              to your Platform9 instance.
+            </Text>
+            <SsoToggle
+              ssoIsEnabled={params.ssoIsEnabled}
+              checked={params.enableSso}
+              onClick={toggleSso}
+            ></SsoToggle>
+          </FormFieldCard>
+          {params.enableSso && (
+            <FormFieldCard title="Configure SSO">
+              <PicklistField
+                DropdownComponent={SsoProviderPicklist}
+                id="ssoProvider"
+                label="SSO Provider"
+                onChange={getParamsUpdater('ssoProvider')}
+                value={params.ssoProvider}
+                required
+              />
+              <Text variant="caption1" className={classes.wizardLabel}>
+                Entity Endpoint for your SSO Provider
+              </Text>
+              <TextField
+                id="entityId"
+                label="Entity ID"
+                onChange={getParamsUpdater('entityId')}
+                value={params.entityId}
+                required
+              />
+              <Text variant="caption1" className={classes.wizardLabel}>
+                SAML Metadata (XML) from your SSO Provider
+              </Text>
+              <div className={classes.field}>
+                <TextField
+                  id="metadataUrl"
+                  label="URL"
+                  onChange={getParamsUpdater('metadataUrl')}
+                  value={params.metadataUrl}
+                />
+                <Text variant="body2" className={classes.orLabel}>
+                  or
+                </Text>
+                <UploadSamlMetadataLink
+                  id="metadata"
+                  onChange={getParamsUpdater('metadata')}
+                  fileNameUpdater={getParamsUpdater('metadataFileName')}
+                />
+                <Text variant="body2" className={classes.filename}>
+                  {params.metadataFileName}
+                </Text>
+              </div>
+              <Text variant="caption1" className={classes.wizardLabel}>
+                SSO Provider Attribute MAP in XML
+              </Text>
+              <Text variant="body2">
+                Enterprise Single Sign on supports SAML 2.0 identity integration for seamless access
+                to your Platform9 instance.
+              </Text>
+              <CodeMirror
+                id="defaultAttributeMap"
+                label="Default Attribute Map"
+                options={customCodeMirrorOptions}
+                onChange={getParamsUpdater('defaultAttributeMap')}
+                value={params.defaultAttributeMap}
+              />
+              <div className={classes.attributeMapButtons}>
+                <Button
+                  className={classes.outlinedButton}
+                  onClick={() => updateParams({ defaultAttributeMap: '' })}
+                >
+                  Clear XML
+                </Button>
+                <CopyToClipboard
+                  copyText={params.defaultAttributeMap}
+                  copyIcon={false}
+                  inline={false}
+                  triggerWithChild
+                >
+                  {
+                    // @ts-ignore
+                    <Button>
+                      <FontAwesomeIcon size="sm" className={classes.copyIcon}>
+                        copy
+                      </FontAwesomeIcon>
+                      Copy Attribute Map
+                    </Button>
+                  }
+                </CopyToClipboard>
+              </div>
+            </FormFieldCard>
+          )}
+        </Progress>
+        {dialogOpened && <SsoEnabledDialog onClose={() => setDialogOpened(false)} />}
+      </ValidatedForm>
     </div>
   )
 }

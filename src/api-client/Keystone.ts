@@ -166,6 +166,10 @@ class Keystone extends ApiService {
     return `${this.v3}/auth/tokens?nocatalog`
   }
 
+  get identityProvidersUrl() {
+    return `${this.v3}/OS-FEDERATION/identity_providers`
+  }
+
   get ssoLoginUrl() {
     return `${this.v3}/OS-FEDERATION/identity_providers/IDP1/protocols/saml2/auth`
   }
@@ -309,6 +313,24 @@ class Keystone extends ApiService {
     }
   }
 
+  addIdpProtocol = async (mappingId) => {
+    const body = {
+      protocol: {
+        mapping_id: mappingId,
+      },
+    }
+    // Currently hardcode IDP1 as the idp and saml2 as the protocol until change needed
+    const data = await this.client.basicPut<any>({
+      url: `${this.identityProvidersUrl}/IDP1/protocols/saml2`,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addIdpProtocol',
+      },
+    })
+    return data.protocol
+  }
+
   getGroups = async () => {
     const data = await this.client.basicGet<any>({
       url: this.groupsUrl,
@@ -399,10 +421,10 @@ class Keystone extends ApiService {
     return data.mappings
   }
 
-  createGroupMapping = async (params) => {
+  createGroupMapping = async (id, params) => {
     const body = { mapping: params }
-    const data = await this.client.basicPost<any>({
-      url: this.groupMappingsUrl,
+    const data = await this.client.basicPut<any>({
+      url: `${this.groupMappingsUrl}/${id}`,
       body,
       options: {
         clsName: this.getClassName(),
@@ -577,7 +599,7 @@ class Keystone extends ApiService {
 
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
-      return { unscopedToken, username, expiresAt, issuedAt }
+      return { unscopedToken, username, expiresAt, issuedAt, ssoLogin: true }
     } catch (err) {
       // Redirect to login page manually
       // When implementing hagrid this will be dynamic, get from API

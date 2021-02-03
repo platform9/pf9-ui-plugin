@@ -7,9 +7,12 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { useDropzone } from 'react-dropzone'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import withFormContext from 'core/components/validatedForm/withFormContext'
 
 interface Props {
-  setWizardContext: any
+  onChange: (value: any) => void
+  fileNameUpdater: (value: any) => void
+  id?: string
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -44,7 +47,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const UploadSamlMetadataLink = ({ setWizardContext }: Props) => {
+const UploadSamlMetadataLink = ({ onChange, fileNameUpdater }: Props) => {
   const classes = useStyles({})
   const [showModal, setModal] = useState(false)
 
@@ -53,14 +56,14 @@ const UploadSamlMetadataLink = ({ setWizardContext }: Props) => {
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0]
-    console.log(file, 'file')
     const reader = new FileReader()
 
     reader.onabort = () => console.log('file reading was aborted')
     reader.onerror = () => console.log('file reading has failed')
     reader.onload = () => {
       const text = reader.result
-      setWizardContext({ metadata: text, metadataFileName: file.name })
+      onChange(text)
+      fileNameUpdater(file.name)
       handleClose()
     }
     reader.readAsText(file)
@@ -98,4 +101,4 @@ const UploadSamlMetadataLink = ({ setWizardContext }: Props) => {
   )
 }
 
-export default UploadSamlMetadataLink
+export default withFormContext(UploadSamlMetadataLink) as React.FC<Props>
