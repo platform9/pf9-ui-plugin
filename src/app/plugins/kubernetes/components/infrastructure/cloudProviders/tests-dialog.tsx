@@ -26,7 +26,7 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
   checkingText: {
     color: theme.palette.blue[500],
     paddingTop: '6px',
-    ...theme.typography.body2Italicized,
+    fontStyle: 'italic',
   },
   dialogActions: {
     justifyContent: 'flex-start',
@@ -129,7 +129,11 @@ const TestsDialog = ({
           {iconsMap.get(status)?.icon}
         </FontAwesomeIcon>
         <Text>{name}</Text>
-        {status === TestStatus.Loading && <Text className={classes.checkingText}>Checking...</Text>}
+        {status === TestStatus.Loading && (
+          <Text variant="body2" className={classes.checkingText}>
+            Checking...
+          </Text>
+        )}
       </div>
     ))
     setTestElements(elements)

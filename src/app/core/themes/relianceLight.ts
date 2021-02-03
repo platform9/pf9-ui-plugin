@@ -268,15 +268,6 @@ export const typography = {
     lineHeight: 'normal',
     letterSpacing: 'normal',
   },
-  body2Italicized: {
-    fontFamily: 'Eina04',
-    fontSize: '14px',
-    fontWeight: 'normal',
-    fontStretch: 'normal',
-    fontStyle: 'italic',
-    lineHeight: 'normal',
-    letterSpacing: 'normal',
-  },
   sidenav: {
     fontFamily: 'Eina04',
     fontSize: '13px',

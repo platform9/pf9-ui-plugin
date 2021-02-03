@@ -103,7 +103,9 @@ const AddCloudProviderCredentialStep = ({
   const updateTestStatus = useCallback(
     (testIndex, status: TestStatus) => {
       const newTests = clone(tests)
-      newTests[testIndex].status = status
+      if (newTests[testIndex]) {
+        newTests[testIndex].status = status
+      }
       setTests(newTests)
     },
     [tests],
