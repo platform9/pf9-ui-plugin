@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { find, mergeLeft, pipe, prop, propEq } from 'ramda'
+import { find, mergeLeft, path, pipe, prop, propEq } from 'ramda'
 import { pipeWhenTruthy } from 'utils/fp'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import createSorter from 'core/helpers/createSorter'
@@ -25,19 +25,21 @@ export const nodesSelector = createSelector(
       pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
 
     // associate nodes with the combinedHost entry
-    return rawNodes.map((node) => {
-      const usage = calculateNodeUsages([combinedHostsObj[node.uuid]]) // expects array
-      return {
-        ...node,
-        // if hostagent is not responding, then the nodes info is outdated
-        // set the status to disconnected manually
-        status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
-        combined: combinedHostsObj[node.uuid],
-        // qbert v3 link fails authorization so we have to use v1 link for logs
-        logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
-        usage,
-      }
-    })
+    return rawNodes
+      .map((node) => {
+        const usage = calculateNodeUsages([combinedHostsObj[node.uuid]]) // expects array
+        return {
+          ...node,
+          // if hostagent is not responding, then the nodes info is outdated
+          // set the status to disconnected manually
+          status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
+          combined: combinedHostsObj[node.uuid],
+          // qbert v3 link fails authorization so we have to use v1 link for logs
+          logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
+          usage,
+        }
+      })
+      .filter((node) => path(['combined', 'cloudStack'], node) !== 'openstack')
   },
 )
 

@@ -233,7 +233,6 @@ const ResetPasswordPage: React.FC = () => {
                         className={classes.textField}
                       />
                       <TextField
-                        variant="standard"
                         required
                         id="newPassword"
                         label="New Password"
@@ -244,7 +243,6 @@ const ResetPasswordPage: React.FC = () => {
                         className={classes.textField}
                       />
                       <TextField
-                        variant="standard"
                         required
                         id="confirmPassword"
                         label="Confirm Password"
