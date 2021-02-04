@@ -11,6 +11,7 @@ import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 import Clemency from 'api-client/Clemency'
+import Hagrid from './Hagrid'
 
 import { ID } from './keystone.model'
 
@@ -48,6 +49,7 @@ class ApiClient {
   public resMgr: ResMgr
   public qbert: Qbert
   public clemency: Clemency
+  public hagrid: Hagrid
   public catalog = {}
   public activeRegion: ID = null
   unscopedToken = null
@@ -96,6 +98,7 @@ class ApiClient {
       instance.resMgr.initialize(),
       instance.qbert.initialize(),
       instance.clemency.initialize(),
+      instance.hagrid.initialize(),
     ])
   }
 
@@ -139,6 +142,7 @@ class ApiClient {
     this.resMgr = this.addApiService(new ResMgr(this))
     this.qbert = this.addApiService(new Qbert(this))
     this.clemency = this.addApiService(new Clemency(this))
+    this.hagrid = this.addApiService(new Hagrid(this))
   }
 
   addApiService = <T extends ApiService>(apiClientInstance: T) => {

@@ -6,6 +6,7 @@ import {
   forgotPasswordUrl,
   loginUrl,
   loginWithCookieUrl,
+  loginWithSsoUrl,
   resetPasswordThroughEmailUrl,
   resetPasswordUrl,
 } from 'app/constants'
@@ -64,6 +65,7 @@ const restoreSession = async (
   unscopedToken?: string
   expiresAt?: string
   issuedAt?: string
+  ssoLogin?: boolean
   // eslint-disable-next-line @typescript-eslint/require-await
 }> => {
   const { keystone } = ApiClient.getInstance()
@@ -76,6 +78,10 @@ const restoreSession = async (
     // Start from scratch to make use of prebuilt functions
     // for standard login page
     return keystone.getUnscopedTokenWithToken(scopedToken)
+  }
+
+  if (pathname === loginWithSsoUrl) {
+    return keystone.authenticateSso()
   }
 
   // Attempt to restore the session
@@ -177,10 +183,17 @@ const AppContainer = () => {
         username = session.username,
         unscopedToken,
         expiresAt,
+        ssoLogin,
       } = await restoreSession(pathname, session, history)
 
       if (unscopedToken) {
-        await setupSession({ username, unscopedToken, expiresAt, issuedAt, isSsoToken })
+        await setupSession({
+          username,
+          unscopedToken,
+          expiresAt,
+          issuedAt,
+          isSsoToken: isSsoToken || ssoLogin,
+        })
       } else {
         // Order matters
         setSessionChecked(true)
