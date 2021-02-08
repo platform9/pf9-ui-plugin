@@ -48,7 +48,7 @@ const OpenStackRcStep = (): JSX.Element => {
   const projectName = tenants.find((tenant) => tenant.id === currentTenant)?.name
   const link = regions.find((r) => r.id === region)?.links?.self
   const { username } = session
-  const keystoneLink = link.split('/regions')[0]
+  const keystoneLink = link?.split('/regions')[0]
 
   return (
     <Paper className={paper} elevation={0}>

@@ -3,6 +3,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { resMgrHostsSelector } from './selectors'
 
 const { resMgr } = ApiClient.getInstance()
 
@@ -13,6 +14,7 @@ export const loadResMgrHosts = createContextLoader(
   },
   {
     uniqueIdentifier: 'id',
+    selector: resMgrHostsSelector,
   },
 )
 
