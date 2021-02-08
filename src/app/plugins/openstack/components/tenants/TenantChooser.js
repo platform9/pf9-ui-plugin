@@ -59,7 +59,10 @@ const TenantChooser = (props) => {
       return
     }
 
-    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id, isSsoToken)
+    const { user, role, scopedToken } = await keystone.changeProjectScopeWithToken(
+      tenant.id,
+      isSsoToken,
+    )
 
     setSelectedTenantName(tenantName)
 

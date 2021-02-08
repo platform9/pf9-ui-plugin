@@ -47,6 +47,9 @@ class ValidatedForm extends PureComponent {
     if (props.triggerSubmit) {
       props.triggerSubmit(this.handleSubmit)
     }
+    if (props.fieldSetter) {
+      props.fieldSetter(this.setFieldValue)
+    }
   }
 
   /**

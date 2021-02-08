@@ -8,17 +8,121 @@ import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { useDispatch } from 'react-redux'
+import store from 'app/store'
+import moment from 'moment'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { loadUserTenants } from 'openstack/components/tenants/actions'
+import { isNilOrEmpty } from 'utils/fp'
+import { preferencesStoreKey, preferencesActions } from 'core/session/preferencesReducers'
+import { LoginMethodTypes } from './helpers'
 
-const { keystone, clemency } = ApiClient.getInstance()
+const { keystone, clemency, setActiveRegion } = ApiClient.getInstance()
 
-export const isSystemUser = ({ username }) => {
-  const { groups = {} } = originUsernameRegex.exec(window.location.origin) || {}
-  const { originUsername = null } = groups
-  const isOriginUsername = username.includes(originUsername)
-
-  const isUuid = uuidRegex.test(username)
-  return isOriginUsername || isUuid || username === 'kplane-clustmgr'
+const authMethods = {
+  [LoginMethodTypes.Local]: async (username, password, totp) =>
+    keystone.authenticate(username, password, totp),
+  [LoginMethodTypes.SSO]: async (_u, _p, _t) => keystone.authenticateSso(),
 }
+
+export const authenticateUser = async ({
+  loginUsername,
+  password,
+  loginMethod,
+  MFAcheckbox,
+  mfa,
+  reauthenticating = false,
+}) => {
+  const totp = MFAcheckbox ? mfa : ''
+  const isSsoToken = loginMethod === LoginMethodTypes.SSO
+
+  const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[loginMethod](
+    loginUsername,
+    password,
+    totp,
+  )
+
+  if (unscopedToken) {
+    const timeDiff = moment(expiresAt).diff(issuedAt)
+    const localExpiresAt = moment()
+      .add(timeDiff)
+      .format()
+
+    if (reauthenticating) {
+      store.dispatch(
+        sessionActions.updateSession({
+          username,
+          unscopedToken,
+          expiresAt: localExpiresAt,
+        }),
+      )
+    } else {
+      store.dispatch(
+        sessionActions.initSession({
+          username,
+          unscopedToken,
+          expiresAt: localExpiresAt,
+        }),
+      )
+    }
+  }
+
+  return { username, unscopedToken, expiresAt, issuedAt, isSsoToken }
+}
+
+export const updateSession = async ({
+  username,
+  unscopedToken,
+  expiresAt,
+  issuedAt,
+  isSsoToken,
+  currentTenantId,
+  password = '',
+  changeProjectScopeWithCredentials = false,
+}) => {
+  const timeDiff = moment(expiresAt).diff(issuedAt)
+  const localExpiresAt = moment()
+    .add(timeDiff)
+    .format()
+
+  let user = null
+  let scopedToken = null
+
+  if (changeProjectScopeWithCredentials) {
+    const response = await keystone.changeProjectScopeWithCredentials(
+      username,
+      password,
+      currentTenantId,
+    )
+    user = response.user
+    scopedToken = response.scopedToken
+  } else {
+    const response = await keystone.changeProjectScopeWithToken(currentTenantId, isSsoToken)
+    user = response.user
+    scopedToken = response.scopedToken
+  }
+
+  if (scopedToken) {
+    await keystone.resetCookie()
+
+    store.dispatch(
+      sessionActions.updateSession({
+        username,
+        unscopedToken,
+        scopedToken,
+        expiresAt: localExpiresAt,
+        userDetails: { ...user },
+        isSsoToken,
+      }),
+    )
+
+    return user
+  }
+
+  return null
+}
+
 export const loadCredentials = createContextLoader(
   ActionDataKeys.ManagementCredentials,
   () => {
@@ -96,13 +200,38 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     const mergedTenantIds = keys({ ...prevRoleAssignments, ...roleAssignments })
 
     // Perform the api calls to update the user and the tenant/role assignments
-    const updatedUserPromise = keystone.updateUser(userId, {
+    const updatedUser = await keystone.updateUser(userId, {
+      username,
       name: username,
       email: username,
       displayname,
       password: password || undefined,
       enabled: enabled,
     })
+
+    // If updating password of active user, reauthenticate the user
+    const state = store.getState()
+    const activeUser = state[sessionStoreKey].userDetails
+    if (userId === activeUser.id && password != undefined) {
+      const userAuthInfo = await authenticateUser({
+        loginUsername: username,
+        password,
+        loginMethod: LoginMethodTypes.Local,
+        MFAcheckbox: false,
+        mfa: '',
+        reauthenticating: true,
+      })
+
+      const currentTenantId = state[preferencesStoreKey][username].root.currentTenant
+
+      await updateSession({
+        ...userAuthInfo,
+        currentTenantId,
+        password,
+        changeProjectScopeWithCredentials: true,
+      })
+    }
+
     const updateTenantRolesPromises = mergedTenantIds.map((tenantId) => {
       const prevRoleId = prevRoleAssignments[tenantId]
       const currRoleId = roleAssignments[tenantId]
@@ -122,20 +251,17 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     }, [])
 
     // Resolve tenant and user/roles operation promises and filter out null responses
-    const [updatedUser] = await Promise.all([
-      updatedUserPromise,
-      tryCatchAsync(
-        () => Promise.all(updateTenantRolesPromises).then(reject(isNil)),
-        (err) => {
-          console.warn(err.message)
-          return emptyArr
-        },
-      )(null),
-    ])
+    await tryCatchAsync(
+      () => Promise.all(updateTenantRolesPromises).then(reject(isNil)),
+      (err) => {
+        console.warn(err.message)
+        return emptyArr
+      },
+    )(null)
+
     mngmTenantActions.invalidateCache()
     // Refresh the user/roles cache
     await mngmUserRoleAssignmentsLoader({ userId }, true)
-
     return updatedUser
   },
   entityName: 'User',
@@ -158,7 +284,7 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
   ActionDataKeys.ManagementUsersRoleAssignments,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
-    uniqueIdentifier: ['user.id', 'role.id'],
+    uniqueIdentifier: ['user.id', 'scope.project.id', 'role.id'],
     indexBy: 'userId',
   },
 )

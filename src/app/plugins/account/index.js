@@ -8,6 +8,7 @@ import MyAccountHeader from 'account/components/secondaryHeaders/MyAccountHeader
 import SsoManagementPage from 'account/components/ssoManagement/SsoManagementPage'
 import { routes } from 'core/utils/routes'
 import { AppPlugins, userAccountPrefix } from 'app/constants'
+import UserSettingsIndexPage from './components/user-settings/user-settings-index-page'
 import AddGroupPage from './components/ssoManagement/groups/AddGroupPage'
 import EditGroupPage from './components/ssoManagement/groups/EditGroupPage'
 
@@ -25,6 +26,15 @@ MyAccount.registerPlugin = (pluginManager) => {
   plugin.registerSecondaryHeader(MyAccountHeader)
 
   plugin.registerRoutes([
+    {
+      name: 'User Settings',
+      link: {
+        path: routes.userSettings.root.toString(userAccountPrefix),
+        exact: true,
+        default: true,
+      },
+      component: UserSettingsIndexPage,
+    },
     {
       name: 'Tenants & Users',
       requiredRoles: 'admin',
@@ -85,9 +95,14 @@ MyAccount.registerPlugin = (pluginManager) => {
   // These nav items are in active development but not shown in production.
   const navItems = [
     {
+      name: 'User Settings',
+      link: { path: routes.userSettings.root.toString(userAccountPrefix) },
+      icon: 'users-cog',
+    },
+    {
       name: 'Tenants & Users',
       link: { path: routes.userManagement.root.toString(userAccountPrefix) },
-      icon: 'user',
+      icon: 'users',
       requiredRoles: 'admin',
       nestedLinks: [
         {

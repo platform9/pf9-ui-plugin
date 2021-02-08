@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react'
-import ApiClient from 'api-client/ApiClient'
 import { Checkbox, FormControlLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
@@ -15,10 +14,11 @@ import moment from 'moment'
 import { connect } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
 import { MFAHelpLink } from 'k8s/links'
-import { sessionActions } from 'core/session/sessionReducers'
 import clsx from 'clsx'
 import Input from 'core/elements/input'
 import Button from 'core/elements/button'
+import { LoginMethodTypes } from 'app/plugins/account/components/userManagement/users/helpers'
+import { authenticateUser } from 'app/plugins/account/components/userManagement/users/actions'
 
 const styles = (theme) => ({
   page: {
@@ -159,19 +159,6 @@ interface Props {
   ssoEnabled: boolean
 }
 
-const { keystone } = ApiClient.getInstance()
-
-enum LoginMethodTypes {
-  Local = 'local',
-  SSO = 'sso',
-}
-
-const authMethods = {
-  [LoginMethodTypes.Local]: async (username, password, totp) =>
-    keystone.authenticate(username, password, totp),
-  [LoginMethodTypes.SSO]: async (_u, _p, _t) => keystone.authenticateSso(),
-}
-
 @(connect() as any)
 class LoginPage extends React.PureComponent<Props> {
   state = {
@@ -203,33 +190,19 @@ class LoginPage extends React.PureComponent<Props> {
     event.preventDefault()
     const { onAuthSuccess } = this.props
     const { username: loginUsername, password, loginMethod, MFAcheckbox, mfa } = this.state
-    const totp = MFAcheckbox ? mfa : ''
-
     this.setState({ loginFailed: false, loading: true })
 
-    const { unscopedToken, username, expiresAt, issuedAt } = await authMethods[loginMethod](
+    const { username, unscopedToken, expiresAt, issuedAt, isSsoToken } = await authenticateUser({
       loginUsername,
       password,
-      totp,
-    )
-    const isSsoToken = loginMethod === LoginMethodTypes.SSO
+      loginMethod,
+      MFAcheckbox,
+      mfa,
+    })
 
     if (!unscopedToken) {
       return this.setState({ loading: false, loginFailed: true })
     }
-
-    const timeDiff = moment(expiresAt).diff(issuedAt)
-    const localExpiresAt = moment()
-      .add(timeDiff)
-      .format()
-
-    this.props.dispatch(
-      sessionActions.initSession({
-        username,
-        unscopedToken,
-        expiresAt: localExpiresAt,
-      }),
-    )
 
     trackEvent('PF9 Signed In', {
       username,

@@ -57,7 +57,7 @@ describe('Keystone', () => {
       const client = await makeUnscopedClient()
       const projects = await client.keystone.getProjects()
       const projectId = projects[0].id
-      const scopedToken = await client.keystone.changeProjectScope(projectId)
+      const scopedToken = await client.keystone.changeProjectScopeWithToken(projectId)
       expect(scopedToken).toBeDefined()
       expect(client.scopedToken).toBeDefined()
       expect(client.scopedToken).toEqual(scopedToken)

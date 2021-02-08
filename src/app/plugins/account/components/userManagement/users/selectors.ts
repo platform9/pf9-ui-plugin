@@ -23,12 +23,12 @@ import {
 import { emptyObj, upsertAllBy } from 'utils/fp'
 import createSorter from 'core/helpers/createSorter'
 import { castBoolToStr } from 'utils/misc'
-import { isSystemUser } from 'account/components/userManagement/users/actions'
 import { tenantsSelector } from 'account/components/userManagement/tenants/selectors'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
 import { Tenant, TenantUser } from 'api-client/keystone.model'
 import { IUsersSelector } from './model'
+import { isSystemUser } from './helpers'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const isValidTenant = (tenant) => !reservedTenantNames.includes(tenant.name)

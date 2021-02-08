@@ -1,6 +1,6 @@
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useEffect, useState } from 'react'
 import clsx from 'clsx'
 import TenantRolesTableField from 'account/components/userManagement/users/TenantRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -24,8 +24,14 @@ import makeStyles from '@material-ui/styles/makeStyles'
 import { requiredValidator } from 'core/utils/fieldValidators'
 import Progress from 'core/components/progress/Progress'
 import { routes } from 'core/utils/routes'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
+import { useDispatch, useSelector } from 'react-redux'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { prop } from 'ramda'
+import ApiClient from 'api-client/ApiClient'
 
 const listUrl = routes.userManagement.users.path()
+const { setActiveRegion } = ApiClient.getInstance()
 
 const useStyles = makeStyles((theme) => ({
   togglableFieldContainer: {
@@ -77,15 +83,27 @@ const tenantRolesValidations = [requiredValidator.withMessage('Must select at le
 
 const EditUserPage = () => {
   const { match, history } = useReactRouter()
+  const dispatch = useDispatch()
   const userId = match.params.id
-  const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
   const user = useMemo(() => users.find(propEq('id', userId)) || emptyObj, [users, userId])
   const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
-  const [update, updating] = useDataUpdater(mngmUserActions.update, onComplete)
+  const [update, updating] = useDataUpdater(mngmUserActions.update)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
     userId,
   })
+
+  const session = useSelector(prop(sessionStoreKey))
+  const { userDetails } = session
+  const { id: activeUserId, email: activeUserEmail } = userDetails
+  const [prefs, updatePrefs] = useScopedPreferences()
+  const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
+  const [activeUserUpdated, setActiveUserUpdated] = useState(false)
+
+  const loadingSomething = loadingUsers || loadingTenants || loadingRoleAssignments || updating
+  const isActiveUser = userId === activeUserId
+  const showPasswordField = !isActiveUser
+
   const initialContext = useMemo(
     () => ({
       id: userId,
@@ -101,7 +119,39 @@ const EditUserPage = () => {
     }),
     [user, roleAssignments],
   )
-  const loadingSomething = loadingUsers || loadingTenants || loadingRoleAssignments || updating
+
+  useEffect(() => {
+    // When the active user's email gets updated, transfer their old prefs over to the new email
+    if (activeUserUpdated) {
+      updatePrefs(oldUserPrefs)
+      if (oldUserPrefs.currentRegion) {
+        setActiveRegion(oldUserPrefs.currentRegion)
+      }
+      history.push(listUrl)
+    }
+  }, [activeUserEmail])
+
+  const handleUserUpdate = async (values) => {
+    const [updated, updatedUser] = await update(values)
+    if (updated && isActiveUser) {
+      setActiveUserUpdated(true)
+      dispatch(
+        sessionActions.updateSession({
+          username: updatedUser.email,
+          userDetails: {
+            ...userDetails,
+            username: updatedUser.email,
+            name: updatedUser.email,
+            email: updatedUser.email,
+            displayName: updatedUser.displayname, // displayName is a UI variable
+            displayname: updatedUser.displayname, // displayname is what we get from the api
+          },
+        }),
+      )
+    } else {
+      history.push(listUrl)
+    }
+  }
 
   return (
     <FormWrapper
@@ -111,7 +161,7 @@ const EditUserPage = () => {
       message={updating ? 'Submitting form...' : 'Loading User...'}
       backUrl={listUrl}
     >
-      <Wizard onComplete={update} context={initialContext}>
+      <Wizard onComplete={handleUserUpdate} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => (
           <>
             <WizardStep stepId="basic" label="Basic Info">
@@ -133,13 +183,15 @@ const EditUserPage = () => {
                       label="Display Name"
                       initialValue={user.displayname}
                     />
-                    <TogglableTextField
-                      id="password"
-                      label="Password"
-                      initialValue={'********'}
-                      value={values.password}
-                      TextFieldComponent={UserPasswordField}
-                    />
+                    {showPasswordField && (
+                      <TogglableTextField
+                        id="password"
+                        label="Password"
+                        initialValue={'********'}
+                        value={values.password}
+                        TextFieldComponent={UserPasswordField}
+                      />
+                    )}
                   </>
                 )}
               </ValidatedForm>

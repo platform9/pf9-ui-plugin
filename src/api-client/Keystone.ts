@@ -72,6 +72,28 @@ const constructAuthFromCredentials = (username, password) => {
   }
 }
 
+const constructAuthFromCredentialsWithProjectId = (username, password, projectId) => {
+  return {
+    auth: {
+      identity: {
+        methods: ['password'],
+        password: {
+          user: {
+            name: username,
+            domain: { id: 'default' },
+            password,
+          },
+        },
+      },
+      scope: {
+        project: {
+          id: projectId,
+        },
+      },
+    },
+  }
+}
+
 const constructAuthFromCredentialsTotp = (username, password, totp) => {
   return {
     auth: {
@@ -516,17 +538,26 @@ class Keystone extends ApiService {
     }
   }
 
-  changeProjectScope = async (projectId, isSsoToken) => {
+  changeProjectScopeWithToken = async (projectId, isSsoToken) => {
     const body = isSsoToken
       ? constructAuthFromSaml(this.client.unscopedToken, projectId)
       : constructAuthFromToken(this.client.unscopedToken, projectId)
+    return this.changeProjectScope(projectId, body, 'changeProjectScopeWithToken')
+  }
+
+  changeProjectScopeWithCredentials = async (username, password, projectId) => {
+    const body = constructAuthFromCredentialsWithProjectId(username, password, projectId)
+    return this.changeProjectScope(projectId, body, 'changeProjectScopeWithCredentials')
+  }
+
+  changeProjectScope = async (projectId, body, mthdName) => {
     try {
       const response = await this.client.rawPost<AuthToken>({
         url: this.tokensUrl,
         data: body,
         options: {
           clsName: this.getClassName(),
-          mthdName: 'changeProjectScope',
+          mthdName,
         },
       })
       const scopedToken = response.headers['x-subject-token']
