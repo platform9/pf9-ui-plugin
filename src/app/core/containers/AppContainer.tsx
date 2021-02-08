@@ -31,14 +31,14 @@ import {
   createSegmentScript,
   trackPage,
 } from 'utils/tracking'
-import moment from 'moment'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import axios from 'axios'
 import { updateClarityStore } from 'utils/clarityHelper'
 import { DocumentMeta } from 'core/components/DocumentMeta'
+import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 
-const { keystone, setActiveRegion } = ApiClient.getInstance()
+const { setActiveRegion } = ApiClient.getInstance()
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -87,10 +87,7 @@ const restoreSession = async (
   return {}
 }
 
-const getUserDetails = async (activeTenant, isSsoToken) => {
-  const { user, scopedToken } = await keystone.changeProjectScope(activeTenant.id, isSsoToken)
-  await keystone.resetCookie()
-
+const getUserDetails = async (user) => {
   // Need this here again bc not able to use AppContainer state and ensure
   // that sandbox state would be set on time for both users logging in for
   // first time and for users who are already logged in
@@ -106,11 +103,6 @@ const getUserDetails = async (activeTenant, isSsoToken) => {
         email: user.email,
       })
     }
-  }
-
-  return {
-    userDetails: user,
-    scopedToken,
   }
 }
 
@@ -213,17 +205,11 @@ const AppContainer = () => {
   }, [])
 
   const setupSession = async ({ username, unscopedToken, expiresAt, issuedAt, isSsoToken }) => {
-    const timeDiff = moment(expiresAt).diff(issuedAt)
-    const localExpiresAt = moment()
-      .add(timeDiff)
-      .format()
-
     const { currentTenant, currentRegion } = getUserPrefs(username)
     const tenants = await loadUserTenants()
     if (isNilOrEmpty(tenants)) {
       throw new Error('No tenants found, please contact support')
     }
-
     const activeTenant =
       tenants.find(propEq('id', currentTenant)) ||
       tenants.find(propEq('name', 'service')) ||
@@ -231,23 +217,25 @@ const AppContainer = () => {
     if (!currentTenant && activeTenant) {
       updateClarityStore('tenantObj', activeTenant)
     }
+    const activeTenantId = activeTenant.id
+
     if (currentRegion) {
       setActiveRegion(currentRegion)
     }
-    const { scopedToken, userDetails } = await getUserDetails(activeTenant, isSsoToken)
 
     // Order matters
+    const user = await updateSession({
+      username,
+      unscopedToken,
+      expiresAt,
+      issuedAt,
+      isSsoToken,
+      currentTenantId: activeTenantId,
+    })
     setSessionChecked(true)
-    dispatch(
-      sessionActions.updateSession({
-        username,
-        unscopedToken,
-        scopedToken,
-        expiresAt: localExpiresAt,
-        userDetails,
-        isSsoToken,
-      }),
-    )
+    if (user) {
+      await getUserDetails(user)
+    }
   }
 
   const authContent =

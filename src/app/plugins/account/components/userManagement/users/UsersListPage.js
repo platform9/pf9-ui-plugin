@@ -1,4 +1,3 @@
-import { isSystemUser } from 'account/components/userManagement/users/actions'
 import SystemUsersToggle from 'account/components/userManagement/users/SystemUsersToggle'
 import { listTablePrefs } from 'app/constants'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
@@ -11,6 +10,7 @@ import { join, pick, pipe, pluck, prop } from 'ramda'
 import React, { useMemo } from 'react'
 import { arrayIfNil } from 'utils/fp'
 import { mngmUserActions } from './actions'
+import { isSystemUser } from './helpers'
 import EnableDisableUserDialog from './enable-disable-user-dialog'
 
 const defaultParams = { systemUsers: true }

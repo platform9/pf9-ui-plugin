@@ -7,8 +7,8 @@ import { FormControl, FormHelperText } from '@material-ui/core'
 import ListTable from 'core/components/listTable/ListTable'
 import { makeStyles } from '@material-ui/styles'
 import SystemUsersToggle from 'account/components/userManagement/users/SystemUsersToggle'
-import { isSystemUser } from 'account/components/userManagement/users/actions'
 import useToggler from 'core/hooks/useToggler'
+import { isSystemUser } from '../users/helpers'
 
 const useStyles = makeStyles((theme) => ({
   rolesPicklist: {
