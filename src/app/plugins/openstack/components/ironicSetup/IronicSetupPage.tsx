@@ -132,10 +132,14 @@ const nodeAuthorized = async (hosts) => {
     }
   }
 
+  // Ironic controller not fully configured yet
+  const onboardedHost = hosts.find((host) => host.roles.includes('pf9-onboarding'))
   return {
     finished: false,
     step: 3,
-    data: {},
+    data: {
+      selectedHost: [onboardedHost],
+    },
   }
 }
 
@@ -277,11 +281,15 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
   )
 }
 
+const isFalse = (x) => x === false
+
 const IronicSetupPage = () => {
-  const [networks, networksLoading] = useDataLoader(networkActions.list)
-  const [subnets, subnetsLoading] = useDataLoader(subnetActions.list)
-  const [hosts, hostsLoading]: IUseDataLoader<Host> = useDataLoader(loadResMgrHosts) as any
-  const [images, imagesLoading] = useDataLoader(loadImages)
+  const [networks, networksLoading, reloadNetworks] = useDataLoader(networkActions.list)
+  const [subnets, subnetsLoading, reloadSubnets] = useDataLoader(subnetActions.list)
+  const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<Host> = useDataLoader(
+    loadResMgrHosts,
+  ) as any
+  const [images, imagesLoading, reloadImages] = useDataLoader(loadImages)
   const [startingStep, setStartingStep] = useState(0)
   const [loading, setLoading] = useState(true)
   const [submittingStep, setSubmittingStep] = useState(false)
@@ -290,10 +298,23 @@ const IronicSetupPage = () => {
     hostImages: true,
   })
 
+  useEffect(() => {
+    // workaround for UX-816 (useDataLoader hook returning loading undefined)
+    reloadNetworks()
+    reloadSubnets()
+    reloadHosts()
+    reloadImages()
+  }, [])
+
   // Determine current step
   useEffect(() => {
     const determineStep = async () => {
-      if (!networksLoading && !hostsLoading && !subnetsLoading && !imagesLoading) {
+      if (
+        isFalse(networksLoading) &&
+        isFalse(hostsLoading) &&
+        isFalse(subnetsLoading) &&
+        isFalse(imagesLoading)
+      ) {
         const netConfig = await networkConfigured(networks)
         if (!netConfig.finished) {
           setStartingStep(netConfig.step)
