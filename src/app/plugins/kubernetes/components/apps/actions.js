@@ -33,26 +33,27 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import { tryCatchAsync, someAsync, flatMapAsync, pipeAsync, mapAsync } from 'utils/async'
 import { ActionDataKeys } from 'k8s/DataKeys'
 
-const { qbert } = ApiClient.getInstance()
+const { qbert, helm } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'id'
 
-export const appDetailLoader = createContextLoader(
+export const appDetailsLoader = createContextLoader(
   ActionDataKeys.AppDetails,
-  async ({ clusterId, id, release, version }) => {
-    const chart = await qbert.getChart(clusterId, id, release, version)
-    const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
-    const icon = pathStr('attributes.icons.0.path', chart)
+  async ({ repository, name, infoType = 'all', versions = true }) => {
+    const chart = await helm.getChartInfo(repository, name, {
+      info_type: infoType,
+      versions,
+    })
     return {
       ...chart,
-      logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
-      readmeMarkdown: await qbert.getChartReadmeContents(clusterId, chart.attributes.readme),
+      name,
+      repository,
     }
   },
   {
-    uniqueIdentifier: ['id', 'clusterId'],
-    indexBy: ['clusterId', 'id', 'release', 'version'],
-    selectorCreator: makeAppDetailsSelector,
+    entityName: 'App Detail',
+    uniqueIdentifier: ['name', 'repository'],
+    indexBy: ['repository', 'name'],
   },
 )
 
@@ -81,44 +82,28 @@ export const appVersionLoader = createContextLoader(
   },
 )
 
-export const appActions = createCRUDActions(ActionDataKeys.Apps, {
-  listFn: async (params) => {
-    const [clusterId, clusters] = await parseClusterParams(params)
-    const apps =
-      clusterId === allKey
-        ? await someAsync(pluck('uuid', clusters).map(qbert.getCharts)).then(flatten)
-        : await qbert.getCharts(clusterId)
+const parseRepoName = (name) => name.match(/^(\w||-)+/)[0]
 
-    return mapAsync(async (chart) => {
-      const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
-      const icon = pathStr('attributes.icons.0.path', chart)
+export const appActions = createCRUDActions(ActionDataKeys.Apps, {
+  listFn: async () => {
+    const apps = await helm.getCharts()
+    return apps.map((app) => {
       return {
-        ...chart,
-        logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
-        readmeMarkdown: await qbert.getChartReadmeContents(clusterId, chart.attributes.readme),
+        id: app.Name,
+        repository: parseRepoName(app.Name),
+        Score: app.Score,
+        ...app.Chart,
       }
-    }, apps)
+    })
   },
   customOperations: {
-    deploy: async ({ clusterId, ...body }) => {
-      await qbert.deployApplication(clusterId, body)
-      // Force a refetch of the deployed apps list
-      releaseActions.invalidateCache()
+    deploy: async ({ clusterId, namespace, body }) => {
+      console.log(clusterId, namespace)
+      helm.deployChart(clusterId, namespace, body)
     },
   },
-  errorMessage: (prevItems, { releaseName }, catchedError, operation) =>
-    objSwitchCase({
-      deploy: `Error when deploying App ${releaseName}`,
-    })(operation),
-  successMessage: (updatedItems, prevItems, { name }, operation) =>
-    objSwitchCase({
-      deploy: `Successfully deployed App ${name}`,
-    })(operation),
+  uniqueIdentifier: 'id',
   entityName: 'App Catalog',
-  uniqueIdentifier: ['id', 'clusterId'],
-  indexBy: 'clusterId',
-  defaultOrderBy: 'name',
-  selectorCreator: makeAppsSelector,
 })
 
 export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
@@ -164,113 +149,3 @@ const reposWithClustersLoader = createContextLoader(
     entityName: 'Repository with Clusters',
   },
 )
-
-const getRepoName = (id, repos) =>
-  id ? pipe(find(propEq(uniqueIdentifier, id)), propOr(id, 'name'))(repos) : ''
-
-export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, {
-  listFn: async () => {
-    return qbert.getRepositories()
-  },
-  createFn: async ({ clusters, ...data }) => {
-    const result = await qbert.createRepository(data)
-
-    const addResults = await tryCatchAsync(
-      () =>
-        flatMapAsync((clusterId) => qbert.createRepositoryForCluster(clusterId, data), clusters),
-      F,
-    )(null)
-
-    if (!addResults) {
-      // TODO: figure out a way to show toast notifications with non-blocking errors
-      console.warn('Error when trying to add repo to cluster')
-    }
-    return result
-  },
-  deleteFn: async ({ id }) => {
-    await qbert.deleteRepository(id)
-  },
-  customOperations: {
-    updateRepoClusters: async ({ id, clusters }, prevItems) => {
-      const repository = find(propEq(uniqueIdentifier, id), prevItems)
-      const prevSelectedClusters = pluck('clusterId', repository.clusters)
-      const body = {
-        name: repository.name,
-        URL: repository.url,
-        source: repository.source,
-      }
-      const itemsToRemove = filter((clusterId) => {
-        return !clusters.includes(clusterId)
-      }, prevSelectedClusters)
-      const itemsToAdd = filter((clusterId) => {
-        return !prevSelectedClusters.includes(clusterId)
-      }, clusters)
-
-      // Invalidate the Repositories with Clusters cache so that we force a refetch of the data
-      reposWithClustersLoader.invalidateCache()
-
-      // Perfom the update operations, return FALSE if there has been any error
-      const deleteResults = await tryCatchAsync(
-        () =>
-          flatMapAsync(
-            (clusterId) => qbert.deleteRepositoriesForCluster(clusterId, id),
-            itemsToRemove,
-          ),
-        F,
-      )(null)
-      const addResults = await tryCatchAsync(
-        () =>
-          flatMapAsync(
-            (clusterId) => qbert.createRepositoryForCluster(clusterId, body),
-            itemsToAdd,
-          ),
-        F,
-      )(null)
-
-      // Check if there has been any errors
-      if (!deleteResults && !addResults) {
-        throw new Error(updateError)
-      }
-      if (!deleteResults) {
-        throw new Error(deleteError)
-      }
-      if (!addResults) {
-        throw new Error(addError)
-      }
-    },
-  },
-  entityName: 'Repository',
-  uniqueIdentifier,
-  refetchCascade: true,
-  successMessage: (updatedItems, prevItems, { id, name }, operation) =>
-    objSwitchCase({
-      create: `Successfully created Repository ${name}`,
-      delete: `Successfully deleted Repository ${getRepoName(id, prevItems)}`,
-      updateRepoClusters: `Successfully edited cluster access for repository ${getRepoName(
-        id,
-        prevItems,
-      )}`,
-    })(operation),
-  errorMessage: (prevItems, { id, name }, catchedErr, operation) =>
-    objSwitchCase({
-      create: objSwitchCase(
-        {
-          [addError]: `Repository ${name} could not be added to cluster `,
-        },
-        `Error when trying to create a ${name} repository`,
-      )(catchedErr.message),
-      delete: `Error when trying to delete Repository ${getRepoName(id, prevItems)}`,
-      updateRepoClusters: objSwitchCase(
-        {
-          [deleteError]: `Repository ${getRepoName(
-            id,
-            prevItems,
-          )} could not be removed from cluster `,
-          [addError]: `Repository ${getRepoName(id, prevItems)} could not be added to cluster `,
-        },
-        `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`,
-      )(catchedErr.message),
-    })(operation),
-  defaultOrderBy: 'name',
-  selector: repositoriesSelector,
-})

@@ -9,7 +9,7 @@ import ScaleMastersPage from './components/infrastructure/clusters/ScaleMastersP
 import ScaleWorkersPage from './components/infrastructure/clusters/ScaleWorkersPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
-import AppsIndexPage from './components/apps/AppsIndexPage'
+import AppsIndexPage from './components/apps/apps-index-page'
 import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
 import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
@@ -19,7 +19,6 @@ import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
 import StorageClassesAddPage from './components/storage/AddStorageClassPage'
-import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
 import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitoringPage'
 import UpdatePrometheusInstancePage from './components/prometheus/UpdatePrometheusInstancePage'
@@ -46,6 +45,9 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
 import OnboardNewNodePage from './components/infrastructure/nodes/onboard-new-node-page'
+import AddRepoPage from './components/repositories/add-repo-page'
+import DeployAppPage from './components/apps/deploy-app-page'
+import EditRepoPage from './components/repositories/edit-repo-page'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -149,14 +151,29 @@ Kubernetes.registerPlugin = (pluginManager) => {
       component: AppsIndexPage,
     },
     {
+      name: 'Deploy App',
+      link: { path: '/apps/deploy/:repository/:name' },
+      component: DeployAppPage,
+    },
+    {
       name: 'Deployed App Details',
       link: { path: '/apps/deployed/:clusterId/:release', exact: true },
       component: DeployedAppDetailsPage,
     },
+    // {
+    //   name: 'App Details',
+    //   link: { path: '/apps/:clusterId/:release/:id', exact: true },
+    //   component: AppDetailsPage,
+    // },
     {
-      name: 'App Details',
-      link: { path: '/apps/:clusterId/:release/:id', exact: true },
-      component: AppDetailsPage,
+      name: 'Add Repository',
+      link: { path: '/apps/repositories/add', exact: true },
+      component: AddRepoPage,
+    },
+    {
+      name: 'Edit Repository',
+      link: { path: '/apps/repositories/edit/:id' },
+      component: EditRepoPage,
     },
     {
       name: 'Workloads',
@@ -341,17 +358,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
         },
       ],
     },
-    // TODO: enable this when backend side is implemented
-    // {
-    //   name: 'App Catalog',
-    //   ...clarityLink('/kubernetes/apps'),
-    //   icon: 'th',
-    //   nestedLinks: [
-    //     { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
-    //     { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
-    //     { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
-    //   ],
-    // },
     {
       name: 'Workloads',
       ...clarityLink('/podsK8s'),
@@ -364,6 +370,16 @@ Kubernetes.registerPlugin = (pluginManager) => {
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
+    {
+      name: 'Apps',
+      ...clarityLink('/kubernetes/apps'),
+      icon: 'th',
+      nestedLinks: [
+        { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
+        // { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
+        { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
+      ],
+    },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
     { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
@@ -390,17 +406,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
         },
       ],
     },
-    // TODO: enable this when backend side is implemented
-    // {
-    //   name: 'App Catalog',
-    //   link: { path: '/apps' },
-    //   icon: 'th',
-    //   nestedLinks: [
-    //     { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
-    //     { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
-    //     { name: 'Repositories', link: { path: '/apps#repositories' } },
-    //   ],
-    // },
     {
       name: 'Workloads',
       link: { path: '/workloads' },
@@ -413,6 +418,19 @@ Kubernetes.registerPlugin = (pluginManager) => {
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
+    {
+      name: 'Apps',
+      link: { path: '/apps' },
+      icon: 'th',
+      nestedLinks: [
+        { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
+        // { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
+        {
+          name: 'Repositories',
+          link: { path: '/apps#repositories', requiredRoles: ['admin', '_member_'] },
+        },
+      ],
+    },
     // TODO: Disabled till all CRUD operations are implemented
     // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
     // { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },

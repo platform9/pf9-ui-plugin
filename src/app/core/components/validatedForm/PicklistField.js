@@ -62,6 +62,7 @@ const PicklistField = React.forwardRef(
         value={value !== undefined ? value : ''}
         error={hasError}
         helperText={errorMessage}
+        showNone={showNone}
       />
     )
   },
@@ -70,7 +71,7 @@ const PicklistField = React.forwardRef(
 PicklistField.defaultProps = {
   validations: [],
   DropdownComponent: Picklist,
-  showNone: true,
+  showNone: false,
   showAll: false,
 }
 

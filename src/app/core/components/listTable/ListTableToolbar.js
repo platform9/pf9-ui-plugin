@@ -11,6 +11,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Picklist from 'core/components/Picklist'
 import { emptyArr } from 'utils/fp'
 import { both, T } from 'ramda'
+import RefreshButton from '../buttons/refresh-button'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -120,23 +121,6 @@ const ListTableToolbar = ({
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
-  const reloadButton = useMemo(
-    () =>
-      onReload && (
-        <Tooltip title="Refresh list">
-          <FontAwesomeIcon
-            className={classes.button}
-            solid
-            size="lg"
-            aria-label="Refresh list"
-            onClick={onReload}
-          >
-            sync
-          </FontAwesomeIcon>
-        </Tooltip>
-      ),
-    [onReload],
-  )
 
   const allActions = useMemo(
     () => [
@@ -213,7 +197,7 @@ const ListTableToolbar = ({
               </Button>
             </Tooltip>
           )}
-          {reloadButton}
+          {onReload && <RefreshButton onRefresh={onReload} />}
         </Toolbar>
       </div>
     </Toolbar>

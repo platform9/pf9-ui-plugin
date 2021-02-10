@@ -56,7 +56,7 @@ export const ToolbarActionIcon = ({ icon }) => {
   )
 }
 
-const ListTableAction = withRouter(
+export const ListTableAction = withRouter(
   ({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh, routeTo, history }) => {
     const { root, actionLabel, disabledAction } = useStyles()
     const [dialogOpened, setDialogOpened] = useState(false)

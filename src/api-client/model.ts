@@ -37,6 +37,16 @@ export interface IBasicRequestPostParams {
   options: IRequestOptions
 }
 
+export interface IBasicRequestDeleteParams {
+  url: string
+  version?: string
+  params?: AxiosRequestConfig['params']
+  endpoint?: string
+  config?: AxiosRequestConfig
+  options: IRequestOptions
+  data?: any
+}
+
 // import { AxiosResponse, AxiosRequestConfig } from 'axios'
 
 // type AxiosGetRequest = <T>(

@@ -634,9 +634,8 @@ class Qbert extends ApiService {
     })
   }
 
-  /* Monocular endpoints being exposed through Qbert */
   getCharts = async (clusterId) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/charts`
+    const url = `/clusters/${clusterId}/repos/charts`
     const response = await this.client.basicGet({
       url,
       options: {
@@ -644,46 +643,72 @@ class Qbert extends ApiService {
         mthdName: 'getCharts',
       },
     })
+    console.log('response', response)
     return normalizeResponse(response)
   }
 
-  getChart = async (clusterId, chart, release, version) => {
-    const versionStr = version ? `versions/${version}` : ''
-    const url = `${await this.clusterMonocularBaseUrl(
-      clusterId,
-    )}/charts/${release}/${chart}/${versionStr}`
-    return this.client.basicGet({
+  getChartInfo = async (name) => {
+    const url = '/charts/info'
+    const response = await this.client.basicGet({
       url,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'getChart',
+        mthdName: 'getChartInfo',
       },
     })
+    return response
   }
 
-  getChartReadmeContents = async (clusterId, readmeUrl) => {
-    const url = pathJoin(await this.clusterMonocularBaseUrl(clusterId, null), readmeUrl)
-    return this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getChartReadmeContents',
-      },
-    })
-  }
+  /* Monocular endpoints being exposed through Qbert */
+  // getCharts = async (clusterId) => {
+  //   const url = `${await this.clusterMonocularBaseUrl(clusterId)}/charts`
+  //   const response = await this.client.basicGet({
+  //     url,
+  //     options: {
+  //       clsName: this.getClassName(),
+  //       mthdName: 'getCharts',
+  //     },
+  //   })
+  //   return normalizeResponse(response)
+  // }
 
-  getChartVersions = async (clusterId, chart, release) => {
-    const url = `${await this.clusterMonocularBaseUrl(
-      clusterId,
-    )}/charts/${release}/${chart}/versions`
-    return this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getChartVersions',
-      },
-    })
-  }
+  // getChart = async (clusterId, chart, release, version) => {
+  //   const versionStr = version ? `versions/${version}` : ''
+  //   const url = `${await this.clusterMonocularBaseUrl(
+  //     clusterId,
+  //   )}/charts/${release}/${chart}/${versionStr}`
+  //   return this.client.basicGet({
+  //     url,
+  //     options: {
+  //       clsName: this.getClassName(),
+  //       mthdName: 'getChart',
+  //     },
+  //   })
+  // }
+
+  // getChartReadmeContents = async (clusterId, readmeUrl) => {
+  //   const url = pathJoin(await this.clusterMonocularBaseUrl(clusterId, null), readmeUrl)
+  //   return this.client.basicGet({
+  //     url,
+  //     options: {
+  //       clsName: this.getClassName(),
+  //       mthdName: 'getChartReadmeContents',
+  //     },
+  //   })
+  // }
+
+  // getChartVersions = async (clusterId, chart, release) => {
+  //   const url = `${await this.clusterMonocularBaseUrl(
+  //     clusterId,
+  //   )}/charts/${release}/${chart}/versions`
+  //   return this.client.basicGet({
+  //     url,
+  //     options: {
+  //       clsName: this.getClassName(),
+  //       mthdName: 'getChartVersions',
+  //     },
+  //   })
+  // }
 
   getReleases = async (clusterId) => {
     const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
@@ -720,8 +745,8 @@ class Qbert extends ApiService {
     })
   }
 
-  deployApplication = async (clusterId, body) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
+  deployApplication = async (clusterId, namespace, body) => {
+    const url = `/clusters/${clusterId}/namespaces/${namespace}/releases`
     return this.client.basicPost({
       url,
       body,
@@ -732,73 +757,17 @@ class Qbert extends ApiService {
     })
   }
 
-  getRepositories = async () => {
-    const url = `${await this.monocularBaseUrl()}/repos`
-    return this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getRepositories',
-      },
-    })
-  }
-
-  getRepositoriesForCluster = async (clusterId) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/repos`
-    return this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getRepositoriesForCluster',
-      },
-    })
-  }
-
-  createRepository = async (body) => {
-    const url = `${await this.monocularBaseUrl()}/repos`
-    return this.client.basicPost({
-      url,
-      body,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'createRepository',
-      },
-    })
-  }
-
-  createRepositoryForCluster = async (clusterId, body) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/repos`
-    return this.client.basicPost({
-      url,
-      body,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'createRepositoryForCluster',
-      },
-    })
-  }
-
-  deleteRepository = async (repoId) => {
-    const url = `${await this.monocularBaseUrl()}/repos/${repoId}`
-    return this.client.basicDelete({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'deleteRepository',
-      },
-    })
-  }
-
-  deleteRepositoriesForCluster = async (clusterId, repoId) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/repos/${repoId}`
-    return this.client.basicDelete({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'deleteRepositoriesForCluster',
-      },
-    })
-  }
+  // deployApplication = async (clusterId, body) => {
+  //   const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
+  //   return this.client.basicPost({
+  //     url,
+  //     body,
+  //     options: {
+  //       clsName: this.getClassName(),
+  //       mthdName: 'deployApplication',
+  //     },
+  //   })
+  // }
 
   getServiceAccounts = async (clusterId, namespace) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`

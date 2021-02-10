@@ -18,6 +18,7 @@ import {
   find,
   when,
   isNil,
+  dissocPath,
 } from 'ramda'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -173,9 +174,9 @@ const reducers = {
     const cacheKey = action?.payload?.cacheKey
     return cacheKey
       ? pipe<CacheState, CacheState, CacheState, CacheState>(
-          assocPath([dataStoreKey, cacheKey], emptyArr),
-          assocPath([paramsStoreKey, cacheKey], emptyArr),
-          assocPath([loadingStoreKey, cacheKey], emptyArr),
+          dissocPath([dataStoreKey, cacheKey]),
+          dissocPath([paramsStoreKey, cacheKey]),
+          dissocPath([loadingStoreKey, cacheKey]),
         )(state)
       : initialState
   },

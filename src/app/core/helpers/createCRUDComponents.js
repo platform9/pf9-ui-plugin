@@ -65,6 +65,7 @@ const createCRUDComponents = (options) => {
     compactTable,
     blankFirstColumn,
     onSelect,
+    extraToolbarContent,
   } = options
 
   // List
@@ -122,6 +123,7 @@ const createCRUDComponents = (options) => {
         onSortChange={getParamsUpdater('orderBy', 'orderDirection')}
         onRowsPerPageChange={getParamsUpdater('rowsPerPage')}
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
+        extraToolbarContent={extraToolbarContent}
       />
     )
   }

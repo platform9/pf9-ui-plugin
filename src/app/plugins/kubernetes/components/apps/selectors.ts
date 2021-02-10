@@ -11,23 +11,24 @@ const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
 export const appDetailsSelector = createSelector(
   [
-    getDataSelector<DataKeys.AppDetails>(DataKeys.AppDetails, [
-      'clusterId',
-      'id',
-      'release',
-      'version',
-    ]),
+    // getDataSelector<DataKeys.AppDetails>(DataKeys.AppDetails, [
+    //   'clusterId',
+    //   'id',
+    //   'release',
+    //   'version',
+    // ]),
+    getDataSelector<DataKeys.AppDetails>(DataKeys.AppDetails),
   ],
   (items) => {
-    return map(({ id, ...item }) => {
-      const chartId = id.substring(0, id.indexOf(':')) // Remove the version from the ID
+    return map(({ item }) => {
+      // const chartId = id.substring(0, id.indexOf(':')) // Remove the version from the ID
       return {
         ...item,
-        id: chartId,
-        name: chartId.substring(`${chartId.indexOf('/').toString()} 1`),
-        home: pathStr('relationships.chart.data.home', item),
-        sources: pathStr('relationships.chart.data.sources', item),
-        maintainers: pathStr('relationships.chart.data.maintainers', item),
+        // id: chartId,
+        // name: chartId.substring(`${chartId.indexOf('/').toString()} 1`),
+        // home: pathStr('relationships.chart.data.home', item),
+        // sources: pathStr('relationships.chart.data.sources', item),
+        // maintainers: pathStr('relationships.chart.data.maintainers', item),
       }
     })(items)
   },

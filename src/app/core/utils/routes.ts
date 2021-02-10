@@ -333,6 +333,13 @@ export const routes = {
         plugin: AppPlugins.Kubernetes,
       },
     }),
+    deploy: Route.register({
+      url: `${pluginRoutePrefix}/apps/deploy/:repository/:name`,
+      name: 'Apps:Deploy',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
     detail: Route.register({
       url: `${pluginRoutePrefix}/apps/:clusterId/:release/:id`,
       defaultParams: {
@@ -346,6 +353,29 @@ export const routes = {
         plugin: AppPlugins.Kubernetes,
       },
       name: 'Apps:Deployed',
+    }),
+  },
+  repositories: {
+    list: Route.register({
+      url: `${pluginRoutePrefix}/apps#repositories`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Repositories:List',
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/apps/repositories/add`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Repositories:Add',
+    }),
+    edit: Route.register({
+      url: `${pluginRoutePrefix}/apps/repositories/edit/:id`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Repositories:Edit',
     }),
   },
   pods: {
