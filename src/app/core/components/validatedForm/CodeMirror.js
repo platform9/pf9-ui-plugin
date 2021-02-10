@@ -10,7 +10,6 @@ import withFormContext, {
 import { compose } from 'app/utils/fp'
 import InfoTooltip from 'app/core/components/InfoTooltip'
 import { Controlled as BaseCodeMirror } from 'react-codemirror2'
-import 'codemirror/addon/display/autorefresh'
 import './codemirror.css'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
@@ -24,7 +23,6 @@ const defaultOptions = {
   mode: 'yaml',
   theme: 'default',
   autoRefresh: true,
-  delay: 1000,
   extraKeys: {
     Tab: (cm) => {
       const spaces = Array(cm.getOption('indentUnit') + 1).join(' ')

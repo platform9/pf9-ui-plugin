@@ -101,10 +101,9 @@ const appListPageUrl = routes.apps.list.path()
 const wizardMetaFormattedNames = {
   version: 'Latest Version',
   repository: 'Repository',
-  info: 'Info',
 }
 
-const wizardMetaCalloutFields = ['version', 'repository', 'info']
+const wizardMetaCalloutFields = ['version', 'repository']
 
 const AppIcon = ({ appName, logoUrl }) => {
   const classes = useStyles()

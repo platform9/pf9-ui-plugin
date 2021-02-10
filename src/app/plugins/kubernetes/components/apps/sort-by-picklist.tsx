@@ -3,6 +3,7 @@ import PicklistDefault from 'core/components/Picklist'
 import { head, propOr } from 'ramda'
 import { allKey } from 'app/constants'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
+
 interface Props {
   options: any
   value: string

@@ -115,6 +115,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     async (params = emptyObj, refetch = contextLoaderFn[invalidateCacheSymbol]) => {
       const { dispatch } = store
       const invalidateCache = contextLoaderFn[invalidateCacheSymbol]
+
       // Get the required values from the provided params
       const providedRequiredParams = pipe(pick(allRequiredParams), reject(isNil))(params)
       // If not all the required params are provided, skip this request and just return an empty array

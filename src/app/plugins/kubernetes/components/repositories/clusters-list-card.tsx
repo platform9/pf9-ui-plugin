@@ -4,7 +4,6 @@ import Theme from 'core/themes/model'
 import React, { useState } from 'react'
 import Text from 'core/elements/text'
 import ClustersMultiSelect from './clusters-multi-select'
-// import { requiredValidator } from 'core/utils/fieldValidators'
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -37,8 +36,6 @@ interface Props {
   wizardContext: any
   setWizardContext: any
 }
-
-// const clusterValidation = [requiredValidator.withMessage('Must select at least one cluster')]
 
 const ClustersListCard = ({ title, wizardContext, setWizardContext }: Props) => {
   const classes = useStyles()

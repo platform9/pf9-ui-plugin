@@ -14,7 +14,6 @@ const { dispatch } = store
 export const repositoriesForClusterLoader = createContextLoader(
   DataKeys.RepositoriesForCluster,
   async ({ clusterId }) => {
-    console.log('clusterid', clusterId)
     if (clusterId !== allKey) {
       const repos: any = await helm.getRepositoriesForCluster(clusterId)
       return repos.map((repo) => ({ ...repo, clusterId }))
@@ -46,9 +45,10 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
       password: password || undefined,
     }
     const result = await helm.createRepository(body)
-    // Refresh the list of apps
+
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.Apps }))
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
+
     return result
   },
   updateFn: async ({ name, url, username, password }) => {
@@ -62,7 +62,7 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
   },
   deleteFn: async ({ name }) => {
     await helm.deleteRepository(name)
-    // Refresh the list of apps
+
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.Apps }))
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
   },
@@ -75,7 +75,9 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
     addRepoToClusters: async ({ repoName, clusterIds }, currentItems) => {
       const body = clusterIds.map((id) => ({ cluster_uuid: id }))
       await helm.addRepoToClusters(repoName, body)
+
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
+
       return currentItems.map((repo) =>
         repo.name === repoName ? { ...repo, clusters: [...repo.clusters, ...clusterIds] } : repo,
       )
@@ -83,7 +85,9 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
     deleteRepoFromClusters: async ({ repoName, clusterIds }, currentItems) => {
       const body = clusterIds.map((id) => ({ cluster_uuid: id }))
       await helm.deleteRepoFromClusters(repoName, body)
+
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
+
       return currentItems.map((repo) => {
         if (repo.name !== repoName) {
           return repo
@@ -101,6 +105,3 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
   uniqueIdentifier: 'name',
   defaultOrderBy: 'name',
 })
-
-// const repos: any = await helm.getRepositoriesForCluster(clusterId)
-// return repos.map((repo) => ({ ...repo, clusterId }))

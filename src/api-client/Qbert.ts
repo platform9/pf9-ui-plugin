@@ -634,82 +634,6 @@ class Qbert extends ApiService {
     })
   }
 
-  getCharts = async (clusterId) => {
-    const url = `/clusters/${clusterId}/repos/charts`
-    const response = await this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getCharts',
-      },
-    })
-    console.log('response', response)
-    return normalizeResponse(response)
-  }
-
-  getChartInfo = async (name) => {
-    const url = '/charts/info'
-    const response = await this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getChartInfo',
-      },
-    })
-    return response
-  }
-
-  /* Monocular endpoints being exposed through Qbert */
-  // getCharts = async (clusterId) => {
-  //   const url = `${await this.clusterMonocularBaseUrl(clusterId)}/charts`
-  //   const response = await this.client.basicGet({
-  //     url,
-  //     options: {
-  //       clsName: this.getClassName(),
-  //       mthdName: 'getCharts',
-  //     },
-  //   })
-  //   return normalizeResponse(response)
-  // }
-
-  // getChart = async (clusterId, chart, release, version) => {
-  //   const versionStr = version ? `versions/${version}` : ''
-  //   const url = `${await this.clusterMonocularBaseUrl(
-  //     clusterId,
-  //   )}/charts/${release}/${chart}/${versionStr}`
-  //   return this.client.basicGet({
-  //     url,
-  //     options: {
-  //       clsName: this.getClassName(),
-  //       mthdName: 'getChart',
-  //     },
-  //   })
-  // }
-
-  // getChartReadmeContents = async (clusterId, readmeUrl) => {
-  //   const url = pathJoin(await this.clusterMonocularBaseUrl(clusterId, null), readmeUrl)
-  //   return this.client.basicGet({
-  //     url,
-  //     options: {
-  //       clsName: this.getClassName(),
-  //       mthdName: 'getChartReadmeContents',
-  //     },
-  //   })
-  // }
-
-  // getChartVersions = async (clusterId, chart, release) => {
-  //   const url = `${await this.clusterMonocularBaseUrl(
-  //     clusterId,
-  //   )}/charts/${release}/${chart}/versions`
-  //   return this.client.basicGet({
-  //     url,
-  //     options: {
-  //       clsName: this.getClassName(),
-  //       mthdName: 'getChartVersions',
-  //     },
-  //   })
-  // }
-
   getReleases = async (clusterId) => {
     const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
     const response = await this.client.basicGet({
@@ -744,30 +668,6 @@ class Qbert extends ApiService {
       },
     })
   }
-
-  deployApplication = async (clusterId, namespace, body) => {
-    const url = `/clusters/${clusterId}/namespaces/${namespace}/releases`
-    return this.client.basicPost({
-      url,
-      body,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'deployApplication',
-      },
-    })
-  }
-
-  // deployApplication = async (clusterId, body) => {
-  //   const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
-  //   return this.client.basicPost({
-  //     url,
-  //     body,
-  //     options: {
-  //       clsName: this.getClassName(),
-  //       mthdName: 'deployApplication',
-  //     },
-  //   })
-  // }
 
   getServiceAccounts = async (clusterId, namespace) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`

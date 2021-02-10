@@ -41,10 +41,10 @@ export interface IBasicRequestDeleteParams {
   url: string
   version?: string
   params?: AxiosRequestConfig['params']
+  data?: AxiosRequestConfig['data']
   endpoint?: string
   config?: AxiosRequestConfig
   options: IRequestOptions
-  data?: any
 }
 
 // import { AxiosResponse, AxiosRequestConfig } from 'axios'

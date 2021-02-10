@@ -65,6 +65,9 @@ const AppCatalogPage = () => {
     [params.clusterId, reposForCluster],
   )
 
+  // These values are passed to the CardTable so the CardTable
+  // knows what to filter. Instead of passing a filter target, you
+  // can pass in a custom filter function
   const filterValues = useMemo(
     () => [
       { value: params.repository, target: 'repository' },

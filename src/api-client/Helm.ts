@@ -166,11 +166,8 @@ class Helm extends ApiService {
     })
   }
 
-  getChartInfo = async (repository, name, params) => {
-    const url = createUrlWithQueryString(
-      `${this.baseUrl}/charts/${repository}/${name}/info`,
-      params,
-    )
+  getChartInfo = async (repoName, name, params) => {
+    const url = createUrlWithQueryString(`${this.baseUrl}/charts/${repoName}/${name}/info`, params)
     return this.client.basicGet({
       url,
       options: {

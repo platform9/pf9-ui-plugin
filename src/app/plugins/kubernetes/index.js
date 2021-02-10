@@ -160,11 +160,6 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/apps/deployed/:clusterId/:release', exact: true },
       component: DeployedAppDetailsPage,
     },
-    // {
-    //   name: 'App Details',
-    //   link: { path: '/apps/:clusterId/:release/:id', exact: true },
-    //   component: AppDetailsPage,
-    // },
     {
       name: 'Add Repository',
       link: { path: '/apps/repositories/add', exact: true },

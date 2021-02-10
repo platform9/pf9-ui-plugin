@@ -8,7 +8,7 @@ const renderType = (value) => {
 }
 
 const renderNumClusters = (value) => {
-  return value.length
+  return value?.length
 }
 
 export const options = {

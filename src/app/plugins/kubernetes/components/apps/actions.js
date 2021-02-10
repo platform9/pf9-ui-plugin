@@ -24,7 +24,6 @@ import {
   makeAppVersionSelector,
   makeAppsSelector,
   makeReleasesSelector,
-  repositoriesSelector,
 } from './selectors'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clusterActions, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
@@ -121,31 +120,3 @@ export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
   indexBy: 'clusterId',
   selectorCreator: makeReleasesSelector,
 })
-
-const reposWithClustersLoader = createContextLoader(
-  ActionDataKeys.RepositoriesWithClusters,
-  async () => {
-    const monocularClusters = await clusterActions.list({
-      appCatalogClusters: true,
-      hasControlPanel: true,
-    })
-    return pipeAsync(
-      map(async ({ uuid: clusterId, name: clusterName }) => {
-        const clusterRepos = await qbert.getRepositoriesForCluster(clusterId)
-        return clusterRepos.map(mergeLeft({ clusterId, clusterName }))
-      }),
-      someAsync,
-      flatten,
-      groupBy(prop(uniqueIdentifier)),
-      values,
-      map((sameIdRepos) => ({
-        ...head(sameIdRepos),
-        clusters: map(pick(['clusterId', 'clusterName']), sameIdRepos),
-      })),
-    )(monocularClusters)
-  },
-  {
-    uniqueIdentifier,
-    entityName: 'Repository with Clusters',
-  },
-)

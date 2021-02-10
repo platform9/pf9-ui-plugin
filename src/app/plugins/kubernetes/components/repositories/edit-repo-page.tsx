@@ -156,13 +156,6 @@ const EditRepoPage = () => {
                         }
                       >
                         <div className={classes.fields}>
-                          {/* <TextField
-                            id="name"
-                            label="Repository Name"
-                            className={classes.textField}
-                            onChange={(value) => setWizardContext({ repositoryName: value })}
-                            required
-                          /> */}
                           <div className={classes.repoInfo}>
                             <Text variant="body2">Repository Name: </Text>
                             <Text variant="caption1">{repo.name}</Text>
