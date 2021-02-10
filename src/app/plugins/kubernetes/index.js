@@ -372,7 +372,11 @@ Kubernetes.registerPlugin = (pluginManager) => {
       nestedLinks: [
         { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
         // { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
-        { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
+        {
+          name: 'Repositories',
+          requiredRoles: 'admin',
+          ...clarityLink('/kubernetes/apps#repositories'),
+        },
       ],
     },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
@@ -422,7 +426,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
         // { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
         {
           name: 'Repositories',
-          link: { path: '/apps#repositories', requiredRoles: ['admin', '_member_'] },
+          link: { path: '/apps#repositories', requiredRoles: ['admin'] },
         },
       ],
     },
