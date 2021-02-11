@@ -52,6 +52,7 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
             classes={{ root: classes.validatedFormContainer }}
             initialValues={wizardContext}
             elevated={false}
+            maxWidth={800}
           >
             <Text variant="subtitle1" className={classes.cpName}>
               {wizardContext.name}

@@ -130,7 +130,11 @@ class UserMenu extends React.PureComponent {
               </div>
               <div className={classes.dropdownLinks}>
                 {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
-                <SimpleLink src={routes.userSettings.root.path()} className={classes.link}>
+                <SimpleLink
+                  src={routes.userSettings.root.path()}
+                  className={classes.link}
+                  onClick={this.handleClose}
+                >
                   <MenuListItem icon="cog">Settings</MenuListItem>
                 </SimpleLink>
                 <MenuListItem icon="sign-out" onClick={this.logout}>
@@ -140,7 +144,7 @@ class UserMenu extends React.PureComponent {
             </div>
             <hr className={classes.divider}></hr>
             <div className={classes.dropdownSection}>
-              <SimpleLink src={helpUrl} className={classes.link}>
+              <SimpleLink src={helpUrl} className={classes.link} onClick={this.handleClose}>
                 <MenuListItem icon="question-circle">Support</MenuListItem>
               </SimpleLink>
             </div>
