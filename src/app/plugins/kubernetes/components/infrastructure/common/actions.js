@@ -20,7 +20,10 @@ export const loadResMgrHosts = createContextLoader(
 
 export const flavorActions = createCRUDActions(ActionDataKeys.Flavors, { service: 'nova' })
 
-export const regionActions = createCRUDActions(ActionDataKeys.Regions, { service: 'keystone' })
+export const regionActions = createCRUDActions(ActionDataKeys.Regions, {
+  service: 'keystone',
+  cache: false,
+})
 
 export const updateRemoteSupport = createContextUpdater(
   ActionDataKeys.ResMgrHosts,
