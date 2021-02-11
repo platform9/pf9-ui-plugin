@@ -130,17 +130,6 @@ export const credentialActions = createCRUDActions(ActionDataKeys.ManagementCred
   entityName: 'Credential',
 })
 
-// Is it worth using contextLoader for this?
-export const getSingleUser = async (userId) => {
-  const user = await keystone.getUser(userId)
-  // Low-budget version of the selector... wait for feedback for this
-  const authTypes = flatten(pathOr([], ['options', 'multi_factor_auth_rules'], user))
-  return {
-    twoFactor: authTypes.includes('totp') ? 'enabled' : 'disabled',
-    ...user,
-  }
-}
-
 export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers, {
   listFn: async () => {
     const [users] = await Promise.all([

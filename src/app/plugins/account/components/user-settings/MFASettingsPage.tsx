@@ -20,8 +20,7 @@ import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
 import { prop } from 'ramda'
 import { RootState } from 'app/store'
-import { credentialActions, getSingleUser } from '../userManagement/users/actions'
-// import { credentialActions, getSingleUser, mngmUserActions } from '../userManagement/users/actions'
+import { credentialActions, mngmUserActions } from '../userManagement/users/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { disableMfa, enableMfa } from './actions'
 import { IconInfo } from 'core/components/validatedForm/Info'
@@ -115,9 +114,9 @@ const updateSsoSettings = ({ params, setLoading, setDialogOpened, updateParams, 
     setLoading(true)
     try {
       await enableMfa({ credential, userOptions, userId })
-      updateParams({ mfaIsEnabled: true })
       // Show user a dialog saying mfa configuration successful
       setDialogOpened(true)
+      updateParams({ mfaIsEnabled: true })
     } finally {
       setLoading(false)
     }
@@ -147,11 +146,9 @@ const MFASettingsPage = () => {
   } = useSelector<RootState, SessionState>(prop(sessionStoreKey)) || {}
   const { history } = useReactRouter()
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState(undefined)
   const [dialogOpened, setDialogOpened] = useState(false)
   const [credentials, loadingCredentials] = useDataLoader(credentialActions.list)
-  // this is an admin-only API, remove if approved
-  // const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
   const { params, updateParams, getParamsUpdater } = useParams<State>({
     enableMFA: false,
     mfaIsEnabled: false,
@@ -165,10 +162,9 @@ const MFASettingsPage = () => {
   })
   const { mfaSecret } = params
 
-  // Remove if approved
-  // const user = useMemo(() => {
-  //   return users.find((u) => u.id === userId)
-  // }, [users, userId])
+  const user = useMemo(() => {
+    return users.find((u) => u.id === userId)
+  }, [users, userId])
 
   const userCredential = useMemo(() => {
     if (!userId) {
@@ -199,17 +195,6 @@ const MFASettingsPage = () => {
     }
   }, [user])
 
-  useEffect(() => {
-    if (!userId) {
-      return
-    }
-    const getData = async () => {
-      const singleUser = await getSingleUser(userId)
-      setUser(singleUser)
-    }
-    getData()
-  }, [userId])
-
   const QRLink = useMemo(() => {
     if (!features || !mfaSecret) {
       return ''
@@ -231,7 +216,7 @@ const MFASettingsPage = () => {
 
   return (
     <div className={classes.mfaPage}>
-      <Progress loading={loading || loadingCredentials}>
+      <Progress loading={loading || loadingCredentials || loadingUsers}>
         <DocumentMeta title="SSO Management" bodyClasses={['form-view']} />
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
