@@ -73,10 +73,10 @@ const EditRepoPage = () => {
   const [repos, loading] = useDataLoader(repositoryActions.list)
   const anyRepositoryActions = repositoryActions as any
   const [updateRepo, updatingRepo] = useDataUpdater(anyRepositoryActions.update)
-  const [deleteClustersFromRepository, deletingRepoFromClusters] = useDataUpdater(
+  const [deleteClustersFromRepository, deletingClustersFromRepository] = useDataUpdater(
     anyRepositoryActions.deleteClustersFromRepository,
   )
-  const [addClustersToRepository, addingRepoToClusters] = useDataUpdater(
+  const [addClustersToRepository, addingClustersToRepository] = useDataUpdater(
     anyRepositoryActions.addClustersToRepository,
   )
 
@@ -117,7 +117,7 @@ const EditRepoPage = () => {
     [repo],
   )
 
-  const submitting = updatingRepo || deletingRepoFromClusters || addingRepoToClusters
+  const submitting = updatingRepo || deletingClustersFromRepository || addingClustersToRepository
 
   return (
     <>

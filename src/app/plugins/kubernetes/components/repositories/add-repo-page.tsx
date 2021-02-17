@@ -67,7 +67,7 @@ const AddRepoPage = () => {
   const { history } = useReactRouter()
   const anyRepositoryActions = repositoryActions as any
   const [addRepo, addingRepo] = useDataUpdater(anyRepositoryActions.create)
-  const [addClustersToRepository, addingRepoToClusters] = useDataUpdater(
+  const [addClustersToRepository, addingClustersToRepository] = useDataUpdater(
     anyRepositoryActions.addClustersToRepository,
   )
 
@@ -90,7 +90,7 @@ const AddRepoPage = () => {
       <FormWrapper
         title="Add New Repository"
         isUpdateForm={true}
-        loading={addingRepo || addingRepoToClusters}
+        loading={addingRepo || addingClustersToRepository}
       >
         <Wizard
           context={initialContext}
