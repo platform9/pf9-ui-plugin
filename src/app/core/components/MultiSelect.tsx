@@ -15,6 +15,7 @@ import { emptyArr } from 'utils/fp'
 import clsx from 'clsx'
 import Text from 'core/elements/text'
 import Theme from 'core/themes/model'
+import { IndeterminateCheckBox } from '@material-ui/icons'
 
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
@@ -68,6 +69,10 @@ const useStyles = makeStyles((theme: Theme) =>
     checkboxSize: {
       fontSize: 16,
     },
+    selectDeselectCheckbox: {
+      padding: theme.spacing(0, 2, 0, 0),
+      justifySelf: 'flex-start',
+    },
     options: {
       overflowY: 'auto',
       display: 'flex',
@@ -76,12 +81,17 @@ const useStyles = makeStyles((theme: Theme) =>
     optionLabel: {
       fontSize: 13,
     },
+    controls: {
+      display: 'grid',
+      gridTemplateColumns: 'auto 1fr',
+      gridTemplateRows: '40px',
+    },
   }),
 )
 
 interface Props {
   id: string
-  label: string
+  label?: string
   options: any
   hasError?: boolean
   required?: boolean
@@ -91,6 +101,8 @@ interface Props {
   maxOptions?: number
   sortSelectedFirst?: boolean
   className?: string
+  showSelectDeselectAllOption?: boolean
+  maxHeight?: number
 }
 
 const MultiSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
@@ -105,8 +117,10 @@ const MultiSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
       values = emptyArr,
       onChange,
       maxOptions,
+      maxHeight,
       sortSelectedFirst,
       className,
+      showSelectDeselectAllOption,
     },
     ref: React.Ref<HTMLDivElement>,
   ) => {
@@ -127,7 +141,6 @@ const MultiSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
       const updatedValues = values.includes(value)
         ? values.filter((currentValue) => currentValue !== value)
         : [...values, value]
-
       onChange(updatedValues)
     }
 
@@ -137,18 +150,54 @@ const MultiSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
       }
     }
 
+    const handleSelectDeselectChange = () => {
+      if (values.length > 0) {
+        // Deselect All
+        onChange([])
+      } else {
+        // Select All
+        onChange(sortedOptions.map((option) => option.value))
+      }
+    }
+
+    const controls = showSelectDeselectAllOption ? (
+      <div className={classes.controls}>
+        {showSelectDeselectAllOption && (
+          <Checkbox
+            color="primary"
+            className={classes.selectDeselectCheckbox}
+            icon={<CheckBoxOutlineBlankIcon className={classes.checkboxSize} />}
+            checked={values.length > 0}
+            checkedIcon={<IndeterminateCheckBox className={classes.checkboxSize} />}
+            onChange={handleSelectDeselectChange}
+          />
+        )}
+        <SearchField
+          classes={classes}
+          term={term}
+          onSearchChange={setTerm}
+          onHitEnter={onHitEnter}
+        />
+      </div>
+    ) : (
+      <SearchField classes={classes} term={term} onSearchChange={setTerm} onHitEnter={onHitEnter} />
+    )
+
     return (
       <div className={clsx('MuiFormControl-root', className)}>
-        <FormControl className={classes.container} id={id} error={hasError} ref={ref}>
-          <Text className={classes.label} variant="caption">
-            {required ? `${label} *` : label}
-          </Text>
-          <SearchField
-            classes={classes}
-            term={term}
-            onSearchChange={setTerm}
-            onHitEnter={onHitEnter}
-          />
+        <FormControl
+          className={classes.container}
+          id={id}
+          error={hasError}
+          ref={ref}
+          style={{ maxHeight: maxHeight ? maxHeight : 350 }}
+        >
+          {label && (
+            <Text className={classes.label} variant="caption">
+              {required ? `${label} *` : label}
+            </Text>
+          )}
+          {controls}
           <Box
             className={classes.options}
             style={{ height: maxOptions ? getOptionsHeight(maxOptions) : 'initial' }}

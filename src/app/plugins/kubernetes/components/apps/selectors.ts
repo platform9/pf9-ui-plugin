@@ -1,52 +1,12 @@
 import { createSelector } from 'reselect'
-import { map, mergeLeft, pipe, filter, pathEq, identity, find, propOr, propEq } from 'ramda'
-import { emptyArr, pathStr, filterIf, pathStrOr } from 'utils/fp'
+import { map, mergeLeft, pipe, filter, pathEq, identity } from 'ramda'
+import { pathStr, filterIf, pathStrOr } from 'utils/fp'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
 import { allKey, imageUrlRoot } from 'app/constants'
 import moment from 'moment'
-const uniqueIdentifier = 'id'
 const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
-
-export const appDetailsSelector = createSelector(
-  [
-    getDataSelector<DataKeys.AppDetails>(DataKeys.AppDetails, [
-      'clusterId',
-      'id',
-      'release',
-      'version',
-    ]),
-  ],
-  (items) => {
-    return map(({ id, ...item }) => {
-      const chartId = id.substring(0, id.indexOf(':')) // Remove the version from the ID
-      return {
-        ...item,
-        id: chartId,
-        name: chartId.substring(`${chartId.indexOf('/').toString()} 1`),
-        home: pathStr('relationships.chart.data.home', item),
-        sources: pathStr('relationships.chart.data.sources', item),
-        maintainers: pathStr('relationships.chart.data.maintainers', item),
-      }
-    })(items)
-  },
-)
-
-export const makeAppDetailsSelector = (
-  defaultParams = {
-    orderBy: 'created_at',
-    orderDirection: 'desc',
-  },
-) => {
-  return createSelector(
-    [appDetailsSelector, (_, params) => mergeLeft(params, defaultParams)],
-    (items, params) => {
-      const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(items)
-    },
-  )
-}
 
 export const deploymentDetailsSelector = createSelector(
   getDataSelector<DataKeys.ReleaseDetail>(DataKeys.ReleaseDetail, ['clusterId', 'release']),
@@ -74,37 +34,6 @@ export const makeDeploymentDetailsSelector = (
 ) => {
   return createSelector(
     [deploymentDetailsSelector, (_, params) => mergeLeft(params, defaultParams)],
-    (items, params) => {
-      const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(items)
-    },
-  )
-}
-
-export const appVersionSelector = createSelector(
-  getDataSelector<DataKeys.AppVersions>(DataKeys.AppVersions, ['clusterId', 'appId', 'release']),
-  (items) => {
-    return map((item: any) => ({
-      ...item,
-      version: pathStr('attributes.version', item),
-      appVersion: pathStr('attributes.app_version', item),
-      versionLabel: [
-        pathStr('attributes.version', item),
-        moment(pathStr('attributes.created', item)).format('MMM DD, YYYY'),
-      ].join(' - '),
-      downloadLink: pathStr('attributes.urls.0', item),
-    }))(items)
-  },
-)
-
-export const makeAppVersionSelector = (
-  defaultParams = {
-    orderBy: 'version',
-    orderDirection: 'desc',
-  },
-) => {
-  return createSelector(
-    [appVersionSelector, (_, params) => mergeLeft(params, defaultParams)],
     (items, params) => {
       const { orderBy, orderDirection } = params
       return pipe(createSorter({ orderBy, orderDirection }))(items)
@@ -169,23 +98,3 @@ export const makeReleasesSelector = (
     },
   )
 }
-
-export const repositoriesSelector = createSelector(
-  [
-    getDataSelector<DataKeys.Repositories>(DataKeys.Repositories),
-    getDataSelector(DataKeys.RepositoriesWithClusters),
-  ],
-  (rawRepos, reposWithClusters) => {
-    return map(({ id, type, attributes }) => ({
-      id,
-      type,
-      name: attributes.name,
-      url: attributes.URL,
-      source: attributes.source,
-      clusters: pipe(
-        find(propEq(uniqueIdentifier, id)),
-        propOr(emptyArr, 'clusters'),
-      )(reposWithClusters),
-    }))(rawRepos)
-  },
-)

@@ -29,6 +29,7 @@ interface FormProps {
   hasError?: boolean
   errorMessage?: string
   onChange: (isChecked: boolean) => void
+  formControlLabelClasses?: any
 }
 interface Props extends FormProps, ValidatedFormProps, WithStyles<typeof styles> {}
 
@@ -46,13 +47,21 @@ const RadioFields = compose(
     }
 
     render() {
-      const { classes, value, hasError, errorMessage, options } = this.props
+      const {
+        classes,
+        value,
+        hasError,
+        errorMessage,
+        options,
+        formControlLabelClasses,
+      } = this.props
 
       return (
         <div className={classes.root}>
           {options.map((option) => (
             <FormControl key={option.value} className={classes.formControl} error={hasError}>
               <FormControlLabel
+                classes={formControlLabelClasses}
                 label={option.label}
                 control={
                   <Radio

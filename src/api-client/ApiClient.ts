@@ -11,6 +11,7 @@ import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 import Clemency from 'api-client/Clemency'
+import Helm from './Helm'
 import Hagrid from './Hagrid'
 
 import { ID } from './keystone.model'
@@ -26,6 +27,7 @@ import {
   IRawRequestPostParams,
   IBasicRequestGetParams,
   IBasicRequestPostParams,
+  IBasicRequestDeleteParams,
 } from './model'
 import ApiService from 'api-client/ApiService'
 import Bugsnag from '@bugsnag/js'
@@ -49,6 +51,7 @@ class ApiClient {
   public resMgr: ResMgr
   public qbert: Qbert
   public clemency: Clemency
+  public helm: Helm
   public hagrid: Hagrid
   public catalog = {}
   public activeRegion: ID = null
@@ -98,6 +101,7 @@ class ApiClient {
       instance.resMgr.initialize(),
       instance.qbert.initialize(),
       instance.clemency.initialize(),
+      instance.helm.initialize(),
       instance.hagrid.initialize(),
     ])
   }
@@ -142,6 +146,7 @@ class ApiClient {
     this.resMgr = this.addApiService(new ResMgr(this))
     this.qbert = this.addApiService(new Qbert(this))
     this.clemency = this.addApiService(new Clemency(this))
+    this.helm = this.addApiService(new Helm(this))
     this.hagrid = this.addApiService(new Hagrid(this))
   }
 
@@ -331,12 +336,13 @@ class ApiClient {
     version,
     endpoint = undefined,
     options: { clsName, mthdName },
-  }: IBasicRequestGetParams) => {
+    data = undefined,
+  }: IBasicRequestDeleteParams) => {
     endpoint = await this.getEndpoint({ endpoint, version, clsName })
-    const response = await this.axiosInstance.delete<T>(
-      pathJoin(endpoint, url),
-      this.getAuthHeaders(),
-    )
+    const response = await this.axiosInstance.delete<T>(pathJoin(endpoint, url), {
+      ...this.getAuthHeaders(),
+      data,
+    })
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
