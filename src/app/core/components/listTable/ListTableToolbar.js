@@ -93,10 +93,11 @@ const FilterDropdown = ({ field, type, label, onChange, value, items }) => {
   }
 }
 
-const ListTableToolbar = ({
+export const ListTableToolbar = ({
   columns,
   filterValues,
   filters,
+  extraLeftToolbarContent,
   extraToolbarContent,
   onAdd,
   onColumnToggle,
@@ -159,7 +160,10 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
+      {extraLeftToolbarContent}
+
       <ListTableBatchActions batchActions={allActions} selected={selected} onRefresh={onRefresh} />
+
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {Array.isArray(filters)

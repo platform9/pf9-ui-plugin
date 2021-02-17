@@ -551,6 +551,7 @@ class ListTable extends PureComponent {
       compactTable,
       blankFirstColumn,
       extraToolbarContent,
+      extraLeftToolbarContent,
       multiSelection,
       headless,
     } = this.props
@@ -599,6 +600,7 @@ class ListTable extends PureComponent {
               {!compactTable && (
                 <ListTableToolbar
                   extraToolbarContent={extraToolbarContent}
+                  extraLeftToolbarContent={extraLeftToolbarContent}
                   selected={selectedRows}
                   onAdd={onAdd && this.handleAdd}
                   onDelete={onDelete && this.handleDelete}
@@ -721,6 +723,7 @@ ListTable.propTypes = {
   headless: PropTypes.bool,
 
   extraToolbarContent: PropTypes.node,
+  extraLeftToolbarContent: PropTypes.node,
 }
 
 ListTable.defaultProps = {
