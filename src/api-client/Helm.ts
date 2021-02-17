@@ -86,30 +86,30 @@ class Helm extends ApiService {
     })
   }
 
-  addRepoToCluster = async (repoName, clusterId) => {
+  addClusterToRepository = async (repoName, clusterId) => {
     const url = `${this.baseUrl}/repos/${repoName}/cluster/${clusterId}`
     return this.client.basicPost({
       url,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'addRepoToCluster',
+        mthdName: 'addClusterToRepository',
       },
     })
   }
 
-  addRepoToClusters = async (repoName, body) => {
+  addClustersToRepository = async (repoName, body) => {
     const url = `${this.baseUrl}/repos/${repoName}/clusters`
     return this.client.basicPost({
       url,
       body,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'addRepoToClusters',
+        mthdName: 'addClustersToRepository',
       },
     })
   }
 
-  deleteRepoFromClusters = async (repoName, body) => {
+  deleteClustersFromRepository = async (repoName, body) => {
     const url = `${this.baseUrl}/repos/${repoName}/clusters`
     const data = body
     return this.client.basicDelete({
@@ -117,18 +117,18 @@ class Helm extends ApiService {
       data,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'deleteRepoFromClusters',
+        mthdName: 'deleteClustersFromRepository',
       },
     })
   }
 
-  deleteRepoFromCluster = async (repoName, clusterId) => {
+  deleteClusterFromRepository = async (repoName, clusterId) => {
     const url = `${this.baseUrl}/repos/${repoName}/cluster/${clusterId}`
     return this.client.basicDelete({
       url,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'deleteRepoFromCluster',
+        mthdName: 'deleteClusterFromRepository',
       },
     })
   }

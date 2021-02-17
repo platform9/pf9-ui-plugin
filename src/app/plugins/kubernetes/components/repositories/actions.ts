@@ -72,9 +72,9 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
       await helm.updateRepositories(body)
       return currentItems
     },
-    addRepoToClusters: async ({ repoName, clusterIds }, currentItems) => {
+    addClustersToRepository: async ({ repoName, clusterIds }, currentItems) => {
       const body = clusterIds.map((id) => ({ cluster_uuid: id }))
-      await helm.addRepoToClusters(repoName, body)
+      await helm.addClustersToRepository(repoName, body)
 
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
 
@@ -82,9 +82,9 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
         repo.name === repoName ? { ...repo, clusters: [...repo.clusters, ...clusterIds] } : repo,
       )
     },
-    deleteRepoFromClusters: async ({ repoName, clusterIds }, currentItems) => {
+    deleteClustersFromRepository: async ({ repoName, clusterIds }, currentItems) => {
       const body = clusterIds.map((id) => ({ cluster_uuid: id }))
-      await helm.deleteRepoFromClusters(repoName, body)
+      await helm.deleteClustersFromRepository(repoName, body)
 
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
 

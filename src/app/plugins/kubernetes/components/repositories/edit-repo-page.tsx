@@ -73,11 +73,11 @@ const EditRepoPage = () => {
   const [repos, loading] = useDataLoader(repositoryActions.list)
   const anyRepositoryActions = repositoryActions as any
   const [updateRepo, updatingRepo] = useDataUpdater(anyRepositoryActions.update)
-  const [deleteRepoFromClusters, deletingRepoFromClusters] = useDataUpdater(
-    anyRepositoryActions.deleteRepoFromClusters,
+  const [deleteClustersFromRepository, deletingRepoFromClusters] = useDataUpdater(
+    anyRepositoryActions.deleteClustersFromRepository,
   )
-  const [addRepoToClusters, addingRepoToClusters] = useDataUpdater(
-    anyRepositoryActions.addRepoToClusters,
+  const [addClustersToRepository, addingRepoToClusters] = useDataUpdater(
+    anyRepositoryActions.addClustersToRepository,
   )
 
   const repo = useMemo(() => repos.find(propEq('name', repoName)) || emptyObj, [repos])
@@ -90,7 +90,7 @@ const EditRepoPage = () => {
         (clusterId) => !wizardContext.clusters.includes(clusterId),
       )
       if (clustersToRemove.length) {
-        await deleteRepoFromClusters({ repoName: repo.name, clusterIds: clustersToRemove })
+        await deleteClustersFromRepository({ repoName: repo.name, clusterIds: clustersToRemove })
       }
 
       // Find clusters that were added
@@ -98,7 +98,7 @@ const EditRepoPage = () => {
         (clusterId) => !repo.clusters.includes(clusterId),
       )
       if (clustersToAdd.length) {
-        await addRepoToClusters({
+        await addClustersToRepository({
           repoName: updatedRepo.name,
           clusterIds: clustersToAdd,
         })

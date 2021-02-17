@@ -67,15 +67,15 @@ const AddRepoPage = () => {
   const { history } = useReactRouter()
   const anyRepositoryActions = repositoryActions as any
   const [addRepo, addingRepo] = useDataUpdater(anyRepositoryActions.create)
-  const [addRepoToClusters, addingRepoToClusters] = useDataUpdater(
-    anyRepositoryActions.addRepoToClusters,
+  const [addClustersToRepository, addingRepoToClusters] = useDataUpdater(
+    anyRepositoryActions.addClustersToRepository,
   )
 
   const handleSubmit = async (wizardContext) => {
     const [success, newRepo] = await addRepo(wizardContext)
 
     if (success && wizardContext.clusters.length) {
-      await addRepoToClusters({
+      await addClustersToRepository({
         repoName: newRepo.name,
         clusterIds: wizardContext.clusters,
       })

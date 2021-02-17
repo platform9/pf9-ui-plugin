@@ -98,6 +98,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const appListPageUrl = routes.apps.list.path()
 
+const placeholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
+
 const wizardMetaFormattedNames = {
   version: 'Latest Version',
   repository: 'Repository',
@@ -109,7 +111,7 @@ const AppIcon = ({ appName, logoUrl }) => {
   const classes = useStyles()
   return (
     <div className={classes.logoContainer}>
-      <img alt={appName} src={logoUrl} />
+      <img alt={appName} src={logoUrl || placeholderIcon} />
     </div>
   )
 }
