@@ -1,35 +1,34 @@
 import { listTablePrefs } from 'app/constants'
-import { mngmTenantActions } from 'app/plugins/account/components/userManagement/tenants/actions'
-
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import useDataLoader from 'core/hooks/useDataLoader'
 import useParams from 'core/hooks/useParams'
 import { pathOr, pick } from 'ramda'
 import React, { useEffect } from 'react'
-
-// export const viewByClustersColumns = [
-//   { id: 'clusterName', label: 'Cluster Name' },
-//   { id: 'kubernetesVersion', label: 'Kubernetes Version' },
-//   { id: 'numApps', label: '# of Apps' },
-//   { id: 'workerNodes', label: '# of Worker Nodes' },
-// ]
+import { releaseActions } from './actions'
 
 export const viewByClustersColumns = [
-  { id: 'id', label: 'Tenant Uuid' },
-  { id: 'name', label: 'Name' },
-  { id: 'description', label: 'Description' },
-  { id: 'clusters', label: 'Mapped Clusters' },
-  {
-    id: 'users',
-    label: 'Users',
-    display: false,
-  },
+  { id: 'clusterName', label: 'Cluster Name' },
+  { id: 'kubernetesVersion', label: 'Kubernetes Version' },
+  { id: 'numApps', label: '# of Apps' },
+  { id: 'workerNodes', label: '# of Worker Nodes' },
 ]
+
+// export const viewByClustersColumns = [
+//   { id: 'id', label: 'Tenant Uuid' },
+//   { id: 'name', label: 'Name' },
+//   { id: 'description', label: 'Description' },
+//   { id: 'clusters', label: 'Mapped Clusters' },
+//   {
+//     id: 'users',
+//     label: 'Users',
+//     display: false,
+//   },
+// ]
 
 const options = {
   columns: viewByClustersColumns,
-  loaderFn: mngmTenantActions.list,
-  name: 'Tenants',
-  title: 'Tenants',
+  name: 'Releases',
+  title: 'Releases',
   uniqueIdentifier: 'id',
   showCheckboxes: false,
   compactTable: true,
@@ -40,6 +39,9 @@ const { ListContainer } = createCRUDComponents(options)
 const searchTarget = 'name'
 
 const filterBySearch = (data, target, searchTerm) => {
+  if (!searchTerm || !target) {
+    return data
+  }
   return data.filter(
     (ele) => pathOr('', target.split('.'), ele).match(new RegExp(searchTerm, 'i')) !== null,
   )
@@ -47,17 +49,15 @@ const filterBySearch = (data, target, searchTerm) => {
 
 const DeployedAppsTableClusterView = ({ searchTerm, setColumns, visibleColumns, setReloadFn }) => {
   const { params, getParamsUpdater } = useParams()
-  console.log('child', visibleColumns)
-
-  const reload = () => console.log('reloaded')
+  const [releases, loadingReleases, reloadReleases] = useDataLoader(releaseActions.list)
+  console.log('releases', releases)
 
   useEffect(() => {
-    setReloadFn(() => reload)
+    setReloadFn(() => reloadReleases())
     setColumns(viewByClustersColumns)
   }, [setReloadFn])
 
-  const data = [{ id: 'kim', name: 'nguy', description: 'hello' }]
-  const filteredData = filterBySearch(data, searchTarget, searchTerm)
+  const filteredData = filterBySearch(releases, searchTarget, searchTerm)
 
   return (
     <>
@@ -65,8 +65,9 @@ const DeployedAppsTableClusterView = ({ searchTerm, setColumns, visibleColumns, 
         getParamsUpdater={getParamsUpdater}
         data={filteredData}
         visibleColumns={visibleColumns}
-        reload={reload}
-        loading={false}
+        reload={reloadReleases}
+        loading={loadingReleases}
+        showCollapseArrow={true}
         {...pick(listTablePrefs, params)}
       />
     </>

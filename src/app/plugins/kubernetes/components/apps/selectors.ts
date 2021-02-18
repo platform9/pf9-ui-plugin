@@ -8,6 +8,26 @@ import { allKey, imageUrlRoot } from 'app/constants'
 import moment from 'moment'
 const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
+export const releasesOnClusterSelector = createSelector(
+  getDataSelector<DataKeys.Releases>(DataKeys.Releases, ['clusterId']),
+  getDataSelector<DataKeys.Clusters>(DataKeys.Clusters, ['uuid']),
+  (releases, clusters) => {
+    console.log('releases', releases)
+    console.log('clusters', clusters)
+    return map((release: any) => {
+      const cluster: any = clusters.find((cluster) => release.clusterId === cluster.uuid) || {}
+      return {
+        ...release,
+        clusterId: {
+          uuid: cluster.uuid,
+          kubeRoleVersion: cluster.kubeRoleVersion,
+          numWorkers: cluster.numWorkers,
+        },
+      }
+    })
+  },
+)
+
 export const deploymentDetailsSelector = createSelector(
   getDataSelector<DataKeys.ReleaseDetail>(DataKeys.ReleaseDetail, ['clusterId', 'release']),
   (items) => {

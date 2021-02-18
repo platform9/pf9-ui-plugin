@@ -3,12 +3,10 @@ import React from 'react'
 // import Tab from 'core/components/tabs/Tab'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import ApiAccessListPage from './ApiAccessListPage'
-import DeployedAppsListPage from '../apps/deployed-apps-list-page'
 
 const ApiAccessPage = () => (
   <PageContainer>
-    {/* <ApiAccessListPage /> */}
-    <DeployedAppsListPage />
+    <ApiAccessListPage />
     {/* <Tabs>
       <Tab value="apiAccess" label="API Access">
         <ApiAccessListPage />

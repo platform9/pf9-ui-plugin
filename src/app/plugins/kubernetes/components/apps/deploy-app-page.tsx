@@ -154,7 +154,7 @@ const DeployAppPage = () => {
     const body = {
       Name: deploymentName,
       Chart: `${repository}/${name}`,
-      Dry: true,
+      Dry: false,
       Version: version,
       Vals: values,
     }

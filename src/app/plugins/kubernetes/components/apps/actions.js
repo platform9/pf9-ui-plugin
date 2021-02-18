@@ -31,6 +31,7 @@ import { pathJoin } from 'utils/misc'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { tryCatchAsync, someAsync, flatMapAsync, pipeAsync, mapAsync } from 'utils/async'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import namespaceActions from '../namespaces/actions'
 
 const { qbert, helm } = ApiClient.getInstance()
 
@@ -106,17 +107,48 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
 })
 
 export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
-  listFn: async (params) => {
-    const [clusterId, clusters] = await parseClusterParams(params)
-    if (clusterId === allKey) {
-      return someAsync(pluck('uuid', clusters).map(qbert.getReleases)).then(flatten)
-    }
-    return qbert.getReleases(clusterId)
+  listFn: async () => {
+    const clusters = await clusterActions.list()
+    const clusterUuids = pluck('uuid', clusters)
+    const releases = await someAsync(
+      clusterUuids.map(async (clusterId) => {
+        const namespaces = await namespaceActions.list({ clusterId })
+        const result = await someAsync(
+          namespaces.map((namespace) => helm.getReleases(clusterId, namespace.name)),
+        )
+        return result
+      }),
+    ).then(flatten)
+    return releases.map((release) => ({ ...release }))
   },
   deleteFn: async (params) => {
     return qbert.deleteRelease(params.clusterId, params.id)
   },
-  uniqueIdentifier,
-  indexBy: 'clusterId',
-  selectorCreator: makeReleasesSelector,
+  uniqueIdentifier: 'Name',
+  // indexBy: 'clusterId',
+  entityName: 'Releases',
 })
+
+// const [clusterId, clusters] = await parseClusterParams(params)
+// if (clusterId === allKey) {
+//   const clusterUuids = pluck('uuid', clusters)
+//   const releases = someAsync(
+//     clusterUuids.map((clusterId) => {
+//       const namespaces = namespaceActions.list({ clusterId })
+//       console.log('namespaces', namespaces)
+//       const result = someAsync(
+//         namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace)),
+//       )
+//       console.log('result', result)
+//       return result
+//     }),
+//   ).then(flatten)
+//   console.log('releases', releases)
+//   return releases.map((release) => ({ ...release, clusterId }))
+//   // return someAsync(pluck('uuid', clusters).map(qbert.getReleases)).then(flatten)
+// }
+// const namespaces = namespaceActions.list({ clusterId })
+// const releases = someAsync(
+//   namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace)),
+// )
+// return releases.map((release) => ({ ...release, clusterId }))

@@ -12,6 +12,9 @@ import { pluck } from 'ramda'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
+  appsListContainer: {
+    marginTop: theme.spacing(2),
+  },
   leftToolBarContent: {
     marginLeft: theme.spacing(2),
     display: 'flex',
@@ -45,6 +48,7 @@ const DeployedAppsListPage = (props: Props) => {
   )
   const [reloadFn, setReloadFn] = useState<any>(null)
   const [onEditFn, setOnEditFn] = useState(null)
+  const [onDeleteFn, setOnDeleteFn] = useState(null)
 
   useEffect(() => {
     // setColumns(tableColumns[activeTableView])
@@ -69,7 +73,7 @@ const DeployedAppsListPage = (props: Props) => {
   }
 
   return (
-    <>
+    <div className={classes.appsListContainer}>
       <ListTableToolbar
         columns={columns}
         selected={[{ id: 'kim', name: 'kim', desciption: 'hello' }]}
@@ -94,9 +98,10 @@ const DeployedAppsListPage = (props: Props) => {
           </div>
         }
         onEdit={onEditFn}
+        onDelete={onDeleteFn}
+        onReload={reloadFn}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onReload={reloadFn}
       />
       <ActiveTable
         searchTerm={searchTerm}
@@ -105,6 +110,7 @@ const DeployedAppsListPage = (props: Props) => {
         setVisibleColumns={setVisibleColumns}
         setReloadFn={setReloadFn}
         setOnEditFn={setOnEditFn}
+        setOnDeleteFn={setOnDeleteFn}
       />
       {/* <ActiveTable
         extraLeftToolbarContent={
@@ -125,7 +131,7 @@ const DeployedAppsListPage = (props: Props) => {
           </div>
         }
       /> */}
-    </>
+    </div>
   )
 }
 

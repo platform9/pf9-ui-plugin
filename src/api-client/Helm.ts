@@ -188,6 +188,17 @@ class Helm extends ApiService {
       },
     })
   }
+
+  getReleases = async (clusterId, namespace) => {
+    const url = `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getReleases',
+      },
+    })
+  }
 }
 
 export default Helm
