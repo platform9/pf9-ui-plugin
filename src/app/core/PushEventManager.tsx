@@ -75,18 +75,16 @@ class PushEventManager {
   }
 
   public readonly connect = async () => {
-    // TODO re-enable websocket when the backend starts to send us data
-    return
-    // const wsUrl = await getWebSocketUrl()
-    // if (!wsUrl) {
-    //   this.handleClose()
-    //   return this
-    // }
-    // this.socket = new WebSocket(wsUrl)
-    // this.socket.addEventListener('open', this.handleOpen)
-    // this.socket.addEventListener('close', this.handleClose)
-    // this.socket.addEventListener('message', this.handleMessage)
-    // return this
+    const wsUrl = await getWebSocketUrl()
+    if (!wsUrl) {
+      this.handleClose()
+      return this
+    }
+    this.socket = new WebSocket(wsUrl)
+    this.socket.addEventListener('open', this.handleOpen)
+    this.socket.addEventListener('close', this.handleClose)
+    this.socket.addEventListener('message', this.handleMessage)
+    return this
   }
 
   public readonly disconnect = () => {
