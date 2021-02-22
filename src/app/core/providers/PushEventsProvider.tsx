@@ -85,7 +85,8 @@ const PushEventsProvider: FC<Props> = ({ children }) => {
 
   useEffect(() => {
     const pushInstance = PushEventManager.getInstance()
-    pushInstance.connect()
+    // TODO re-enable socket connection when the backend starts sending us data
+    // pushInstance.connect()
     const unsub = pushInstance.subscribe(handleMessage)
     return () => {
       unsub()
