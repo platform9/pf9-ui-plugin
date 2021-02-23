@@ -4,6 +4,7 @@ import { setupFromConfig } from 'utils/registry'
 import config from '../../config'
 import ApiClient from 'api-client/ApiClient'
 import './app.css'
+import './static/font-awesome.css'
 
 Bugsnag.start({
   releaseStage: process.env.NODE_ENV,
