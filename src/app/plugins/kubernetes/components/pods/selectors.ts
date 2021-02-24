@@ -29,7 +29,7 @@ export const podsSelector = createSelector(
         const name = pod?.metadata?.name // pathStr('metadata.name', pod),
         const namespace = pod?.metadata?.namespace // pathStr('metadata.namespace', pod),
         const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
-          cluster.version,
+          cluster?.version,
           qbertEndpoint,
           cluster,
         )
