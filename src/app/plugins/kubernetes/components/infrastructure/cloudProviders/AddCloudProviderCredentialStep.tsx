@@ -199,6 +199,7 @@ const AddCloudProviderCredentialStep = ({
           triggerSubmit={setupValidator}
           title={title}
           link={links[wizardContext.provider]}
+          maxWidth={800}
         >
           {({ setFieldValue, values }) => (
             <>

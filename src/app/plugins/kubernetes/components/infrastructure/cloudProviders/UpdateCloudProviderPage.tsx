@@ -116,6 +116,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                       initialValues={wizardContext}
                       elevated={false}
                       onSubmit={handleNext}
+                      maxWidth={800}
                     >
                       <Text variant="subtitle1" className={classes.cpName}>
                         {wizardContext.name}
