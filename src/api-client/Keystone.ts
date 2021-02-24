@@ -867,6 +867,36 @@ class Keystone extends ApiService {
     return data.credentials
   }
 
+  addCredential = async (params) => {
+    const body = {
+      credential: params,
+    }
+    const data = await this.client.basicPost<any>({
+      url: this.credentialsUrl,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addCredential',
+      },
+    })
+    return data.credential
+  }
+
+  deleteCredential = async (credentialId) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: `${this.credentialsUrl}/${credentialId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteCredential',
+        },
+      })
+      return credentialId
+    } catch (err) {
+      throw new Error('Unable to delete non-existent credential')
+    }
+  }
+
   getUser = async (id) => {
     const data = await this.client.basicGet<any>({
       url: `${this.usersUrl}/${id}`,

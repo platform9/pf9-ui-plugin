@@ -3,7 +3,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
 import { makeFilteredUsersSelector } from 'account/components/userManagement/users/selectors'
-import { always, find, head, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
+import { always, find, flatten, head, isNil, keys, pathOr, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
@@ -123,22 +123,19 @@ export const updateSession = async ({
   return null
 }
 
-export const loadCredentials = createContextLoader(
-  ActionDataKeys.ManagementCredentials,
-  () => {
-    return keystone.getCredentials()
-  },
-  {
-    requiredRoles: 'admin',
-  },
-)
+export const credentialActions = createCRUDActions(ActionDataKeys.ManagementCredentials, {
+  listFn: async () => keystone.getCredentials(),
+  createFn: async (params) => await keystone.addCredential(params),
+  deleteFn: async ({ id }) => await keystone.deleteCredential(id),
+  entityName: 'Credential',
+})
 
 export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers, {
   listFn: async () => {
     const [users] = await Promise.all([
       keystone.getUsers(),
       // Make sure the derived data gets loaded as well
-      loadCredentials(true),
+      credentialActions.list(true),
       mngmTenantActions.list(),
     ])
     return users
@@ -184,21 +181,9 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     return createdUser
   },
   updateFn: async (
-    { id: userId, username, displayname, password, enabled = true, roleAssignments },
+    { id: userId, username, displayname, password, enabled = true, roleAssignments, options },
     prevItems,
   ) => {
-    const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
-      userId,
-    })
-    const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
-      (acc, roleAssignment) => ({
-        ...acc,
-        [pathStr('scope.project.id', roleAssignment)]: pathStr('role.id', roleAssignment),
-      }),
-      {},
-    )
-    const mergedTenantIds = keys({ ...prevRoleAssignments, ...roleAssignments })
-
     // Perform the api calls to update the user and the tenant/role assignments
     const updatedUser = await keystone.updateUser(userId, {
       username,
@@ -207,6 +192,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       displayname,
       password: password || undefined,
       enabled: enabled,
+      options: options,
     })
 
     // If updating password of active user, reauthenticate the user
@@ -231,6 +217,23 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
         changeProjectScopeWithCredentials: true,
       })
     }
+
+    if (!roleAssignments) {
+      return updatedUser
+    }
+
+    // Set user roles
+    const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
+      userId,
+    })
+    const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
+      (acc, roleAssignment) => ({
+        ...acc,
+        [pathStr('scope.project.id', roleAssignment)]: pathStr('role.id', roleAssignment),
+      }),
+      {},
+    )
+    const mergedTenantIds = keys({ ...prevRoleAssignments, ...roleAssignments })
 
     const updateTenantRolesPromises = mergedTenantIds.map((tenantId) => {
       const prevRoleId = prevRoleAssignments[tenantId]

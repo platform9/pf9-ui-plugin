@@ -107,15 +107,15 @@ const Info = ({
   )
 }
 
-export const IconInfo: FC<{ icon: string; title: string; spacer?: boolean }> = ({
-  icon,
-  title,
-  children,
-  spacer = true,
-}) => {
+export const IconInfo: FC<{
+  icon: string
+  title: string
+  spacer?: boolean
+  className?: string
+}> = ({ icon, title, children, className = '', spacer = true }) => {
   const classes = useIconInfoStyles({ spacer })
   return (
-    <Info className={classes.infoContainer}>
+    <Info className={clsx(classes.infoContainer, className)}>
       <Text className={classes.alertTitle} variant="body2">
         <FontAwesomeIcon>{icon}</FontAwesomeIcon> {title}
       </Text>
