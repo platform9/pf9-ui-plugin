@@ -193,7 +193,7 @@ const ResetPasswordPage: React.FC = () => {
 
     try {
       const options: IApiData = {
-        secret: token,
+        token: token,
         username: params.emailId,
         password: params.confirmPassword,
       }
