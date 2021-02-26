@@ -75,7 +75,7 @@ const ForgotPasswordPage = (props) => {
     })
 
     try {
-      const response = clemency.requestNewPassword(params.emailId)
+      const response = await clemency.requestNewPassword(params.emailId)
 
       console.log(response)
       response.code === 200
