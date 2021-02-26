@@ -77,7 +77,8 @@ const ForgotPasswordPage = (props) => {
     try {
       const response = clemency.requestNewPassword(params.emailId)
 
-      response.status === 200
+      console.log(response)
+      response.code === 200
         ? updateParams({ isResetSuccessful: true, loading: false })
         : updateParams({ isError: true, loading: false })
     } catch (err) {
