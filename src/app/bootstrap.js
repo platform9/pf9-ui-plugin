@@ -4,7 +4,7 @@ import { setupFromConfig } from 'utils/registry'
 import config from '../../config'
 import ApiClient from 'api-client/ApiClient'
 import './app.css'
-import './all.min.css'
+// import './all.min.css'
 
 Bugsnag.start({
   releaseStage: process.env.NODE_ENV,

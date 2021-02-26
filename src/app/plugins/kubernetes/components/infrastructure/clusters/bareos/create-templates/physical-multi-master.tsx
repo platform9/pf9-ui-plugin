@@ -70,11 +70,9 @@ interface Props {
   wizardContext: any
   setWizardContext: any
   onNext: any
-  experimentalFeatures?: boolean
 }
 
-const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled']
-const clusterEarlyAccessAddons = ['networkPluginOperator', 'kubevirtPluginOperator']
+const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled', 'networkPluginOperator', 'kubevirtPluginOperator']
 const trackingFields = {
   platform: CloudProviders.PhysicalMachine,
   target: ClusterCreateTypes.MultiMaster,
@@ -82,12 +80,10 @@ const trackingFields = {
 
 const PhysicalMultiMasterCluster: FC<Props> = ({
   onNext,
-  experimentalFeatures = false,
   ...props
 }) => {
   const { wizardContext, setWizardContext } = props
   const classes = useStyles({})
-  const addons = [].concat(clusterAddons, experimentalFeatures ? clusterEarlyAccessAddons : [])
   return (
     <>
       <WizardStep
@@ -120,13 +116,10 @@ const PhysicalMultiMasterCluster: FC<Props> = ({
           <FormFieldCard title="Cluster Settings">
             <KubernetesVersion />
 
-            {experimentalFeatures && (
-              <>
-                <Divider className={classes.divider} />
-                <Text variant="caption1">Cluster Network Stack</Text>
-                <NetworkStack {...props} />
-              </>
-            )}
+            <Divider className={classes.divider} />
+            <Text variant="caption1">Cluster Network Stack</Text>
+            <NetworkStack {...props} />
+              
 
             <Divider className={classes.divider} />
             <Text variant="caption1">Application & Container Settings</Text>
@@ -138,7 +131,7 @@ const PhysicalMultiMasterCluster: FC<Props> = ({
             <AddonTogglers
               wizardContext={wizardContext}
               setWizardContext={setWizardContext}
-              addons={addons}
+              addons={clusterAddons}
             />
           </FormFieldCard>
         </ValidatedForm>
