@@ -35,7 +35,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     gridTemplateColumns: 'repeat(4, 290px)',
     gridTemplateAreas: `
       'cluster node pod cloud'
-      'user tenant deployment service'
+      'deployment service user tenant'
     `,
     gridGap: theme.spacing(2),
     marginTop: theme.spacing(2),
@@ -171,6 +171,7 @@ const reports = [
   {
     entity: 'user',
     permissions: ['admin'],
+    overallPermissions: ['admin'],
     route: routes.userManagement.users.path(),
     addRoute: routes.userManagement.addUser.path(),
     title: 'Users',
@@ -183,6 +184,7 @@ const reports = [
   {
     entity: 'tenant',
     permissions: ['admin'],
+    overallPermissions: ['admin'],
     route: routes.userManagement.tenants.path(),
     addRoute: routes.userManagement.addTenant.path(),
     title: 'Tenants',
@@ -254,7 +256,7 @@ const reports = [
 ]
 
 const reportsWithPerms = (reports, role) => {
-  return reports.map((report) => {
+  const mappedReports = reports.map((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) {
       return report
@@ -262,6 +264,13 @@ const reportsWithPerms = (reports, role) => {
     // remove the add action when not permitted to
     return report.permissions.includes(role) ? report : { ...report, addRoute: '' }
   })
+  const filteredReports = mappedReports.filter((report) => {
+    if (!report.overallPermissions) {
+      return report
+    }
+    return report.overallPermissions.includes(role)
+  })
+  return filteredReports
 }
 
 const nodeHealthStatus = ({ status }) => {

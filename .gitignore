@@ -16,6 +16,7 @@ coverage/*
 .vscode
 cypress/screenshots/*
 cypress/videos/*
+yarn-error.log
 
 build-container/
 node-v*-linux-x64.tar.gz
