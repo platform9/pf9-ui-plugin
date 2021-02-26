@@ -185,6 +185,7 @@ const ResetPasswordPage: React.FC = () => {
   const handleFormSubmit = async () => {
     if (params.isResetPasswordSuccessful) {
       history.push(loginUrl)
+      return
     }
 
     updateParams({
