@@ -190,7 +190,7 @@ class ApiClient {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     if (version !== undefined) {
-      return endpoint.replace(/\/v3$/, `/${version}`)
+      return endpoint.replace(/\/v3$/, `/${version}`).replace(/\/v3\/$/, `/${version}/`)
     }
     return endpoint
   }
