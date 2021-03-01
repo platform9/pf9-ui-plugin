@@ -25,6 +25,7 @@ export interface GlobalState {
 export interface IDataKeys {
   Nodes: Node[]
   Clusters: IClusterAction[]
+  ImportedClusters: any
   Pods: Array<IGenericResource<GetClusterPodsItem>>
   ResMgrHosts: Host[]
   CombinedHosts: any // ? dont see where we load them

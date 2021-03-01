@@ -61,6 +61,15 @@ const normalizeCluster = <T>(baseUrl) => (cluster): T & INormalizedCluster => ({
   nodes: [],
 })
 
+const normalizeImportedClusters = (apiResponse) => {
+  const clusters = apiResponse.items
+  const normalizedClusters = clusters.map((cluster) => ({
+    ...cluster,
+    uuid: cluster.metadata.uid,
+  }))
+  return normalizedClusters
+}
+
 /* eslint-disable camelcase */
 class Qbert extends ApiService {
   public getClassName() {
@@ -241,6 +250,19 @@ class Qbert extends ApiService {
     })
     const baseUrl = await this.getApiEndpoint()
     return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
+  }
+
+  getImportedClusters = async () => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/clusters`
+    const response = await this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusters',
+      },
+    })
+    return normalizeImportedClusters(response)
   }
 
   getClusterDetails = async (clusterId) => {
