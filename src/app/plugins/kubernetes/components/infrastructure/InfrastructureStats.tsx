@@ -27,12 +27,14 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 export enum InfrastructureTabs {
   Clusters = 'clusters',
+  ImportedClusters = 'importedClusters',
   Nodes = 'nodes',
   CloudProviders = 'cloudProviders',
 }
 
 const headerCardMap = new Map<InfrastructureTabs, { component: React.ComponentType }>([
   [InfrastructureTabs.Clusters, { component: ClusterListHeader }],
+  [InfrastructureTabs.ImportedClusters, { component: ClusterListHeader }],
   [InfrastructureTabs.Nodes, { component: NodeListHeader }],
   [InfrastructureTabs.CloudProviders, { component: CloudProviderListHeader }],
 ])
