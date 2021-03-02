@@ -1,40 +1,14 @@
-import {
-  mergeLeft,
-  filter,
-  prop,
-  pluck,
-  map,
-  pipe,
-  head,
-  values,
-  groupBy,
-  propEq,
-  find,
-  propOr,
-  pick,
-  F,
-  flatten,
-} from 'ramda'
+import { flatten } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { objSwitchCase, pathStr } from 'utils/fp'
-import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
-import {
-  makeAppDetailsSelector,
-  makeDeploymentDetailsSelector,
-  makeAppVersionSelector,
-  makeAppsSelector,
-  makeReleasesSelector,
-} from './selectors'
+import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clusterActions, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
-import { pathJoin } from 'utils/misc'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { tryCatchAsync, someAsync, flatMapAsync, pipeAsync, mapAsync } from 'utils/async'
+import { someAsync, mapAsync } from 'utils/async'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import namespaceActions from '../namespaces/actions'
 
-const { qbert, helm } = ApiClient.getInstance()
-
-const uniqueIdentifier = 'id'
+const { helm } = ApiClient.getInstance()
 
 export const appDetailsLoader = createContextLoader(
   ActionDataKeys.AppDetails,
@@ -58,30 +32,36 @@ export const appDetailsLoader = createContextLoader(
 
 export const deploymentDetailLoader = createContextLoader(
   ActionDataKeys.ReleaseDetail,
-  async ({ clusterId, release }) => {
-    return qbert.getRelease(clusterId, release)
+  async ({ clusterId, namespace, releaseName }) => {
+    const details = helm.getReleaseInfo(clusterId, namespace, releaseName)
+    return {
+      ...details,
+      clusterId,
+    }
   },
   {
-    uniqueIdentifier,
-    indexBy: ['clusterId', 'release'],
-    selectorCreator: makeDeploymentDetailsSelector,
-  },
-)
-
-export const appVersionLoader = createContextLoader(
-  ActionDataKeys.AppVersions,
-  async ({ clusterId, appId, release }) => {
-    return qbert.getChartVersions(clusterId, appId, release)
-  },
-  {
-    indexBy: ['clusterId', 'appId', 'release'],
-    defaultOrderBy: 'version',
-    defaultOrderDirection: 'desc',
-    selectorCreator: makeAppVersionSelector,
+    uniqueIdentifier: 'Name',
+    indexBy: ['clusterId', 'namespace', 'releaseName'],
   },
 )
 
 const parseRepoName = (name) => name.match(/^(\w||-)+/)[0]
+
+export const appsAvailableToClusterLoader = createContextLoader(
+  ActionDataKeys.AppsAvailableToCluster,
+  async ({ clusterId }) => {
+    const charts = await helm.getChartsForCluster(clusterId)
+    return charts.map((chart) => ({
+      ...chart,
+      repository: parseRepoName(chart.Name),
+    }))
+  },
+  {
+    // uniqueIdentifier: ['Name', 'clusterId'],
+    uniqueIdentifier: ['Name'],
+    indexBy: 'clusterId',
+  },
+)
 
 export const appActions = createCRUDActions(ActionDataKeys.Apps, {
   listFn: async () => {
@@ -96,9 +76,24 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
     })
   },
   customOperations: {
-    deploy: async ({ clusterId, namespace, body }) => {
-      console.log(clusterId, namespace)
-      helm.deployChart(clusterId, namespace, body)
+    deploy: async ({
+      clusterId,
+      namespace,
+      deploymentName,
+      repository,
+      chartName,
+      version,
+      dry = false,
+      values = undefined,
+    }) => {
+      const body = {
+        Name: deploymentName,
+        Chart: `${repository}/${chartName}`,
+        Dry: dry,
+        Version: version,
+        Vals: values,
+      }
+      await helm.deployChart(clusterId, namespace, body)
     },
   },
   uniqueIdentifier: 'id',
@@ -106,17 +101,59 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
 })
 
 export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
-  listFn: async (params) => {
-    const [clusterId, clusters] = await parseClusterParams(params)
+  listFn: async ({ clusterId, namespace }) => {
+    console.log('action', namespace)
     if (clusterId === allKey) {
-      return someAsync(pluck('uuid', clusters).map(qbert.getReleases)).then(flatten)
+      const clusters = await clusterActions.list()
+      const results = mapAsync(async (cluster) => {
+        const namespaces = await namespaceActions.list({ clusterId: cluster.uuid })
+        const results = someAsync(
+          namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace.name)),
+        ).then(flatten)
+        return results
+      }, clusters)
+      return flatten(results)
+    } else {
+      if (namespace) {
+        const release = await helm.getReleases(clusterId, namespace)
+        return release
+      } else {
+        const namespaces = await namespaceActions.list({ clusterId })
+        const releases = someAsync(
+          namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace.name)),
+        ).then(flatten)
+        return releases.map((release) => {
+          return {
+            ...release,
+            clusterId,
+            namespace,
+          }
+        })
+      }
     }
-    return qbert.getReleases(clusterId)
   },
-  deleteFn: async (params) => {
-    return qbert.deleteRelease(params.clusterId, params.id)
+  updateFn: async ({
+    clusterId,
+    namespace,
+    releaseName,
+    action,
+    version = undefined,
+    values = undefined,
+  }) => {
+    const body = {
+      Name: releaseName,
+      Action: action,
+      Version: version,
+      Vals: values,
+    }
+    return helm.updateRelease(clusterId, namespace, body)
   },
-  uniqueIdentifier,
-  indexBy: 'clusterId',
-  selectorCreator: makeReleasesSelector,
+  deleteFn: async ({ clusterId, namespace, releaseName }) => {
+    const params = {
+      Name: releaseName,
+    }
+    await helm.deleteRelease(clusterId, namespace, params)
+  },
+  uniqueIdentifier: 'Name',
+  indexBy: ['clusterId', 'namespace'],
 })

@@ -1,12 +1,12 @@
 import React from 'react'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { repositoryActions } from './actions'
+import { releaseActions } from './actions'
 import { Dialog, DialogActions } from '@material-ui/core'
 import Progress from 'core/components/progress/Progress'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import Text from 'core/elements/text'
 import Button from 'core/elements/button'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,27 +25,37 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const UpdateRepositoryDialog = ({ rows: [repository], onClose }) => {
+const DeleteAppDeploymentDialog = ({ name, chart, clusterId, namespace, onClose }) => {
   const classes = useStyles()
-  const anyRepositoryActions = repositoryActions as any
-  const [update, updating] = useDataUpdater(anyRepositoryActions.updateRepositories, onClose)
+  const [deleteAppDeployment, deletingAppDeployment] = useDataUpdater(
+    releaseActions.delete,
+    onClose,
+  )
 
-  const updateRepository = () => update({ repositories: [repository] })
+  const handleAppDeploymentDeletion = () =>
+    deleteAppDeployment({ clusterId, namespace, releaseName: name })
 
   return (
     <Dialog open onClose={onClose}>
-      <FormFieldCard title="Update Repository">
-        <Progress loading={updating} minHeight={100} maxHeight={100}>
+      <FormFieldCard title="Delete App Deployment">
+        <Progress loading={deletingAppDeployment} minHeight={100} maxHeight={100}>
           <div className={classes.dialogTextContent}>
             <Text variant="body2" component="p">
-              This will update repository <b>{repository.name}</b>. Are you sure?
+              Are you sure you would like to delete the App Deployment:
+            </Text>
+            <br />
+            <Text variant="subtitle2">{name}</Text>
+            <Text variant="body2">{chart}</Text>
+            <br />
+            <Text variant="body2">
+              Once deleted it will be removed from all clusters it is currently deployed.
             </Text>
             <DialogActions className={classes.dialogButtons}>
               <Button className={classes.cancelButton} onClick={onClose}>
                 Cancel
               </Button>
-              <Button variant="light" color="primary" onClick={updateRepository}>
-                Update
+              <Button variant="light" color="primary" onClick={handleAppDeploymentDeletion}>
+                Delete
               </Button>
             </DialogActions>
           </div>
@@ -55,4 +65,4 @@ const UpdateRepositoryDialog = ({ rows: [repository], onClose }) => {
   )
 }
 
-export default UpdateRepositoryDialog
+export default DeleteAppDeploymentDialog

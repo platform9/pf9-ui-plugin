@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/styles'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import Text from 'core/elements/text'
 import Theme from 'core/themes/model'
-import React from 'react'
+import React, { useCallback } from 'react'
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -57,6 +57,11 @@ const AppCard = ({ app, onClick }) => {
   const handleOnClick = () => {
     onClick(app)
   }
+
+  const getIconUrl = useCallback(() => {
+    return icon && icon.match(/.(jpg|jpeg|png|gif)/) ? icon : placeholderIcon
+  }, [])
+
   return (
     <Grid item sm={6} md={4} lg={3} xl={2}>
       <div className={classes.card}>
@@ -65,7 +70,7 @@ const AppCard = ({ app, onClick }) => {
           <Text variant="body2">Repository {repository}</Text>
         </div>
         <div className={classes.middleContent}>
-          <img className={classes.logo} src={icon || placeholderIcon} />
+          <img className={classes.logo} src={getIconUrl()} />
           <Text variant="body2" component="p" className={classes.description}>
             {description}{' '}
           </Text>

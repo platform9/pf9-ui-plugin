@@ -13,7 +13,7 @@ interface Props {
   selectFirst?: boolean
 }
 
-const RepositoryPicklist = ({ value, onChange, selectFirst = true }: Props) => {
+const RepositoryPicklist = ({ value, onChange, selectFirst = false }: Props) => {
   const [repos, reposLoading] = useDataLoader(repositoryActions.list)
   const options = useMemo(() => projectAs({ label: 'name', value: 'name' }, repos), [repos])
 

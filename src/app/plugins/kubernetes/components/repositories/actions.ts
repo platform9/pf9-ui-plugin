@@ -22,7 +22,7 @@ export const repositoriesForClusterLoader = createContextLoader(
   {
     entityName: 'Repositories For Cluster',
     uniqueIdentifier: ['name'],
-    indexBy: ['clusterId'],
+    indexBy: 'clusterId',
   },
 )
 
@@ -77,6 +77,7 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
       await helm.addClustersToRepository(repoName, body)
 
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
+      dispatch(cacheActions.clearCache({ cacheKey: DataKeys.AppsAvailableToCluster }))
 
       return currentItems.map((repo) =>
         repo.name === repoName ? { ...repo, clusters: [...repo.clusters, ...clusterIds] } : repo,
@@ -87,6 +88,7 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
       await helm.deleteClustersFromRepository(repoName, body)
 
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
+      dispatch(cacheActions.clearCache({ cacheKey: DataKeys.AppsAvailableToCluster }))
 
       return currentItems.map((repo) => {
         if (repo.name !== repoName) {

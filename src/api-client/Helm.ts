@@ -188,6 +188,54 @@ class Helm extends ApiService {
       },
     })
   }
+
+  getReleases = async (clusterId, namespace) => {
+    const url = `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getReleases',
+      },
+    })
+  }
+
+  deleteRelease = async (clusterId, namespace, params) => {
+    const url = createUrlWithQueryString(
+      `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases`,
+      params,
+    )
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteRelease',
+      },
+    })
+  }
+
+  updateRelease = async (clusterId, namespace, body) => {
+    const url = `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases`
+    return this.client.basicPut({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateRelease',
+      },
+    })
+  }
+
+  getReleaseInfo = async (clusterId, namespace, releaseName) => {
+    const url = `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases/${releaseName}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getReleaseInfo',
+      },
+    })
+  }
 }
 
 export default Helm

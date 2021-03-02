@@ -8,9 +8,12 @@ export default function NamespacePicklistField({
   addNewItemOption = false,
   addNewItemHandler = undefined,
   label = 'Namespace',
+  required = 'false',
+  ...rest
 }) {
   return (
     <PicklistField
+      {...rest}
       DropdownComponent={NamespacePicklist}
       id="namespace"
       label={label}
@@ -20,7 +23,7 @@ export default function NamespacePicklistField({
       addNewItemOptionLabel="Add new namespace"
       disabled={!clusterId}
       addNewItemHandler={addNewItemHandler}
-      required
+      required={required}
     />
   )
 }
