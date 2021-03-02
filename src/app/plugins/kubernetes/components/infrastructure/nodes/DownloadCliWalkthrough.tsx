@@ -11,7 +11,11 @@ import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import ExternalLink from 'core/components/ExternalLink'
 import { nodePrerequisitesDocumentationLink } from 'k8s/links'
-import { downloadAndInstallPf9CliCommand, runPf9CliCommand } from '../clusters/constants'
+import {
+  configureCliCommand,
+  downloadAndInstallPf9CliCommand,
+  runPf9CliCommand,
+} from '../clusters/constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -94,10 +98,19 @@ const DownloadCliWalkthrough = (): JSX.Element => {
       <Text variant="h6">Use the PF9 CLI to connect nodes to the Platform9 Management Plane</Text>
       <NumberedSteps
         step={1}
-        title="Download and install the CLI"
+        title="Download the CLI for each node"
         description={
           <CopyToClipboard copyText={downloadAndInstallPf9CliCommand}>
             <CodeBlock>{downloadAndInstallPf9CliCommand}</CodeBlock>
+          </CopyToClipboard>
+        }
+      />
+      <NumberedSteps
+        step={2}
+        title="Configure the CLI"
+        description={
+          <CopyToClipboard copyText={configureCliCommand}>
+            <CodeBlock>{configureCliCommand}</CodeBlock>
           </CopyToClipboard>
         }
       />
@@ -115,7 +128,7 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         </CopyToClipboard>
       </Text>
       <NumberedSteps
-        step={2}
+        step={3}
         title={
           'Using a user with SUDO privileges, run the PF9 CLI command Prep-Node to attach the node to Platform9.'
         }
