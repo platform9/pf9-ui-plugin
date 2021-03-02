@@ -5,6 +5,7 @@ import { GetCloudProvider } from 'api-client/qbert.model'
 export enum CloudProviders {
   Aws = 'aws',
   Azure = 'azure',
+  Google = 'google',
   BareOS = 'local',
   PhysicalMachine = 'physical',
   VirtualMachine = 'virtual',
