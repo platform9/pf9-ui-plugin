@@ -30,6 +30,7 @@ export const awsNetworkingConfigurationsLink = `${k8sBaseUrl}/networking/configu
 export const awsAccessHelpLink = `${amazonDocBaseUrl}/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys`
 export const iamPolicyLink = `${pf9GitHubRepoUrl}/support-locker/master/pmk/aws-policy.json`
 export const awsRoute53HelpLink = `${amazonDocBaseUrl}/Route53/latest/DeveloperGuide/dns-configuring-new-domain.html`
+export const eksHelpLink = `${k8sBaseUrl}/eks-cluster-management`
 
 // Azure
 export const azurePrerequisitesLink = `${k8sBaseUrl}/public-cloud/azure-prerequisites`
