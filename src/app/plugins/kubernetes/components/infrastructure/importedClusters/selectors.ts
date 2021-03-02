@@ -6,7 +6,14 @@ export const importedClustersSelector = createSelector(
   [getDataSelector<DataKeys.ImportedClusters>(DataKeys.ImportedClusters)],
   (importedClusters) => {
     return importedClusters.map((cluster) => {
-      return cluster
+      return {
+        ...cluster,
+        name: cluster.metadata?.labels?.id,
+        external: cluster.metadata?.labels?.external,
+        status: cluster.status?.phase,
+        region: cluster.metadata?.labels?.region,
+        kubeVersion: cluster.spec?.kubeVersion,
+        creationTimestamp: cluster.metadata?.creationTimestamp
     })
   },
 )
