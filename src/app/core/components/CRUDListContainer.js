@@ -10,6 +10,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import useReactRouter from 'use-react-router'
 import { pathJoin } from 'utils/misc'
 import ConfirmationDialog from './ConfirmationDialog'
+import DropdownButton from './DropdownButton'
 
 const CRUDListContainer = ({
   children,
@@ -17,6 +18,7 @@ const CRUDListContainer = ({
   nameProp,
   addText,
   addButton: AddButton,
+  addButtonConfigs,
   AddDialog,
   EditDialog,
   DeleteDialog,
@@ -36,7 +38,11 @@ const CRUDListContainer = ({
 
   const deleteEnabled = !!handleRemove
   const editEnabled = EditDialog || editUrl
-  const addEnabled = AddDialog || addUrl
+  const addEnabled = AddDialog || addUrl || addButtonConfigs
+
+  const validAddButtonConfigs = addButtonConfigs
+    ? addButtonConfigs.filter((config) => config.cond())
+    : []
 
   const deleteConfirmText = useMemo(() => {
     if (isNilOrEmpty(selectedItems)) {
@@ -119,10 +125,33 @@ const CRUDListContainer = ({
       )}
       {addEnabled && (
         <PageContainerHeader>
-          {AddButton ? (
-            <AddButton onClick={handleAdd} />
+          {addButtonConfigs ? (
+            // If addButtonConfigs supplied, override standard method
+            <>
+              {validAddButtonConfigs && validAddButtonConfigs.length && (
+                <PageContainerHeader>
+                  {validAddButtonConfigs.length === 1 ? (
+                    <CreateButton
+                      onClick={() => {
+                        history.push(validAddButtonConfigs[0].link)
+                      }}
+                    >
+                      {validAddButtonConfigs[0].label}
+                    </CreateButton>
+                  ) : (
+                    <DropdownButton links={validAddButtonConfigs} />
+                  )}
+                </PageContainerHeader>
+              )}
+            </>
           ) : (
-            <CreateButton onClick={handleAdd}>{addText}</CreateButton>
+            <>
+              {AddButton ? (
+                <AddButton onClick={handleAdd} />
+              ) : (
+                <CreateButton onClick={handleAdd}>{addText}</CreateButton>
+              )}
+            </>
           )}
         </PageContainerHeader>
       )}

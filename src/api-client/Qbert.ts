@@ -394,6 +394,34 @@ class Qbert extends ApiService {
     })
   }
 
+  discoverExternalClusters = async (body) => {
+    const url = '/externalClusters/discover'
+    const discoveredClusters = await this.client.basicPost<any>({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'discoverExternalClusters',
+      },
+    })
+    return discoveredClusters
+  }
+
+  registerExternalCluster = async (body) => {
+    const url = '/externalClusters/register'
+    const registeredCluster = await this.client.basicPost<any>({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'registerExternalCluster',
+      },
+    })
+    return registeredCluster
+  }
+
   /* k8s API */
   getKubernetesVersion = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/version`

@@ -1,7 +1,7 @@
 import { Tooltip } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
-import CreateButton from 'core/components/buttons/CreateButton'
+// import CreateButton from 'core/components/buttons/CreateButton'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
@@ -153,17 +153,31 @@ const renderMetaData = (_, { tags }) => {
 }
 
 export const options = {
-  addUrl: routes.cluster.add.path(),
-  addButton: ({ onClick }) => {
-    const session = useSelector(prop(sessionStoreKey))
-    const {
-      userDetails: { role },
-    }: any = session
-    if (role !== 'admin') {
-      return null
-    }
-    return <CreateButton onClick={onClick}>Add Cluster</CreateButton>
-  },
+  addButtonConfigs: [
+    {
+      label: 'Create Cluster',
+      link: routes.cluster.add.path(),
+      cond: () => {
+        const session = useSelector(prop(sessionStoreKey))
+        const {
+          userDetails: { role },
+        }: any = session
+        return role === 'admin'
+      },
+    },
+    {
+      label: 'Import Cluster',
+      link: routes.cluster.import.path(),
+      cond: () => {
+        const session = useSelector(prop(sessionStoreKey))
+        const {
+          userDetails: { role },
+          features,
+        }: any = session
+        return role === 'admin' && features.experimental.kplane
+      },
+    },
+  ],
   columns: [
     { id: 'uuid', label: 'UUID', render: renderUUID, display: false },
     { id: 'name', label: 'Name', render: renderClusterDetailLink },
