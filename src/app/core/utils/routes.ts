@@ -363,13 +363,13 @@ export const routes = {
         name: 'Apps:Deployed',
       }),
       edit: Route.register({
-        url: `${pluginRoutePrefix}/apps/deployed/edit/:name`,
+        url: `${pluginRoutePrefix}/apps/deployed/edit/:clusterId/:namespace/:name`,
         name: 'Apps:Edit',
         defaultParams: {
           plugin: AppPlugins.Kubernetes,
         },
       }),
-    }
+    },
     // deployed: Route.register({
     //   url: `${pluginRoutePrefix}/apps/deployed/:clusterId/:release`,
     //   defaultParams: {

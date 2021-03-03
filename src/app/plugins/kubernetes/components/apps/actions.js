@@ -34,10 +34,7 @@ export const deploymentDetailLoader = createContextLoader(
   ActionDataKeys.ReleaseDetail,
   async ({ clusterId, namespace, releaseName }) => {
     const details = helm.getReleaseInfo(clusterId, namespace, releaseName)
-    return {
-      ...details,
-      clusterId,
-    }
+    return details
   },
   {
     uniqueIdentifier: 'Name',
@@ -114,21 +111,15 @@ export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
       }, clusters)
       return flatten(results)
     } else {
-      if (namespace) {
-        const release = await helm.getReleases(clusterId, namespace)
-        return release
-      } else {
+      if (namespace === allKey) {
         const namespaces = await namespaceActions.list({ clusterId })
         const releases = someAsync(
           namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace.name)),
         ).then(flatten)
-        return releases.map((release) => {
-          return {
-            ...release,
-            clusterId,
-            namespace,
-          }
-        })
+        return releases
+      } else {
+        const release = await helm.getReleases(clusterId, namespace)
+        return release
       }
     }
   },
@@ -149,10 +140,10 @@ export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
     return helm.updateRelease(clusterId, namespace, body)
   },
   deleteFn: async ({ clusterId, namespace, releaseName }) => {
-    const params = {
+    const data = {
       Name: releaseName,
     }
-    await helm.deleteRelease(clusterId, namespace, params)
+    await helm.deleteRelease(clusterId, namespace, data)
   },
   uniqueIdentifier: 'Name',
   indexBy: ['clusterId', 'namespace'],

@@ -14,6 +14,7 @@ import clsx from 'clsx'
 import Progress from 'core/components/progress/Progress'
 import { repositoriesForClusterLoader } from 'k8s/components/repositories/actions'
 import DisconnectRepositoryDialog from 'k8s/components/repositories/disconnect-repository-dialog'
+import { allKey } from 'app/constants'
 
 const useInfoCardStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -194,7 +195,9 @@ const ClusterDeployedApps = ({ cluster }) => {
   ] = useDataLoader(appsAvailableToClusterLoader, { clusterId: cluster.uuid })
   const [deployedApps, loadingDeployedApps] = useDataLoader(releaseActions.list, {
     clusterId: cluster.uuid,
+    namespace: allKey,
   })
+  console.log('deployedApps', deployedApps)
   const [repositories, loadingRepositories, reloadRepositories] = useDataLoader(
     repositoriesForClusterLoader,
     {
@@ -303,7 +306,7 @@ const ClusterDeployedApps = ({ cluster }) => {
             emptyItemsMessage={noRepositoriesMessage}
           />
         </div>
-        <ClusterDeployedAppsTable clusterId={cluster.uuid} history={history} />
+        <ClusterDeployedAppsTable apps={deployedApps} clusterId={cluster.uuid} history={history} />
       </Progress>
     </>
   )

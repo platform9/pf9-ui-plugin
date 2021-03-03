@@ -200,13 +200,11 @@ class Helm extends ApiService {
     })
   }
 
-  deleteRelease = async (clusterId, namespace, params) => {
-    const url = createUrlWithQueryString(
-      `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases`,
-      params,
-    )
+  deleteRelease = async (clusterId, namespace, data) => {
+    const url = `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases`
     return this.client.basicDelete({
       url,
+      data,
       options: {
         clsName: this.getClassName(),
         mthdName: 'deleteRelease',

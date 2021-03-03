@@ -17,7 +17,12 @@ import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import useReactRouter from 'use-react-router'
 import AppVersionPicklistField from './app-version-picklist-field'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { deploymentDetailLoader, releaseActions } from './actions'
+import {
+  appDetailsLoader,
+  appsAvailableToClusterLoader,
+  deploymentDetailLoader,
+  releaseActions,
+} from './actions'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterPicklist from '../common/ClusterPicklist'
@@ -124,41 +129,79 @@ const EditAppDeploymentPage = () => {
   const fileInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
   const name = match.params['name']
+  const clusterId = match.params['clusterId']
+  const namespace = match.params['namespace']
 
-  const [deployedAppDetails, loadingDeployedAppDetails] = useDataLoader(deploymentDetailLoader)
+  const [[deployedAppDetails] = {}, loadingDeployedAppDetails]: any = useDataLoader(
+    deploymentDetailLoader,
+    {
+      releaseName: name,
+      clusterId,
+      namespace,
+    },
+  )
+  /* 
+    Unfortunately, the deployed apps details API does not tell us what repository the app is from.
+    We can only get that info from the apps API. Therefore, we must load all the apps that are 
+    available to the cluster and from there filter out the app we want.
+  */
+
+  const [
+    appsAvailableToCluster,
+    loadingAppsAvailableToCluster,
+  ] = useDataLoader(appsAvailableToClusterLoader, { clusterId: clusterId })
+
+  // Loop through the list of apps available to this cluster and find the app/chart we want
+  const app = useMemo(
+    () =>
+      appsAvailableToCluster.find(
+        (app) => app.Chart?.name === deployedAppDetails?.chart?.metadata?.name,
+      ),
+    [appsAvailableToCluster, deployedAppDetails],
+  )
+  // We also need to load app/chart detail for other additional info such as app/chart versions
+  const [[appDetail = {}], loadingAppDetail] = useDataLoader(appDetailsLoader, {
+    name: deployedAppDetails?.chart?.metadata?.name,
+    repository: app?.repository,
+  })
+
   const [updateDeployedApp, updatingDeployedApp] = useDataUpdater(releaseActions.update)
-
-  //   const [[appDetail = {}], loadingAppDetail] = useDataLoader(appDetailsLoader, {
-  //     name,
-  //     repository,
-  //   })
 
   const initialContext = useMemo(
     () => ({
       deploymentName: name,
-      version: '1.45',
-      clusterId: '6e64871b-3cbf-450f-8476-aa0b92a784af',
-      namespace: 'platform9-system',
+      version: deployedAppDetails?.chart?.metadata?.version,
+      repository: app?.repository,
+      clusterId: clusterId,
+      namespace: namespace,
       useDefaultValues: true,
-      values: 'default values',
-      info: 'www.google.com/hello/kimberly/nguy',
+      values: JSON.stringify(deployedAppDetails?.chart?.values, null, 1),
+      info: appDetail?.metadata?.home,
     }),
-    [deployedAppDetails],
+    [deployedAppDetails, app, appDetail, name, clusterId, namespace],
   )
 
-  const appVersions = []
-
-  //   const appVersions = useMemo(() => {
-  //     const versions = appDetail.Versions?.slice(0, 10)
-  //     if (!versions) {
-  //       return []
-  //     }
-  //     return versions.map((version) => ({ value: version, label: version }))
-  //   }, [appDetail])
+  const appVersions = useMemo(() => {
+    const versions = appDetail.Versions?.slice(0, 10)
+    if (!versions) {
+      return []
+    }
+    return versions.map((version) => ({ value: version, label: version }))
+  }, [appDetail])
 
   const handleSubmit = async (wizardContext) => {
-    const { releaseName, clusterId, namespace, version, values, useDefaultValues } = wizardContext
-    const action = parseFloat(version) >= parseFloat('1.52') ? 'upgrade' : 'rollback'
+    const {
+      deploymentName,
+      clusterId,
+      namespace,
+      version,
+      values,
+      useDefaultValues,
+    } = wizardContext
+    const action =
+      parseFloat(version) >= parseFloat(deployedAppDetails?.chart?.metadata?.version)
+        ? 'upgrade'
+        : 'rollback'
 
     // If useDefaultValues is true, meaning we use the chart's default values.yaml file, then there's no need
     // to send the values to the API. When the API gives us the chart's default values, it is in object form.
@@ -170,7 +213,7 @@ const EditAppDeploymentPage = () => {
     const [success] = await updateDeployedApp({
       clusterId,
       namespace,
-      releaseName,
+      releaseName: deploymentName,
       action,
       version,
       vals,
@@ -197,7 +240,7 @@ const EditAppDeploymentPage = () => {
     reader.readAsText(file)
   }
 
-  const loading = loadingDeployedAppDetails
+  const loading = loadingDeployedAppDetails || loadingAppsAvailableToCluster || loadingAppDetail
 
   return (
     <>
@@ -215,7 +258,7 @@ const EditAppDeploymentPage = () => {
             <WizardMeta
               className={classes.deployAppForm}
               fields={wizardContext}
-              icon={<AppIcon appName={name} logoUrl={''} />}
+              icon={<AppIcon appName={name} logoUrl={deployedAppDetails?.chart?.metadata?.icon} />}
               keyOverrides={wizardMetaFormattedNames}
               calloutFields={wizardMetaCalloutFields}
             >
@@ -229,10 +272,10 @@ const EditAppDeploymentPage = () => {
                   elevated={false}
                 >
                   <div className={classes.chartInfo}>
-                    <Text variant="subtitle1">{'App Name'}</Text>
+                    <Text variant="subtitle1">{name}</Text>
 
                     <Text variant="body2" className={classes.infoText}>
-                      {'App Description'}
+                      {deployedAppDetails?.chart?.metadata?.description}
                     </Text>
                   </div>
                   <FormFieldCard>

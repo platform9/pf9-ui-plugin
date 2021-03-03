@@ -157,7 +157,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'Edit Deployed App',
-      link: { path: '/apps/deployed/edit/:name', exact: true },
+      link: { path: '/apps/deployed/edit/:clusterId/:namespace/:name', exact: true },
       component: EditAppDeploymentPage,
     },
     {

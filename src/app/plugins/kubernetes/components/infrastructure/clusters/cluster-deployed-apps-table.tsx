@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 // import { Table, TableCell, TableHead, TableRow, TableSortLabel } from '@material-ui/core'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
@@ -114,30 +114,18 @@ const columns = [
   { id: 'version', label: 'Version', disableSorting: true },
 ]
 
-const apps = [
-  {
-    icon: 'https://raw.githubusercontent.com/fluxcd/flux/master/docs/_files/weave-flux.png',
-    name: 'flux',
-    chart: 'fluxcd',
-    namespace: 'kimberly',
-    version: '2.23',
-  },
-  {
-    icon: 'https://docs.gitea.io/images/gitea.png',
-    name: 'gitea',
-    chart: 'k8s-land',
-    namespace: 'kimberly',
-    version: '2.23',
-  },
-]
+const placeholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
 
 const AppRow = ({ app, onEdit, onDelete }) => {
-  const { icon, name, chart, namespace, version } = app
+  const { icon, name, chart, namespace, chart_version } = app
+  const getIconUrl = useCallback((icon) => {
+    return icon && icon.match(/.(jpg|jpeg|png|gif)/) ? icon : placeholderIcon
+  }, [])
   const classes = useRowStyles()
   return (
     <div className={classes.card}>
       <div className={classes.iconCell}>
-        <img alt={name} src={icon} className={classes.appIcon} />
+        <img alt={name} src={getIconUrl(icon)} className={classes.appIcon} />
         <hr className={classes.divider} />
       </div>
       <div className={classes.appCell}>
@@ -153,7 +141,7 @@ const AppRow = ({ app, onEdit, onDelete }) => {
       </div>
       <div className={classes.cell}>
         <Text className={classes.text} variant="caption1">
-          {version}
+          {chart_version}
         </Text>
       </div>
       <div className={classes.actionsCell}>
@@ -173,7 +161,7 @@ const AppRow = ({ app, onEdit, onDelete }) => {
 
 type Order = 'Asc' | 'Desc'
 
-const ClusterDeployedAppsTable = ({ clusterId, history }) => {
+const ClusterDeployedAppsTable = ({ apps, clusterId, history }) => {
   const classes = useStyles()
   const [order, setOrder] = useState<Order>('Asc')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -185,7 +173,6 @@ const ClusterDeployedAppsTable = ({ clusterId, history }) => {
   }
 
   const handleAppDeploymentDeletion = (app) => {
-    console.log('app', app)
     setActiveApp(app)
     setShowDeleteDialog(true)
   }
@@ -220,7 +207,15 @@ const ClusterDeployedAppsTable = ({ clusterId, history }) => {
         <AppRow
           key={app.name}
           app={app}
-          onEdit={() => history.push(routes.apps.deployed.edit.path({ name: app.name }))}
+          onEdit={() =>
+            history.push(
+              routes.apps.deployed.edit.path({
+                clusterId,
+                namespace: app.namespace,
+                name: app.name,
+              }),
+            )
+          }
           onDelete={handleAppDeploymentDeletion}
         />
       ))}

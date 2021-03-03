@@ -2,6 +2,8 @@ import { listTablePrefs } from 'app/constants'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
+import { routes } from 'core/utils/routes'
+import DataKeys from 'k8s/DataKeys'
 import { pick } from 'ramda'
 import React from 'react'
 import ClusterPicklistDefault from '../common/ClusterPicklist'
@@ -53,13 +55,23 @@ const ListPage = ({ ListContainer }) => {
 }
 
 const options = {
+  // deleteFn: releaseActions.delete,
+  editUrl: ({ clusterId, namespace, name }, id) => {
+    console.log(routes.apps.deployed.edit.path({ clusterId, namespace, name }))
+    return routes.apps.deployed.edit.path({ clusterId, namespace, name })
+  },
   columns: [
     { id: 'name', label: 'App Name' },
-    { id: 'app', label: 'App' },
-    { id: 'version', label: 'Version' },
+    { id: 'chart', label: 'App' },
+    { id: 'chart_version', label: 'Version' },
   ],
   name: 'Deployed Apps',
+  cacheKey: DataKeys.Deployments,
+  uniqueIdentifier: 'name',
   title: 'Deployed Apps',
+  multiSelection: false,
+  searchTarget: 'name',
+
   ListPage,
 }
 
