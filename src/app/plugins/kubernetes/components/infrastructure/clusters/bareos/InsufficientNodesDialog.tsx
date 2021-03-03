@@ -13,7 +13,11 @@ import { useSelector } from 'react-redux'
 import { prop } from 'ramda'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { ClusterCreateTypeNames } from '../model'
-import { downloadPf9CliCommand, installPf9CliCommand, runPf9CliCommand } from '../constants'
+import {
+  configureCliCommand,
+  downloadAndInstallPf9CliCommand,
+  runPf9CliCommand,
+} from '../constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   formCard: {
@@ -108,17 +112,17 @@ const InsufficientNodesNodesDialog = ({
           step={1}
           title="Download the CLI for each node"
           description={
-            <CopyToClipboard copyText={downloadPf9CliCommand}>
-              <CodeBlock>{downloadPf9CliCommand}</CodeBlock>
+            <CopyToClipboard copyText={downloadAndInstallPf9CliCommand}>
+              <CodeBlock>{downloadAndInstallPf9CliCommand}</CodeBlock>
             </CopyToClipboard>
           }
         />
         <NumberedStep
           step={2}
-          title="Install the CLI"
+          title="Configure the CLI"
           description={
-            <CopyToClipboard copyText={installPf9CliCommand}>
-              <CodeBlock>{installPf9CliCommand}</CodeBlock>
+            <CopyToClipboard copyText={configureCliCommand}>
+              <CodeBlock>{configureCliCommand}</CodeBlock>
             </CopyToClipboard>
           }
         />
