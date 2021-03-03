@@ -7,8 +7,12 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import { someAsync, mapAsync } from 'utils/async'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import namespaceActions from '../namespaces/actions'
+import { makeReleasesSelector } from './selectors'
+import store from 'app/store'
+import { cacheActions } from 'core/caching/cacheReducers'
 
 const { helm } = ApiClient.getInstance()
+const { dispatch } = store
 
 export const appDetailsLoader = createContextLoader(
   ActionDataKeys.AppDetails,
@@ -91,6 +95,7 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
         Vals: values,
       }
       await helm.deployChart(clusterId, namespace, body)
+      dispatch(cacheActions.clearCache({ cacheKey: ActionDataKeys.Releases }))
     },
   },
   uniqueIdentifier: 'id',
@@ -99,28 +104,15 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
 
 export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
   listFn: async ({ clusterId, namespace }) => {
-    console.log('action', namespace)
-    if (clusterId === allKey) {
-      const clusters = await clusterActions.list()
-      const results = mapAsync(async (cluster) => {
-        const namespaces = await namespaceActions.list({ clusterId: cluster.uuid })
-        const results = someAsync(
-          namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace.name)),
-        ).then(flatten)
-        return results
-      }, clusters)
-      return flatten(results)
+    if (namespace === allKey) {
+      const namespaces = await namespaceActions.list({ clusterId })
+      const releases = someAsync(
+        namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace.name)),
+      ).then(flatten)
+      return releases
     } else {
-      if (namespace === allKey) {
-        const namespaces = await namespaceActions.list({ clusterId })
-        const releases = someAsync(
-          namespaces.map(async (namespace) => await helm.getReleases(clusterId, namespace.name)),
-        ).then(flatten)
-        return releases
-      } else {
-        const release = await helm.getReleases(clusterId, namespace)
-        return release
-      }
+      const release = await helm.getReleases(clusterId, namespace)
+      return release
     }
   },
   updateFn: async ({
@@ -139,12 +131,13 @@ export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
     }
     return helm.updateRelease(clusterId, namespace, body)
   },
-  deleteFn: async ({ clusterId, namespace, releaseName }) => {
+  deleteFn: async ({ clusterId, namespace, name }) => {
     const data = {
-      Name: releaseName,
+      Name: name,
     }
     await helm.deleteRelease(clusterId, namespace, data)
   },
-  uniqueIdentifier: 'Name',
+  uniqueIdentifier: 'name',
   indexBy: ['clusterId', 'namespace'],
+  selectorCreator: makeReleasesSelector,
 })

@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { map, mergeLeft, pipe, filter, pathEq, identity } from 'ramda'
-import { pathStr, filterIf, pathStrOr } from 'utils/fp'
+import { pathStr, pathStrOr } from 'utils/fp'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
@@ -81,20 +81,23 @@ export const makeReleasesSelector = (
   return createSelector(
     [
       getDataSelector<DataKeys.Releases>(DataKeys.Releases, ['clusterId']),
+      getDataSelector<DataKeys.Apps>(DataKeys.Apps),
       (_, params) => mergeLeft(params, defaultParams),
     ],
-    (items, params) => {
-      const { namespace, orderBy, orderDirection } = params
-      return pipe<any, any, any, any>(
-        filterIf(namespace && namespace !== allKey, pathEq(['attributes', 'namespace'], namespace)),
-        map((item: any) => ({
-          ...item,
-          name: pathStr('attributes.name', item),
-          logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),
-          lastUpdated: moment(pathStr('attributes.updated', item), apiDateFormat).format('llll'),
-        })),
+    (releases, charts, params) => {
+      const { orderBy, orderDirection } = params
+      return pipe<any, any, any>(
+        map((release: any) => {
+          const chart = charts.find((chart) => chart.name === release.chart)
+          return {
+            ...release,
+            repository: chart?.repository,
+            icon: chart?.icon,
+            home: chart?.home,
+          }
+        }),
         createSorter({ orderBy, orderDirection }),
-      )(items)
+      )(releases)
     },
   )
 }

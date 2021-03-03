@@ -55,11 +55,9 @@ const ListPage = ({ ListContainer }) => {
 }
 
 const options = {
-  // deleteFn: releaseActions.delete,
-  editUrl: ({ clusterId, namespace, name }, id) => {
-    console.log(routes.apps.deployed.edit.path({ clusterId, namespace, name }))
-    return routes.apps.deployed.edit.path({ clusterId, namespace, name })
-  },
+  deleteFn: releaseActions.delete,
+  editUrl: ({ clusterId, namespace, name }, id) =>
+    routes.apps.deployed.edit.path({ clusterId, namespace, name }),
   columns: [
     { id: 'name', label: 'App Name' },
     { id: 'chart', label: 'App' },

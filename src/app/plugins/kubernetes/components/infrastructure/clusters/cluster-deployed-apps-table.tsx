@@ -166,10 +166,12 @@ const ClusterDeployedAppsTable = ({ apps, clusterId, history }) => {
   const [order, setOrder] = useState<Order>('Asc')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [activeApp, setActiveApp] = useState(null)
+  const [sortedApps, setSortedApps] = useState(apps)
 
   const handleSort = () => {
     const newOrder = order === 'Asc' ? 'Desc' : 'Asc'
     setOrder(newOrder)
+    setSortedApps(sortedApps.reverse())
   }
 
   const handleAppDeploymentDeletion = (app) => {
@@ -203,7 +205,7 @@ const ClusterDeployedAppsTable = ({ apps, clusterId, history }) => {
         ))}
       </div>
       <hr className={classes.divider} />
-      {apps.map((app) => (
+      {sortedApps.map((app) => (
         <AppRow
           key={app.name}
           app={app}

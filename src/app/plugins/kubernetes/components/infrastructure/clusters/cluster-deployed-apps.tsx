@@ -197,7 +197,7 @@ const ClusterDeployedApps = ({ cluster }) => {
     clusterId: cluster.uuid,
     namespace: allKey,
   })
-  console.log('deployedApps', deployedApps)
+
   const [repositories, loadingRepositories, reloadRepositories] = useDataLoader(
     repositoriesForClusterLoader,
     {
@@ -262,7 +262,9 @@ const ClusterDeployedApps = ({ cluster }) => {
 
   const repositoryFields = useMemo(() => {
     return repositories.map((repository) => {
-      const numDeployedAppsFromRepository = 0
+      const numDeployedAppsFromRepository = deployedApps.filter(
+        (app) => app.repository === repository.name,
+      ).length
       const totalAppsInRepository = appsAvailableToCluster.filter(
         (app) => app.repository === repository.name,
       ).length

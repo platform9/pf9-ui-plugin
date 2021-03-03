@@ -17,12 +17,7 @@ import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import useReactRouter from 'use-react-router'
 import AppVersionPicklistField from './app-version-picklist-field'
 import useDataLoader from 'core/hooks/useDataLoader'
-import {
-  appDetailsLoader,
-  appsAvailableToClusterLoader,
-  deploymentDetailLoader,
-  releaseActions,
-} from './actions'
+import { appDetailsLoader, deploymentDetailLoader, releaseActions } from './actions'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterPicklist from '../common/ClusterPicklist'
@@ -132,6 +127,13 @@ const EditAppDeploymentPage = () => {
   const clusterId = match.params['clusterId']
   const namespace = match.params['namespace']
 
+  const [deployedApps, loadingDeployedApps] = useDataLoader(releaseActions.list, {
+    clusterId,
+    namespace,
+  })
+  const deployedApp = deployedApps.find((app) => app.name === name)
+  const { repository, chart } = deployedApp
+
   const [[deployedAppDetails] = {}, loadingDeployedAppDetails]: any = useDataLoader(
     deploymentDetailLoader,
     {
@@ -140,29 +142,11 @@ const EditAppDeploymentPage = () => {
       namespace,
     },
   )
-  /* 
-    Unfortunately, the deployed apps details API does not tell us what repository the app is from.
-    We can only get that info from the apps API. Therefore, we must load all the apps that are 
-    available to the cluster and from there filter out the app we want.
-  */
 
-  const [
-    appsAvailableToCluster,
-    loadingAppsAvailableToCluster,
-  ] = useDataLoader(appsAvailableToClusterLoader, { clusterId: clusterId })
-
-  // Loop through the list of apps available to this cluster and find the app/chart we want
-  const app = useMemo(
-    () =>
-      appsAvailableToCluster.find(
-        (app) => app.Chart?.name === deployedAppDetails?.chart?.metadata?.name,
-      ),
-    [appsAvailableToCluster, deployedAppDetails],
-  )
   // We also need to load app/chart detail for other additional info such as app/chart versions
   const [[appDetail = {}], loadingAppDetail] = useDataLoader(appDetailsLoader, {
-    name: deployedAppDetails?.chart?.metadata?.name,
-    repository: app?.repository,
+    name: chart,
+    repository: repository,
   })
 
   const [updateDeployedApp, updatingDeployedApp] = useDataUpdater(releaseActions.update)
@@ -171,14 +155,14 @@ const EditAppDeploymentPage = () => {
     () => ({
       deploymentName: name,
       version: deployedAppDetails?.chart?.metadata?.version,
-      repository: app?.repository,
+      repository: repository,
       clusterId: clusterId,
       namespace: namespace,
       useDefaultValues: true,
       values: JSON.stringify(deployedAppDetails?.chart?.values, null, 1),
       info: appDetail?.metadata?.home,
     }),
-    [deployedAppDetails, app, appDetail, name, clusterId, namespace],
+    [deployedAppDetails, appDetail, name, clusterId, namespace],
   )
 
   const appVersions = useMemo(() => {
@@ -240,7 +224,7 @@ const EditAppDeploymentPage = () => {
     reader.readAsText(file)
   }
 
-  const loading = loadingDeployedAppDetails || loadingAppsAvailableToCluster || loadingAppDetail
+  const loading = loadingDeployedAppDetails || loadingDeployedApps || loadingAppDetail
 
   return (
     <>
