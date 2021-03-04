@@ -5,7 +5,7 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { routes } from 'core/utils/routes'
 import DataKeys from 'k8s/DataKeys'
 import { pick } from 'ramda'
-import React from 'react'
+import React, { useMemo } from 'react'
 import ClusterPicklistDefault from '../common/ClusterPicklist'
 import NamespacePicklistDefault from '../common/NamespacePicklist'
 import { releaseActions } from './actions'
@@ -25,11 +25,16 @@ const ListPage = ({ ListContainer }) => {
       clusterId: params.clusterId,
     })
 
+    const filteredReleases = useMemo(
+      () => releases.filter((release) => release.status === 'deployed'),
+      [releases],
+    )
+
     return (
       <ListContainer
         loading={loading}
         reload={reload}
-        data={releases}
+        data={filteredReleases}
         getParamsUpdater={getParamsUpdater}
         filters={
           <>
@@ -69,7 +74,6 @@ const options = {
   title: 'Deployed Apps',
   multiSelection: false,
   searchTarget: 'name',
-
   ListPage,
 }
 

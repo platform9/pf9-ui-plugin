@@ -205,6 +205,11 @@ const ClusterDeployedApps = ({ cluster }) => {
     },
   )
 
+  const filteredDeployedApps = useMemo(
+    () => deployedApps.filter((app) => app.status === 'deployed'),
+    [deployedApps],
+  )
+
   const numRepositories = useMemo(() => repositories.length, [repositories])
 
   const handleRepositoryDisconnectButtonClick = useCallback((name) => {
@@ -263,7 +268,7 @@ const ClusterDeployedApps = ({ cluster }) => {
   const repositoryFields = useMemo(() => {
     return repositories.map((repository) => {
       const numDeployedAppsFromRepository = deployedApps.filter(
-        (app) => app.repository === repository.name,
+        (app) => app.repository === repository.name && app.status === 'deployed',
       ).length
       const totalAppsInRepository = appsAvailableToCluster.filter(
         (app) => app.repository === repository.name,
@@ -274,7 +279,7 @@ const ClusterDeployedApps = ({ cluster }) => {
         value: renderRepositoryValue(numDeployedAppsFromRepository, totalAppsInRepository),
       }
     })
-  }, [repositories, appsAvailableToCluster])
+  }, [repositories, appsAvailableToCluster, deployedApps])
 
   const loadingSomething =
     loadingAppsAvailableToCluster || loadingDeployedApps || loadingRepositories
@@ -308,7 +313,11 @@ const ClusterDeployedApps = ({ cluster }) => {
             emptyItemsMessage={noRepositoriesMessage}
           />
         </div>
-        <ClusterDeployedAppsTable apps={deployedApps} clusterId={cluster.uuid} history={history} />
+        <ClusterDeployedAppsTable
+          apps={filteredDeployedApps}
+          clusterId={cluster.uuid}
+          history={history}
+        />
       </Progress>
     </>
   )
