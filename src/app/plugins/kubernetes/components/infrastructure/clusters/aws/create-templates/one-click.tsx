@@ -35,7 +35,7 @@ export const initialContext = {
   ami: 'ubuntu',
   calicoIpIpMode: 'Always',
   calicoNatOutgoing: true,
-  calicoBlockSize: '24',
+  calicoBlockSize: '26',
   mtuSize: 1440,
   etcdBackup: true,
   etcdStoragePath: defaultEtcBackupPath,
