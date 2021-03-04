@@ -181,7 +181,11 @@ class ApiClient {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     if (version !== undefined) {
-      return endpoint.replace(/\/v3$/, `/${version}`).replace(/\/v3\/$/, `/${version}/`)
+      endpoint = endpoint.replace(/\/v3$/, `/${version}`).replace(/\/v3\//, `/${version}/`)
+    }
+    // eslint-disable-next-line no-extra-boolean-cast
+    if (!!this.apiServices[clsName].scopedEnpointPath) {
+      return `${endpoint}/${this.apiServices[clsName].scopedEnpointPath()}`
     }
     return endpoint
   }
