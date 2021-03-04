@@ -44,12 +44,12 @@ import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/mod
 import { bareOSClusterTracking } from '../../tracking'
 
 export const initialContext = {
-  containersCidr: '10.20.0.0/22',
-  servicesCidr: '10.21.0.0/22',
+  containersCidr: '10.20.0.0/16',
+  servicesCidr: '10.21.0.0/16',
   networkPlugin: 'calico',
   calicoIpIpMode: 'Always',
   calicoNatOutgoing: true,
-  calicoBlockSize: '24',
+  calicoBlockSize: '26',
   runtimeConfigOption: 'default',
   mtuSize: 1440,
   privileged: true,

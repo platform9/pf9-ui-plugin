@@ -7,8 +7,8 @@ export enum NetworkStackTypes {
 export const getDefaultCIDRIpsForStack = (stack) =>
   ({
     [NetworkStackTypes.IPv4]: {
-      containersCidr: '10.20.0.0/22',
-      servicesCidr: '10.21.0.0/22',
+      containersCidr: '10.20.0.0/16',
+      servicesCidr: '10.21.0.0/16',
     },
     [NetworkStackTypes.IPv6]: {
       containersCidr: 'fd00:101::/116',
