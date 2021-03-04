@@ -82,7 +82,7 @@ const CalicoNetworkFields = ({ values }) => (
       label="Block Size"
       info={calicoBlockSizeTooltip?.[values.networkStack]}
       required
-      validations={[ipValidators?.[values.networkStack]?.blockSizeValidator]}
+      validations={[ipValidators?.[values.networkStack]?.blockSizeValidator, ipValidators?.[values.networkStack]?.calicoBlockSizeCIDRValidator]}
     />
     <TextField
       id="mtuSize"

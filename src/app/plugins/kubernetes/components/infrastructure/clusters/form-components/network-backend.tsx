@@ -20,7 +20,7 @@ export const handleNetworkBackendChange = (option, wizardContext) => {
     privileged: option === 'calico' ? true : wizardContext.privileged,
     calicoIpIpMode: option === 'calico' ? 'Always' : undefined,
     calicoNatOutgoing: option === 'calico' ? true : undefined,
-    calicoBlockSize: option === 'calico' ? '24' : undefined,
+    calicoBlockSize: option === 'calico' && wizardContext.networkStack === NetworkStackTypes.IPv6 ? '122' : option === 'calico' ? '26' : undefined,
     calicoDetectionMethod: option === 'calico' ? CalicoDetectionTypes.FirstFound : undefined,
   }
 }
