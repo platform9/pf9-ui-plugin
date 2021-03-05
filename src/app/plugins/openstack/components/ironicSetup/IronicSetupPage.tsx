@@ -123,10 +123,14 @@ const nodeAuthorized = async (hosts) => {
     }
   }
 
+  // Ironic controller not fully configured yet
+  const onboardedHost = hosts.find((host) => host.roles.includes('pf9-onboarding'))
   return {
     finished: false,
     step: 3,
-    data: {},
+    data: {
+      selectedHost: [onboardedHost],
+    }
   }
 }
 
