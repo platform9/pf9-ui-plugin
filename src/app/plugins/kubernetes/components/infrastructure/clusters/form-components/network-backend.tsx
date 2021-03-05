@@ -14,13 +14,13 @@ const networkBackendOptions = [
   // { label: 'Canal (experimental)', value: 'canal' },
 ]
 
-export const handleNetworkBackendChange = (option, wizardContext) => {
+export const handleNetworkBackendChange = (option, stack, wizardContext) => {
   return {
     networkPlugin: option,
     privileged: option === 'calico' ? true : wizardContext.privileged,
     calicoIpIpMode: option === 'calico' ? 'Always' : undefined,
     calicoNatOutgoing: option === 'calico' ? true : undefined,
-    calicoBlockSize: option === 'calico' && wizardContext.networkStack === NetworkStackTypes.IPv6 ? '122' : option === 'calico' ? '26' : undefined,
+    calicoBlockSize: option === 'calico' && stack === NetworkStackTypes.IPv6 ? '122' : option === 'calico' ? '26' : undefined,
     calicoDetectionMethod: option === 'calico' ? CalicoDetectionTypes.FirstFound : undefined,
   }
 }
