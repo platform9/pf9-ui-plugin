@@ -65,7 +65,7 @@ const normalizeImportedClusters = (apiResponse) => {
   const clusters = apiResponse.items
   const normalizedClusters = clusters.map((cluster) => ({
     ...cluster,
-    uuid: cluster.metadata.uid,
+    uuid: cluster.metadata.name,
   }))
   return normalizedClusters
 }
@@ -442,6 +442,19 @@ class Qbert extends ApiService {
       },
     })
     return registeredCluster
+  }
+
+  deregisterExternalCluster = async (id) => {
+    const url = `/externalClusters/${id}/deregister`
+    return this.client.basicPost({
+      url,
+      body: {},
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deregisterExternalCluster',
+      },
+    })
   }
 
   /* k8s API */

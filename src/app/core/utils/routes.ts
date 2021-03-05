@@ -113,7 +113,7 @@ export const routes = {
     url: `${appUrlRoot}/login`,
     name: 'Login',
   }),
-  infrastructre: Route.register({
+  infrastructure: Route.register({
     url: `${pluginRoutePrefix}/infrastructure`,
     defaultParams: {
       plugin: AppPlugins.Kubernetes,
@@ -243,6 +243,13 @@ export const routes = {
         }),
       },
     },
+    importedClusters: Route.register({
+      url: `${pluginRoutePrefix}/infrastructure#importedClusters`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Infrastructure:ImportedClusters:List',
+    }),
     import: Route.register({
       url: `${pluginRoutePrefix}/infrastructure/clusters/import`,
       defaultParams: {

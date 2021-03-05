@@ -6,6 +6,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ClusterPicklist = forwardRef(
@@ -18,6 +19,7 @@ const ClusterPicklist = forwardRef(
       onlyMasterNodeClusters,
       onlyAppCatalogEnabled,
       onlyHealthyClusters,
+      showImportedClusters,
       value,
       ...rest
     },
@@ -30,7 +32,17 @@ const ClusterPicklist = forwardRef(
       healthyClusters: onlyHealthyClusters,
     }
     const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
-    const options = useMemo(() => projectAs({ label: 'name', value: 'uuid' }, clusters), [clusters])
+    const [importedClusters, importedClustersLoading] = useDataLoader(importedClusterActions.list)
+    const options = useMemo(() => {
+      if (showImportedClusters) {
+        return [
+          ...projectAs({ label: 'name', value: 'uuid' }, clusters),
+          ...projectAs({ label: 'name', value: 'uuid' }, importedClusters),
+        ]
+      } else {
+        return projectAs({ label: 'name', value: 'uuid' }, clusters)
+      }
+    }, [clusters, importedClusters])
 
     // Select the first cluster as soon as clusters are loaded
     useEffect(() => {
@@ -73,6 +85,7 @@ ClusterPicklist.defaultProps = {
   onlyAppCatalogEnabled: false,
   onlyPrometheusEnabled: false,
   onlyHealthyClusters: false,
+  importedClusters: false,
   selectFirst: true,
 }
 

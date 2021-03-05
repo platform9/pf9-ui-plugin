@@ -24,6 +24,7 @@ import {
   isTransientStatus,
   isUnhealthyStatus,
 } from '../infrastructure/clusters/ClusterStatusUtils'
+import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -106,6 +107,34 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
     piePrimary: 'healthy',
   }),
 }
+
+export const importedClusterStatusCardProps: IStatusCardWithFilterProps = {
+  entity: 'importedCluster',
+  permissions: ['admin'],
+  route: 'n/a',
+  addRoute: 'n/a',
+  title: 'Clusters Total',
+  icon: 'n/a',
+  dataLoader: [importedClusterActions.list, {}],
+  quantityFn: (clusters) => ({
+    quantity: clusters.length,
+    // Pie Data currently has dummy values, waiting on backend to supply possible values
+    pieData: [
+      {
+        name: 'running',
+        value: clusters.filter((cluster) => cluster.status === 'Running').length,
+        color: 'green.main',
+      },
+      {
+        name: 'disconnected',
+        value: clusters.filter((cluster) => cluster.status === 'Disconnected').length,
+        color: 'red.main',
+      },
+    ],
+    piePrimary: 'running',
+  }),
+}
+
 export const nodeStatusCardProps: IStatusCardWithFilterProps = {
   entity: 'node',
   permissions: ['admin'],

@@ -118,6 +118,7 @@ const ListTableToolbar = ({
   editDisabledInfo,
   deleteCond,
   deleteDisabledInfo,
+  hideDelete,
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
@@ -136,7 +137,7 @@ const ListTableToolbar = ({
             },
           ]
         : emptyArr),
-      ...(onDelete
+      ...(onDelete && !hideDelete
         ? [
             {
               label: 'Delete',
@@ -244,6 +245,7 @@ ListTableToolbar.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
   onChangeRowsPerPage: PropTypes.func.isRequired,
   rowsPerPageOptions: PropTypes.arrayOf(PropTypes.number),
+  hideDelete: PropTypes.bool,
 }
 
 export default ListTableToolbar
