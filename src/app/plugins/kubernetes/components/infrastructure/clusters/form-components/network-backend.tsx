@@ -33,7 +33,7 @@ const NetworkBackendField = ({
   <PicklistField
     id="networkPlugin"
     label="Network backend"
-    onChange={(value) => setWizardContext(handleNetworkBackendChange(value, wizardContext))}
+    onChange={(value) => setWizardContext(handleNetworkBackendChange(value, wizardContext.networkStack, wizardContext))}
     options={options}
     info={
       wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
