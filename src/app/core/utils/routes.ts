@@ -354,13 +354,6 @@ export const routes = {
         plugin: AppPlugins.Kubernetes,
       },
     }),
-    edit: Route.register({
-      url: `${pluginRoutePrefix}/apps/deployed/edit/:name`,
-      name: 'Apps:Edit',
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-    }),
     detail: Route.register({
       url: `${pluginRoutePrefix}/apps/:clusterId/:release/:id`,
       defaultParams: {
@@ -384,13 +377,6 @@ export const routes = {
         },
       }),
     },
-    // deployed: Route.register({
-    //   url: `${pluginRoutePrefix}/apps/deployed/:clusterId/:release`,
-    //   defaultParams: {
-    //     plugin: AppPlugins.Kubernetes,
-    //   },
-    //   name: 'Apps:Deployed',
-    // }),
   },
   repositories: {
     list: Route.register({

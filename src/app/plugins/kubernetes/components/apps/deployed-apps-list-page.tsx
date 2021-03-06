@@ -26,7 +26,7 @@ const ListPage = ({ ListContainer }) => {
     })
 
     const filteredDeployedApps = useMemo(
-      () => deployedApps.filter((release) => release.status !== 'uninstalling'),
+      () => deployedApps.filter((app) => app.status !== 'uninstalling'),
       [deployedApps],
     )
 

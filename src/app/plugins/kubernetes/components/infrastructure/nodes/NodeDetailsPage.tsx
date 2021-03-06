@@ -196,7 +196,7 @@ const NodeDetail: FC<INodesSelector> = (node) => {
 }
 
 export const DetailRow: FC<{
-  label: string | React.ReactNode
+  label: string
   value: string | React.ReactNode
   helpMessage?: string
 }> = ({ label, value, helpMessage }) => {
@@ -204,13 +204,9 @@ export const DetailRow: FC<{
   return (
     <tr>
       <td>
-        {typeof label === 'string' ? (
-          <Text className={rowHeader} variant="caption1" component="span">
-            {label}:
-          </Text>
-        ) : (
-          label
-        )}
+        <Text className={rowHeader} variant="caption1" component="span">
+          {label}:
+        </Text>
       </td>
       <td>
         {typeof value === 'string' ? (
