@@ -21,6 +21,7 @@ export const handleNetworkStackChange = (changeValue, wizardContext) => {
       changeValue === NetworkStackTypes.IPv4
         ? wizardContext.networkPlugin
         : NetworkBackendTypes.Calico,
+      changeValue,
       wizardContext,
     ),
   }

@@ -49,6 +49,7 @@ const createCRUDComponents = (options) => {
     renderEmptyTable = false,
     addButton,
     addUrl,
+    addButtonConfigs,
     AddDialog,
     EditDialog,
     DeleteDialog,
@@ -141,6 +142,7 @@ const createCRUDComponents = (options) => {
         addButton={addButton}
         editUrl={editUrl}
         addUrl={addUrl}
+        addButtonConfigs={addButtonConfigs}
         deleteFn={deleteFn}
         uniqueIdentifier={uniqueIdentifier}
         AddDialog={AddDialog}

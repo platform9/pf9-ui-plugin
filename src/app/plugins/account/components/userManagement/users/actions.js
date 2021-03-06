@@ -159,7 +159,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       : await clemency.createUser({
           username,
           displayname,
-          tenants: defaultTenantId,
+          ui_version: 'serenity',
         })
     if (createdUser.role === '_member_') {
       return createdUser

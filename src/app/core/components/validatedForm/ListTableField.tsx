@@ -12,6 +12,7 @@ interface Props extends ValidatedFormProps {
   columns?: any
   data: any
   title?: string
+  extraToolbarContent?: JSX.Element
   loading: boolean
 }
 
@@ -26,6 +27,7 @@ const ListTableField: React.ComponentType<Props> = forwardRef<HTMLElement, Props
     columns,
     data,
     title,
+    extraToolbarContent,
     loading,
   } = props
 
@@ -39,6 +41,7 @@ const ListTableField: React.ComponentType<Props> = forwardRef<HTMLElement, Props
         data={data}
         multiSelection={multiSelection}
         selectedRows={value}
+        extraToolbarContent={extraToolbarContent}
         loading={loading}
       />
       {hasError && <div>{errorMessage}</div>}

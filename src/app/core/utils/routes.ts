@@ -243,6 +243,20 @@ export const routes = {
         }),
       },
     },
+    import: Route.register({
+      url: `${pluginRoutePrefix}/infrastructure/clusters/import`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Infrastructure:Clusters:Import',
+    }),
+    importEKS: Route.register({
+      url: `${pluginRoutePrefix}/infrastructure/clusters/import/eks`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Infrastructure:Clusters:Import:EKS',
+    }),
     scaleMasters: Route.register({
       url: `${pluginRoutePrefix}/infrastructure/clusters/scaleMasters/:id`,
       defaultParams: {

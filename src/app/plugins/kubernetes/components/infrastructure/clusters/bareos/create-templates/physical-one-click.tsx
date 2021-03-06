@@ -29,7 +29,7 @@ export const initialContext = {
   networkPlugin: 'calico',
   calicoIpIpMode: 'Always',
   calicoNatOutgoing: true,
-  calicoBlockSize: '24',
+  calicoBlockSize: '26',
   runtimeConfigOption: 'default',
   mtuSize: 1440,
   privileged: true,

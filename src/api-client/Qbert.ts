@@ -70,7 +70,7 @@ class Qbert extends ApiService {
 
   protected async getEndpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('qbert', 'admin')
-    const mappedEndpoint = endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
+    const mappedEndpoint = endpoint.replace(/v(1|2|3)$/, `v3`)
 
     // Certain operations like column renderers from ListTable need to prepend the Qbert URL to links
     // sent from the backend.  But getting the endpoint is an async operation so we need to make an
@@ -79,6 +79,8 @@ class Qbert extends ApiService {
     // this.cachedEndpoint = mappedEndpoint
     return mappedEndpoint
   }
+
+  scopedEnpointPath = () => this.client.activeProjectId
 
   monocularBaseUrl = async () => {
     return this.client.keystone.getServiceEndpoint('monocular', 'public')
@@ -391,6 +393,34 @@ class Qbert extends ApiService {
         mthdName: 'getKubeConfig',
       },
     })
+  }
+
+  discoverExternalClusters = async (body) => {
+    const url = '/externalClusters/discover'
+    const discoveredClusters = await this.client.basicPost<any>({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'discoverExternalClusters',
+      },
+    })
+    return discoveredClusters
+  }
+
+  registerExternalCluster = async (body) => {
+    const url = '/externalClusters/register'
+    const registeredCluster = await this.client.basicPost<any>({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'registerExternalCluster',
+      },
+    })
+    return registeredCluster
   }
 
   /* k8s API */

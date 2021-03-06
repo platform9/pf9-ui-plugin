@@ -48,6 +48,8 @@ import AddRepoPage from './components/repositories/add-repo-page'
 import DeployAppPage from './components/apps/deploy-app-page'
 import EditRepoPage from './components/repositories/edit-repo-page'
 import EditAppDeploymentPage from './components/apps/edit-app-deployment-page'
+import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
+import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -100,6 +102,18 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/clusters/bareos/add/:platform/:type', exact: true },
       requiredRoles: 'admin',
       component: AddBareOsClusterPage,
+    },
+    {
+      name: 'Import Cluster',
+      link: { path: '/infrastructure/clusters/import', exact: true },
+      requiredRoles: 'admin',
+      component: ImportClusterPage,
+    },
+    {
+      name: 'Import EKS Cluster',
+      link: { path: '/infrastructure/clusters/import/eks', exact: true },
+      requiredRoles: 'admin',
+      component: ImportEKSClusterPage,
     },
     {
       name: 'Edit Cluster',
