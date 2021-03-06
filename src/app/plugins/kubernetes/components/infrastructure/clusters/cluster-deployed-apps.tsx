@@ -9,7 +9,7 @@ import ClusterDeployedAppsTable from './cluster-deployed-apps-table'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import SimpleLink from 'core/components/SimpleLink'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { appsAvailableToClusterLoader, releaseActions } from 'k8s/components/apps/actions'
+import { appsAvailableToClusterLoader, deployedAppActions } from 'k8s/components/apps/actions'
 import clsx from 'clsx'
 import Progress from 'core/components/progress/Progress'
 import { repositoriesForClusterLoader } from 'k8s/components/repositories/actions'
@@ -193,7 +193,8 @@ const ClusterDeployedApps = ({ cluster }) => {
     loadingAppsAvailableToCluster,
     reloadAppsAvailableToCluster,
   ] = useDataLoader(appsAvailableToClusterLoader, { clusterId: cluster.uuid })
-  const [deployedApps, loadingDeployedApps] = useDataLoader(releaseActions.list, {
+
+  const [deployedApps, loadingDeployedApps] = useDataLoader(deployedAppActions.list, {
     clusterId: cluster.uuid,
     namespace: allKey,
   })
@@ -206,22 +207,20 @@ const ClusterDeployedApps = ({ cluster }) => {
   )
 
   const filteredDeployedApps = useMemo(
-    () => deployedApps.filter((app) => app.status === 'deployed'),
+    () => deployedApps.filter((app) => app.status !== 'uninstalling'),
     [deployedApps],
   )
 
   const numRepositories = useMemo(() => repositories.length, [repositories])
 
-  const handleRepositoryDisconnectButtonClick = useCallback((name) => {
+  const handleRepositoryDisconnectButtonClick = (name) => {
     setShowDialog(true)
     setActiveRepository(name)
-  }, [])
+  }
 
-  const handleDialogClose = useCallback(() => {
-    setShowDialog(false)
-  }, [])
+  const handleDialogClose = () => setShowDialog(false)
 
-  const handleRepositoryDisconnect = useCallback(async () => {
+  const handleRepositoryDisconnect = async () => {
     handleDialogClose()
     // After user disconnects a repository from the cluster, we
     // want to refetch the list of repositories that are connected to the cluster
@@ -229,7 +228,8 @@ const ClusterDeployedApps = ({ cluster }) => {
     // Since the list of repositories the cluster is connected to has changed,
     // we need to refetch the list of apps available to the cluster
     reloadAppsAvailableToCluster()
-  }, [])
+    // Should this be done in the repositoryActions.deleteClustersFromRepository action instead?
+  }
 
   const overviewFields = useMemo(() => {
     return [
@@ -241,7 +241,7 @@ const ClusterDeployedApps = ({ cluster }) => {
       {
         id: 'apps',
         label: 'Number of Apps',
-        value: deployedApps.length.toString(),
+        value: filteredDeployedApps.length.toString(),
       },
       {
         id: 'workerNodes',
@@ -249,7 +249,7 @@ const ClusterDeployedApps = ({ cluster }) => {
         value: cluster.numWorkers?.toString(),
       },
     ]
-  }, [])
+  }, [cluster, filteredDeployedApps])
 
   const renderRepositoryLabel = useCallback(
     (name) => <RepositoryLabel name={name} onClick={handleRepositoryDisconnectButtonClick} />,
@@ -268,7 +268,7 @@ const ClusterDeployedApps = ({ cluster }) => {
   const repositoryFields = useMemo(() => {
     return repositories.map((repository) => {
       const numDeployedAppsFromRepository = deployedApps.filter(
-        (app) => app.repository === repository.name && app.status === 'deployed',
+        (app) => app.repository === repository.name && app.status !== 'uninstalling',
       ).length
       const totalAppsInRepository = appsAvailableToCluster.filter(
         (app) => app.repository === repository.name,

@@ -17,12 +17,13 @@ import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import useReactRouter from 'use-react-router'
 import AppVersionPicklistField from './app-version-picklist-field'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { appDetailsLoader, deploymentDetailLoader, releaseActions } from './actions'
+import { appDetailsLoader, deploymentDetailLoader, deployedAppActions } from './actions'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterPicklist from '../common/ClusterPicklist'
 import NamespacePicklist from '../common/NamespacePicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import { compareVersions, getAppVersionPicklistOptions, getIcon } from './helpers'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -98,8 +99,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const appListPageUrl = routes.apps.list.path()
 
-const placeholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
-
 const wizardMetaFormattedNames = {
   version: 'Latest Version',
   repository: 'Repository',
@@ -108,12 +107,11 @@ const wizardMetaFormattedNames = {
 
 const wizardMetaCalloutFields = ['version', 'repository', 'info']
 
-const AppIcon = ({ appName, logoUrl }) => {
+const AppIcon = ({ appName, icon }) => {
   const classes = useStyles()
-  const imgSource = logoUrl && logoUrl.match(/.(jpg|jpeg|png|gif)/) ? logoUrl : placeholderIcon
   return (
     <div className={classes.logoContainer}>
-      <img alt={appName} src={imgSource} />
+      <img alt={appName} src={getIcon(icon)} />
     </div>
   )
 }
@@ -127,12 +125,12 @@ const EditAppDeploymentPage = () => {
   const clusterId = match.params['clusterId']
   const namespace = match.params['namespace']
 
-  const [deployedApps, loadingDeployedApps] = useDataLoader(releaseActions.list, {
+  const [deployedApps, loadingDeployedApps] = useDataLoader(deployedAppActions.list, {
     clusterId,
     namespace,
   })
-  const deployedApp = deployedApps.find((app) => app.name === name)
-  const { repository, chart } = deployedApp
+  const deployedApp = deployedApps.find((app) => app.name === name) || {}
+  const { repository, chart, chart_version: chartVersion } = deployedApp
 
   const [[deployedAppDetails] = {}, loadingDeployedAppDetails]: any = useDataLoader(
     deploymentDetailLoader,
@@ -149,29 +147,33 @@ const EditAppDeploymentPage = () => {
     repository: repository,
   })
 
-  const [updateDeployedApp, updatingDeployedApp] = useDataUpdater(releaseActions.update)
+  const [updateDeployedApp, updatingDeployedApp] = useDataUpdater(deployedAppActions.update)
+
+  const defaultStructuredValues = JSON.stringify(deployedAppDetails?.chart?.values, null, 1)
 
   const initialContext = useMemo(
     () => ({
       deploymentName: name,
-      version: deployedAppDetails?.chart?.metadata?.version,
+      version: chartVersion,
       repository: repository,
       clusterId: clusterId,
       namespace: namespace,
-      useDefaultValues: true,
-      values: JSON.stringify(deployedAppDetails?.chart?.values, null, 1),
+      useDefaultValues: false,
+      values: JSON.stringify(deployedAppDetails?.config, null, 1),
       info: appDetail?.metadata?.home,
     }),
     [deployedAppDetails, appDetail, name, clusterId, namespace],
   )
 
-  const appVersions = useMemo(() => {
-    const versions = appDetail.Versions?.slice(0, 10)
-    if (!versions) {
+  // Only version upgrades are available to the user so we must filter out the list of
+  // app versions to only include versions >= to the deployed app's current version
+  const availableVersions = useMemo(() => {
+    if (!appDetail?.Versions || !chartVersion) {
       return []
     }
-    return versions.map((version) => ({ value: version, label: version }))
-  }, [appDetail])
+    return appDetail.Versions.filter((version) => compareVersions(version, chartVersion) >= 0)
+  }, [appDetail, deployedAppDetails])
+  const appVersions = useMemo(() => getAppVersionPicklistOptions(availableVersions), [appDetail])
 
   const handleSubmit = async (wizardContext) => {
     const {
@@ -182,28 +184,23 @@ const EditAppDeploymentPage = () => {
       values,
       useDefaultValues,
     } = wizardContext
-    const action =
-      parseFloat(version) >= parseFloat(deployedAppDetails?.chart?.metadata?.version)
-        ? 'upgrade'
-        : 'rollback'
 
-    // If useDefaultValues is true, meaning we use the chart's default values.yaml file, then there's no need
-    // to send the values to the API. When the API gives us the chart's default values, it is in object form.
-    // However, the deploy app API only accepts values as a string or byte blob. If we stringify the values object,
-    // and send it in the deploy request body, not sure if the API can read it. That's why it's better to send
-    // values as undefined if we're using the default values.yaml
-    const vals = useDefaultValues ? undefined : values
+    const vals = useDefaultValues ? JSON.stringify(deployedAppDetails?.chart?.values) : values
 
     const [success] = await updateDeployedApp({
       clusterId,
       namespace,
-      releaseName: deploymentName,
-      action,
+      deploymentName,
+      chart,
+      repository,
+      action: 'upgrade',
       version,
-      vals,
+      values: vals,
     })
     if (success) {
       history.push(routes.apps.list.path())
+    } else {
+      setErrorMessage('ERROR: Cannot edit deployed app')
     }
   }
 
@@ -242,7 +239,7 @@ const EditAppDeploymentPage = () => {
             <WizardMeta
               className={classes.deployAppForm}
               fields={wizardContext}
-              icon={<AppIcon appName={name} logoUrl={deployedAppDetails?.chart?.metadata?.icon} />}
+              icon={<AppIcon appName={name} icon={deployedAppDetails?.chart?.metadata?.icon} />}
               keyOverrides={wizardMetaFormattedNames}
               calloutFields={wizardMetaCalloutFields}
             >
@@ -320,8 +317,13 @@ const EditAppDeploymentPage = () => {
                       id="useDefaultValues"
                       value={wizardContext.useDefaultValues}
                       label="Use default structured values"
-                      onChange={(value) =>
-                        setWizardContext({ values: 'default value', useDefaultValues: value })
+                      onChange={(checked) =>
+                        setWizardContext({
+                          values: checked
+                            ? defaultStructuredValues
+                            : JSON.stringify(deployedAppDetails?.config, null, 1),
+                          useDefaultValues: checked,
+                        })
                       }
                     />
                     {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}

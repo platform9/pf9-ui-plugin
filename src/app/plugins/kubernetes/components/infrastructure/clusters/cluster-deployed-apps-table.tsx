@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from 'react'
-// import { Table, TableCell, TableHead, TableRow, TableSortLabel } from '@material-ui/core'
+import React, { useMemo, useState } from 'react'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
@@ -10,17 +9,18 @@ import SimpleLink from 'core/components/SimpleLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import DeleteAppDeploymentDialog from 'k8s/components/apps/delete-app-deployment-dialog'
 import { routes } from 'core/utils/routes'
+import { getIcon } from 'k8s/components/apps/helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   appTable: {
     minWidth: '1200px',
   },
-  columnHeaders: {
+  headers: {
     display: 'grid',
     gridTemplateColumns: '150px 1fr 1fr 200px 200px',
     gridGap: theme.spacing(2),
   },
-  nameColHeader: {
+  nameHeader: {
     alignContent: 'center',
   },
   icon: {
@@ -107,25 +107,28 @@ const useRowStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const columns = [
+interface Column {
+  id: string
+  label: string
+  disableSorting?: boolean
+  className?: string
+}
+
+const columns: Array<Column> = [
   { id: 'icon', label: '', disableSorting: true },
-  { id: 'name', label: 'App Deployment Name', className: 'nameColHeader' },
+  { id: 'name', label: 'App Deployment Name', className: 'nameHeader' },
   { id: 'namespace', label: 'Namespace', disableSorting: true },
   { id: 'version', label: 'Version', disableSorting: true },
 ]
 
-const placeholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
-
 const AppRow = ({ app, onEdit, onDelete }) => {
   const { icon, name, chart, namespace, chart_version } = app
-  const getIconUrl = useCallback((icon) => {
-    return icon && icon.match(/.(jpg|jpeg|png|gif)/) ? icon : placeholderIcon
-  }, [])
+
   const classes = useRowStyles()
   return (
     <div className={classes.card}>
       <div className={classes.iconCell}>
-        <img alt={name} src={getIconUrl(icon)} className={classes.appIcon} />
+        <img alt={name} src={getIcon(icon)} className={classes.appIcon} />
         <hr className={classes.divider} />
       </div>
       <div className={classes.appCell}>
@@ -161,43 +164,55 @@ const AppRow = ({ app, onEdit, onDelete }) => {
 
 type Order = 'Asc' | 'Desc'
 
+const sort = (items: Array<any>, target: string, order: Order) => {
+  const sortedItems = items.sort((a, b) => a[target].localeCompare(b[target]))
+  return order === 'Asc' ? sortedItems : sortedItems.reverse()
+}
+
 const ClusterDeployedAppsTable = ({ apps, clusterId, history }) => {
   const classes = useStyles()
-  const [order, setOrder] = useState<Order>('Asc')
+  const [sortOrder, setSortOrder] = useState<Order>('Asc')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [activeApp, setActiveApp] = useState(null)
-
-  const sortedApps = order === 'Asc' ? apps : apps.reverse()
+  const sortedApps = useMemo(() => sort(apps, 'name', sortOrder), [apps, sortOrder])
 
   const handleSort = () => {
-    const newOrder = order === 'Asc' ? 'Desc' : 'Asc'
-    setOrder(newOrder)
+    setSortOrder(sortOrder === 'Asc' ? 'Desc' : 'Asc')
   }
 
-  const handleAppDeploymentDeletion = (app) => {
+  const handleDeleteAppDeployment = (app) => {
     setActiveApp(app)
     setShowDeleteDialog(true)
   }
+
+  const handleEditAppDeployment = ({ namespace, name }) =>
+    history.push(
+      routes.apps.deployed.edit.path({
+        clusterId,
+        namespace,
+        name,
+      }),
+    )
 
   return (
     <div className={classes.appTable}>
       {showDeleteDialog && (
         <DeleteAppDeploymentDialog
           clusterId={clusterId}
-          namespace={activeApp.namespace}
-          name={activeApp.name}
-          chart={activeApp.chart}
+          namespace={activeApp?.namespace}
+          name={activeApp?.name}
+          chart={activeApp?.chart}
           onClose={() => setShowDeleteDialog(false)}
         />
       )}
-      <div className={classes.columnHeaders}>
+      <div className={classes.headers}>
         {columns.map(({ label, disableSorting, className = '' }) => (
           <div key={label}>
             <span className={clsx(classes.columnLabel, classes[className])}>{label}</span>
             {!disableSorting && (
               <IconButton component="span" size="small" disableRipple={true} onClick={handleSort}>
                 <ArrowDownwardIcon
-                  className={clsx(classes.icon, classes[`iconDirection${capitalize(order)}`])}
+                  className={clsx(classes.icon, classes[`iconDirection${capitalize(sortOrder)}`])}
                 />
               </IconButton>
             )}
@@ -209,16 +224,8 @@ const ClusterDeployedAppsTable = ({ apps, clusterId, history }) => {
         <AppRow
           key={app.name}
           app={app}
-          onEdit={() =>
-            history.push(
-              routes.apps.deployed.edit.path({
-                clusterId,
-                namespace: app.namespace,
-                name: app.name,
-              }),
-            )
-          }
-          onDelete={handleAppDeploymentDeletion}
+          onEdit={handleEditAppDeployment}
+          onDelete={handleDeleteAppDeployment}
         />
       ))}
     </div>

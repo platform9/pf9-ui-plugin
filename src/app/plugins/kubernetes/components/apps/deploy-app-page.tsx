@@ -24,6 +24,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterPicklist from './cluster-picklist'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import { getAppVersionPicklistOptions, getIcon } from './helpers'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -99,8 +100,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const appListPageUrl = routes.apps.list.path()
 
-const placeholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
-
 const wizardMetaFormattedNames = {
   version: 'Latest Version',
   repository: 'Repository',
@@ -109,12 +108,11 @@ const wizardMetaFormattedNames = {
 
 const wizardMetaCalloutFields = ['version', 'repository', 'info']
 
-const AppIcon = ({ appName, logoUrl }) => {
+const AppIcon = ({ appName, icon }) => {
   const classes = useStyles()
-  const imgSource = logoUrl && logoUrl.match(/.(jpg|jpeg|png|gif)/) ? logoUrl : placeholderIcon
   return (
     <div className={classes.logoContainer}>
-      <img alt={appName} src={imgSource} />
+      <img alt={appName} src={getIcon(icon)} />
     </div>
   )
 }
@@ -148,13 +146,7 @@ const DeployAppPage = () => {
     [appDetail],
   )
 
-  const appVersions = useMemo(() => {
-    const versions = appDetail.Versions?.slice(0, 10)
-    if (!versions) {
-      return []
-    }
-    return versions.map((version) => ({ value: version, label: version }))
-  }, [appDetail])
+  const appVersions = useMemo(() => getAppVersionPicklistOptions(appDetail.Versions), [appDetail])
 
   const handleSubmit = async (wizardContext) => {
     const {
@@ -166,12 +158,7 @@ const DeployAppPage = () => {
       useDefaultValues,
     } = wizardContext
 
-    // If useDefaultValues is true, meaning we use the chart's default values.yaml file, then there's no need
-    // to send the values to the API. When the API gives us the chart's default values, it is in object form.
-    // However, the deploy app API only accepts values as a string or byte blob. If we stringify the values object,
-    // and send it in the deploy request body, not sure if the API can read it. That's why it's better to send
-    // values as undefined if we're using the default values.yaml
-    const vals = useDefaultValues ? undefined : values
+    const vals = useDefaultValues ? JSON.stringify(appDetail?.values) : values
 
     const [success] = await deploy({
       clusterId,
@@ -184,6 +171,8 @@ const DeployAppPage = () => {
     })
     if (success) {
       history.push(routes.apps.list.path())
+    } else {
+      setErrorMessage('ERROR: Cannot deploy app')
     }
   }
 
@@ -228,7 +217,7 @@ const DeployAppPage = () => {
             <WizardMeta
               className={classes.deployAppForm}
               fields={wizardContext}
-              icon={<AppIcon appName={appDetail.name} logoUrl={appDetail.metadata?.icon} />}
+              icon={<AppIcon appName={appDetail.name} icon={appDetail.metadata?.icon} />}
               keyOverrides={wizardMetaFormattedNames}
               calloutFields={wizardMetaCalloutFields}
             >
@@ -311,10 +300,10 @@ const DeployAppPage = () => {
                       id="useDefaultValues"
                       value={wizardContext.useDefaultValues}
                       label="Use default structured values"
-                      onChange={(value) =>
+                      onChange={(checked) =>
                         setWizardContext({
-                          values: defaultValues,
-                          useDefaultValues: value,
+                          values: checked ? initialContext.values : '',
+                          useDefaultValues: checked,
                         })
                       }
                     />

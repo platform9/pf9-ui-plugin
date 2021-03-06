@@ -1,6 +1,6 @@
 import React from 'react'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { releaseActions } from './actions'
+import { deployedAppActions } from './actions'
 import { Dialog, DialogActions } from '@material-ui/core'
 import Progress from 'core/components/progress/Progress'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const DeleteAppDeploymentDialog = ({ name, chart, clusterId, namespace, onClose }) => {
   const classes = useStyles()
   const [deleteAppDeployment, deletingAppDeployment] = useDataUpdater(
-    releaseActions.delete,
+    deployedAppActions.delete,
     onClose,
   )
 

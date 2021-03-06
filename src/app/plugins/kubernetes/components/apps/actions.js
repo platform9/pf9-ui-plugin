@@ -7,7 +7,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import { someAsync, mapAsync } from 'utils/async'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import namespaceActions from '../namespaces/actions'
-import { makeReleasesSelector } from './selectors'
+import { makeDeployedAppsSelector } from './selectors'
 import store from 'app/store'
 import { cacheActions } from 'core/caching/cacheReducers'
 
@@ -35,7 +35,7 @@ export const appDetailsLoader = createContextLoader(
 )
 
 export const deploymentDetailLoader = createContextLoader(
-  ActionDataKeys.ReleaseDetail,
+  ActionDataKeys.DeployedAppDetails,
   async ({ clusterId, namespace, releaseName }) => {
     const details = helm.getReleaseInfo(clusterId, namespace, releaseName)
     return details
@@ -58,7 +58,6 @@ export const appsAvailableToClusterLoader = createContextLoader(
     }))
   },
   {
-    // uniqueIdentifier: ['Name', 'clusterId'],
     uniqueIdentifier: ['Name'],
     indexBy: 'clusterId',
   },
@@ -95,14 +94,14 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
         Vals: values,
       }
       await helm.deployChart(clusterId, namespace, body)
-      dispatch(cacheActions.clearCache({ cacheKey: ActionDataKeys.Releases }))
+      dispatch(cacheActions.clearCache({ cacheKey: ActionDataKeys.DeployedApps }))
     },
   },
   uniqueIdentifier: 'id',
   entityName: 'App Catalog',
 })
 
-export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
+export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps, {
   listFn: async ({ clusterId, namespace }) => {
     if (namespace === allKey) {
       const namespaces = await namespaceActions.list({ clusterId })
@@ -118,18 +117,25 @@ export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
   updateFn: async ({
     clusterId,
     namespace,
-    releaseName,
+    deploymentName,
+    repository,
+    chart,
     action,
     version = undefined,
     values = undefined,
   }) => {
     const body = {
-      Name: releaseName,
+      Name: deploymentName,
+      Chart: `${repository}/${chart}`,
       Action: action,
       Version: version,
       Vals: values,
     }
-    return helm.updateRelease(clusterId, namespace, body)
+    const result = helm.updateRelease(clusterId, namespace, body)
+    // Is it possible to invalidate the DeployedAppsDetails for just one specific app deployment
+    // instead of invalidating the entire cache?
+    dispatch(cacheActions.clearCache({ cacheKey: ActionDataKeys.DeployedAppDetails }))
+    return result
   },
   deleteFn: async ({ clusterId, namespace, name }) => {
     const data = {
@@ -139,5 +145,5 @@ export const releaseActions = createCRUDActions(ActionDataKeys.Releases, {
   },
   uniqueIdentifier: 'name',
   indexBy: ['clusterId', 'namespace'],
-  selectorCreator: makeReleasesSelector,
+  selectorCreator: makeDeployedAppsSelector,
 })

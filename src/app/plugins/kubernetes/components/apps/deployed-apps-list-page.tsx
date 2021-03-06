@@ -8,7 +8,7 @@ import { pick } from 'ramda'
 import React, { useMemo } from 'react'
 import ClusterPicklistDefault from '../common/ClusterPicklist'
 import NamespacePicklistDefault from '../common/NamespacePicklist'
-import { releaseActions } from './actions'
+import { deployedAppActions } from './actions'
 const ClusterPicklist: any = ClusterPicklistDefault
 const NamespacePicklist: any = NamespacePicklistDefault
 
@@ -20,21 +20,21 @@ const usePrefParams = createUsePrefParamsHook('Deployed Apps', listTablePrefs)
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [releases, loading, reload] = useDataLoader(releaseActions.list, {
+    const [deployedApps, loading, reload] = useDataLoader(deployedAppActions.list, {
       namespace: params.namespace,
       clusterId: params.clusterId,
     })
 
-    const filteredReleases = useMemo(
-      () => releases.filter((release) => release.status === 'deployed'),
-      [releases],
+    const filteredDeployedApps = useMemo(
+      () => deployedApps.filter((release) => release.status !== 'uninstalling'),
+      [deployedApps],
     )
 
     return (
       <ListContainer
         loading={loading}
         reload={reload}
-        data={filteredReleases}
+        data={filteredDeployedApps}
         getParamsUpdater={getParamsUpdater}
         filters={
           <>
@@ -60,7 +60,7 @@ const ListPage = ({ ListContainer }) => {
 }
 
 const options = {
-  deleteFn: releaseActions.delete,
+  deleteFn: deployedAppActions.delete,
   editUrl: ({ clusterId, namespace, name }, id) =>
     routes.apps.deployed.edit.path({ clusterId, namespace, name }),
   columns: [
@@ -69,9 +69,9 @@ const options = {
     { id: 'chart_version', label: 'Version' },
   ],
   name: 'Deployed Apps',
-  cacheKey: DataKeys.Deployments,
-  uniqueIdentifier: 'name',
+  cacheKey: DataKeys.DeployedApps,
   title: 'Deployed Apps',
+  uniqueIdentifier: 'name',
   multiSelection: false,
   searchTarget: 'name',
   ListPage,
