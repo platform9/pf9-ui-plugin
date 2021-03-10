@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
 import Text from 'core/elements/text'
@@ -194,10 +194,13 @@ const ClusterDeployedApps = ({ cluster }) => {
     reloadAppsAvailableToCluster,
   ] = useDataLoader(appsAvailableToClusterLoader, { clusterId: cluster.uuid })
 
-  const [deployedApps, loadingDeployedApps] = useDataLoader(deployedAppActions.list, {
-    clusterId: cluster.uuid,
-    namespace: allKey,
-  })
+  const [deployedApps, loadingDeployedApps, reloadDeployedApps] = useDataLoader(
+    deployedAppActions.list,
+    {
+      clusterId: cluster.uuid,
+      namespace: allKey,
+    },
+  )
 
   const [repositories, loadingRepositories, reloadRepositories] = useDataLoader(
     repositoriesForClusterLoader,
@@ -213,6 +216,10 @@ const ClusterDeployedApps = ({ cluster }) => {
 
   const numRepositories = useMemo(() => repositories.length, [repositories])
 
+  useEffect(() => {
+    reloadDeployedApps()
+  }, [])
+
   const handleRepositoryDisconnectButtonClick = (name) => {
     setShowDialog(true)
     setActiveRepository(name)
@@ -227,8 +234,7 @@ const ClusterDeployedApps = ({ cluster }) => {
     await reloadRepositories()
     // Since the list of repositories the cluster is connected to has changed,
     // we need to refetch the list of apps available to the cluster
-    reloadAppsAvailableToCluster()
-    // Should this be done in the repositoryActions.deleteClustersFromRepository action instead?
+    await reloadAppsAvailableToCluster()
   }
 
   const overviewFields = useMemo(() => {

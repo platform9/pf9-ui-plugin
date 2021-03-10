@@ -105,6 +105,9 @@ const useRowStyles = makeStyles((theme: Theme) => ({
   text: {
     color: theme.palette.grey[700],
   },
+  disabledIcon: {
+    color: theme.palette.grey[400],
+  },
 }))
 
 interface Column {
@@ -149,14 +152,25 @@ const AppRow = ({ app, onEdit, onDelete }) => {
       </div>
       <div className={classes.actionsCell}>
         <hr className={classes.divider} />
-        <div className={classes.actions}>
-          <SimpleLink src="" onClick={() => onEdit(app)}>
-            <FontAwesomeIcon size="md">edit</FontAwesomeIcon>
-          </SimpleLink>
-          <SimpleLink src="" onClick={() => onDelete(app)}>
-            <FontAwesomeIcon size="md">trash-alt</FontAwesomeIcon>
-          </SimpleLink>
-        </div>
+        {app.status !== 'pending-install' ? (
+          <div className={classes.actions}>
+            <SimpleLink src="" onClick={() => onEdit(app)}>
+              <FontAwesomeIcon size="md">edit</FontAwesomeIcon>
+            </SimpleLink>
+            <SimpleLink src="" onClick={() => onDelete(app)}>
+              <FontAwesomeIcon size="md">trash-alt</FontAwesomeIcon>
+            </SimpleLink>
+          </div>
+        ) : (
+          <div className={classes.actions}>
+            <FontAwesomeIcon className={classes.disabledIcon} size="md">
+              edit
+            </FontAwesomeIcon>
+            <FontAwesomeIcon className={classes.disabledIcon} size="md">
+              trash-alt
+            </FontAwesomeIcon>
+          </div>
+        )}
       </div>
     </div>
   )

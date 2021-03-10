@@ -132,8 +132,6 @@ export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps,
       Vals: values,
     }
     const result = helm.updateRelease(clusterId, namespace, body)
-    // Is it possible to invalidate the DeployedAppsDetails for just one specific app deployment
-    // instead of invalidating the entire cache?
     dispatch(cacheActions.clearCache({ cacheKey: ActionDataKeys.DeployedAppDetails }))
     return result
   },
@@ -143,7 +141,7 @@ export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps,
     }
     await helm.deleteRelease(clusterId, namespace, data)
   },
-  uniqueIdentifier: 'name',
+  uniqueIdentifier: ['name', 'clusterId', 'namespace'],
   indexBy: ['clusterId', 'namespace'],
   selectorCreator: makeDeployedAppsSelector,
 })

@@ -20,10 +20,7 @@ const usePrefParams = createUsePrefParamsHook('Deployed Apps', listTablePrefs)
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [deployedApps, loading, reload] = useDataLoader(deployedAppActions.list, {
-      namespace: params.namespace,
-      clusterId: params.clusterId,
-    })
+    const [deployedApps, loading, reload] = useDataLoader(deployedAppActions.list, params)
 
     const filteredDeployedApps = useMemo(
       () => deployedApps.filter((app) => app.status !== 'uninstalling'),
@@ -61,8 +58,10 @@ const ListPage = ({ ListContainer }) => {
 
 const options = {
   deleteFn: deployedAppActions.delete,
+  deleteCond: ([selectedRow]) => selectedRow.status !== 'pending-install',
   editUrl: ({ clusterId, namespace, name }, id) =>
     routes.apps.deployed.edit.path({ clusterId, namespace, name }),
+  editCond: ([selectedRow]) => selectedRow.status !== 'pending-install',
   columns: [
     { id: 'name', label: 'App Name' },
     { id: 'chart', label: 'App' },

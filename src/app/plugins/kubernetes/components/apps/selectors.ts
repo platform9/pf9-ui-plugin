@@ -6,7 +6,9 @@ import createSorter from 'core/helpers/createSorter'
 import { allKey } from 'app/constants'
 import { filterIf } from 'utils/fp'
 
-export const makeDeployedAppsSelector = (defaultParams = {}) => {
+export const makeDeployedAppsSelector = (
+  defaultParams = { orderBy: 'name', orderDirection: 'asc' },
+) => {
   return createSelector(
     [
       getDataSelector<DataKeys.DeployedApps>(DataKeys.DeployedApps, ['clusterId']),
