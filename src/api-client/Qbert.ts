@@ -65,11 +65,7 @@ const normalizeImportedClusters = (apiResponse) => {
   const clusters = apiResponse.items
   const normalizedClusters = clusters.map((cluster) => ({
     ...cluster,
-<<<<<<< HEAD
-    uuid: cluster.metadata.uid,
-=======
     uuid: cluster.metadata.name,
->>>>>>> 350098dd19d293f22076daa557a06b0c55449fce
   }))
   return normalizedClusters
 }

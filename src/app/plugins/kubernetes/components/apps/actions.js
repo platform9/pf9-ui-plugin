@@ -97,7 +97,6 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
   },
   customOperations: {
     deploy: async ({ clusterId, namespace, body }) => {
-      console.log(clusterId, namespace)
       helm.deployChart(clusterId, namespace, body)
     },
   },

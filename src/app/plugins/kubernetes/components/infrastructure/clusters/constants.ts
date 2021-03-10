@@ -7,8 +7,8 @@ export enum NetworkStackTypes {
 export const getDefaultCIDRIpsForStack = (stack) =>
   ({
     [NetworkStackTypes.IPv4]: {
-      containersCidr: '10.20.0.0/22',
-      servicesCidr: '10.21.0.0/22',
+      containersCidr: '10.20.0.0/16',
+      servicesCidr: '10.21.0.0/16',
     },
     [NetworkStackTypes.IPv6]: {
       containersCidr: 'fd00:101::/116',
@@ -16,8 +16,6 @@ export const getDefaultCIDRIpsForStack = (stack) =>
     },
   }?.[stack])
 
-export const downloadAndInstallPf9CliCommand = 'bash <(curl -sL http://pf9.io/get_cli)'
-export const downloadPf9CliCommand =
-  'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
-export const installPf9CliCommand = 'bash ./cli-setup.sh'
-export const runPf9CliCommand = 'pf9ctl cluster prep-node'
+export const downloadAndInstallPf9CliCommand = `bash <(curl -sL https://pmkft-assets.s3-us-west-1.amazonaws.com/pf9ctl_setup)`
+export const configureCliCommand = 'pf9ctl config set'
+export const runPf9CliCommand = 'pf9ctl prep-node'

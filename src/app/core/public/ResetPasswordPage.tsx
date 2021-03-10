@@ -185,6 +185,7 @@ const ResetPasswordPage: React.FC = () => {
   const handleFormSubmit = async () => {
     if (params.isResetPasswordSuccessful) {
       history.push(loginUrl)
+      return
     }
 
     updateParams({
@@ -193,7 +194,7 @@ const ResetPasswordPage: React.FC = () => {
 
     try {
       const options: IApiData = {
-        secret: token,
+        token: token,
         username: params.emailId,
         password: params.confirmPassword,
       }

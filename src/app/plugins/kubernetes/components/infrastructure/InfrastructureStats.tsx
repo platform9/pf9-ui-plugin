@@ -35,11 +35,7 @@ export enum InfrastructureTabs {
 
 const headerCardMap = new Map<InfrastructureTabs, { component: React.ComponentType }>([
   [InfrastructureTabs.Clusters, { component: ClusterListHeader }],
-<<<<<<< HEAD
-  [InfrastructureTabs.ImportedClusters, { component: ClusterListHeader }],
-=======
   [InfrastructureTabs.ImportedClusters, { component: ImportedClusterListHeader }],
->>>>>>> 350098dd19d293f22076daa557a06b0c55449fce
   [InfrastructureTabs.Nodes, { component: NodeListHeader }],
   [InfrastructureTabs.CloudProviders, { component: CloudProviderListHeader }],
 ])
