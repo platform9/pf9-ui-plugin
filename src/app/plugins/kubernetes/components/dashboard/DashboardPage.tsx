@@ -118,7 +118,7 @@ export const importedClusterStatusCardProps: IStatusCardWithFilterProps = {
   dataLoader: [importedClusterActions.list, {}],
   quantityFn: (clusters) => ({
     quantity: clusters.length,
-    // Pie Data currently has dummy values, waiting on backend to supply possible values
+    // Possible "" value, not sure what to do with that
     pieData: [
       {
         name: 'running',
@@ -126,8 +126,18 @@ export const importedClusterStatusCardProps: IStatusCardWithFilterProps = {
         color: 'green.main',
       },
       {
-        name: 'disconnected',
-        value: clusters.filter((cluster) => cluster.status === 'Disconnected').length,
+        name: 'pending',
+        value: clusters.filter((cluster) => cluster.status === 'Pending').length,
+        color: 'yellow.main',
+      },
+      {
+        name: 'terminating',
+        value: clusters.filter((cluster) => cluster.status === 'Terminating').length,
+        color: 'orange.main',
+      },
+      {
+        name: 'failing',
+        value: clusters.filter((cluster) => cluster.status === 'Failing').length,
         color: 'red.main',
       },
     ],

@@ -57,7 +57,6 @@ const ListPage = ({ ListContainer }) => {
               onChange={updateClusterId}
               value={params.clusterId}
               onlyMasterNodeClusters
-              showImportedClusters
             />
             <NamespacePicklist
               selectFirst={false}

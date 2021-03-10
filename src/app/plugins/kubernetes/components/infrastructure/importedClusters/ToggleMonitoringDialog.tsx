@@ -14,7 +14,6 @@ const { appbert } = ApiClient.getInstance()
 const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
   const dispatch = useDispatch()
   const [appbertData, loadingAppbertData, reloadAppbert] = useDataLoader(clusterTagActions.list)
-  console.log(appbertData, loadingAppbertData)
   const [tagUpdater, updatingTag] = useDataUpdater(clusterTagActions.update, (success) => {
     if (success) {
       onClose()
@@ -36,7 +35,7 @@ const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
     }
     return false
   }, [appbertData])
-  console.log(enabled, 'enabled')
+
   useEffect(() => {
     reloadAppbert()
   }, [])
@@ -56,8 +55,6 @@ const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
         )
         return onClose(false)
       }
-
-      console.log(cluster.uuid, !enabled)
       await tagUpdater({ clusterId: cluster.uuid, pkg: 'pf9-mon', on: !enabled })
     } catch (e) {
       dispatch(

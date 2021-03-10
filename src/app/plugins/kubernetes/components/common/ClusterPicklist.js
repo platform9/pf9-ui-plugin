@@ -19,7 +19,6 @@ const ClusterPicklist = forwardRef(
       onlyMasterNodeClusters,
       onlyAppCatalogEnabled,
       onlyHealthyClusters,
-      showImportedClusters,
       value,
       ...rest
     },
@@ -34,14 +33,11 @@ const ClusterPicklist = forwardRef(
     const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
     const [importedClusters, importedClustersLoading] = useDataLoader(importedClusterActions.list)
     const options = useMemo(() => {
-      if (showImportedClusters) {
-        return [
-          ...projectAs({ label: 'name', value: 'uuid' }, clusters),
-          ...projectAs({ label: 'name', value: 'uuid' }, importedClusters),
-        ]
-      } else {
-        return projectAs({ label: 'name', value: 'uuid' }, clusters)
-      }
+      // Sorting on these may be a bit weird, ask chris what's preferred
+      return [
+        ...projectAs({ label: 'name', value: 'uuid' }, clusters),
+        ...projectAs({ label: 'name', value: 'uuid' }, importedClusters),
+      ]
     }, [clusters, importedClusters])
 
     // Select the first cluster as soon as clusters are loaded
@@ -85,7 +81,6 @@ ClusterPicklist.defaultProps = {
   onlyAppCatalogEnabled: false,
   onlyPrometheusEnabled: false,
   onlyHealthyClusters: false,
-  importedClusters: false,
   selectFirst: true,
 }
 

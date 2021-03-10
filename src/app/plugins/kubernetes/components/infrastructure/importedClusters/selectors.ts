@@ -33,9 +33,9 @@ export const makeImportedClustersSelector = (
 ) => {
   return createSelector(
     [importedClustersSelector, (_, params) => mergeLeft(params, defaultParams)],
-    (alertRules, params) => {
+    (clusters, params) => {
       const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(alertRules)
+      return pipe(createSorter({ orderBy, orderDirection }))(clusters)
     },
   )
 }
