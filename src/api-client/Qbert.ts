@@ -65,7 +65,11 @@ const normalizeImportedClusters = (apiResponse) => {
   const clusters = apiResponse.items
   const normalizedClusters = clusters.map((cluster) => ({
     ...cluster,
+<<<<<<< HEAD
     uuid: cluster.metadata.uid,
+=======
+    uuid: cluster.metadata.name,
+>>>>>>> 350098dd19d293f22076daa557a06b0c55449fce
   }))
   return normalizedClusters
 }
@@ -412,6 +416,47 @@ class Qbert extends ApiService {
       options: {
         clsName: this.getClassName(),
         mthdName: 'getKubeConfig',
+      },
+    })
+  }
+
+  discoverExternalClusters = async (body) => {
+    const url = '/externalClusters/discover'
+    const discoveredClusters = await this.client.basicPost<any>({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'discoverExternalClusters',
+      },
+    })
+    return discoveredClusters
+  }
+
+  registerExternalCluster = async (body) => {
+    const url = '/externalClusters/register'
+    const registeredCluster = await this.client.basicPost<any>({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'registerExternalCluster',
+      },
+    })
+    return registeredCluster
+  }
+
+  deregisterExternalCluster = async (id) => {
+    const url = `/externalClusters/${id}/deregister`
+    return this.client.basicPost({
+      url,
+      body: {},
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deregisterExternalCluster',
       },
     })
   }

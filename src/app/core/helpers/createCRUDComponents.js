@@ -49,6 +49,7 @@ const createCRUDComponents = (options) => {
     renderEmptyTable = false,
     addButton,
     addUrl,
+    addButtonConfigs,
     AddDialog,
     EditDialog,
     DeleteDialog,
@@ -66,6 +67,7 @@ const createCRUDComponents = (options) => {
     blankFirstColumn,
     onSelect,
     extraToolbarContent,
+    hideDelete,
   } = options
 
   // List
@@ -124,6 +126,7 @@ const createCRUDComponents = (options) => {
         onRowsPerPageChange={getParamsUpdater('rowsPerPage')}
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
         extraToolbarContent={extraToolbarContent}
+        hideDelete={hideDelete}
       />
     )
   }
@@ -141,6 +144,7 @@ const createCRUDComponents = (options) => {
         addButton={addButton}
         editUrl={editUrl}
         addUrl={addUrl}
+        addButtonConfigs={addButtonConfigs}
         deleteFn={deleteFn}
         uniqueIdentifier={uniqueIdentifier}
         AddDialog={AddDialog}

@@ -32,7 +32,7 @@ import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
 import { MessageTypes } from 'core/components/notifications/model'
 import { RootState } from 'app/store'
-import { apply, Dictionary, keys, mergeAll, prop, toPairs } from 'ramda'
+import { apply, keys, mergeAll, prop, toPairs } from 'ramda'
 import pluginManager from 'core/utils/pluginManager'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import BannerContainer from 'core/components/notifications/BannerContainer'
@@ -163,8 +163,8 @@ const renderPluginRoutes = (role) => (id, plugin) => {
   })
 }
 
-const getSections = moize((plugins: Dictionary<any>, role) =>
-  toPairs(plugins).map(([id, plugin]) => ({
+const getSections = moize((plugins: any, role) =>
+  toPairs<any, any>(plugins).map(([id, plugin]) => ({
     id,
     name: plugin.name,
     links: plugin

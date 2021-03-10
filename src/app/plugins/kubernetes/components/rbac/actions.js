@@ -2,7 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { clusterActions, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import {
   apiGroupsSelector,
   makeApiGroupsSelector,
@@ -87,8 +87,9 @@ export const apiGroupsLoader = createContextLoader(
 
 export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
   listFn: async (params) => {
-    const { clusterId } = params
-    const clusters = await clusterActions.list({ healthyClusters: true })
+    // const { clusterId } = params
+    // const clusters = await clusterActions.list({ healthyClusters: true })
+    const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterRoles)).then(flatten)
     }
@@ -136,8 +137,9 @@ export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
 
 export const clusterRoleActions = createCRUDActions(ActionDataKeys.ClusterRoles, {
   listFn: async (params) => {
-    const { clusterId } = params
-    const clusters = await clusterActions.list({ healthyClusters: true })
+    // const { clusterId } = params
+    // const clusters = await clusterActions.list({ healthyClusters: true })
+    const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoles)).then(flatten)
     }
@@ -184,8 +186,9 @@ export const clusterRoleActions = createCRUDActions(ActionDataKeys.ClusterRoles,
 
 export const roleBindingActions = createCRUDActions(ActionDataKeys.RoleBindings, {
   listFn: async (params) => {
-    const { clusterId } = params
-    const clusters = await clusterActions.list({ healthyClusters: true })
+    // const { clusterId } = params
+    // const clusters = await clusterActions.list({ healthyClusters: true })
+    const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterRoleBindings)).then(flatten)
     }
@@ -266,8 +269,9 @@ export const roleBindingActions = createCRUDActions(ActionDataKeys.RoleBindings,
 
 export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.ClusterRoleBindings, {
   listFn: async (params) => {
-    const { clusterId } = params
-    const clusters = await clusterActions.list({ healthyClusters: true })
+    // const { clusterId } = params
+    // const clusters = await clusterActions.list({ healthyClusters: true })
+    const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoleBindings)).then(
         flatten,

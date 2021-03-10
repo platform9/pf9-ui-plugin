@@ -53,6 +53,12 @@ export enum CustomerTiers {
   Growth = 'growth',
 }
 
+export enum ClusterCloudPlatforms {
+  EKS = 'eks',
+  AKS = 'aks',
+  GKE = 'gke',
+}
+
 export const defaultGroupMappingId = 'idp1_mapping'
 
 export const upgradeLinks = {

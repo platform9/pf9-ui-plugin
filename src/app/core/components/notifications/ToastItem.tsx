@@ -64,7 +64,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   close: {},
 }))
 
-const renderMessages = pipe(
+const renderMessages: any = pipe<any, any, any, any, any>(
   split('\n'),
   reject(isNilOrEmpty),
   toPairs,

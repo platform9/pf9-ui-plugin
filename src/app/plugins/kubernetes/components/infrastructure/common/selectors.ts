@@ -14,13 +14,13 @@ const getNetworkInterfaces = (node: Host) => {
   const extensions = node?.extensions as ExtensionsClass
   const ifaceMap = extensions?.interfaces?.data?.iface_info
   // Pair the interface name (obj key) to the data (obj value)
-  const pairedIfaces = toPairs(ifaceMap)
+  const pairedIfaces: any = toPairs(ifaceMap)
   const ifaceList = pairedIfaces.map((pair) => {
     // Some interfaces have multiple IP addresses
-    const ifaces = pair[1].ifaces
+    const ifaces = pair[1]?.ifaces
     return ifaces.map((iface) => ({
       name: pair[0],
-      mac: pair[1].mac,
+      mac: pair[1]?.mac,
       ip: iface.addr,
       netmask: iface.netmask,
       label: `${pair[0]}: ${iface.addr}`,

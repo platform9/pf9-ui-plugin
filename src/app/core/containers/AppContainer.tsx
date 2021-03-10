@@ -28,15 +28,15 @@ import { isNilOrEmpty, pathStrOr } from 'utils/fp'
 import { getCookieValue } from 'utils/misc'
 import {
   appCuesSetAnonymous,
-  createDriftScript,
-  createSegmentScript,
+  driftScriptContent,
+  segmentScriptContent,
   trackPage,
 } from 'utils/tracking'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import axios from 'axios'
 import { updateClarityStore } from 'utils/clarityHelper'
-import { DocumentMeta } from 'core/components/DocumentMeta'
+import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 
 const { setActiveRegion } = ApiClient.getInstance()
@@ -157,12 +157,12 @@ const AppContainer = () => {
 
       // Segment tracking
       if (!analyticsOff) {
-        DocumentMeta.addElementToDomBody(createSegmentScript())
+        DocumentMetaCls.addScriptElementToDomBody('segmentCode', segmentScriptContent)
       }
 
       // Drift tracking code for live demo
       if (sandboxFlag) {
-        DocumentMeta.addElementToDomBody(createDriftScript())
+        DocumentMetaCls.addScriptElementToDomBody('driftCode', driftScriptContent)
       }
 
       setLoginFeatures({
