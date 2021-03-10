@@ -21,12 +21,17 @@ import { mergeLeft, pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
 import { adjustWith, updateWith } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
+import { importedClusterActions } from '../importedClusters/actions'
 
 const { appbert, qbert } = ApiClient.getInstance()
 
 export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
   listFn: async () => {
     return appbert.getClusterTags()
+  },
+  updateFn: async ({ clusterId, pkg, on }) => {
+    console.log(clusterId, pkg, on)
+    return appbert.toggleAddon(clusterId, pkg, on)
   },
   uniqueIdentifier: 'uuid',
 })
@@ -178,8 +183,10 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params) => {
   const clusters = await clusterActions.list(params)
+  const importedClusters = await importedClusterActions.list()
+  const collectiveClusters = [...clusters, ...importedClusters]
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
-  return [clusterId, clusters]
+  return [clusterId, collectiveClusters]
 }
 
 export const loadSupportedRoleVersions = createContextLoader(

@@ -23,6 +23,7 @@ import ClustersChecklists from './ClustersChecklists'
 import PresetField from 'core/components/PresetField'
 import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
+import { importedClusterActions } from '../../importedClusters/actions'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -57,6 +58,7 @@ const ImportEKSClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const [cloudProviders] = useDataLoader(cloudProviderActions.list)
+  const [, , reloadImportedClusters] = useDataLoader(importedClusterActions.list)
   const providerType = CloudProviders.Aws
   const [submitting, setSubmitting] = useState(false)
 
@@ -67,7 +69,9 @@ const ImportEKSClusterPage = () => {
       clusters: data.finalSelectedClusters,
     })
     setSubmitting(false)
-    history.push(routes.cluster.list.path())
+    // do this here bc invalidateCache in the actions doesn't seem to work
+    reloadImportedClusters()
+    history.push(routes.cluster.importedClusters.path())
   }
 
   const getCloudProviderName = useCallback(

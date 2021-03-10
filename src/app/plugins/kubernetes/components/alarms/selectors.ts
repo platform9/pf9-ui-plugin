@@ -1,17 +1,18 @@
 import { createSelector } from 'reselect'
-import { equals, find, flatten, mergeLeft, pathOr, pipe, prop, propEq } from 'ramda'
+import { equals, flatten, mergeLeft, pathOr, pipe } from 'ramda'
 import { filterIf, pathStr } from 'utils/fp'
 import moment from 'moment'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
 import { IAlertOverTime, IAlertSelector, ISeverityCount } from './model'
-import { IClusterAction } from '../infrastructure/clusters/model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
 import { prometheusRuleSelector } from 'k8s/components/prometheus/selectors'
 import { AlertManagerAlert } from 'api-client/qbert.model'
 import { capitalizeString } from 'utils/misc'
+import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
+import { findClusterName } from 'k8s/util/helpers'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
@@ -45,10 +46,11 @@ export const alertsSelector = createSelector(
     getDataSelector(DataKeys.Alerts, ['clusterId']),
     getDataSelector(DataKeys.AlertRules),
     clustersSelector,
+    importedClustersSelector,
     prometheusRuleSelector,
     pathOr('', [clientStoreKey, 'endpoints', 'qbert']),
   ],
-  (rawAlerts, rawAlertRules, clusters, prometheusRules, qbertEndpoint) => {
+  (rawAlerts, rawAlertRules, clusters, importedClusters, prometheusRules, qbertEndpoint) => {
     const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
     // Need to dig into the coreos prometheus rules to fetch the 'for' property
     const flattenedRules = flatten(
@@ -78,10 +80,7 @@ export const alertsSelector = createSelector(
         status: capitalizeString(alert?.status?.state || 'N/A'),
         exportedNamespace: alert?.labels?.exported_namespace,
         query: alertRule?.query,
-        clusterName: pipe(
-          find<IClusterAction>(propEq('uuid', alert.clusterId)),
-          prop('name'),
-        )(clusters),
+        clusterName: findClusterName([...clusters, ...importedClusters], alert.clusterId),
         for: flattenedRules.find((rule) => {
           return (
             equals(rule.alert, pathStr('labels.alertname', alert)) &&

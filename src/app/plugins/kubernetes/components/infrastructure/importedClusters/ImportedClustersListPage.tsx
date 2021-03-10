@@ -1,0 +1,87 @@
+import React from 'react'
+import { DateAndTime } from 'core/components/listTable/cells/DateCell'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import { ActionDataKeys } from '../../../DataKeys'
+import { routes } from 'core/utils/routes'
+import { useSelector } from 'react-redux'
+import { prop } from 'ramda'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { isAdmin } from '../clusters/helpers'
+import DetachImportedClusterDialog from './DetachImportedClusterDialog'
+import ToggleMonitoringDialog from './ToggleMonitoringDialog'
+
+const renderExternal = (_, { external }) => (external ? <div>External</div> : null)
+
+const renderNodeGroups = (_, { nodeGroups }) => <div>{nodeGroups?.length || 0}</div>
+
+const columns = [
+  { id: 'uuid', label: 'UUID', display: false },
+  { id: 'name', label: 'Name' },
+  { id: 'external', label: 'Type', render: renderExternal },
+  { id: 'status', label: 'Status' },
+  { id: 'region', label: 'Region' },
+  { id: 'kubeVersion', label: 'Kubernetes Version' },
+  { id: 'nodeGroups', label: 'Node Groups', render: renderNodeGroups },
+  { id: 'containerCidr', label: 'Container CIDR' },
+  { id: 'servicesCidr', label: 'Services CIDR' },
+  { id: 'creationTimestamp', label: 'Created', render: (value) => <DateAndTime value={value} /> },
+]
+
+export const options = {
+  addButtonConfigs: [
+    {
+      label: 'Create Cluster',
+      link: routes.cluster.add.path(),
+      cond: () => {
+        const session = useSelector(prop(sessionStoreKey))
+        const {
+          userDetails: { role },
+        }: any = session
+        return role === 'admin'
+      },
+    },
+    {
+      label: 'Import Cluster',
+      link: routes.cluster.import.path(),
+      cond: () => {
+        const session = useSelector(prop(sessionStoreKey))
+        const {
+          userDetails: { role },
+          features,
+        }: any = session
+        return role === 'admin' && features.experimental.kplane
+      },
+    },
+  ],
+  columns,
+  cacheKey: ActionDataKeys.ImportedClusters,
+  name: 'Imported Clusters',
+  title: 'Imported Clusters',
+  uniqueIdentifier: 'uuid',
+  multiSelection: false,
+  hideDelete: true,
+  batchActions: [
+    // Add in when details page is in
+    // {
+    //   icon: 'info-circle',
+    //   label: 'Details',
+    //   routeTo: (rows) => `/ui/kubernetes/infrastructure/importedclusters/${rows[0].uuid}`,
+    // },
+    {
+      cond: isAdmin,
+      icon: 'chart-bar',
+      label: 'Monitoring',
+      dialog: ToggleMonitoringDialog,
+    },
+    {
+      cond: isAdmin,
+      icon: 'trash-alt',
+      label: 'Detach',
+      dialog: DetachImportedClusterDialog,
+    },
+  ],
+}
+
+const { ListPage } = createCRUDComponents(options)
+
+export default ListPage

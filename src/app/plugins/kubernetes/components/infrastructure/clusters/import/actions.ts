@@ -62,6 +62,8 @@ export const registerExternalClusters = async ({ cloudProviderId, clusters }) =>
     },
   )(null)
 
-  // Todo: Invalidate imported clusters cache here
+  // I don't think this works below... either that or it takes some time for the cluster to
+  // be returned from the sunpike API after the API call finishes
+  // importedClusterActions.invalidateCache()
   return clusters
 }

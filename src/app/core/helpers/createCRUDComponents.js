@@ -67,6 +67,7 @@ const createCRUDComponents = (options) => {
     blankFirstColumn,
     onSelect,
     extraToolbarContent,
+    hideDelete,
   } = options
 
   // List
@@ -125,6 +126,7 @@ const createCRUDComponents = (options) => {
         onRowsPerPageChange={getParamsUpdater('rowsPerPage')}
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
         extraToolbarContent={extraToolbarContent}
+        hideDelete={hideDelete}
       />
     )
   }
