@@ -163,7 +163,7 @@ const renderPluginRoutes = (role) => (id, plugin) => {
   })
 }
 
-const getSections = moize((plugins: Dictionary<any>, role) =>
+const getSections = moize((plugins: Dictionary<any>, role, features) =>
   toPairs(plugins).map(([id, plugin]) => ({
     id,
     name: plugin.name,
@@ -172,6 +172,9 @@ const getSections = moize((plugins: Dictionary<any>, role) =>
       .filter(
         ({ requiredRoles }) =>
           isNilOrEmpty(requiredRoles) || ensureArray(requiredRoles).includes(role),
+      )
+      .filter(
+        ({ requiredFeatures }) => isNilOrEmpty(requiredFeatures) || requiredFeatures(features),
       ),
   })),
 )
@@ -365,7 +368,7 @@ const AuthenticatedContainer = () => {
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
 
-  const sections = getSections(plugins, role)
+  const sections = getSections(plugins, role, features)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
   return (
