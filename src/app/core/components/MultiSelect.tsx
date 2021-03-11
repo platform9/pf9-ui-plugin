@@ -1,4 +1,4 @@
-import React, { useState, useMemo, ComponentType } from 'react'
+import React, { useState, useMemo, ComponentType, useEffect } from 'react'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import Box from '@material-ui/core/Box'
 import FormControl from '@material-ui/core/FormControl'
@@ -16,6 +16,7 @@ import clsx from 'clsx'
 import Text from 'core/elements/text'
 import Theme from 'core/themes/model'
 import { IndeterminateCheckBox } from '@material-ui/icons'
+import { allKey } from 'app/constants'
 
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
@@ -136,6 +137,13 @@ const MultiSelect: ComponentType<Props> = React.forwardRef<HTMLElement, Props>(
       const sortBySelected = (a, b) => values.includes(b.value) - values.includes(a.value)
       return sortSelectedFirst ? visibleOptions.sort(sortBySelected) : visibleOptions
     }, [term, fuse, values, sortSelectedFirst])
+
+    useEffect(() => {
+      if (values === allKey) {
+        // Select All
+        onChange(sortedOptions.map((option) => option.value))
+      }
+    }, [values])
 
     const toggleOption = (value) => {
       const updatedValues = values.includes(value)
