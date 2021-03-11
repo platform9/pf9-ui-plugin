@@ -30,7 +30,6 @@ export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
     return appbert.getClusterTags()
   },
   updateFn: async ({ clusterId, pkg, on }) => {
-    console.log(clusterId, pkg, on)
     return appbert.toggleAddon(clusterId, pkg, on)
   },
   uniqueIdentifier: 'uuid',
