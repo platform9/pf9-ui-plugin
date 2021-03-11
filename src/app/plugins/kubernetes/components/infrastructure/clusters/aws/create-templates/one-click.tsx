@@ -160,7 +160,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
               <ClusterDomainField
                 values={values}
                 onChange={handleClusterDomainUpdate(values)}
-                required={!wizardContext.usePf9Domain}
+                required={false}
                 disabled={wizardContext.usePf9Domain}
               />
 
