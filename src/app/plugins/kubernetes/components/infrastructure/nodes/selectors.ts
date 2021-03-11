@@ -35,7 +35,7 @@ export const nodesSelector = createSelector(
           status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
           combined: combinedHostsObj[node.uuid],
           // qbert v3 link fails authorization so we have to use v1 link for logs
-          logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
+          logs: `${qbertUrl}/logs/${node.uuid}`.replace(/\/v3\//, '/v1/'),
           usage,
         }
       })
