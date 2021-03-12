@@ -77,6 +77,7 @@ const ListPage = ({ ListContainer }) => {
         filters={
           <>
             <Picklist
+              label="Node Group"
               onChange={getParamsUpdater('groupName')}
               value={params.groupName}
               options={options}
