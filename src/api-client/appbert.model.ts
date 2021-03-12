@@ -13,4 +13,5 @@ export interface ClusterTag {
 export interface Pkg {
   name: string
   validate: boolean
+  installed: boolean
 }

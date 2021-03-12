@@ -14,16 +14,16 @@ import { castBoolToStr, formatDate } from 'utils/misc'
 import ExternalLink from 'core/components/ExternalLink'
 import { applicationLoadBalancer } from 'k8s/links'
 
-interface IClusterDetailFields {
+export interface IClusterDetailFields<T> {
   id: string
   title: string
   required?: boolean
   helpMessage?: string | React.ReactNode
-  condition?: (cluster: IClusterSelector) => boolean
-  render?: (value: string | boolean) => string | React.ReactNode
+  condition?: (cluster: T) => boolean
+  render?: (value: any) => string | React.ReactNode
 }
 
-const getFieldsForCard = (fields: IClusterDetailFields[], cluster: IClusterSelector) => {
+export function getFieldsForCard<T>(fields: Array<IClusterDetailFields<T>>, cluster: T) {
   const fieldsToDisplay = {}
   fields.forEach((field) => {
     const { id, title, required = false, condition, render, helpMessage } = field
@@ -40,7 +40,7 @@ const getFieldsForCard = (fields: IClusterDetailFields[], cluster: IClusterSelec
 }
 
 // Common
-const clusterOverviewFields: IClusterDetailFields[] = [
+const clusterOverviewFields: Array<IClusterDetailFields<IClusterSelector>> = [
   {
     id: 'created_at',
     title: 'Cluster Created',

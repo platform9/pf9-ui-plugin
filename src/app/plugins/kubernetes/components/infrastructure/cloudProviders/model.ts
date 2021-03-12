@@ -9,6 +9,9 @@ export enum CloudProviders {
   BareOS = 'local',
   PhysicalMachine = 'physical',
   VirtualMachine = 'virtual',
+  EKS = 'eks',
+  AKS = 'aks',
+  GKE = 'gke',
 }
 
 export enum CloudProvidersFriendlyName {

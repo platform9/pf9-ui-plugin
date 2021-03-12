@@ -33,6 +33,7 @@ import {
 import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
 import { createUrlWithQueryString } from 'core/utils/routes'
+import { ImportedCluster } from 'k8s/components/infrastructure/importedClusters/model'
 
 type AlertManagerRaw = Omit<Omit<AlertManagerAlert, 'clusterId'>, 'id'>
 
@@ -61,7 +62,7 @@ const normalizeCluster = <T>(baseUrl) => (cluster): T & INormalizedCluster => ({
   nodes: [],
 })
 
-const normalizeImportedClusters = (apiResponse) => {
+const normalizeImportedClusters = (apiResponse: GCluster<ImportedCluster>) => {
   const clusters = apiResponse.items
   const normalizedClusters = clusters.map((cluster) => ({
     ...cluster,
@@ -254,7 +255,7 @@ class Qbert extends ApiService {
 
   getImportedClusters = async () => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/clusters`
-    const response = await this.client.basicGet<any>({
+    const response = await this.client.basicGet<GCluster<ImportedCluster>>({
       url,
       version: 'v4',
       options: {

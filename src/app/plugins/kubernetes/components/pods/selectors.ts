@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { any, head, map, mergeLeft, pathEq, pathOr, pipe, pluck, propEq, toPairs } from 'ramda'
+import { any, head, map, mergeLeft, pathEq, pathOr, pipe, pluck, propEq, toPairs as ToPairs } from 'ramda'
 import { emptyArr, emptyObj, filterIf } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
@@ -13,6 +13,7 @@ import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 import { getK8sDashboardLinkFromVersion } from '../infrastructure/clusters/helpers'
 import { clientStoreKey } from 'core/client/clientReducers'
 import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
+const toPairs: any = ToPairs
 
 export const podsSelector = createSelector(
   [

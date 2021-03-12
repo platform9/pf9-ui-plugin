@@ -9,16 +9,21 @@ import { sessionStoreKey } from 'core/session/sessionReducers'
 import { isAdmin } from '../clusters/helpers'
 import DetachImportedClusterDialog from './DetachImportedClusterDialog'
 import ToggleMonitoringDialog from './ToggleMonitoringDialog'
+import SimpleLink from 'core/components/SimpleLink'
 
 const renderExternal = (_, { external }) => (external ? <div>External</div> : null)
 
 const renderNodeGroups = (_, { nodeGroups }) => <div>{nodeGroups?.length || 0}</div>
 
+const renderClusterDetailLink = (name, cluster) => (
+  <SimpleLink src={routes.cluster.imported.details.path({ id: cluster.uuid })}>{name}</SimpleLink>
+)
+
 const columns = [
   { id: 'uuid', label: 'UUID', display: false },
-  { id: 'name', label: 'Name' },
+  { id: 'name', label: 'Name', render: renderClusterDetailLink },
   { id: 'external', label: 'Type', render: renderExternal },
-  { id: 'status', label: 'Status' },
+  { id: 'status.phase', label: 'Status' },
   { id: 'region', label: 'Region' },
   { id: 'kubeVersion', label: 'Kubernetes Version' },
   { id: 'nodeGroups', label: 'Node Groups', render: renderNodeGroups },
@@ -42,7 +47,7 @@ export const options = {
     },
     {
       label: 'Import Cluster',
-      link: routes.cluster.import.path(),
+      link: routes.cluster.import.root.path(),
       cond: () => {
         const session = useSelector(prop(sessionStoreKey))
         const {

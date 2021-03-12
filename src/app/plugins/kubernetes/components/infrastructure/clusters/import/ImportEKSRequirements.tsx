@@ -55,7 +55,7 @@ const ImportEKSRequirements = ({ onComplete, platform }) => {
     if (!hasAwsProvider) {
       setShowDialog(true)
     } else {
-      onComplete(routes.cluster.importEKS.path())
+      onComplete(routes.cluster.import.eks.path())
     }
   }, [onComplete, cloudProviders])
 

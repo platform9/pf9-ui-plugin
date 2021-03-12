@@ -50,6 +50,7 @@ import DeployAppPage from './components/apps/deploy-app-page'
 import EditRepoPage from './components/repositories/edit-repo-page'
 import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
+import ImportedClusterDetailsPage from './components/infrastructure/importedClusters/imported-cluster-details'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -114,6 +115,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/clusters/import/eks', exact: true },
       requiredRoles: 'admin',
       component: ImportEKSClusterPage,
+    },
+    {
+      name: 'Imported Cluster Details',
+      link: { path: '/infrastructure/clusters/imported/:id', exact: true },
+      requiredRoles: 'admin',
+      component: ImportedClusterDetailsPage,
     },
     {
       name: 'Edit Cluster',

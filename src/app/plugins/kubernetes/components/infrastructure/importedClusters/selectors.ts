@@ -13,7 +13,6 @@ export const importedClustersSelector = createSelector(
         name: cluster.spec?.displayName,
         cloudProviderId: cluster.spec?.cloudProviderID,
         external: cluster.metadata?.labels?.external,
-        status: cluster.status?.phase,
         region: cluster.metadata?.labels?.region,
         kubeVersion: cluster.spec?.kubeVersion,
         creationTimestamp: cluster.metadata?.creationTimestamp,

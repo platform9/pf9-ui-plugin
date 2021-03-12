@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
+import { ClusterTag } from 'api-client/appbert.model'
 import Alert from 'core/components/Alert'
 import Progress from 'core/components/progress/Progress'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -8,12 +9,17 @@ import { notificationActions, NotificationType } from 'core/notifications/notifi
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { clusterTagActions } from '../clusters/actions'
+import { IUseDataLoader } from '../nodes/model'
 
 const { appbert } = ApiClient.getInstance()
 
 const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
   const dispatch = useDispatch()
-  const [appbertData, loadingAppbertData, reloadAppbert] = useDataLoader(clusterTagActions.list)
+  const [
+    appbertData,
+    loadingAppbertData,
+    reloadAppbert,
+  ]: IUseDataLoader<ClusterTag> = useDataLoader(clusterTagActions.list) as any
   const [tagUpdater, updatingTag] = useDataUpdater(clusterTagActions.update, (success) => {
     if (success) {
       onClose()
@@ -55,7 +61,7 @@ const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
         )
         return onClose(false)
       }
-      await tagUpdater({ clusterId: cluster.uuid, pkg: 'pf9-mon', on: !enabled })
+      await tagUpdater({ clusterId: cluster.uuid, pkg: monPkg.ID, on: !enabled })
     } catch (e) {
       dispatch(
         notificationActions.registerNotification({

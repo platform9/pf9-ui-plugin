@@ -2,6 +2,7 @@ import React from 'react'
 import ListTable from 'core/components/listTable/ListTable'
 import NoContentMessage from 'core/components/NoContentMessage'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { emptyArr } from 'utils/fp'
 
 const createListTableComponent = ({
   title,
@@ -11,22 +12,22 @@ const createListTableComponent = ({
   columns,
   uniqueIdentifier = 'id',
   searchTarget = 'name',
-  paginate,
-  showCheckboxes,
-  multiSelection,
+  paginate = true,
+  showCheckboxes = true,
+  multiSelection = true,
   onReload,
-  onRefresh,
+  onRefresh = undefined,
   compactTable = false,
-  batchActions,
+  batchActions = emptyArr,
 }) => {
   const CustomListTable = ({
     data,
-    onAdd,
-    onDelete,
-    onEdit,
-    rowActions,
-    loading,
-    onSortChange,
+    onAdd = undefined,
+    onDelete = undefined,
+    onEdit = undefined,
+    rowActions = undefined,
+    loading = false,
+    onSortChange = undefined,
   }) => {
     const [{ visibleColumns, columnsOrder, rowsPerPage }, updatePrefs] = useScopedPreferences(name)
 

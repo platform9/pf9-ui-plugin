@@ -56,7 +56,7 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
     if (!hasGoogleProvider) {
       // setShowDialog(true)
     } else {
-      onComplete(routes.cluster.importEKS.path())
+      onComplete(routes.cluster.import.eks.path())
     }
   }, [onComplete, cloudProviders])
 

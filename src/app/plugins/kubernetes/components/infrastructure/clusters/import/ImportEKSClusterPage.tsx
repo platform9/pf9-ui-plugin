@@ -71,7 +71,7 @@ const ImportEKSClusterPage = () => {
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
     reloadImportedClusters()
-    history.push(routes.cluster.importedClusters.path())
+    history.push(routes.cluster.imported.list.path())
   }
 
   const getCloudProviderName = useCallback(
@@ -87,7 +87,7 @@ const ImportEKSClusterPage = () => {
       <Wizard
         onComplete={handleSubmit}
         context={initialContext}
-        originPath={routes.cluster.import.path()}
+        originPath={routes.cluster.import.root.path()}
         submitLabel="Import"
       >
         {({ wizardContext, setWizardContext, onNext }) => (
