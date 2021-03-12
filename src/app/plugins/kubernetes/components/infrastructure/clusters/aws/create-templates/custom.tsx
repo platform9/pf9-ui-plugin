@@ -68,7 +68,7 @@ export const initialContext = {
   networkStack: 'ipv4',
   privileged: true,
   allowWorkloadsOnMaster: false,
-  useRoute53: true,
+  useRoute53: false,
 }
 
 const columns = [
