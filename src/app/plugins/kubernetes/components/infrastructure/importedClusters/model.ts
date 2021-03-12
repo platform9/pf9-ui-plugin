@@ -1,3 +1,11 @@
+export const importedClusterStatusMap = {
+  Pending: 'pause',
+  Running: 'ok',
+  Terminating: 'loading',
+  Failing: 'fail',
+  '': 'unknown',
+}
+
 export interface ImportedClusterSelector extends ImportedCluster {
   name: ImportedCluster['spec']['displayName']
   cloudProviderId: ImportedCluster['spec']['cloudProviderID']

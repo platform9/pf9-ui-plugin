@@ -10,6 +10,8 @@ import { isAdmin } from '../clusters/helpers'
 import DetachImportedClusterDialog from './DetachImportedClusterDialog'
 import ToggleMonitoringDialog from './ToggleMonitoringDialog'
 import SimpleLink from 'core/components/SimpleLink'
+import { importedClusterStatusMap } from './model'
+import ClusterStatusSpan from '../clusters/ClusterStatus'
 
 const renderExternal = (_, { external }) => (external ? <div>External</div> : null)
 
@@ -19,11 +21,19 @@ const renderClusterDetailLink = (name, cluster) => (
   <SimpleLink src={routes.cluster.imported.details.path({ id: cluster.uuid })}>{name}</SimpleLink>
 )
 
+const renderStatus = (phase) => {
+  return (
+    <ClusterStatusSpan title={phase} variant="table" status={importedClusterStatusMap[phase]}>
+      {phase}
+    </ClusterStatusSpan>
+  )
+}
+
 const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name', render: renderClusterDetailLink },
   { id: 'external', label: 'Type', render: renderExternal },
-  { id: 'status.phase', label: 'Status' },
+  { id: 'status.phase', label: 'Status', render: renderStatus },
   { id: 'region', label: 'Region' },
   { id: 'kubeVersion', label: 'Kubernetes Version' },
   { id: 'nodeGroups', label: 'Node Groups', render: renderNodeGroups },

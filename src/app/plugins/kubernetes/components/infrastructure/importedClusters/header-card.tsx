@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 import { Card, Tooltip } from '@material-ui/core'
 import Text from 'core/elements/text'
 import ExternalLink from 'core/components/ExternalLink'
-import { ImportedClusterSelector } from './model'
+import { ImportedClusterSelector, importedClusterStatusMap } from './model'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { IUseDataLoader } from '../nodes/model'
 import { ClusterTag } from 'api-client/appbert.model'
@@ -18,13 +18,6 @@ import Alert from 'core/components/Alert'
 const getGrafanaUrl = (host, cluster) =>
   `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
 
-const importedClusterStatusMap = {
-  Pending: 'pause',
-  Running: 'ok',
-  Terminating: 'loading',
-  Failing: 'fail',
-  '': 'unknown',
-}
 const HeaderCard: FC<{ title: string; cluster: ImportedClusterSelector }> = ({
   title,
   cluster,
