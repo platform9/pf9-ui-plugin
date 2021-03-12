@@ -120,7 +120,7 @@ export default HeaderCard
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
     width: 424,
-    minHeight: 175,
+    minHeight: 210,
     display: 'grid',
     marginTop: theme.spacing(2),
     backgroundColor: theme.palette.grey['000'],
@@ -131,6 +131,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
     color: theme.palette.grey[700],
     padding: theme.spacing(1, 2),
     borderBottom: `1px solid ${theme.palette.grey[300]}`,
+    display: 'flex',
+    alignItems: 'center',
   },
   article: {
     padding: theme.spacing(1, 3),
@@ -142,6 +144,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   grafanaLink: {
     ...theme.typography.body2,
+    marginTop: 4,
   },
   uppercase: {
     textTransform: 'uppercase',

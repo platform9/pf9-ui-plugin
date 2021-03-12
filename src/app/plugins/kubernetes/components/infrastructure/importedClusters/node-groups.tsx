@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { ImportedClusterSelector } from './model'
+import Text from 'core/elements/text'
 
 const renderSubnets = (subnets = []) => <span>{subnets.length}</span>
 const renderNumberOfNodes = (instances = []) => <span>{`Nodes ${instances.length}`}</span>
@@ -14,12 +15,20 @@ const renderScalingConfig = (scalingConfig: any = {}) => (
     <div>Desired {scalingConfig?.desiredSize}</div>
   </div>
 )
+const renderFormattedName = (name) => (
+  <Text variant="body2" className="capitalize">
+    {name
+      .replace(/_/g, ' ')
+      .replace(/-/g, ' ')
+      .toLowerCase()}
+  </Text>
+)
 
 const columns = [
   { id: 'name', label: 'Name' },
   { id: 'instances', label: 'Number of Nodes', render: renderNumberOfNodes },
-  { id: 'capacityType', label: 'Capacity Type' },
-  { id: 'status', label: 'Status' },
+  { id: 'capacityType', label: 'Capacity Type', render: renderFormattedName },
+  { id: 'status', label: 'Status', render: renderFormattedName },
   { id: 'instanceTypes', label: 'Instance Types', render: renderInstanceTypes },
   { id: 'scalingConfig', label: 'Autoscaling', render: renderScalingConfig },
   { id: 'kubernetesVersion', label: 'Kubernetes Version' },

@@ -25,6 +25,7 @@ import {
   isUnhealthyStatus,
 } from '../infrastructure/clusters/ClusterStatusUtils'
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import { ImportedClusterSelector } from '../infrastructure/importedClusters/model'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -116,28 +117,28 @@ export const importedClusterStatusCardProps: IStatusCardWithFilterProps = {
   title: 'Clusters Total',
   icon: 'n/a',
   dataLoader: [importedClusterActions.list, {}],
-  quantityFn: (clusters) => ({
+  quantityFn: (clusters: ImportedClusterSelector[]) => ({
     quantity: clusters.length,
     // Possible "" value, not sure what to do with that
     pieData: [
       {
         name: 'running',
-        value: clusters.filter((cluster) => cluster.status === 'Running').length,
+        value: clusters.filter((cluster) => cluster.status.phase === 'Running').length,
         color: 'green.main',
       },
       {
         name: 'pending',
-        value: clusters.filter((cluster) => cluster.status === 'Pending').length,
+        value: clusters.filter((cluster) => cluster.status.phase === 'Pending').length,
         color: 'yellow.main',
       },
       {
         name: 'terminating',
-        value: clusters.filter((cluster) => cluster.status === 'Terminating').length,
+        value: clusters.filter((cluster) => cluster.status.phase === 'Terminating').length,
         color: 'orange.main',
       },
       {
         name: 'failing',
-        value: clusters.filter((cluster) => cluster.status === 'Failing').length,
+        value: clusters.filter((cluster) => cluster.status.phase === 'Failing').length,
         color: 'red.main',
       },
     ],
