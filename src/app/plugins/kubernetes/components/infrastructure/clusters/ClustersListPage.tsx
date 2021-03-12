@@ -174,7 +174,7 @@ export const options = {
           userDetails: { role },
           features,
         }: any = session
-        return role === 'admin' && features.experimental.kplane
+        return role === 'admin' && features?.experimental?.kplane
       },
     },
   ],

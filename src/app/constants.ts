@@ -51,7 +51,10 @@ export enum CustomerTiers {
   Enterprise = 'enterprise',
   Freedom = 'freedom',
   Growth = 'growth',
+  OEM = 'oem',
 }
+
+export const ssoEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 
 export enum ClusterCloudPlatforms {
   EKS = 'eks',

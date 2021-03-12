@@ -9,6 +9,7 @@ import {
   loginWithSsoUrl,
   resetPasswordThroughEmailUrl,
   resetPasswordUrl,
+  ssoEnabledTiers,
 } from 'app/constants'
 import Progress from 'core/components/progress/Progress'
 import AuthenticatedContainer from 'core/containers/AuthenticatedContainer'
@@ -165,9 +166,14 @@ const AppContainer = () => {
         DocumentMetaCls.addScriptElementToDomBody('driftCode', driftScriptContent)
       }
 
+      // Legacy DU & DDU have different conditions
       setLoginFeatures({
         loaded: true,
-        sso: pathStrOr(false, 'data.experimental.sso', initialFeatures),
+        sso:
+          (initialFeatures?.data?.experimental?.kplane &&
+            ssoEnabledTiers.includes(initialFeatures?.data?.customer_tier)) ||
+          (!initialFeatures?.data?.experimental?.kplane &&
+            pathStrOr(false, 'data.experimental.sso', initialFeatures)),
       })
     }
 
