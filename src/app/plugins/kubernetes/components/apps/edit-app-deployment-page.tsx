@@ -14,17 +14,16 @@ import Text from 'core/elements/text'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import SimpleLink from 'core/components/SimpleLink'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
-import NamespacePicklistField from '../infrastructure/clusters/form-components/namespace-picklist-field'
-import AddNewNamespaceDialog from './add-new-namespace-dialog'
 import useReactRouter from 'use-react-router'
 import AppVersionPicklistField from './app-version-picklist-field'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { appActions, appDetailsLoader } from './actions'
-import useDataUpdater from 'core/hooks/useDataUpdater'
-import ClusterPicklist from './cluster-picklist'
+import { appDetailsLoader, deploymentDetailLoader, deployedAppActions } from './actions'
 import PicklistField from 'core/components/validatedForm/PicklistField'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import ClusterPicklist from '../common/ClusterPicklist'
+import NamespacePicklist from '../common/NamespacePicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
-import { getAppVersionPicklistOptions, getIcon } from './helpers'
+import { compareVersions, getAppVersionPicklistOptions, getIcon } from './helpers'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -117,36 +116,64 @@ const AppIcon = ({ appName, icon }) => {
   )
 }
 
-const DeployAppPage = () => {
+const EditAppDeploymentPage = () => {
   const classes = useStyles()
   const { match, history } = useReactRouter()
   const fileInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const [showNamespaceDialog, setShowNamespaceDialog] = useState(false)
-
   const name = match.params['name']
-  const repository = match.params['repository']
-  const [[appDetail = {}], loadingAppDetail] = useDataLoader(appDetailsLoader, {
-    name,
-    repository,
-  })
-  const anyAppActions = appActions as any
-  const [deploy, deploying] = useDataUpdater(anyAppActions.deploy)
+  const clusterId = match.params['clusterId']
+  const namespace = match.params['namespace']
 
-  const defaultValues = useMemo(() => JSON.stringify(appDetail?.values, null, 1), [appDetail])
+  const [deployedApps, loadingDeployedApps] = useDataLoader(deployedAppActions.list, {
+    clusterId,
+    namespace,
+  })
+  const deployedApp = deployedApps.find((app) => app.name === name) || {}
+  const { repository, chart, chart_version: chartVersion } = deployedApp
+
+  const [[deployedAppDetails] = {}, loadingDeployedAppDetails]: any = useDataLoader(
+    deploymentDetailLoader,
+    {
+      releaseName: name,
+      clusterId,
+      namespace,
+    },
+  )
+
+  // We also need to load app/chart detail for other additional info such as app/chart versions
+  const [[appDetail = {}], loadingAppDetail] = useDataLoader(appDetailsLoader, {
+    name: chart,
+    repository: repository,
+  })
+
+  const [updateDeployedApp, updatingDeployedApp] = useDataUpdater(deployedAppActions.update)
+
+  const defaultStructuredValues = JSON.stringify(deployedAppDetails?.chart?.values, null, 1)
 
   const initialContext = useMemo(
     () => ({
-      version: appDetail?.metadata?.version,
-      repository: appDetail?.repository,
-      values: defaultValues,
-      useDefaultValues: true,
+      deploymentName: name,
+      version: chartVersion,
+      repository: repository,
+      clusterId: clusterId,
+      namespace: namespace,
+      useDefaultValues: false,
+      values: JSON.stringify(deployedAppDetails?.config, null, 1),
       info: appDetail?.metadata?.home,
     }),
-    [appDetail],
+    [deployedAppDetails, appDetail, name, clusterId, namespace],
   )
 
-  const appVersions = useMemo(() => getAppVersionPicklistOptions(appDetail.Versions), [appDetail])
+  // Only version upgrades are available to the user so we must filter out the list of
+  // app versions to only include versions >= to the deployed app's current version
+  const availableVersions = useMemo(() => {
+    if (!appDetail?.Versions || !chartVersion) {
+      return []
+    }
+    return appDetail.Versions.filter((version) => compareVersions(version, chartVersion) >= 0)
+  }, [appDetail, deployedAppDetails])
+  const appVersions = useMemo(() => getAppVersionPicklistOptions(availableVersions), [appDetail])
 
   const handleSubmit = async (wizardContext) => {
     const {
@@ -158,30 +185,23 @@ const DeployAppPage = () => {
       useDefaultValues,
     } = wizardContext
 
-    const vals = useDefaultValues ? JSON.stringify(appDetail?.values) : values
+    const vals = useDefaultValues ? JSON.stringify(deployedAppDetails?.chart?.values) : values
 
-    const [success] = await deploy({
+    const [success] = await updateDeployedApp({
       clusterId,
       namespace,
       deploymentName,
+      chart,
       repository,
-      chartName: name,
+      action: 'upgrade',
       version,
       values: vals,
     })
     if (success) {
       history.push(routes.apps.list.path())
     } else {
-      setErrorMessage('ERROR: Cannot deploy app')
+      setErrorMessage('ERROR: Cannot edit deployed app')
     }
-  }
-
-  const handleAddNewNamespace = () => {
-    setShowNamespaceDialog(true)
-  }
-
-  const closeDialog = () => {
-    setShowNamespaceDialog(false)
   }
 
   const openFileBrowser = () => {
@@ -201,14 +221,16 @@ const DeployAppPage = () => {
     reader.readAsText(file)
   }
 
+  const loading = loadingDeployedAppDetails || loadingDeployedApps || loadingAppDetail
+
   return (
     <>
-      <DocumentMeta title="Deploy Application" bodyClasses={['form-view']} />
+      <DocumentMeta title="Edit Deployed Application" bodyClasses={['form-view']} />
       <FormWrapper
-        title="Deploy Application"
-        loading={loadingAppDetail || deploying}
-        renderContentOnMount={!loadingAppDetail}
-        message={loadingAppDetail ? 'Loading' : 'Submitting'}
+        title="Edit Deployed Application"
+        loading={loading || updatingDeployedApp}
+        renderContentOnMount={!loading}
+        message={loading ? 'Loading' : 'Submitting'}
         backUrl={appListPageUrl}
         isUpdateForm={true}
       >
@@ -217,17 +239,11 @@ const DeployAppPage = () => {
             <WizardMeta
               className={classes.deployAppForm}
               fields={wizardContext}
-              icon={<AppIcon appName={appDetail.name} icon={appDetail.metadata?.icon} />}
+              icon={<AppIcon appName={name} icon={deployedAppDetails?.chart?.metadata?.icon} />}
               keyOverrides={wizardMetaFormattedNames}
               calloutFields={wizardMetaCalloutFields}
             >
               <WizardStep stepId="deploy">
-                {showNamespaceDialog && (
-                  <AddNewNamespaceDialog
-                    clusterId={wizardContext.clusterId}
-                    onClose={closeDialog}
-                  />
-                )}
                 <ValidatedForm
                   classes={{ root: classes.validatedFormContainer }}
                   fullWidth
@@ -237,10 +253,10 @@ const DeployAppPage = () => {
                   elevated={false}
                 >
                   <div className={classes.chartInfo}>
-                    <Text variant="subtitle1">{appDetail.name}</Text>
+                    <Text variant="subtitle1">{name}</Text>
 
                     <Text variant="body2" className={classes.infoText}>
-                      {appDetail.metadata?.description}
+                      {deployedAppDetails?.chart?.metadata?.description}
                     </Text>
                   </div>
                   <FormFieldCard>
@@ -249,7 +265,7 @@ const DeployAppPage = () => {
                         className={classes.nameField}
                         id="deploymentName"
                         label="Deployment Name"
-                        required
+                        disabled
                       />
                       <div className={classes.clusterField}>
                         <PicklistField
@@ -257,22 +273,21 @@ const DeployAppPage = () => {
                           id="clusterId"
                           label="Cluster"
                           onChange={(value) => setWizardContext({ clusterId: value })}
-                          selectFirst={false}
-                          repository={repository}
-                          required
+                          disabled
                         />
                       </div>
-
                       <div className={classes.namespaceField}>
-                        <NamespacePicklistField
+                        <PicklistField
+                          DropdownComponent={NamespacePicklist}
+                          id="namespace"
+                          label="Namespace"
                           clusterId={wizardContext.clusterId}
-                          addNewItemOption={true}
-                          addNewItemHandler={handleAddNewNamespace}
+                          onChange={(value) => setWizardContext({ namespace: value })}
+                          disabled
                         />
                       </div>
                       <AppVersionPicklistField options={appVersions} />
                     </div>
-
                     <Text variant="body2">
                       {'Enter value details below or '}
                       <SimpleLink src="" onClick={openFileBrowser}>
@@ -292,7 +307,9 @@ const DeployAppPage = () => {
                       <CodeMirror
                         id="values"
                         value={wizardContext.values}
-                        onChange={(values) => setWizardContext({ values, useDefaultValues: false })}
+                        onChange={(values) => {
+                          setWizardContext({ values, useDefaultValues: false })
+                        }}
                         className={classes.codeMirror}
                       />
                     </fieldset>
@@ -302,7 +319,9 @@ const DeployAppPage = () => {
                       label="Use default structured values"
                       onChange={(checked) =>
                         setWizardContext({
-                          values: checked ? initialContext.values : '',
+                          values: checked
+                            ? defaultStructuredValues
+                            : JSON.stringify(deployedAppDetails?.config, null, 1),
                           useDefaultValues: checked,
                         })
                       }
@@ -319,4 +338,4 @@ const DeployAppPage = () => {
   )
 }
 
-export default DeployAppPage
+export default EditAppDeploymentPage

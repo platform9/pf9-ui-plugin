@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
 import { memoizedDep } from 'utils/misc'
+import { isEqual } from 'lodash'
 
 const onErrorHandler = moize((loaderFn, registerNotification) => (errorMessage, catchedErr) => {
   const { cacheKey } = loaderFn
@@ -51,7 +52,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
       pipe(
         path([cacheStoreKey, paramsStoreKey, cacheKey]),
         arrayIfNil,
-        find(whereEq(memoizedIndexedParams)),
+        find((item) => isEqual(item, memoizedIndexedParams)),
       ),
     [cacheKey, memoizedIndexedParams],
   )

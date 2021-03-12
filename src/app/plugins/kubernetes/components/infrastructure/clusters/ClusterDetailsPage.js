@@ -31,6 +31,7 @@ import { variantIcon } from 'core/components/Alert'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import ClusterDeployedApps from './cluster-deployed-apps'
 
 const oneSecond = 1000
 
@@ -218,6 +219,12 @@ const ClusterDetailsPage = () => {
           <div className={classes.tabContainer}>
             {clusterHeader}
             <ClusterInfo />
+          </div>
+        </Tab>
+        <Tab value="deployedApps" label="Deployed Apps">
+          <div className={classes.tabContainer}>
+            {clusterHeader}
+            <ClusterDeployedApps cluster={cluster} />
           </div>
         </Tab>
       </Tabs>

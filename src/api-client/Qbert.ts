@@ -1,7 +1,6 @@
 import { propOr, map, pipe, mergeLeft } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
-import { normalizeResponse } from 'api-client/helpers'
 import ApiService from 'api-client/ApiService'
 import {
   Node,
@@ -660,41 +659,6 @@ class Qbert extends ApiService {
       options: {
         clsName: this.getClassName(),
         mthdName: 'createServiceAccount',
-      },
-    })
-  }
-
-  getReleases = async (clusterId) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
-    const response = await this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getReleases',
-      },
-    })
-    return normalizeResponse(response)
-  }
-
-  getRelease = async (clusterId, name) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`
-    const response = await this.client.basicGet({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'getRelease',
-      },
-    })
-    return normalizeResponse(response)
-  }
-
-  deleteRelease = async (clusterId, name) => {
-    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`
-    return this.client.basicDelete({
-      url,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'deleteRelease',
       },
     })
   }

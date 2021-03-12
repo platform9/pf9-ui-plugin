@@ -4,9 +4,9 @@ import { repositoryActions } from './actions'
 import { Dialog, DialogActions } from '@material-ui/core'
 import Progress from 'core/components/progress/Progress'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import Text from 'core/elements/text'
 import Button from 'core/elements/button'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,27 +25,45 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const UpdateRepositoryDialog = ({ rows: [repository], onClose }) => {
+interface DisconnectRepositoryDialog {
+  name: string
+  clusterId: string
+  onClose: () => void
+  onSubmit?: () => void
+}
+
+const DisconnectRepositoryDialog = ({ name, clusterId, onClose, onSubmit }) => {
   const classes = useStyles()
   const anyRepositoryActions = repositoryActions as any
-  const [update, updating] = useDataUpdater(anyRepositoryActions.updateRepositories, onClose)
+  const [disconnectRepository, disconnectingRepository] = useDataUpdater(
+    anyRepositoryActions.deleteClustersFromRepository,
+    onSubmit ? onSubmit : onClose,
+  )
 
-  const updateRepository = () => update({ repositories: [repository] })
+  const handleRepositoryDeletion = () =>
+    disconnectRepository({ repoName: name, clusterIds: [clusterId] })
 
   return (
     <Dialog open onClose={onClose}>
-      <FormFieldCard title="Update Repository">
-        <Progress loading={updating} minHeight={100} maxHeight={100}>
+      <FormFieldCard title="Disconnect Repository">
+        <Progress loading={disconnectingRepository} minHeight={100} maxHeight={100}>
           <div className={classes.dialogTextContent}>
             <Text variant="body2" component="p">
-              This will update repository <b>{repository.name}</b>. Are you sure?
+              Are you sure you would like to disconnect the repository:
+            </Text>
+            <br />
+            <Text variant="subtitle2">{name}</Text>
+            <br />
+            <Text variant="body2">
+              Once disconnected, all apps that reside in this repository will no longer be available
+              to this cluster.
             </Text>
             <DialogActions className={classes.dialogButtons}>
               <Button className={classes.cancelButton} onClick={onClose}>
                 Cancel
               </Button>
-              <Button variant="light" color="primary" onClick={updateRepository}>
-                Update
+              <Button variant="light" color="primary" onClick={handleRepositoryDeletion}>
+                Disconnect
               </Button>
             </DialogActions>
           </div>
@@ -55,4 +73,4 @@ const UpdateRepositoryDialog = ({ rows: [repository], onClose }) => {
   )
 }
 
-export default UpdateRepositoryDialog
+export default DisconnectRepositoryDialog

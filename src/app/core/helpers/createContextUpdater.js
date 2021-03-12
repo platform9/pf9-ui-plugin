@@ -14,6 +14,7 @@ import {
   pipe,
   reject,
   split,
+  uniq,
 } from 'ramda'
 import {
   emptyArr,
@@ -136,7 +137,11 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
     async (params = emptyObj, additionalOptions = emptyObj) => {
       const { dispatch, getState } = store
       const indexedParams = pipe(
-        pickAll(allIndexKeys),
+        pickAll(
+          Array.isArray(uniqueIdentifier)
+            ? uniq([...allIndexKeys, ...uniqueIdentifier])
+            : uniq([...allIndexKeys, uniqueIdentifier]),
+        ),
         reject(either(isNil, equals(allKey))),
       )(params)
       const {

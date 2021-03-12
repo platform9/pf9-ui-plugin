@@ -37,8 +37,7 @@ export interface IDataKeys {
   Apps: any // no model for this yet
   AppVersions: any // no model for this yet
   ApiGroups: any // no model for this yet
-  Releases: any // no model for this yet
-  ReleaseDetail: any[] // no model for this yet
+  DeployedApps: any // no model for this yet
   RepositoriesWithClusters: any // no model for this yet
   Repositories: any // no model for this yet
   CloudProviders: GetCloudProvider[]

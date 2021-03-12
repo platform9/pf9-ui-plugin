@@ -30,7 +30,6 @@ import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
-import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
 import RbacIndexPage from './components/rbac/RbacIndexPage'
 import AddRolePage from './components/rbac/AddRolePage'
 import AddClusterRolePage from './components/rbac/AddClusterRolePage'
@@ -48,6 +47,7 @@ import OnboardNewNodePage from './components/infrastructure/nodes/onboard-new-no
 import AddRepoPage from './components/repositories/add-repo-page'
 import DeployAppPage from './components/apps/deploy-app-page'
 import EditRepoPage from './components/repositories/edit-repo-page'
+import EditAppDeploymentPage from './components/apps/edit-app-deployment-page'
 import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 
@@ -170,9 +170,9 @@ Kubernetes.registerPlugin = (pluginManager) => {
       component: DeployAppPage,
     },
     {
-      name: 'Deployed App Details',
-      link: { path: '/apps/deployed/:clusterId/:release', exact: true },
-      component: DeployedAppDetailsPage,
+      name: 'Edit Deployed App',
+      link: { path: '/apps/deployed/edit/:clusterId/:namespace/:name', exact: true },
+      component: EditAppDeploymentPage,
     },
     {
       name: 'Add Repository',
@@ -385,7 +385,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       icon: 'th',
       nestedLinks: [
         { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
-        // { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
+        { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
         {
           name: 'Repositories',
           requiredRoles: 'admin',
@@ -437,7 +437,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       icon: 'th',
       nestedLinks: [
         { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
-        // { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
+        { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
         {
           name: 'Repositories',
           link: { path: '/apps#repositories', requiredRoles: ['admin'] },
