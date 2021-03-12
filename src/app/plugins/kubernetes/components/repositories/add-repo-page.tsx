@@ -16,6 +16,11 @@ import { RepositoryType, repositoryOptions } from './models'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { repositoryActions } from './actions'
+import { useSelector } from 'react-redux'
+import { RootState } from 'app/store'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { pathOr, prop } from 'ramda'
+import { allKey, CustomerTiers } from 'app/constants'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -56,11 +61,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const initialContext = {
-  repositoryType: RepositoryType.Public,
-  searchTerm: '',
-  clusters: [],
-}
+const customerTierBlacklist = [CustomerTiers.Freedom]
 
 const AddRepoPage = () => {
   const classes = useStyles()
@@ -70,6 +71,16 @@ const AddRepoPage = () => {
   const [addClustersToRepository, addingClustersToRepository] = useDataUpdater(
     anyRepositoryActions.addClustersToRepository,
   )
+
+  const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
+  const { username, features } = session
+  const customerTier = pathOr(CustomerTiers.Freedom, ['customer_tier'], features)
+
+  const initialContext = {
+    repositoryType: RepositoryType.Public,
+    searchTerm: '',
+    clusters: customerTierBlacklist.includes(customerTier) ? allKey : [],
+  }
 
   const handleSubmit = async (wizardContext) => {
     const [success, newRepo] = await addRepo(wizardContext)
@@ -179,6 +190,9 @@ const AddRepoPage = () => {
                         title="ASSIGN CLUSTERS"
                         wizardContext={wizardContext}
                         setWizardContext={setWizardContext}
+                        username={username}
+                        customerTier={customerTier}
+                        customerTierBlacklist={customerTierBlacklist}
                       />
                     </div>
                   </ValidatedForm>

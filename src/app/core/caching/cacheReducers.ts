@@ -14,7 +14,6 @@ import {
   of,
   identity,
   Dictionary,
-  whereEq,
   find,
   when,
   isNil,
@@ -32,6 +31,7 @@ import {
 } from 'utils/fp'
 import { defaultUniqueIdentifier } from 'app/constants'
 import DataKeys from 'k8s/DataKeys'
+import { isEqual } from 'lodash'
 
 export const paramsStoreKey = 'cachedParams'
 export const dataStoreKey = 'cachedData'
@@ -150,7 +150,16 @@ const reducers = {
       over(
         paramsLens,
         params
-          ? pipe(arrayIfNil, when(pipe(find(whereEq(params)), isNil), append(params)))
+          ? pipe(
+              arrayIfNil,
+              when(
+                pipe(
+                  find((item) => isEqual(item, params)),
+                  isNil,
+                ),
+                append(params),
+              ),
+            )
           : identity,
       ),
     )(state)

@@ -4,9 +4,18 @@ import Theme from 'core/themes/model'
 import React, { useState } from 'react'
 import Text from 'core/elements/text'
 import ClustersMultiSelect from './clusters-multi-select'
+import { CustomerTiers } from 'app/constants'
+import FreeTierUpgradeModal from './free-tier-upgrade-modal'
 
-const useStyles = makeStyles((theme: Theme) => ({
+interface StyleProps {
+  disable: boolean
+}
+
+const useStyles = makeStyles<Theme, StyleProps>((theme) => ({
   card: {
+    position: 'relative',
+    zIndex: 1,
+    pointerEvents: ({ disable }) => (disable ? 'none' : 'auto'),
     border: `1px solid ${theme.palette.grey[300]}`,
     borderRadius: 4,
     boxShadow: 'none',
@@ -29,16 +38,32 @@ const useStyles = makeStyles((theme: Theme) => ({
   count: {
     color: theme.palette.blue[500],
   },
+  clustersList: {
+    opacity: ({ disable }) => (disable ? '0.5' : 1),
+    zIndex: 1,
+  },
 }))
 
 interface Props {
   title: string
   wizardContext: any
   setWizardContext: any
+  username?: string
+  customerTier?: CustomerTiers
+  customerTierBlacklist?: CustomerTiers[]
 }
 
-const ClustersListCard = ({ title, wizardContext, setWizardContext }: Props) => {
-  const classes = useStyles()
+const ClustersListCard = ({
+  title,
+  wizardContext,
+  setWizardContext,
+  username,
+  customerTier,
+  customerTierBlacklist,
+}: Props) => {
+  const disable =
+    customerTier && customerTierBlacklist && customerTierBlacklist.includes(customerTier)
+  const classes = useStyles({ disable })
   const [numClusters, setNumClusters] = useState(0)
 
   return (
@@ -55,12 +80,15 @@ const ClustersListCard = ({ title, wizardContext, setWizardContext }: Props) => 
         </Text>
       }
     >
-      <ClustersMultiSelect
-        id="clusters"
-        onChange={(value) => setWizardContext({ clusters: value })}
-        wizardContext={wizardContext}
-        setNumClusterOptions={setNumClusters}
-      />
+      {disable && <FreeTierUpgradeModal username={username} customerTier={customerTier} />}
+      <div className={classes.clustersList}>
+        <ClustersMultiSelect
+          id="clusters"
+          onChange={(value) => setWizardContext({ clusters: value })}
+          wizardContext={wizardContext}
+          setNumClusterOptions={setNumClusters}
+        />
+      </div>
     </FormFieldCard>
   )
 }

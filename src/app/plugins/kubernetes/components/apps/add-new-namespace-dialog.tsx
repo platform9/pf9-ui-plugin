@@ -30,6 +30,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.red.main,
     marginRight: theme.spacing(1),
   },
+  cancelButton: {
+    background: theme.palette.grey['000'],
+    border: `1px solid ${theme.palette.blue[500]}`,
+    color: theme.palette.blue[500],
+  },
 }))
 
 const result = {
@@ -80,7 +85,7 @@ const AddNewNamespaceDialog = ({ clusterId, onClose }) => {
               <Text variant="body2">Create a new namespace for cluster {cluster.name}.</Text>
               <TextField id="name" label="Namespace" required validations={[namespaceValidator]} />
               <DialogActions className={classes.dialogButtons}>
-                <Button variant="light" color="secondary" onClick={onClose}>
+                <Button className={classes.cancelButton} onClick={onClose}>
                   Cancel
                 </Button>
                 <SubmitButton />
