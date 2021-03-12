@@ -2,19 +2,17 @@ import { createSelector } from 'reselect'
 import { pathOr } from 'ramda'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-
-const findClusterName = (clusters, clusterId) => {
-  const cluster = clusters.find((x) => x.uuid === clusterId)
-  return (cluster && cluster.name) || ''
-}
+import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
+import { findClusterName } from 'k8s/util/helpers'
 
 export const namespacesSelector = createSelector(
   getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
+  importedClustersSelector,
   getDataSelector<DataKeys.Namespaces>(DataKeys.Namespaces, ['clusterId']),
-  (rawClusters, rawNamespaces) => {
+  (rawClusters, importedClusters, rawNamespaces) => {
     return rawNamespaces.map((ns) => ({
       ...ns,
-      clusterName: findClusterName(rawClusters, ns.clusterId),
+      clusterName: findClusterName([...rawClusters, ...importedClusters], ns.clusterId),
       status: pathOr('N/A', ['status', 'phase'], ns),
     }))
   },

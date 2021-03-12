@@ -76,6 +76,13 @@ const styles = (theme) => ({
 
 const minSearchLength = 3
 
+const determineCheckboxCond = (checkboxCond, row) => {
+  if (!checkboxCond) {
+    return true
+  }
+  return checkboxCond(row)
+}
+
 // Reject all columns that are not visible or excluded
 export const pluckVisibleColumnIds = (columns) =>
   columns.filter((column) => column.display !== false && column.excluded !== true).map(prop('id'))
@@ -158,13 +165,26 @@ class ListTable extends PureComponent {
 
   areAllSelected = (data) => {
     const { selected } = this.state
-    const { selectedRows = selected } = this.props
-    return data.every((row) => includes(row, selectedRows))
+    const { selectedRows = selected, checkboxCond } = this.props
+    return data.every((row) => {
+      if (checkboxCond) {
+        // Ignore rows that do not meet condition criteria
+        return includes(row, selectedRows) || !checkboxCond(row)
+      }
+      return includes(row, selectedRows)
+    })
   }
 
   handleSelectAllClick = (event, checked) => {
+    // Todo: exclude rows with no checkbox condition
     const { selected } = this.state
-    const { paginate, onSelectedRowsChange, selectedRows = selected, onSelectAll } = this.props
+    const {
+      paginate,
+      onSelectedRowsChange,
+      selectedRows = selected,
+      onSelectAll,
+      checkboxCond,
+    } = this.props
     const filteredData = this.getFilteredRows()
     const paginatedData = paginate ? this.paginate(filteredData) : filteredData
 
@@ -175,6 +195,9 @@ class ListTable extends PureComponent {
     } else {
       // Remove active paginated rows from selected
       newSelected = selectedRows.filter((row) => !paginatedData.includes(row))
+    }
+    if (checkboxCond) {
+      newSelected = newSelected.filter((item) => checkboxCond(item))
     }
     if (onSelectedRowsChange) {
       // Controlled mode
@@ -190,9 +213,21 @@ class ListTable extends PureComponent {
 
   handleClick = moize(
     (row) => (event) => {
+      // Todo: exclude rows with no checkbox condition
       const { selected } = this.state
       const isSelected = this.isSelected(row)
-      const { multiSelection, onSelectedRowsChange, onSelect, selectedRows = selected } = this.props
+      const {
+        multiSelection,
+        onSelectedRowsChange,
+        onSelect,
+        selectedRows = selected,
+        checkboxCond,
+      } = this.props
+      if (checkboxCond) {
+        if (!checkboxCond(row)) {
+          return
+        }
+      }
       if (!multiSelection) {
         if (onSelectedRowsChange) {
           // Controlled mode
@@ -452,7 +487,7 @@ class ListTable extends PureComponent {
   }
 
   renderRow = (row) => {
-    const { multiSelection, showCheckboxes, classes } = this.props
+    const { multiSelection, showCheckboxes, checkboxCond, classes } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes
@@ -470,10 +505,14 @@ class ListTable extends PureComponent {
       <TableRow hover key={uid} {...checkboxProps} className={classes.tableRow}>
         {showCheckboxes && (
           <TableCell padding="checkbox">
-            {multiSelection ? (
-              <Checkbox checked={isSelected} color="primary" />
-            ) : (
-              <Radio checked={isSelected} color="primary" />
+            {determineCheckboxCond(checkboxCond, row) && (
+              <>
+                {multiSelection ? (
+                  <Checkbox checked={isSelected} color="primary" />
+                ) : (
+                  <Radio checked={isSelected} color="primary" />
+                )}
+              </>
             )}
           </TableCell>
         )}
@@ -553,6 +592,7 @@ class ListTable extends PureComponent {
       extraToolbarContent,
       multiSelection,
       headless,
+      hideDelete,
     } = this.props
 
     if (!data) {
@@ -622,6 +662,7 @@ class ListTable extends PureComponent {
                   rowsPerPage={rowsPerPage}
                   onChangeRowsPerPage={this.handleChangeRowsPerPage}
                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                  hideDelete={hideDelete}
                 />
               )}
               <div className={classes.tableWrapper}>{tableContent}</div>
@@ -654,6 +695,7 @@ ListTable.propTypes = {
   onDelete: PropTypes.func,
   deleteCond: PropTypes.func,
   deleteDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  hideDelete: PropTypes.bool,
   onEdit: PropTypes.func,
   editCond: PropTypes.func,
   editDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),

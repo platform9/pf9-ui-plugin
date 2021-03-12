@@ -167,7 +167,7 @@ export const options = {
     },
     {
       label: 'Import Cluster',
-      link: routes.cluster.import.path(),
+      link: routes.cluster.import.root.path(),
       cond: () => {
         const session = useSelector(prop(sessionStoreKey))
         const {

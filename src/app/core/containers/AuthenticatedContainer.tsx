@@ -32,7 +32,7 @@ import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
 import { MessageTypes } from 'core/components/notifications/model'
 import { RootState } from 'app/store'
-import { apply, Dictionary, keys, mergeAll, prop, toPairs } from 'ramda'
+import { apply, Dictionary, keys, mergeAll, prop, toPairs as ToPairs } from 'ramda'
 import pluginManager from 'core/utils/pluginManager'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import BannerContainer from 'core/components/notifications/BannerContainer'
@@ -43,6 +43,8 @@ import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
+
+const toPairs: any = ToPairs
 
 declare let window: CustomWindow
 
@@ -278,17 +280,17 @@ const loadRegionFeatures = async (setRegionFeatures, setStacks, dispatch, histor
     dispatch(sessionActions.updateSession({ features }))
 
     const regionFeatures = {
-      kubernetes: features.experimental.containervisor,
-      metalstack: features.experimental.ironic,
-      openstack: features.experimental.openstackEnabled,
+      kubernetes: features?.experimental?.containervisor,
+      metalstack: features?.experimental?.ironic,
+      openstack: features?.experimental?.openstackEnabled,
     }
 
     setRegionFeatures(regionFeatures)
     setStacks(determineStacks(regionFeatures))
 
     redirectToAppropriateStack(
-      features.experimental.ironic,
-      features.experimental.containervisor,
+      features?.experimental?.ironic,
+      features?.experimental?.containervisor,
       history,
     )
   } catch (err) {
@@ -366,7 +368,7 @@ const AuthenticatedContainer = () => {
     }
   }, [])
 
-  const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
+  const withStackSlider = regionFeatures?.openstack && regionFeatures?.kubernetes
 
   const sections = getSections(plugins, role, features)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'

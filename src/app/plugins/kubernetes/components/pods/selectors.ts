@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { any, head, map, mergeLeft, pathEq, pathOr, pipe, pluck, propEq, toPairs } from 'ramda'
+import { any, head, map, mergeLeft, pathEq, pathOr, pipe, pluck, propEq, toPairs as ToPairs } from 'ramda'
 import { emptyArr, emptyObj, filterIf } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
@@ -12,20 +12,24 @@ import { IDataKeys } from 'k8s/datakeys.model'
 import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 import { getK8sDashboardLinkFromVersion } from '../infrastructure/clusters/helpers'
 import { clientStoreKey } from 'core/client/clientReducers'
+import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
+const toPairs: any = ToPairs
 
 export const podsSelector = createSelector(
   [
     getDataSelector<DataKeys.Pods>(DataKeys.Pods, ['clusterId']),
     clustersSelector,
+    importedClustersSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawPods, clusters, qbertEndpoint) => {
+  (rawPods, clusters, importedClusters, qbertEndpoint) => {
     // associate nodes with the combinedHost entry
     return pipe<IDataKeys[DataKeys.Pods], IPodSelector[]>(
       // Filter by namespace
       map((pod) => {
         const { clusterId } = pod
-        const cluster = clusters.find(propEq('uuid', clusterId))
+        const allClusters = [...clusters, ...importedClusters]
+        const cluster = allClusters.find(propEq('uuid', clusterId))
         const name = pod?.metadata?.name // pathStr('metadata.name', pod),
         const namespace = pod?.metadata?.namespace // pathStr('metadata.namespace', pod),
         const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
@@ -85,19 +89,21 @@ export const deploymentsSelector = createSelector(
     getDataSelector<DataKeys.Deployments>(DataKeys.Deployments, ['clusterId']),
     podsSelector,
     clustersSelector,
+    importedClustersSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawDeployments, pods, clusters, qbertEndpoint) => {
+  (rawDeployments, pods, clusters, importedClusters, qbertEndpoint) => {
     return rawDeployments.map((rawDeployment) => {
       const { clusterId } = rawDeployment
-      const cluster = clusters.find(propEq('uuid', clusterId))
+      const allClusters = [...clusters, ...importedClusters]
+      const cluster = allClusters.find(propEq('uuid', clusterId))
       const selectors = rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
       const name = rawDeployment?.metadata?.name
       const namespace = rawDeployment?.metadata?.namespace
       const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
 
       const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
-        cluster.version,
+        cluster?.version,
         qbertEndpoint,
         cluster,
       )
@@ -145,13 +151,15 @@ export const serviceSelectors = createSelector(
   [
     getDataSelector<DataKeys.KubeServices>(DataKeys.KubeServices, 'clusterId'),
     clustersSelector,
+    importedClustersSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawServices, clusters, qbertEndpoint) => {
+  (rawServices, clusters, importedClusters, qbertEndpoint) => {
     return pipe<IDataKeys[DataKeys.KubeServices], any>(
       map((service) => {
         const { clusterId } = service
-        const cluster = clusters.find(propEq('uuid', clusterId))
+        const allClusters = [...clusters, ...importedClusters]
+        const cluster = allClusters.find(propEq('uuid', clusterId))
         const type = service?.spec?.type // = pathStr('spec.type', service)
         const externalName = service?.spec?.externalName // pathStr('spec.externalName', service)
         const name = service?.metadata?.name // pathStr('metadata.name', service)
@@ -174,7 +182,7 @@ export const serviceSelectors = createSelector(
           clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0) ? 'OK' : 'Pending'
 
         const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
-          cluster.version,
+          cluster?.version,
           qbertEndpoint,
           cluster,
         )

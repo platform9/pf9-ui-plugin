@@ -8,11 +8,16 @@ import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { importedClusterActions } from '../../importedClusters/actions'
+
+const renderImported = (_, { pf9Registered }) =>
+  pf9Registered ? <Text variant="caption2">Imported</Text> : null
 
 const columns = [
   { id: 'name', label: 'Name' },
   { id: 'id', label: 'ID' },
   { id: 'vpc', label: 'VPC' },
+  { id: 'imported', label: '', render: renderImported },
 ]
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -29,12 +34,15 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
+const clusterIsNotImported = (cluster) => !cluster.pf9Registered
+
 const ClustersChecklists = ({ cloudProviderId, selectedRegions, onChange, value, className }) => {
   const classes = useStyles()
   const [loadingClusters, setLoadingClusters] = useState(true)
   const [details] = useDataLoader(loadCloudProviderDetails, {
     cloudProviderId: cloudProviderId,
   })
+  const [importedClusters, loadingImportedClusters] = useDataLoader(importedClusterActions.list)
 
   const [allClusters, setAllClusters] = useState([])
 
@@ -63,22 +71,22 @@ const ClustersChecklists = ({ cloudProviderId, selectedRegions, onChange, value,
       setAllClusters(externalClusters)
       setLoadingClusters(false)
     }
-    if (allRegions.length) {
+    if (allRegions.length && importedClusters) {
       getClusters()
     }
-  }, [allRegions, cloudProviderId])
+  }, [allRegions, cloudProviderId, importedClusters])
 
   return (
     <div className={className}>
       <Text variant="caption1" className={classes.title}>
         Clusters
       </Text>
-      {loadingClusters && (
+      {(loadingClusters || loadingImportedClusters) && (
         <Text variant="body2">
           <FontAwesomeIcon spin>sync</FontAwesomeIcon> Loading clusters...
         </Text>
       )}
-      {!loadingClusters && !selectedRegions.length && (
+      {!loadingClusters && !loadingImportedClusters && !selectedRegions.length && (
         <Text variant="body2">
           Select region(s) to the left to see available clusters in the region.
         </Text>
@@ -94,6 +102,7 @@ const ClustersChecklists = ({ cloudProviderId, selectedRegions, onChange, value,
               columns={columns}
               onChange={(value) => onChange(value, region)}
               value={value[region]}
+              checkboxCond={clusterIsNotImported}
               extraToolbarContent={
                 <Text className={classes.flexGrow} variant="body1">
                   {region}

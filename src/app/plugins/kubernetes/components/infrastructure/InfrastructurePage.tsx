@@ -13,9 +13,11 @@ import { useSelector } from 'react-redux'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
+import ImportedClustersListPage from './importedClusters/ImportedClustersListPage'
 
 const tabTogglerSpacing = {
   [InfrastructureTabs.Clusters]: 185,
+  [InfrastructureTabs.ImportedClusters]: 185,
   [InfrastructureTabs.CloudProviders]: 220,
   [InfrastructureTabs.Nodes]: 200,
 }
@@ -86,6 +88,10 @@ const InfrastructurePage = () => {
         <Tab value={InfrastructureTabs.Clusters} label="Clusters">
           {header}
           <ClustersListPage header={header} />
+        </Tab>
+        <Tab value={InfrastructureTabs.ImportedClusters} label="Imported Clusters">
+          {header}
+          <ImportedClustersListPage />
         </Tab>
         {role === 'admin' && (
           <Tab value={InfrastructureTabs.Nodes} label="Nodes">

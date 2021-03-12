@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/styles'
 import { ClusterListHeader } from './clusters/ClustersListPageHeader'
 import { NodeListHeader } from './nodes/NodesListPageHeader'
 import { CloudProviderListHeader } from './cloudProviders/CloudProviderListHeader'
+import { ImportedClusterListHeader } from './importedClusters/ImportedClustersListPageHeader'
 // Types
 import Theme from 'core/themes/model'
 // import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
@@ -27,12 +28,14 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 export enum InfrastructureTabs {
   Clusters = 'clusters',
+  ImportedClusters = 'importedClusters',
   Nodes = 'nodes',
   CloudProviders = 'cloudProviders',
 }
 
 const headerCardMap = new Map<InfrastructureTabs, { component: React.ComponentType }>([
   [InfrastructureTabs.Clusters, { component: ClusterListHeader }],
+  [InfrastructureTabs.ImportedClusters, { component: ImportedClusterListHeader }],
   [InfrastructureTabs.Nodes, { component: NodeListHeader }],
   [InfrastructureTabs.CloudProviders, { component: CloudProviderListHeader }],
 ])

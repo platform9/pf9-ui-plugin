@@ -113,7 +113,7 @@ export const routes = {
     url: `${appUrlRoot}/login`,
     name: 'Login',
   }),
-  infrastructre: Route.register({
+  infrastructure: Route.register({
     url: `${pluginRoutePrefix}/infrastructure`,
     defaultParams: {
       plugin: AppPlugins.Kubernetes,
@@ -243,20 +243,38 @@ export const routes = {
         }),
       },
     },
-    import: Route.register({
-      url: `${pluginRoutePrefix}/infrastructure/clusters/import`,
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-      name: 'Infrastructure:Clusters:Import',
-    }),
-    importEKS: Route.register({
-      url: `${pluginRoutePrefix}/infrastructure/clusters/import/eks`,
-      defaultParams: {
-        plugin: AppPlugins.Kubernetes,
-      },
-      name: 'Infrastructure:Clusters:Import:EKS',
-    }),
+    import: {
+      root: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/import`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:Clusters:Import',
+      }),
+      eks: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/import/eks`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:Clusters:Import:EKS',
+      }),
+    },
+    imported: {
+      list: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure#importedClusters`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:ImportedClusters:List',
+      }),
+      details: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/imported/:id`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:ImportedClusters:ClusterDetails',
+      }),
+    },
     scaleMasters: Route.register({
       url: `${pluginRoutePrefix}/infrastructure/clusters/scaleMasters/:id`,
       defaultParams: {

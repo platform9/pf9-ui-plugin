@@ -13,6 +13,7 @@ interface Props extends ValidatedFormProps {
   data: any
   title?: string
   extraToolbarContent?: JSX.Element
+  checkboxCond?: any
   loading: boolean
 }
 
@@ -28,6 +29,7 @@ const ListTableField: React.ComponentType<Props> = forwardRef<HTMLElement, Props
     data,
     title,
     extraToolbarContent,
+    checkboxCond,
     loading,
   } = props
 
@@ -42,6 +44,7 @@ const ListTableField: React.ComponentType<Props> = forwardRef<HTMLElement, Props
         multiSelection={multiSelection}
         selectedRows={value}
         extraToolbarContent={extraToolbarContent}
+        checkboxCond={checkboxCond}
         loading={loading}
       />
       {hasError && <div>{errorMessage}</div>}

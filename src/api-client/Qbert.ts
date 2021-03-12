@@ -32,6 +32,7 @@ import {
 import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
 import { createUrlWithQueryString } from 'core/utils/routes'
+import { ImportedCluster } from 'k8s/components/infrastructure/importedClusters/model'
 
 type AlertManagerRaw = Omit<Omit<AlertManagerAlert, 'clusterId'>, 'id'>
 
@@ -59,6 +60,15 @@ const normalizeCluster = <T>(baseUrl) => (cluster): T & INormalizedCluster => ({
   isUpgrading: cluster.taskStatus === 'upgrading',
   nodes: [],
 })
+
+const normalizeImportedClusters = (apiResponse: GCluster<ImportedCluster>) => {
+  const clusters = apiResponse.items
+  const normalizedClusters = clusters.map((cluster) => ({
+    ...cluster,
+    uuid: cluster.metadata.name,
+  }))
+  return normalizedClusters
+}
 
 /* eslint-disable camelcase */
 class Qbert extends ApiService {
@@ -244,6 +254,19 @@ class Qbert extends ApiService {
     return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
   }
 
+  getImportedClusters = async () => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/clusters`
+    const response = await this.client.basicGet<GCluster<ImportedCluster>>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusters',
+      },
+    })
+    return normalizeImportedClusters(response)
+  }
+
   getClusterDetails = async (clusterId) => {
     const url = `/clusters/${clusterId}`
     const cluster = await this.client.basicGet({
@@ -421,6 +444,19 @@ class Qbert extends ApiService {
       },
     })
     return registeredCluster
+  }
+
+  deregisterExternalCluster = async (id) => {
+    const url = `/externalClusters/${id}/deregister`
+    return this.client.basicPost({
+      url,
+      body: {},
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deregisterExternalCluster',
+      },
+    })
   }
 
   /* k8s API */

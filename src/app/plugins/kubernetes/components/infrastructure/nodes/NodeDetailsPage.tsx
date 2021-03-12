@@ -48,6 +48,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     justifyContent: 'flex-end',
     color: theme.palette.grey[700],
+    textAlign: 'right',
   },
   rowValue: {
     marginLeft: theme.spacing(0.5),
@@ -209,13 +210,13 @@ export const DetailRow: FC<{
         </Text>
       </td>
       <td>
-        {typeof value === 'string' ? (
-          <Text className={rowValue} variant="body2" component="span">
-            {value}
-          </Text>
-        ) : (
-          value
-        )}
+        <Text
+          className={rowValue}
+          variant="body2"
+          component={typeof value === 'string' ? 'span' : 'div'}
+        >
+          {value}
+        </Text>
       </td>
       <td className={rowHelp}>
         {!!helpMessage && <HelpContainer title={helpMessage} color="black" />}
