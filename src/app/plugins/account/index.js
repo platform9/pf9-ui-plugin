@@ -124,6 +124,9 @@ MyAccount.registerPlugin = (pluginManager) => {
       icon: 'key',
       requiredRoles: 'admin',
       requiredFeatures: (features) => {
+        if (!features || !features.experimental) {
+          return false
+        }
         // Legacy DU & DDU have different conditions
         if (features.experimental.kplane) {
           return ssoEnabledTiers.includes(pathOr('', ['customer_tier'], features))
