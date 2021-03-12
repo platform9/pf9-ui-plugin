@@ -7,10 +7,11 @@ import EditUserPage from 'account/components/userManagement/users/EditUserPage'
 import MyAccountHeader from 'account/components/secondaryHeaders/MyAccountHeader'
 import SsoManagementPage from 'account/components/ssoManagement/SsoManagementPage'
 import { routes } from 'core/utils/routes'
-import { AppPlugins, userAccountPrefix } from 'app/constants'
+import { AppPlugins, ssoEnabledTiers, userAccountPrefix } from 'app/constants'
 import UserSettingsIndexPage from './components/user-settings/user-settings-index-page'
 import AddGroupPage from './components/ssoManagement/groups/AddGroupPage'
 import EditGroupPage from './components/ssoManagement/groups/EditGroupPage'
+import { pathOr } from 'ramda'
 
 class MyAccount extends React.PureComponent {
   render() {
@@ -122,6 +123,16 @@ MyAccount.registerPlugin = (pluginManager) => {
       link: { path: routes.sso.root.toString(userAccountPrefix) },
       icon: 'key',
       requiredRoles: 'admin',
+      requiredFeatures: (features) => {
+        if (!features || !features.experimental) {
+          return false
+        }
+        // Legacy DU & DDU have different conditions
+        if (features.experimental.kplane) {
+          return ssoEnabledTiers.includes(pathOr('', ['customer_tier'], features))
+        }
+        return features.experimental.sso
+      },
     },
   ]
 
