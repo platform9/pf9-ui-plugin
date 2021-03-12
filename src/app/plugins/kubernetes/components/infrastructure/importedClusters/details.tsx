@@ -7,7 +7,18 @@ import Theme from 'core/themes/model'
 import { formatDate } from 'utils/misc'
 import { getFieldsForCard, IClusterDetailFields } from '../clusters/ClusterInfo'
 import renderLabels from 'k8s/components/pods/renderLabels'
+import Text from 'core/elements/text'
 
+const renderVPCField = (vpc: any = {}) => {
+  const privateAccess = vpc?.privateAccess
+  const publicAccess = vpc?.publicAccess
+  const isPublicPrivateVpc = privateAccess === true && publicAccess === true
+  return (
+    <Text variant="body2">{`${publicAccess === true ? 'Public' : ''}${
+      isPublicPrivateVpc ? ' + ' : ''
+    }${privateAccess === true ? 'Private' : ''}`}</Text>
+  )
+}
 const renderLoggingFields = (target) => (data) => {
   const tags = new Set()
   data.forEach((logging) => {
@@ -27,7 +38,6 @@ const renderLoggingFields = (target) => (data) => {
 const eksOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
   { id: 'spec.eks.eksVersion', title: 'EKS Version', required: true },
   { id: 'spec.eks.network.vpc.clusterSecurityGroupId', title: 'Cluster Security Group ID' },
-  { id: 'spec.eks.tags', title: 'Tags', render: renderLabels() },
 ]
 
 // Common
@@ -42,7 +52,7 @@ const clusterOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>
 ]
 
 const networkingFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
-  { id: 'metadata.labels.region', title: 'Public VPC', required: true },
+  { id: 'spec.eks.network.vpc', title: 'VPC', required: true, render: renderVPCField },
   { id: 'containerCidr', title: 'Container CIDR', required: true },
   { id: 'servicesCidr', title: 'Services CIDR', required: true },
   { id: 'spec.eks.network.vpc.vpcId', title: 'VPC ID', required: true },
@@ -84,9 +94,16 @@ const ClusterInfo = ({ cluster, loading, reload }: Props) => {
 
   return (
     <div className={classes.clusterInfo}>
-      <InfoPanel title="Overview" items={overview} />
-      <InfoPanel title="Networking" items={networking} />
-      <InfoPanel title="Logging" items={logging} />
+      <InfoPanel className={classes.overview} title="Overview" items={overview} />
+      <InfoPanel className={classes.networking} title="Networking" items={networking} />
+      <InfoPanel className={classes.logging} title="Logging" items={logging} />
+      {cluster?.spec?.eks?.tags && (
+        <InfoPanel
+          className={classes.tags}
+          title="Tags"
+          customBody={renderLabels()(cluster?.spec?.eks?.tags)}
+        />
+      )}
     </div>
   )
 }
@@ -97,9 +114,29 @@ const useStyles = makeStyles<Theme>((theme) => ({
   clusterInfo: {
     display: 'grid',
     gridTemplateColumns: 'max-content max-content',
+    gridTemplateRows: 'max-content max-content',
     gridGap: '16px',
-    alignItems: 'start',
+    alignItems: 'stretch',
     justifyItems: 'start',
     marginTop: theme.spacing(2),
+    maxWidth: 1100,
+    gridTemplateAreas: `
+    "overview overview networking"
+    "logging tags blank"
+    `,
+  },
+  overview: {
+    gridArea: 'overview',
+  },
+  networking: {
+    gridArea: 'networking',
+  },
+  logging: {
+    gridArea: 'logging',
+    width: '100%',
+  },
+  tags: {
+    gridArea: 'tags',
+    width: '100%',
   },
 }))
