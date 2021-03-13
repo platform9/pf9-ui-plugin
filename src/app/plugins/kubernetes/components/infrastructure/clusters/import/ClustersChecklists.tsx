@@ -8,7 +8,6 @@ import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { importedClusterActions } from '../../importedClusters/actions'
 
 const renderImported = (_, { pf9Registered }) =>
   pf9Registered ? <Text variant="caption2">Imported</Text> : null
@@ -42,8 +41,6 @@ const ClustersChecklists = ({ cloudProviderId, selectedRegions, onChange, value,
   const [details] = useDataLoader(loadCloudProviderDetails, {
     cloudProviderId: cloudProviderId,
   })
-  const [importedClusters, loadingImportedClusters] = useDataLoader(importedClusterActions.list)
-
   const [allClusters, setAllClusters] = useState([])
 
   const allRegions = useMemo(() => {
@@ -71,48 +68,49 @@ const ClustersChecklists = ({ cloudProviderId, selectedRegions, onChange, value,
       setAllClusters(externalClusters)
       setLoadingClusters(false)
     }
-    if (allRegions.length && importedClusters) {
+    if (allRegions.length) {
       getClusters()
     }
-  }, [allRegions, cloudProviderId, importedClusters])
+  }, [allRegions, cloudProviderId])
 
   return (
     <div className={className}>
       <Text variant="caption1" className={classes.title}>
         Clusters
       </Text>
-      {(loadingClusters || loadingImportedClusters) && (
+      {loadingClusters && (
         <Text variant="body2">
           <FontAwesomeIcon spin>sync</FontAwesomeIcon> Loading clusters...
         </Text>
       )}
-      {!loadingClusters && !loadingImportedClusters && !selectedRegions.length && (
+      {!loadingClusters && !selectedRegions.length && (
         <Text variant="body2">
           Select region(s) to the left to see available clusters in the region.
         </Text>
       )}
-      {selectedRegions.map((region) => {
-        const regionClusters = clustersByRegion[region]?.clusters || []
-        return (
-          <div className={classes.listContainer} key={region}>
-            <ListTableField
-              id={region}
-              data={regionClusters}
-              loading={false}
-              columns={columns}
-              onChange={(value) => onChange(value, region)}
-              value={value[region]}
-              checkboxCond={clusterIsNotImported}
-              extraToolbarContent={
-                <Text className={classes.flexGrow} variant="body1">
-                  {region}
-                </Text>
-              }
-              multiSelection
-            />
-          </div>
-        )
-      })}
+      {!loadingClusters &&
+        selectedRegions.map((region) => {
+          const regionClusters = clustersByRegion[region]?.clusters || []
+          return (
+            <div className={classes.listContainer} key={region}>
+              <ListTableField
+                id={region}
+                data={regionClusters}
+                loading={false}
+                columns={columns}
+                onChange={(value) => onChange(value, region)}
+                value={value[region]}
+                checkboxCond={clusterIsNotImported}
+                extraToolbarContent={
+                  <Text className={classes.flexGrow} variant="body1">
+                    {region}
+                  </Text>
+                }
+                multiSelection
+              />
+            </div>
+          )
+        })}
     </div>
   )
 }

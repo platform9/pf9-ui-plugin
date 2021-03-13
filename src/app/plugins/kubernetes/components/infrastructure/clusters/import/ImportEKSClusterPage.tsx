@@ -24,6 +24,7 @@ import PresetField from 'core/components/PresetField'
 import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
+import { trackEvent } from 'utils/tracking'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -64,6 +65,11 @@ const ImportEKSClusterPage = () => {
 
   const handleSubmit = async (data) => {
     setSubmitting(true)
+    trackEvent('Import EKS Clusters', {
+      cloud_provider_id: data.cloudProviderId,
+      regions: data.regions,
+      clusters: data.finalSelectedClusters.map((cluster) => cluster.id),
+    })
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,

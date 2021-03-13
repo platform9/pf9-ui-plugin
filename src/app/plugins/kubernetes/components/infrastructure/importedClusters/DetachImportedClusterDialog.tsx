@@ -6,6 +6,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { importedClusterActions } from './actions'
+import { trackEvent } from 'utils/tracking'
 
 interface IDetachImportedClusterDialog {
   rows: any[]
@@ -20,6 +21,11 @@ const DetachImportedClusterDialog: React.FC<IDetachImportedClusterDialog> = ({
   const [detachCluster, detachingCluster] = useDataUpdater(
     importedClusterActions.delete,
     (success) => {
+      trackEvent('Detach Imported Cluster', {
+        cluster_uuid: cluster.uuid,
+        cluster_name: cluster.name,
+        cloud_provider_type: cluster.providerType,
+      })
       success && onClose()
     },
   )
