@@ -255,7 +255,7 @@ class Qbert extends ApiService {
   }
 
   getSunpikeApis = async () => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2`
+    const url = `/sunpike/apis/sunpike.platform9.com`
     return this.client.basicGet<any>({
       url,
       version: 'v4',
