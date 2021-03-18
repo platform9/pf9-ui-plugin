@@ -1,10 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Menu, MenuItem } from '@material-ui/core'
-import { withStyles } from '@material-ui/styles'
+import { withStyles as WStyle } from '@material-ui/styles'
 import { withRouter } from 'react-router'
-import { logoutUrl, helpUrl } from 'app/constants'
-import { connect } from 'react-redux'
+import { logoutUrl, helpUrl, CustomerTiers } from 'app/constants'
+import { connect as reduxConnect } from 'react-redux'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import ChangePasswordModal from './ChangePasswordModal'
 import FontAwesomeIcon from './FontAwesomeIcon'
@@ -13,11 +12,20 @@ import Text from 'core/elements/text'
 import clsx from 'clsx'
 import Avatar from './Avatar'
 import { routes } from 'core/utils/routes'
+import { isAdminRole } from 'k8s/util/helpers'
+import { pathOr } from 'ramda'
+import Theme from 'core/themes/model'
 
-const styles = (theme) => ({
+const withStyles: any = WStyle
+const connect: any = reduxConnect
+
+const styles = (theme: Theme) => ({
+  userMenuContainer: {
+    backgroundColor: theme.palette.blue[100],
+  },
   avatar: {
     position: 'relative',
-    float: 'right',
+    // float: 'right',
     cursor: 'pointer',
   },
   avatarImg: {
@@ -66,10 +74,13 @@ const styles = (theme) => ({
     height: 1,
     backgroundColor: theme.palette.blue[200],
   },
+  enterpriseLabel: {
+    color: theme.palette.pink.main,
+  },
 })
 
 @withStyles(styles)
-class MenuListItem extends React.PureComponent {
+class MenuListItem extends React.PureComponent<any> {
   render() {
     const { classes, title, children, icon, ...props } = this.props
     return (
@@ -86,7 +97,7 @@ class MenuListItem extends React.PureComponent {
 @withStyles(styles)
 @withRouter
 @connect((store) => ({ session: store[sessionStoreKey] }))
-class UserMenu extends React.PureComponent {
+class UserMenu extends React.PureComponent<any> {
   state = { anchorEl: null, showChangePasswordModal: false }
   handleClick = (event) => this.setState({ anchorEl: event.currentTarget })
   handleClose = () => this.setState({ anchorEl: null })
@@ -102,17 +113,21 @@ class UserMenu extends React.PureComponent {
     const {
       username,
       userDetails: { displayName },
+      features = {},
     } = session
+
+    const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
 
     if (showChangePasswordModal) {
       return <ChangePasswordModal onCancel={this.handleCancelChangePassword} />
     }
 
     return (
-      <div className={`${classes.avatar} ${className}`}>
+      <div className={clsx(classes.avatar, className)}>
         <Avatar onClick={this.handleClick} displayName={displayName} diameter={36} fontSize={16} />
         <Menu
           id="user-menu"
+          PopoverClasses={{ paper: classes.userMenuContainer }}
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={this.handleClose}
@@ -126,6 +141,11 @@ class UserMenu extends React.PureComponent {
                 <div>
                   <Text variant="subtitle2">{displayName}</Text>
                   <Text variant="body2">{username}</Text>
+                  {customerTier === CustomerTiers.Enterprise && (
+                    <Text variant="caption2" className={classes.enterpriseLabel}>
+                      ENTERPRISE
+                    </Text>
+                  )}
                 </div>
               </div>
               <div className={classes.dropdownLinks}>
@@ -135,14 +155,23 @@ class UserMenu extends React.PureComponent {
                   className={classes.link}
                   onClick={this.handleClose}
                 >
-                  <MenuListItem icon="cog">Settings</MenuListItem>
+                  <MenuListItem icon="user">My Account</MenuListItem>
                 </SimpleLink>
+                {isAdminRole(session) && (
+                  <SimpleLink
+                    src={routes.userManagement.root.path()}
+                    className={classes.link}
+                    onClick={this.handleClose}
+                  >
+                    <MenuListItem icon="cog">Admin Settings</MenuListItem>
+                  </SimpleLink>
+                )}
                 <MenuListItem icon="sign-out" onClick={this.logout}>
                   Sign Out
                 </MenuListItem>
               </div>
             </div>
-            <hr className={classes.divider}></hr>
+            <hr className={classes.divider} />
             <div className={classes.dropdownSection}>
               <SimpleLink src={helpUrl} className={classes.link} onClick={this.handleClose}>
                 <MenuListItem icon="question-circle">Support</MenuListItem>
@@ -153,10 +182,6 @@ class UserMenu extends React.PureComponent {
       </div>
     )
   }
-}
-
-UserMenu.propTypes = {
-  classes: PropTypes.object,
 }
 
 export default UserMenu
