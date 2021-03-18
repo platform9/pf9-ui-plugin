@@ -29,7 +29,7 @@ import { trackEvent } from 'utils/tracking'
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
     ? setWizardContext({ regions: wizardContext.regions.filter((r) => r !== region) })
-    : setWizardContext({ regions: [...wizardContext.regions, region] })
+    : setWizardContext({ regions: [...wizardContext.regions, region].sort() })
 }
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -41,7 +41,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'flex',
   },
   regions: {
-    width: 200,
+    minWidth: 200,
   },
   clusters: {
     flexGrow: 1,

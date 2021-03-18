@@ -25,11 +25,21 @@ const useStyles = makeStyles<Theme>((theme) => ({
     padding: theme.spacing(0, 3),
     marginBottom: theme.spacing(2),
   },
+  errorContainer: {
+    border: `1px solid ${theme.palette.grey[300]}`,
+    padding: theme.spacing(2, 3),
+    marginBottom: theme.spacing(2),
+  },
   title: {
     marginBottom: theme.spacing(3),
   },
   flexGrow: {
     flexGrow: 1,
+  },
+  errorMessage: {
+    marginTop: theme.spacing(1.5),
+    padding: theme.spacing(2),
+    background: theme.palette.grey[100],
   },
 }))
 
@@ -90,7 +100,23 @@ const ClustersChecklists = ({ cloudProviderId, selectedRegions, onChange, value,
       )}
       {!loadingClusters &&
         selectedRegions.map((region) => {
-          const regionClusters = clustersByRegion[region]?.clusters || []
+          const regionData = clustersByRegion[region]
+          const regionError = regionData?.error
+          const regionClusters = regionData?.clusters || []
+          if (regionError) {
+            return (
+              <div className={classes.errorContainer} key={region}>
+                <Text variant="body2">
+                  Failed to retrieve clusters in the <b>{region}</b> region due to the following
+                  error:
+                </Text>
+                <Text variant="body2" className={classes.errorMessage}>
+                  {regionError}
+                </Text>
+              </div>
+            )
+          }
+
           return (
             <div className={classes.listContainer} key={region}>
               <ListTableField
