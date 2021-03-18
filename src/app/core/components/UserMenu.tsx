@@ -1,9 +1,9 @@
 import React from 'react'
 import { Menu, MenuItem } from '@material-ui/core'
-import { withStyles as WStyle } from '@material-ui/styles'
+import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
 import { logoutUrl, helpUrl, CustomerTiers } from 'app/constants'
-import { connect as reduxConnect } from 'react-redux'
+import { connect } from 'react-redux'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import ChangePasswordModal from './ChangePasswordModal'
 import FontAwesomeIcon from './FontAwesomeIcon'
@@ -15,9 +15,6 @@ import { routes } from 'core/utils/routes'
 import { isAdminRole } from 'k8s/util/helpers'
 import { pathOr } from 'ramda'
 import Theme from 'core/themes/model'
-
-const withStyles: any = WStyle
-const connect: any = reduxConnect
 
 const styles = (theme: Theme) => ({
   userMenuContainer: {
@@ -79,6 +76,7 @@ const styles = (theme: Theme) => ({
   },
 })
 
+// @ts-ignore
 @withStyles(styles)
 class MenuListItem extends React.PureComponent<any> {
   render() {
@@ -94,8 +92,10 @@ class MenuListItem extends React.PureComponent<any> {
   }
 }
 
+// @ts-ignore
 @withStyles(styles)
 @withRouter
+// @ts-ignore
 @connect((store) => ({ session: store[sessionStoreKey] }))
 class UserMenu extends React.PureComponent<any> {
   state = { anchorEl: null, showChangePasswordModal: false }
