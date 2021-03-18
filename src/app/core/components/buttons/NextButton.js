@@ -1,7 +1,7 @@
 import React from 'react'
-import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/styles'
 import Button from 'core/elements/button'
+import FontAwesomeIcon from '../FontAwesomeIcon'
 
 const styles = (theme) => ({
   baseButton: {
@@ -24,7 +24,7 @@ const NextButton = ({ children, classes, disabled, showForward = true, ...rest }
   return (
     <Button {...params} disabled={disabled}>
       {children || 'Next'}
-      {showForward && <Icon className={classes.rightIcon}>arrow_forward</Icon>}
+      {showForward && <FontAwesomeIcon className={classes.rightIcon}>arrow-right</FontAwesomeIcon>}
     </Button>
   )
 }

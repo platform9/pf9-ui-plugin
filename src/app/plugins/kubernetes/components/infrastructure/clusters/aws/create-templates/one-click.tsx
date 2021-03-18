@@ -20,6 +20,7 @@ import { castBoolToStr } from 'utils/misc'
 import KubernetesVersion from '../../form-components/kubernetes-version'
 import { awsClusterTracking } from '../../tracking'
 import { ClusterCreateTypes } from '../../model'
+import { CalicoDetectionTypes } from '../../form-components/calico-network-fields'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -44,6 +45,7 @@ export const initialContext = {
   usePf9Domain: false,
   networkStack: 'ipv4',
   privileged: true,
+  calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
 }
 
 const columns = [
