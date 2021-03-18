@@ -9,7 +9,7 @@ import WizardMeta from 'core/components/wizard/WizardMeta'
 import WizardStep from 'core/components/wizard/WizardStep'
 import Theme from 'core/themes/model'
 import { routes } from 'core/utils/routes'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import Text from 'core/elements/text'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import SimpleLink from 'core/components/SimpleLink'
@@ -21,10 +21,11 @@ import AppVersionPicklistField from './app-version-picklist-field'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { appActions, appDetailsLoader } from './actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import ClusterPicklist from './cluster-picklist'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
-import { getAppVersionPicklistOptions, getIcon } from './helpers'
+import { filterConnectedClusters, getAppVersionPicklistOptions, getIcon } from './helpers'
+import ClusterPicklist from '../common/ClusterPicklist'
+import { repositoryActions } from '../repositories/actions'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -130,6 +131,7 @@ const DeployAppPage = () => {
     name,
     repository,
   })
+  const [repositories, loadingRepositories] = useDataLoader(repositoryActions.list)
   const anyAppActions = appActions as any
   const [deploy, deploying] = useDataUpdater(anyAppActions.deploy)
 
@@ -201,12 +203,20 @@ const DeployAppPage = () => {
     reader.readAsText(file)
   }
 
+  // Filter the clusters list and return only the clusters that are connected to this repository
+  const filterClusters = useCallback(
+    (clusters) => filterConnectedClusters(repository, repositories, clusters),
+    [repositories],
+  )
+
+  const loadingSomething = loadingAppDetail || loadingRepositories || deploying
+
   return (
     <>
       <DocumentMeta title="Deploy Application" bodyClasses={['form-view']} />
       <FormWrapper
         title="Deploy Application"
-        loading={loadingAppDetail || deploying}
+        loading={loadingSomething}
         renderContentOnMount={!loadingAppDetail}
         message={loadingAppDetail ? 'Loading' : 'Submitting'}
         backUrl={appListPageUrl}
@@ -258,7 +268,7 @@ const DeployAppPage = () => {
                           label="Cluster"
                           onChange={(value) => setWizardContext({ clusterId: value })}
                           selectFirst={false}
-                          repository={repository}
+                          filterFn={filterClusters}
                           required
                         />
                       </div>

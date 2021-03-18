@@ -254,6 +254,18 @@ class Qbert extends ApiService {
     return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
   }
 
+  getSunpikeApis = async () => {
+    const url = `/sunpike/apis/sunpike.platform9.com`
+    return this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusters',
+      },
+    })
+  }
+
   getImportedClusters = async () => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/clusters`
     const response = await this.client.basicGet<GCluster<ImportedCluster>>({

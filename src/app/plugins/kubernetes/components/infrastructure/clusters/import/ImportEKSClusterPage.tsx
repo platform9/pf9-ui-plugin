@@ -24,11 +24,12 @@ import PresetField from 'core/components/PresetField'
 import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
+import { trackEvent } from 'utils/tracking'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
     ? setWizardContext({ regions: wizardContext.regions.filter((r) => r !== region) })
-    : setWizardContext({ regions: [...wizardContext.regions, region] })
+    : setWizardContext({ regions: [...wizardContext.regions, region].sort() })
 }
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -40,7 +41,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'flex',
   },
   regions: {
-    width: 200,
+    minWidth: 200,
   },
   clusters: {
     flexGrow: 1,
@@ -64,6 +65,11 @@ const ImportEKSClusterPage = () => {
 
   const handleSubmit = async (data) => {
     setSubmitting(true)
+    trackEvent('Import EKS Clusters', {
+      cloud_provider_id: data.cloudProviderId,
+      regions: data.regions,
+      clusters: data.finalSelectedClusters.map((cluster) => cluster.id),
+    })
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,
