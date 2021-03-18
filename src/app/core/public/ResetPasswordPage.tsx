@@ -8,9 +8,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import CheckIcon from '@material-ui/icons/Check'
 import ClearIcon from '@material-ui/icons/Clear'
 import ListItemText from '@material-ui/core/ListItemText'
-import Visibility from '@material-ui/icons/Visibility'
-import VisibilityOff from '@material-ui/icons/VisibilityOff'
-import IconButton from '@material-ui/core/IconButton'
 import { propSatisfies } from 'ramda'
 import useParams from 'core/hooks/useParams'
 import ApiClient from 'api-client/ApiClient'
@@ -31,6 +28,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { loginUrl } from 'app/constants'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -169,9 +167,9 @@ const ResetPasswordPage: React.FC = () => {
   const renderPasswordMask: IPasswordMask = (key) => ({
     endAdornment: (
       <InputAdornment position="end">
-        <IconButton aria-label="toggle password visibility" onClick={togglePasswordMask(key)}>
-          {params[key] ? <Visibility /> : <VisibilityOff />}
-        </IconButton>
+        <FontAwesomeIcon aria-label="toggle password visibility" onClick={togglePasswordMask(key)}>
+          {params[key] ? 'eye' : 'eye-slash'}
+        </FontAwesomeIcon>
       </InputAdornment>
     ),
   })
