@@ -54,6 +54,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginLeft: theme.spacing(0.5),
     color: theme.palette.grey[700],
     wordBreak: 'break-all',
+    display: 'flex',
+    flexDirection: 'column',
   },
   card: {
     marginRight: theme.spacing(2),
