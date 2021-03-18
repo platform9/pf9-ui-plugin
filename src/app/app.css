@@ -57,3 +57,15 @@ input[type='search']::-webkit-search-cancel-button {
 .uppercase {
   text-transform: uppercase;
 }
+.flex {
+  display: flex;
+}
+.info-tooltip-icon {
+  padding-top: 4px;
+  padding-right: 4px;
+  width: 19px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
