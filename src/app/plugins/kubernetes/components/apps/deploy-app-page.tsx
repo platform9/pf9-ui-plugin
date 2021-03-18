@@ -286,7 +286,7 @@ const DeployAppPage = () => {
                     <Text variant="body2">
                       {'Enter value details below or '}
                       <SimpleLink src="" onClick={openFileBrowser}>
-                        upload.yaml
+                        upload .yaml
                       </SimpleLink>
                       <input
                         type="file"
