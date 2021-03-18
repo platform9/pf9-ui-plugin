@@ -1,3 +1,5 @@
+import { includes } from 'ramda'
+
 const placeholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
 
 export const getIcon = (icon) =>
@@ -8,6 +10,21 @@ export const getAppVersionPicklistOptions = (versions, numOptionsToShow = 15) =>
     return []
   }
   return versions.slice(0, numOptionsToShow).map((version) => ({ value: version, label: version }))
+}
+
+/**
+ * Returns a list of clusters that are connected to the repository
+ * @param {string} currentRepository The current repository
+ * @param {array } repositories Array of all repositories
+ * @param {array} clusters Array of all clusters
+ * @returns
+ */
+export const filterConnectedClusters = (currentRepository, repositories, clusters) => {
+  // Find the current repository and get its list of clusterIds
+  const connectedClusterIds =
+    repositories.find((repo) => repo.name === currentRepository)?.clusters || []
+
+  return clusters.filter((cluster) => includes(cluster.uuid, connectedClusterIds))
 }
 
 /**
