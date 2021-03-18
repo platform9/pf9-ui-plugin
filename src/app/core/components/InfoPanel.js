@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { DetailRow } from 'k8s/components/infrastructure/nodes/NodeDetailsPage'
 import Text from 'core/elements/text'
+import clsx from 'clsx'
 
 const styles = (theme) => ({
   root: {},
@@ -38,16 +39,23 @@ const DetailRowDiv = withStyles(styles)(({ classes, items }) =>
 
 const renderDetailRow = (items) => <DetailRowDiv items={items} />
 
-const InfoPanel = withStyles(styles)(({ classes, items, title }) => (
-  <div className={classes.card}>
-    <Text variant="subtitle2" component="h3">
-      {title}
-    </Text>
-    <table className={classes.cardContent}>
-      <tbody>{Array.isArray(items) ? items.map(renderDetailRow) : renderDetailRow(items)}</tbody>
-    </table>
-  </div>
-))
+const InfoPanel = withStyles(styles)(
+  ({ classes, items = [], customBody = undefined, className = undefined, title }) => (
+    <div className={clsx(classes.card, className)}>
+      <Text variant="subtitle2" component="h3">
+        {title}
+      </Text>
+      {customBody && <div className={classes.cardContent}>{customBody}</div>}
+      {!customBody && (
+        <table className={classes.cardContent}>
+          <tbody>
+            {Array.isArray(items) ? items.map(renderDetailRow) : renderDetailRow(items)}
+          </tbody>
+        </table>
+      )}
+    </div>
+  ),
+)
 
 InfoPanel.propTypes = {
   title: PropTypes.string,
