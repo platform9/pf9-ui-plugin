@@ -2,9 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { connect } from 'react-redux'
+import FontAwesomeIcon from './FontAwesomeIcon'
 
 @connect((store) => ({ store }))
 class MoreMenu extends React.PureComponent {
@@ -48,13 +47,13 @@ class MoreMenu extends React.PureComponent {
             )
           )
         })}
-        <IconButton
+        <FontAwesomeIcon
           aria-label="More Actions"
           aria-owns={anchorEl ? 'more-menu' : null}
           onClick={this.handleOpen}
         >
-          <MoreVertIcon />
-        </IconButton>
+          ellipsis-v
+        </FontAwesomeIcon>
         <Menu
           id="more-menu"
           anchorEl={anchorEl}
