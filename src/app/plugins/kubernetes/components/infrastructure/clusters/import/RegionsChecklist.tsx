@@ -6,10 +6,14 @@ import { FormControl, FormControlLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
+import clsx from 'clsx'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   title: {
     marginBottom: theme.spacing(3),
+  },
+  nowrap: {
+    whiteSpace: 'nowrap',
   },
 }))
 
@@ -35,7 +39,7 @@ const RegionsChecklist = ({ cloudProviderId, onChange, value, className }) => {
   }, [details])
 
   return (
-    <div className={className}>
+    <div className={clsx(classes.nowrap, className)}>
       <Text variant="caption1" className={classes.title}>
         Regions
       </Text>
