@@ -1,7 +1,7 @@
 import React from 'react'
-import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/styles'
 import Button from 'core/elements/button'
+import FontAwesomeIcon from '../FontAwesomeIcon'
 
 const styles = (theme) => ({
   baseButton: {
@@ -23,7 +23,7 @@ const PrevButton = ({ children, classes, disabled, ...rest }) => {
 
   return (
     <Button {...params} disabled={disabled} color="secondary">
-      <Icon className={classes.leftIcon}>arrow_back</Icon>
+      <FontAwesomeIcon className={classes.leftIcon}>arrow-left</FontAwesomeIcon>
       {children || 'Back'}
     </Button>
   )

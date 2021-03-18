@@ -2,8 +2,9 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { Tooltip } from '@material-ui/core'
-import Icon from '@material-ui/core/Icon/Icon'
+
 import moize from 'moize'
+import FontAwesomeIcon from './FontAwesomeIcon'
 
 const styles = (theme) => ({
   infoTooltip: {
@@ -18,21 +19,29 @@ const styles = (theme) => ({
     marginTop: -7,
   },
   infoIcon: {
-    fontSize: theme.spacing(2.4),
-    paddingTop: '0.1rem',
-    paddingRight: '0.5rem',
+    fontSize: theme.spacing(2.5),
+    paddingTop: 4,
+    paddingRight: 4,
+    color: theme.palette.blue.main,
+    width: 19,
+    height: 19,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toolTipContainer: {
+    display: 'flex',
   },
 })
 
 @withStyles(styles)
 class InfoTooltip extends PureComponent {
+  // for some reason the styles are not propagating to the info tooltip
   renderTitle = moize((info) => (
-    <React.Fragment>
-      <Icon className={this.props.classes.infoIcon} color="primary">
-        <span>info</span>
-      </Icon>
+    <div className="flex">
+      <FontAwesomeIcon className="info-tooltip-icon">info-circle</FontAwesomeIcon>
       <span>{info}</span>
-    </React.Fragment>
+    </div>
   ))
 
   render() {
