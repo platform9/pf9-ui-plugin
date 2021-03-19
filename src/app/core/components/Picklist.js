@@ -101,10 +101,17 @@ const Picklist = React.forwardRef((props, ref) => {
       : value
     : value
 
-  // If loading is different than true, it means we are not performing any async
-  // operation to load the options, hence we can render the contents on mount
+  // When loading we want to remove the visual elements inside the borders as
+  // the loading content will be populated there
+  const loadingProps = loading
+    ? {
+        placeholder: '',
+        label: '',
+        value: '',
+      }
+    : {}
   return (
-    <Progress inline={inline} overlay loading={loading} renderContentOnMount={loading !== true}>
+    <Progress inline={inline} overlay loading={loading} renderContentOnMount message="Loading">
       <TextField
         {...restProps}
         ref={ref}
@@ -113,6 +120,7 @@ const Picklist = React.forwardRef((props, ref) => {
         classes={{ root: classes.root }}
         label={label}
         value={nonEmptyValue || (multiple ? emptyArr : '')}
+        {...loadingProps}
         SelectProps={selectProps}
         onChange={handleChange}
         inputProps={inputProps}
