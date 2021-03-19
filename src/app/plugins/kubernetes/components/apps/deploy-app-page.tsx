@@ -165,7 +165,7 @@ const DeployAppPage = () => {
     const [success] = await deploy({
       clusterId,
       namespace,
-      deploymentName,
+      deploymentName: deploymentName.toLowerCase(),
       repository,
       chartName: name,
       version,
