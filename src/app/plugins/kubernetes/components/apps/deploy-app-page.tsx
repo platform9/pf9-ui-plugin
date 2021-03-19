@@ -165,7 +165,7 @@ const DeployAppPage = () => {
     const [success] = await deploy({
       clusterId,
       namespace,
-      deploymentName,
+      deploymentName: deploymentName.toLowerCase(),
       repository,
       chartName: name,
       version,
@@ -286,7 +286,7 @@ const DeployAppPage = () => {
                     <Text variant="body2">
                       {'Enter value details below or '}
                       <SimpleLink src="" onClick={openFileBrowser}>
-                        upload.yaml
+                        upload a values.yaml file
                       </SimpleLink>
                       <input
                         type="file"
