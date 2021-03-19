@@ -92,9 +92,18 @@ export const imageUrls = Object.freeze({
   logoPrimary: `${imageUrlRoot}/primary-logo.png`,
   logoBlue: `${imageUrlRoot}/logo-color.png`,
   logo: `${imageUrlRoot}/logo.png`,
-  loading: `${imageUrlRoot}/loading.gif`,
+  // loading: `${imageUrlRoot}/loading.gif`,
+  loadingBluePinkTiles: `${imageUrlRoot}/loading-blue-pink-tiles.svg`,
+  loadingBlueTiles: `${imageUrlRoot}/loading-blue-tiles.svg`,
+  loadingEllipsis: `${imageUrlRoot}/loading-ellipsis.svg`,
   kubernetes: `${imageUrlRoot}/logo-kubernetes-h.png`,
 })
+
+export const LoadingGifs = {
+  BlueTiles: 'loadingBlueTiles',
+  BluePinkTiles: 'loadingBluePinkTiles',
+  Ellipsis: 'loadingEllipsis',
+}
 
 // k8s
 export const defaultMonitoringTag = Object.freeze({
