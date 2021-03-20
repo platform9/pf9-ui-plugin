@@ -16,5 +16,5 @@ export const isAdminRole = (session) => {
 
 export const findClusterName = (clusters, clusterId) => {
   const cluster = clusters.find((x) => x.uuid === clusterId)
-  return (cluster && cluster.name) || ''
+  return (cluster && cluster.name) || null
 }
