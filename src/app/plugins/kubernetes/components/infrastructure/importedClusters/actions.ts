@@ -14,14 +14,17 @@ export const getImportedClusters = async () => {
 
 export const importedClusterActions = createCRUDActions(ActionDataKeys.ImportedClusters, {
   listFn: async () => {
-    const rawSunpikeApis = await qbert.getSunpikeApis()
-    const sunpikeApis = rawSunpikeApis.versions?.map((version) => version.version)
-    if (!intersection(sunpikeApis, acceptedApiVersions).length) {
-      // If API is not supported yet, return an empty array
+    try {
+      const rawSunpikeApis = await qbert.getSunpikeApis()
+      const sunpikeApis = rawSunpikeApis.versions?.map((version) => version.version)
+      if (!intersection(sunpikeApis, acceptedApiVersions).length) {
+        // If API is not supported yet, return an empty array
+        return []
+      }
+    } catch (err) {
       return []
     }
-    const importedClusters = await qbert.getImportedClusters()
-    return importedClusters
+    return qbert.getImportedClusters()
   },
   deleteFn: async ({ uuid }) => {
     await qbert.deregisterExternalCluster(uuid)

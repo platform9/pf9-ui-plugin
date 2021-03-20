@@ -40,6 +40,7 @@ export const loadAlerts = createContextLoader(
     indexBy: 'clusterId',
     selector: alertsSelector,
     selectorCreator: makeAlertsSelector,
+    cache: false,
   },
 )
 

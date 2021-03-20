@@ -74,7 +74,9 @@ export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) 
   }
   const { major, minor } = matches.groups || {}
   const isNewDashboardUrl = parseInt(major) >= 1 && parseInt(minor) >= 16
-  return `${qbertEndpoint}/${qbert.scopedEnpointPath()}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/${
+  return `${qbertEndpoint}/${qbert.scopedEnpointPath()}/clusters/${
+    cluster.uuid
+  }/k8sapi/api/v1/namespaces/${
     isNewDashboardUrl ? 'kubernetes-dashboard' : 'kube-system'
   }/services/https:kubernetes-dashboard:443/proxy/`
 }
