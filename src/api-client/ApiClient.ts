@@ -29,6 +29,7 @@ import {
 import ApiService from 'api-client/ApiService'
 import Bugsnag from '@bugsnag/js'
 import { someAsync } from 'utils/async'
+import ApiError from 'core/errors/ApiError'
 
 interface ApiClientOptions {
   [key: string]: any
@@ -68,7 +69,7 @@ class ApiClient {
 
   static getInstance() {
     if (!ApiClient.instance) {
-      throw new Error(
+      throw new ApiError(
         'ApiClient instance has not been initialized, please call ApiClient.init to instantiate it',
       )
     }
@@ -104,7 +105,7 @@ class ApiClient {
   constructor(options: ApiClientOptions) {
     this.options = options
     if (!options.keystoneEndpoint) {
-      throw new Error('keystoneEndpoint required')
+      throw new ApiError('keystoneEndpoint required')
     }
     const getResponseError: any = (cond as any)([
       [hasPathStr('response.data.error'), pathStr('response.data.error')],

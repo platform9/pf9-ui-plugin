@@ -1,5 +1,19 @@
 import { createSelector } from 'reselect'
-import { any, head, map, mergeLeft, pathEq, pathOr, pipe, pluck, propEq, toPairs } from 'ramda'
+import {
+  any,
+  head,
+  map,
+  mergeLeft,
+  pathEq,
+  pathOr,
+  pipe,
+  pluck,
+  propEq,
+  toPairs as ToPairs,
+  filter,
+  isNil,
+  complement,
+} from 'ramda'
 import { emptyArr, emptyObj, filterIf } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
@@ -13,6 +27,8 @@ import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 import { getK8sDashboardLinkFromVersion } from '../infrastructure/clusters/helpers'
 import { clientStoreKey } from 'core/client/clientReducers'
 
+const toPairs: any = ToPairs
+
 export const podsSelector = createSelector(
   [
     getDataSelector<DataKeys.Pods>(DataKeys.Pods, ['clusterId']),
@@ -21,11 +37,15 @@ export const podsSelector = createSelector(
   ],
   (rawPods, clusters, qbertEndpoint) => {
     // associate nodes with the combinedHost entry
-    return pipe<IDataKeys[DataKeys.Pods], IPodSelector[]>(
+    return pipe<IDataKeys[DataKeys.Pods], IPodSelector[], IPodSelector[]>(
       // Filter by namespace
       map((pod) => {
         const { clusterId } = pod
         const cluster = clusters.find(propEq('uuid', clusterId))
+        if (!cluster) {
+          // If no cluster if found, this item is invalid because the parent cluster has been deleted
+          return null
+        }
         const name = pod?.metadata?.name // pathStr('metadata.name', pod),
         const namespace = pod?.metadata?.namespace // pathStr('metadata.namespace', pod),
         const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
@@ -63,6 +83,7 @@ export const podsSelector = createSelector(
           logs: logUrls,
         }
       }),
+      filter(complement(isNil)),
     )(rawPods)
   },
 )
@@ -88,43 +109,50 @@ export const deploymentsSelector = createSelector(
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawDeployments, pods, clusters, qbertEndpoint) => {
-    return rawDeployments.map((rawDeployment) => {
-      const { clusterId } = rawDeployment
-      const cluster = clusters.find(propEq('uuid', clusterId))
-      const selectors = rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
-      const name = rawDeployment?.metadata?.name
-      const namespace = rawDeployment?.metadata?.namespace
-      const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
-
-      const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
-        cluster.version,
-        qbertEndpoint,
-        cluster,
-      )
-      const dashboardUrl = `${k8sDashboardUrl}#/deployment/${namespace}/${name}?namespace=${namespace}`
-
-      // Check if any pod label matches the first deployment match label key
-      // Note: this logic should probably be revised (copied from Clarity UI)
-      const deploymentPods = pods.filter((pod) => {
-        if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
-          return false
+    return rawDeployments
+      .map((rawDeployment) => {
+        const { clusterId } = rawDeployment
+        const cluster = clusters.find(propEq('uuid', clusterId))
+        if (!cluster) {
+          // If no cluster if found, this item is invalid because the parent cluster has been deleted
+          return null
         }
-        const podLabels = pod?.metadata?.labels // pathStr('metadata.labels', pod)
-        return any(([key, value]) => key === labelKey && value === labelValue, toPairs(podLabels))
+        const selectors =
+          rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
+        const name = rawDeployment?.metadata?.name
+        const namespace = rawDeployment?.metadata?.namespace
+        const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
+
+        const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
+          cluster?.version,
+          qbertEndpoint,
+          cluster,
+        )
+        const dashboardUrl = `${k8sDashboardUrl}#/deployment/${namespace}/${name}?namespace=${namespace}`
+
+        // Check if any pod label matches the first deployment match label key
+        // Note: this logic should probably be revised (copied from Clarity UI)
+        const deploymentPods = pods.filter((pod) => {
+          if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
+            return false
+          }
+          const podLabels = pod?.metadata?.labels // pathStr('metadata.labels', pod)
+          return any(([key, value]) => key === labelKey && value === labelValue, toPairs(podLabels))
+        })
+        return {
+          ...rawDeployment,
+          dashboardUrl,
+          id: rawDeployment?.metadata?.uid,
+          name,
+          created: rawDeployment?.metadata?.creationTimestamp,
+          labels: rawDeployment?.metadata?.labels,
+          selectors,
+          pods: deploymentPods.length,
+          namespace,
+          clusterName: cluster?.name,
+        }
       })
-      return {
-        ...rawDeployment,
-        dashboardUrl,
-        id: rawDeployment?.metadata?.uid,
-        name,
-        created: rawDeployment?.metadata?.creationTimestamp,
-        labels: rawDeployment?.metadata?.labels,
-        selectors,
-        pods: deploymentPods.length,
-        namespace,
-        clusterName: cluster?.name,
-      }
-    })
+      .filter(complement(isNil))
   },
 )
 
@@ -148,10 +176,14 @@ export const serviceSelectors = createSelector(
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawServices, clusters, qbertEndpoint) => {
-    return pipe<IDataKeys[DataKeys.KubeServices], any>(
-      map((service) => {
+    return rawServices
+      .map((service) => {
         const { clusterId } = service
         const cluster = clusters.find(propEq('uuid', clusterId))
+        if (!cluster) {
+          // If no cluster if found, this item is invalid because the parent cluster has been deleted
+          return null
+        }
         const type = service?.spec?.type // = pathStr('spec.type', service)
         const externalName = service?.spec?.externalName // pathStr('spec.externalName', service)
         const name = service?.metadata?.name // pathStr('metadata.name', service)
@@ -193,8 +225,8 @@ export const serviceSelectors = createSelector(
           namespace,
           clusterName: cluster?.name,
         }
-      }),
-    )(rawServices)
+      })
+      .filter(complement(isNil))
   },
 )
 

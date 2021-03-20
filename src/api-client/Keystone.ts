@@ -24,6 +24,7 @@ import {
 } from './keystone.model'
 import DataKeys from 'k8s/DataKeys'
 import ApiClient from 'api-client/ApiClient'
+import ApiError from 'core/errors/ApiError'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -327,7 +328,7 @@ class Keystone extends ApiService {
       })
       return { tenantId, userId, roleId }
     } catch (err) {
-      throw new Error('Unable to delete non-existant project')
+      throw new ApiError('Unable to delete non-existant project')
     }
   }
 
@@ -380,7 +381,7 @@ class Keystone extends ApiService {
       })
       return groupId
     } catch (err) {
-      throw new Error('Unable to delete non-existant group')
+      throw new ApiError('Unable to delete non-existant group')
     }
   }
 
@@ -406,7 +407,7 @@ class Keystone extends ApiService {
       })
       return { tenantId, groupId, roleId }
     } catch (err) {
-      throw new Error('Unable to delete non-existant role')
+      throw new ApiError('Unable to delete non-existant role')
     }
   }
 
@@ -459,7 +460,7 @@ class Keystone extends ApiService {
       })
       return mappingId
     } catch (err) {
-      throw new Error('Unable to delete non-existant group mapping')
+      throw new ApiError('Unable to delete non-existant group mapping')
     }
   }
 
@@ -512,7 +513,7 @@ class Keystone extends ApiService {
       })
       return projectId
     } catch (err) {
-      throw new Error('Unable to delete non-existant project')
+      throw new ApiError('Unable to delete non-existant project')
     }
   }
 
@@ -829,7 +830,7 @@ class Keystone extends ApiService {
     const services = await this.getServicesForActiveRegion()
     const endpoint = pathStr(`${serviceName}.${type}.url`, services)
     if (!endpoint) {
-      throw new Error(`${capitalizeString(serviceName)} endpoint not available in active region`)
+      throw new ApiError(`${capitalizeString(serviceName)} endpoint not available in active region`)
     }
     return endpoint
   }
@@ -919,7 +920,7 @@ class Keystone extends ApiService {
       })
       return userId
     } catch (err) {
-      throw new Error('Unable to delete non-existant user')
+      throw new ApiError('Unable to delete non-existant user')
     }
   }
 }
