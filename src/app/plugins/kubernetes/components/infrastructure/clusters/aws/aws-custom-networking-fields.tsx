@@ -129,17 +129,19 @@ const AwsCustomNetworkingFields = ({ setWizardContext, wizardContext }) => {
 
   return (
     <>
-      <PicklistField
-        DropdownComponent={ClusterDomainPicklist}
-        id="domainId"
-        label="Domain"
-        onChange={updateFqdns}
-        cloudProviderId={wizardContext.cloudProviderId}
-        cloudProviderRegionId={wizardContext.region}
-        info="Select the base domain name to be used for the API and service FQDNs"
-        required={!wizardContext.usePf9Domain}
-        disabled={wizardContext.usePf9Domain}
-      />
+      {wizardContext.useRoute53 && (
+        <PicklistField
+          DropdownComponent={ClusterDomainPicklist}
+          id="domainId"
+          label="Domain"
+          onChange={updateFqdns}
+          cloudProviderId={wizardContext.cloudProviderId}
+          cloudProviderRegionId={wizardContext.region}
+          info="Select the base domain name to be used for the API and service FQDNs"
+          required={!wizardContext.usePf9Domain}
+          disabled={wizardContext.usePf9Domain}
+        />
+      )}
 
       <PicklistField
         id="network"

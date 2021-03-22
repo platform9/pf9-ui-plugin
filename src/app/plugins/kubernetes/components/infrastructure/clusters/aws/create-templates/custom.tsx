@@ -41,6 +41,7 @@ import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import WorkerNodeInstanceTypeField from '../../form-components/worker-node-instance-type'
 import { ClusterCreateTypes } from '../../model'
 import { awsClusterTracking } from '../../tracking'
+import CheckboxField from 'core/components/validatedForm/CheckboxField'
 
 export const initialContext = {
   template: 'small',
@@ -67,6 +68,7 @@ export const initialContext = {
   networkStack: 'ipv4',
   privileged: true,
   allowWorkloadsOnMaster: false,
+  useRoute53: false,
 }
 
 const columns = [
@@ -279,6 +281,15 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
               <FormFieldCard title="Cluster Settings">
                 {/* Kubernetes Version */}
                 <KubernetesVersion />
+
+                <CheckboxField
+                  id="useRoute53"
+                  label="Use Route53 for Cluster Access"
+                  value={wizardContext.useRoute53}
+                  info="Enable Platform9 to use a selected  Route53 domain for the  API Server and Service Endpoints."
+                  onChange={(value) => setWizardContext({ useRoute53: value })}
+                />
+
                 <Divider className={classes.divider} />
 
                 {/* App & Container Settings */}
@@ -338,21 +349,25 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                   wizardContext={wizardContext}
                 />
 
-                {/* API FQDN */}
-                <ApiFqdnField
-                  setWizardContext={setWizardContext}
-                  wizardContext={wizardContext}
-                  required={false}
-                  disabled={wizardContext.usePf9Domain}
-                />
+                {wizardContext.useRoute53 && (
+                  <>
+                    {/* API FQDN */}
+                    <ApiFqdnField
+                      setWizardContext={setWizardContext}
+                      wizardContext={wizardContext}
+                      required={false}
+                      disabled={wizardContext.usePf9Domain}
+                    />
 
-                {/* Services FQDN */}
-                <ServicesFqdnField
-                  setWizardContext={setWizardContext}
-                  wizardContext={wizardContext}
-                  required={!wizardContext.usePf9Domain}
-                  disabled={wizardContext.usePf9Domain}
-                />
+                    {/* Services FQDN */}
+                    <ServicesFqdnField
+                      setWizardContext={setWizardContext}
+                      wizardContext={wizardContext}
+                      required={!wizardContext.usePf9Domain}
+                      disabled={wizardContext.usePf9Domain}
+                    />
+                  </>
+                )}
               </FormFieldCard>
 
               <FormFieldCard title="Cluster Networking Range & HTTP Proxy">
