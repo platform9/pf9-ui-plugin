@@ -12,7 +12,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty, emptyArr } from 'utils/fp'
 import { memoizedDep } from 'utils/misc'
-import { isEqual } from 'lodash'
 
 /**
  * Hook to load data using the specified loader function
@@ -91,7 +90,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
       pipe(
         path([cacheStoreKey, paramsStoreKey, cacheKey]),
         arrayIfNil,
-        find((item) => isEqual(item, memoizedIndexedParams)),
+        find(equals(memoizedIndexedParams)),
       ),
     [cacheKey, memoizedIndexedParams],
   )
