@@ -28,7 +28,6 @@ const HeaderCard: FC<{ title: string; cluster: ImportedClusterSelector }> = ({
   const baseEndpoint = useSelector(pathOr('', [clientStoreKey, 'endpoints', 'qbert'])).match(
     /(.*?)\/qbert/,
   )[1]
-  console.log(baseEndpoint)
   const enabled = useMemo(() => {
     if (clusterTags?.length) {
       const clusterPackages = clusterTags.find((item) => {

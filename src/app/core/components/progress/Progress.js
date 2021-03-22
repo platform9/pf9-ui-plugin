@@ -2,7 +2,7 @@ import React, { PureComponent, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
-import { imageUrls } from 'app/constants'
+import { imageUrls, LoadingGifs } from 'app/constants'
 import Text from 'core/elements/text'
 import { pick, omit, keys } from 'ramda'
 
@@ -21,18 +21,19 @@ const styles = (theme) => ({
     minWidth: 100,
   },
   message: {
-    fontWeight: 'bold',
-    fontSize: theme.typography.pxToRem(20),
-    margin: '0 20px',
+    ...theme.typography.subtitle2,
+    margin: '0 8px 4px 0',
     color: 'inherit',
+    order: ({ inline }) => (inline ? -1 : 0),
   },
   messageInline: {
-    fontSize: theme.typography.pxToRem(14),
-    color: 'inherit',
+    ...theme.typography.body2,
+    color: theme.palette.grey[500],
   },
   img: {
-    maxHeight: ({ inline }) => (inline ? 25 : '80%'),
-    opacity: ({ inline }) => (inline ? 0.7 : 1),
+    maxHeight: ({ inline }) => (inline ? 35 : '80%'),
+    height: ({ inline }) => (inline ? 35 : 90),
+    opacity: ({ inline }) => (inline ? 1 : 1),
   },
   status: {
     display: 'flex',
@@ -58,13 +59,20 @@ const styles = (theme) => ({
     width: '100%',
   },
   contentLoading: {
-    opacity: 0.3,
+    opacity: ({ inline }) => (inline ? 0.8 : 0.3),
   },
   hiddenContent: {
     visibility: ({ inline }) => (inline ? 'visible' : 'hidden'),
     display: ({ inline }) => (inline ? 'none' : 'inherit'),
   },
 })
+
+const getLoadingImage = (inline, imageType) => {
+  if (inline) {
+    return imageUrls[LoadingGifs.Ellipsis]
+  }
+  return imageUrls[imageType]
+}
 
 @withStyles(styles)
 class Progress extends PureComponent {
@@ -97,6 +105,7 @@ class Progress extends PureComponent {
       inline = false,
       message = null,
       renderLoadingImage,
+      loadingImage = LoadingGifs.BlueTiles,
       renderContentOnMount,
     } = this.props
     if (!loading) {
@@ -111,7 +120,11 @@ class Progress extends PureComponent {
         })}
       >
         {renderLoadingImage && (
-          <img alt="Loading..." src={imageUrls.loading} className={classes.img} />
+          <img
+            alt="Loading..."
+            src={getLoadingImage(inline, loadingImage)}
+            className={classes.img}
+          />
         )}
         {message && (
           <Text
@@ -176,6 +189,7 @@ Progress.propTypes = {
   minHeight: PropTypes.number,
   // eslint-disable-next-line react/no-unused-prop-types
   maxHeight: PropTypes.number,
+  loadingImage: PropTypes.oneOf(Object.keys(LoadingGifs)),
 }
 
 Progress.defaultProps = {
@@ -184,7 +198,7 @@ Progress.defaultProps = {
   inline: false,
   renderContentOnMount: true,
   renderLoadingImage: true,
-  message: 'Loading...',
+  message: 'Loading',
   minHeight: 400,
 }
 

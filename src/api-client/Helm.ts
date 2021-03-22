@@ -12,7 +12,7 @@ class Helm extends ApiService {
   }
 
   get baseUrl(): string {
-    return 'pf9helm'
+    return '/pf9helm'
   }
 
   getRepository = async (repoName) => {

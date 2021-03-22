@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { map } from 'ramda'
+import { propSatisfies, complement, isNil } from 'ramda'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
@@ -13,15 +13,14 @@ export const storageClassSelector = createSelector(
     importedClustersSelector,
   ],
   (rawStorageClasses, clusters, importedClusters) => {
-    return map(
-      (storageClass) => ({
+    return rawStorageClasses
+      .map((storageClass) => ({
         id: storageClass?.metadata?.uid,
         name: storageClass?.metadata?.name,
         clusterName: findClusterName([...clusters, ...importedClusters], storageClass.clusterId),
         type: storageClass?.parameters?.type,
         created: storageClass?.metadata?.creationTimestamp,
-      }),
-      rawStorageClasses,
-    )
+      }))
+      .filter(propSatisfies(complement(isNil), 'clusterName'))
   },
 )

@@ -8,6 +8,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
+import { trackEvent } from 'utils/tracking'
 import { clusterTagActions } from '../clusters/actions'
 import { IUseDataLoader } from '../nodes/model'
 
@@ -50,6 +51,20 @@ const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
     try {
       const pkgs: any = await appbert.getPackages()
       const monPkg = pkgs.find((pkg) => pkg.name === 'pf9-mon')
+
+      if (enabled) {
+        trackEvent('Imported Cluster - Toggle Monitoring Off', {
+          cluster_uuid: cluster.uuid,
+          cluster_name: cluster.name,
+          cloud_provider_type: cluster.providerType,
+        })
+      } else {
+        trackEvent('Imported Cluster - Toggle Monitoring On', {
+          cluster_uuid: cluster.uuid,
+          cluster_name: cluster.name,
+          cloud_provider_type: cluster.providerType,
+        })
+      }
 
       if (!monPkg) {
         dispatch(

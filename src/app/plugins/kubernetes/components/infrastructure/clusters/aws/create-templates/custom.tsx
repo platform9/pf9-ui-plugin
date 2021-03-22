@@ -355,7 +355,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     <ApiFqdnField
                       setWizardContext={setWizardContext}
                       wizardContext={wizardContext}
-                      required={!wizardContext.usePf9Domain}
+                      required={false}
                       disabled={wizardContext.usePf9Domain}
                     />
 

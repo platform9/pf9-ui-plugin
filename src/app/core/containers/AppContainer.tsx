@@ -39,12 +39,21 @@ import axios from 'axios'
 import { updateClarityStore } from 'utils/clarityHelper'
 import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
+import Theme from 'core/themes/model'
 
 const { setActiveRegion } = ApiClient.getInstance()
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1,
+  },
+  progress: {
+    '& img': {
+      height: 130,
+    },
+    '& img ~ span': {
+      fontSize: theme.typography.subtitle1.fontSize,
+    },
   },
 }))
 
@@ -280,7 +289,9 @@ const AppContainer = () => {
           {sessionChecked ? (
             authContent
           ) : (
-            <Progress renderLoadingImage={false} loading message={'Loading app...'} />
+            <div className={classes.progress}>
+              <Progress loading message={'Loading app'} />
+            </div>
           )}
         </Route>
       </Switch>

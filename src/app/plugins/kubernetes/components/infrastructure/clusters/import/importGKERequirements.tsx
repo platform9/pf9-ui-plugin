@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Text from 'core/elements/text'
 import BulletList from 'core/components/BulletList'
@@ -8,11 +8,13 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 // import ExternalLink from 'core/components/ExternalLink'
 import { IconInfo } from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { cloudProviderActions } from '../../cloudProviders/actions'
-import { CloudProviders } from '../../cloudProviders/model'
+// import useDataLoader from 'core/hooks/useDataLoader'
+// import { cloudProviderActions } from '../../cloudProviders/actions'
+// import { CloudProviders } from '../../cloudProviders/model'
 // import AwsCloudProviderRequirementDialog from '../../clusters/aws/AwsCloudProviderRequirementDialog'
-import { routes } from 'core/utils/routes'
+// import { routes } from 'core/utils/routes'
+import ComingSoonDialog from './ComingSoonDialog'
+import { trackEvent } from 'utils/tracking'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
@@ -47,24 +49,33 @@ const GKEReqsLeftSection = [
 const ImportGKERequirements = ({ onComplete, platform }) => {
   const classes = useStyles({})
   // const [showDialog, setShowDialog] = useState(false)
-  const [cloudProviders] = useDataLoader(cloudProviderActions.list)
+  const [showComingSoonDialog, setShowComingSoonDialog] = useState(false)
+  // const [cloudProviders] = useDataLoader(cloudProviderActions.list)
 
-  const handleClick = useCallback(() => {
-    const hasGoogleProvider = !!cloudProviders.some(
-      (provider) => provider.type === CloudProviders.Google,
-    )
-    if (!hasGoogleProvider) {
-      // setShowDialog(true)
-    } else {
-      onComplete(routes.cluster.import.eks.path())
-    }
-  }, [onComplete, cloudProviders])
+  const triggerDialog = () => {
+    trackEvent('Clicked Import GKE Cluster')
+    setShowComingSoonDialog(true)
+  }
+
+  // const handleClick = useCallback(() => {
+  //   const hasGoogleProvider = !!cloudProviders.some(
+  //     (provider) => provider.type === CloudProviders.Google,
+  //   )
+  //   if (!hasGoogleProvider) {
+  //     // setShowDialog(true)
+  //   } else {
+  //     onComplete(routes.cluster.import.eks.path())
+  //   }
+  // }, [onComplete, cloudProviders])
 
   return (
     <>
       {/* {showDialog && (
         <AwsCloudProviderRequirementDialog showDialog={showDialog} setShowDialog={setShowDialog} />
       )} */}
+      {showComingSoonDialog && (
+        <ComingSoonDialog onClose={() => setShowComingSoonDialog(false)} clusterType="GKE" />
+      )}
       <FormFieldCard
         className={classes.formCard}
         title="Google GKE Cluster Management"
@@ -78,7 +89,9 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
           Platform9 is able to connect to Google and import GKE clusters to bring them under
           management.
         </Text>
-        <Text variant="body2">This feature is coming soon.</Text>
+        <Text variant="body2" className={classes.text}>
+          This feature is coming soon.
+        </Text>
         <IconInfo
           icon="info-circle"
           title="The following requirements must be met to be able to import and manage GKE Clusters:"
@@ -88,9 +101,7 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
           </div>
         </IconInfo>
         <div className={classes.actionRow}>
-          <SubmitButton onClick={handleClick} disabled>
-            Import GKE Clusters
-          </SubmitButton>
+          <SubmitButton onClick={triggerDialog}>Import GKE Clusters</SubmitButton>
         </div>
       </FormFieldCard>
     </>

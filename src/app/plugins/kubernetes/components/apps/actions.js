@@ -103,6 +103,9 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
 
 export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps, {
   listFn: async ({ clusterId, namespace }) => {
+    // Fetch dependent cache
+    await appActions.list()
+
     if (namespace === allKey) {
       const namespaces = await namespaceActions.list({ clusterId })
       const releases = someAsync(

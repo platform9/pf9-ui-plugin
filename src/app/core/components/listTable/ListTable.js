@@ -10,6 +10,7 @@ import {
   TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
+import { LoadingGifs } from 'app/constants'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import clsx from 'clsx'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
@@ -632,7 +633,12 @@ class ListTable extends PureComponent {
       )
 
     return (
-      <Progress loading={loading} overlay renderContentOnMount>
+      <Progress
+        loading={loading}
+        overlay
+        renderContentOnMount
+        loadingImage={LoadingGifs.BluePinkTiles}
+      >
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
             <div className={clsx(classes.root, compactTable && classes.compactTableHeight)}>

@@ -7,6 +7,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { ValidatedFormProps } from 'core/components/validatedForm/model'
+import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import Progress from 'core/components/progress/Progress'
 
 const useStyles = makeStyles((theme: Theme) => ({
   clustersMultiSelect: {
@@ -24,24 +26,36 @@ interface Props extends ValidatedFormProps {
 const ClustersMultiSelect: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
   ({ wizardContext, onChange, setNumClusterOptions, ...rest }, ref) => {
     const classes = useStyles()
-    const [clusters] = useDataLoader(clusterActions.list)
-    const options = useMemo(() => projectAs({ value: 'uuid', label: 'name' }, clusters), [clusters])
+    const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+    const [importedClusters, loadingImportedClusters] = useDataLoader(importedClusterActions.list)
+
+    const options = useMemo(() => {
+      return [
+        ...projectAs({ label: 'name', value: 'uuid' }, clusters),
+        ...projectAs({ label: 'name', value: 'uuid' }, importedClusters),
+      ]
+    }, [clusters, importedClusters])
 
     useEffect(() => {
       setNumClusterOptions(options.length)
     }, [options])
 
     return (
-      <MultiSelect
-        className={classes.clustersMultiSelect}
-        id="clusters"
-        options={options}
-        values={wizardContext.clusters}
-        onChange={onChange}
-        maxHeight={500}
-        showSelectDeselectAllOption={true}
-        {...rest}
-      ></MultiSelect>
+      <Progress
+        loading={loadingClusters || loadingImportedClusters}
+        renderContentOnMount={!loadingClusters || !loadingImportedClusters}
+      >
+        <MultiSelect
+          className={classes.clustersMultiSelect}
+          id="clusters"
+          options={options}
+          values={wizardContext.clusters}
+          onChange={onChange}
+          maxHeight={500}
+          showSelectDeselectAllOption={true}
+          {...rest}
+        ></MultiSelect>
+      </Progress>
     )
   },
 )

@@ -11,6 +11,7 @@ import { appActions } from './actions'
 import RepositoryPicklist from './repository-picklist'
 import { repositoriesForClusterLoader } from '../repositories/actions'
 import { pluck } from 'ramda'
+
 const ClusterPicklist: any = ClusterPicklistDefault
 
 const defaultParams = {
@@ -53,7 +54,7 @@ const AppCatalogPage = () => {
   const filterByCluster = useCallback(
     (apps) => {
       // Find the repos that are attached to the cluster
-      const repoNames = pluck(
+      const repoNames = pluck<any, string>(
         'name',
         reposForCluster.filter((item) => item?.clusterId === params.clusterId),
       )
@@ -94,7 +95,7 @@ const AppCatalogPage = () => {
         searchTarget="name"
         filters={filters}
         filterValues={filterValues}
-        showSortOption={true}
+        showSortOption
         sortOptions={sortByOptions}
         onSortChange={getParamsUpdater('sortBy')}
         sortBy={params.sortBy}

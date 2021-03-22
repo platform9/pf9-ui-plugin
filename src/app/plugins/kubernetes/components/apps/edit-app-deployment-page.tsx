@@ -9,7 +9,7 @@ import WizardMeta from 'core/components/wizard/WizardMeta'
 import WizardStep from 'core/components/wizard/WizardStep'
 import Theme from 'core/themes/model'
 import { routes } from 'core/utils/routes'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import Text from 'core/elements/text'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import SimpleLink from 'core/components/SimpleLink'
@@ -20,10 +20,16 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { appDetailsLoader, deploymentDetailLoader, deployedAppActions } from './actions'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import ClusterPicklist from '../common/ClusterPicklist'
 import NamespacePicklist from '../common/NamespacePicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
-import { compareVersions, getAppVersionPicklistOptions, getIcon } from './helpers'
+import {
+  compareVersions,
+  filterConnectedClusters,
+  getAppVersionPicklistOptions,
+  getIcon,
+} from './helpers'
+import ClusterPicklist from '../common/ClusterPicklist'
+import { repositoryActions } from '../repositories/actions'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -131,7 +137,7 @@ const EditAppDeploymentPage = () => {
   })
   const deployedApp = deployedApps.find((app) => app.name === name) || {}
   const { repository, chart, chart_version: chartVersion } = deployedApp
-
+  const [repositories, loadingRepositories] = useDataLoader(repositoryActions.list)
   const [[deployedAppDetails] = {}, loadingDeployedAppDetails]: any = useDataLoader(
     deploymentDetailLoader,
     {
@@ -221,7 +227,14 @@ const EditAppDeploymentPage = () => {
     reader.readAsText(file)
   }
 
-  const loading = loadingDeployedAppDetails || loadingDeployedApps || loadingAppDetail
+  // Filter the clusters list and return only the clusters that are connected to this repository
+  const filterClusters = useCallback(
+    (clusters) => filterConnectedClusters(repository, repositories, clusters),
+    [repositories],
+  )
+
+  const loading =
+    loadingDeployedAppDetails || loadingDeployedApps || loadingRepositories || loadingAppDetail
 
   return (
     <>
@@ -273,6 +286,7 @@ const EditAppDeploymentPage = () => {
                           id="clusterId"
                           label="Cluster"
                           onChange={(value) => setWizardContext({ clusterId: value })}
+                          filterFn={filterClusters}
                           disabled
                         />
                       </div>
@@ -291,7 +305,7 @@ const EditAppDeploymentPage = () => {
                     <Text variant="body2">
                       {'Enter value details below or '}
                       <SimpleLink src="" onClick={openFileBrowser}>
-                        upload.yaml
+                        upload a values.yaml file
                       </SimpleLink>
                       <input
                         type="file"

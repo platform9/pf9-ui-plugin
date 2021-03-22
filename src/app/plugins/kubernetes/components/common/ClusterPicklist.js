@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import { isEmpty, propOr, head } from 'ramda'
+import { isEmpty, propOr, head, project } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
@@ -20,6 +20,7 @@ const ClusterPicklist = forwardRef(
       onlyAppCatalogEnabled,
       onlyHealthyClusters,
       value,
+      filterFn,
       ...rest
     },
     ref,
@@ -32,13 +33,19 @@ const ClusterPicklist = forwardRef(
     }
     const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
     const [importedClusters, importedClustersLoading] = useDataLoader(importedClusterActions.list)
+
+    const filteredClusters = useMemo(
+      () =>
+        filterFn
+          ? filterFn([...clusters, ...importedClusters])
+          : [...clusters, ...importedClusters],
+      [clusters, importedClusters],
+    )
+
     const options = useMemo(() => {
       // Sorting on these may be a bit weird, ask chris what's preferred
-      return [
-        ...projectAs({ label: 'name', value: 'uuid' }, clusters),
-        ...projectAs({ label: 'name', value: 'uuid' }, importedClusters),
-      ]
-    }, [clusters, importedClusters])
+      return [...projectAs({ label: 'name', value: 'uuid' }, filteredClusters)]
+    }, [filteredClusters])
 
     // Select the first cluster as soon as clusters are loaded
     useEffect(() => {
@@ -70,6 +77,7 @@ ClusterPicklist.propTypes = {
   onlyPrometheusEnabled: PropTypes.bool,
   onlyHealthyClusters: PropTypes.bool,
   selectFirst: PropTypes.bool,
+  filterFn: PropTypes.func,
 }
 
 ClusterPicklist.defaultProps = {

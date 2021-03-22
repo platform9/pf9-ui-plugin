@@ -5,7 +5,7 @@ import SeverityPicklist from './SeverityPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadAlerts, loadTimeSeriesAlerts } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
-import { listTablePrefs, allKey } from 'app/constants'
+import { listTablePrefs, allKey, LoadingGifs } from 'app/constants'
 import { pick } from 'ramda'
 
 import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
@@ -164,7 +164,13 @@ const ListPage = ({ ListContainer }) => {
           </div>
         </div>
         <div className={classes.chartContainer}>
-          <Progress loading={timeSeriesLoading} overlay={false} maxHeight={160} minHeight={320}>
+          <Progress
+            loading={timeSeriesLoading}
+            overlay={false}
+            maxHeight={160}
+            minHeight={320}
+            loadingImage={LoadingGifs.BluePinkTiles}
+          >
             <div className={classes.chartContainerHeader}>Alarms</div>
             <div className={classes.moveLeft}>
               <StackedAreaChart

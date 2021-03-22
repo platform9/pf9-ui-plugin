@@ -5,21 +5,13 @@ import {
   loadingStoreKey,
   paramsStoreKey,
 } from 'core/caching/cacheReducers'
-import { notificationActions } from 'core/notifications/notificationReducers'
+import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
 import useScopedPreferences from 'core/session/useScopedPreferences'
-import moize from 'moize'
-import { either, equals, find, isNil, path, pickAll, pipe, reject, whereEq } from 'ramda'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { either, equals, find, isNil, path, pickAll, pipe, reject } from 'ramda'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
+import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty, emptyArr } from 'utils/fp'
 import { memoizedDep } from 'utils/misc'
-import { isEqual } from 'lodash'
-
-const onErrorHandler = moize((loaderFn, registerNotification) => (errorMessage, catchedErr) => {
-  const { cacheKey } = loaderFn
-  console.error(`Error when fetching items for entity "${cacheKey}"`, catchedErr)
-  registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
-})
 
 /**
  * Hook to load data using the specified loader function
@@ -28,31 +20,77 @@ const onErrorHandler = moize((loaderFn, registerNotification) => (errorMessage, 
  * @returns {[array, boolean, function]} Returns an array with the loaded data, a loading boolean and a function to reload the data
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
+  // @ts-ignore
   const { loadOnDemand = false, defaultParams = emptyObj, loadingFeedback = true } = options
   const { cacheKey, fetchErrorMessage, selectorCreator, indexBy, cache } = loaderFn
   const [{ currentTenant, currentRegion }] = useScopedPreferences()
+  const [refetching, setRefetching] = useState(null)
+  const dispatch = useDispatch()
 
-  // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
+  // Memoize the params dependency as we want to make sure
+  // it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
   const memoizedIndexedParams = cache
     ? memoizedDep(pipe(pickAll(indexBy), reject(either(isNil, equals(allKey))))(memoizedParams))
     : memoizedParams
 
-  const selector = useMemo(() => {
-    return selectorCreator(defaultParams)
-  }, [])
+  const onErrorHandler = useCallback(
+    (catchedErr: Error, reloadData = false) => {
+      const title = ensureFunction(fetchErrorMessage)(catchedErr, params)
+
+      console.error(`Error when fetching items for entity "${cacheKey}"`, catchedErr)
+      dispatch(
+        notificationActions.registerNotification({
+          title,
+          message: catchedErr.message || catchedErr.toString(),
+          type: NotificationType.error,
+        }),
+      )
+    },
+    [memoizedParams],
+  )
+
+  const selector = useCallback(
+    (state) => {
+      if (refetching) {
+        // Don't try to select the data until we finished the data refetch
+        return emptyArr
+      }
+      try {
+        const defaultSelector = selectorCreator(defaultParams)
+        const output = defaultSelector(state, memoizedParams)
+
+        // Reset the flag value after a successful data selection
+        if (refetching !== null) {
+          setRefetching(null)
+        }
+        return output
+      } catch (err) {
+        onErrorHandler(err)
+
+        // When we find a selector error, it could mean the data is corruputed,
+        // so we force a data reload (only if we haven't tried before)
+        if (refetching === null) {
+          setRefetching(true)
+        }
+
+        // Return an empty array, thus preventing a blank page error
+        // that could be consequence of returning a null or undefined
+        return emptyArr
+      }
+    },
+    [refetching, memoizedParams],
+  )
 
   // Try to retrieve the data from the store with the provided parameters
-  const data = useSelector((state) => {
-    return selector(state, memoizedParams)
-  })
+  const data = useSelector(selector)
 
   const paramsSelector = useMemo(
     () =>
       pipe(
         path([cacheStoreKey, paramsStoreKey, cacheKey]),
         arrayIfNil,
-        find((item) => isEqual(item, memoizedIndexedParams)),
+        find(equals(memoizedIndexedParams)),
       ),
     [cacheKey, memoizedIndexedParams],
   )
@@ -63,26 +101,16 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   ])
   const loading = useSelector(loadingSelector)
 
-  const dispatch = useDispatch()
-
-  // We use this ref to flag when the component has been unmounted so we prevent further state updates
+  // We use this ref to flag when the component has been
+  // unmounted so we prevent further state updates
   const unmounted = useRef(false)
-
-  // Set a custom error handler for all loading functions using this hook
-  // We do this here because we have access to the ToastContext, unlike in the dataLoader functions
-  const onError = useMemo(() => {
-    const dispatchRegisterNotif = (title, message, type) => {
-      dispatch(notificationActions.registerNotification({ title, message, type }))
-    }
-    return onErrorHandler(loaderFn, dispatchRegisterNotif)
-  }, [])
 
   // The following function will handle the calls to the data loading and
   // set the loading state variable to true in the meantime, while also taking care
   // of the sequantialization of multiple concurrent calls
   // It will set the result of the last data loading call to the "data" state variable
   const loadData = useCallback(
-    async (refetch = true) => {
+    async (refetch) => {
       if (refetch || isNilOrEmpty(data) || isNil(cachedParams)) {
         // No need to update loading state if a request is already in progress
         if (loadingFeedback) {
@@ -91,9 +119,11 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         try {
           await loaderFn(memoizedParams, refetch)
         } catch (err) {
-          const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)
-          // TODO we should be putting these somewhere in the store to allow more control over the errors handling
-          onError(parsedErrorMesssage, err)
+          onErrorHandler(err)
+        }
+        // Set the flag to false to allow the selectors to do its thing
+        if (refetch) {
+          setRefetching(false)
         }
         if (loadingFeedback) {
           dispatch(cacheActions.setLoading({ cacheKey, loading: false }))
@@ -105,10 +135,10 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
 
   // Load the data on component mount and every time the params change
   useEffect(() => {
-    if (!loadOnDemand) {
-      loadData(false)
+    if (!loadOnDemand || refetching) {
+      loadData(refetching)
     }
-  }, [memoizedIndexedParams, currentTenant, currentRegion, loadOnDemand])
+  }, [memoizedIndexedParams, currentTenant, currentRegion, loadOnDemand, refetching])
 
   // When unmounted, set the unmounted ref to true to prevent further state updates
   useEffect(() => {
