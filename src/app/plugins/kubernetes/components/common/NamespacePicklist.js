@@ -9,15 +9,16 @@ import namespaceActions from 'k8s/components/namespaces/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const NamespacePicklist = forwardRef(
-  ({ clusterId, loading, onChange, selectFirst, ...rest }, ref) => {
+  ({ clusterId, loading, onChange, selectFirst, value, ...rest }, ref) => {
     const [namespaces, namespacesLoading] = useDataLoader(namespaceActions.list, { clusterId })
     const options = useMemo(
       () => projectAs({ label: 'name', value: 'name' }, uniqBy(prop('name'), namespaces)),
       [namespaces],
     )
+
     // Select the first item as soon as data is loaded
     useEffect(() => {
-      if (!isEmpty(options) && selectFirst) {
+      if (!value && !isEmpty(options) && selectFirst) {
         onChange(propOr(allKey, 'value', head(options)))
       }
     }, [options])
@@ -29,6 +30,7 @@ const NamespacePicklist = forwardRef(
         onChange={onChange}
         loading={loading || namespacesLoading}
         options={options}
+        value={value}
       />
     )
   },
