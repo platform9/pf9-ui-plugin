@@ -7,7 +7,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import { someAsync, mapAsync } from 'utils/async'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import namespaceActions from '../namespaces/actions'
-import { makeDeployedAppsSelector } from './selectors'
+import { makeAppsSelector, makeDeployedAppsSelector } from './selectors'
 import store from 'app/store'
 import { cacheActions } from 'core/caching/cacheReducers'
 
@@ -70,35 +70,16 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
       return {
         id: app.Name,
         repository: parseRepoName(app.Name),
-        Score: app.Score,
-        ...app.Chart,
+        ...app,
+        // Score: app.Score,
+        // ...app.Chart,
       }
     })
   },
-  customOperations: {
-    deploy: async ({
-      clusterId,
-      namespace,
-      deploymentName,
-      repository,
-      chartName,
-      version,
-      dry = false,
-      values = undefined,
-    }) => {
-      const body = {
-        Name: deploymentName,
-        Chart: `${repository}/${chartName}`,
-        Dry: dry,
-        Version: version,
-        Vals: values,
-      }
-      await helm.deployChart(clusterId, namespace, body)
-      dispatch(cacheActions.clearCache({ cacheKey: ActionDataKeys.DeployedApps }))
-    },
-  },
+
   uniqueIdentifier: 'id',
   entityName: 'App Catalog',
+  selectorCreator: makeAppsSelector,
 })
 
 export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps, {
@@ -143,6 +124,35 @@ export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps,
       Name: name,
     }
     await helm.deleteRelease(clusterId, namespace, data)
+  },
+  customOperations: {
+    deploy: async (
+      {
+        clusterId,
+        namespace,
+        deploymentName,
+        repository,
+        chartName,
+        version,
+        dry = false,
+        values = undefined,
+      },
+      prevItems,
+    ) => {
+      const body = {
+        Name: deploymentName,
+        Chart: `${repository}/${chartName}`,
+        Dry: dry,
+        Version: version,
+        Vals: values,
+      }
+      await helm.deployChart(clusterId, namespace, body)
+
+      // Refetch the list of deployed apps under this clusterId and namespace
+      deployedAppActions.list({ clusterId, namespace }, true)
+
+      return prevItems
+    },
   },
   uniqueIdentifier: ['name', 'clusterId', 'namespace'],
   indexBy: ['clusterId', 'namespace'],
