@@ -176,7 +176,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
   const searchParams = new URLSearchParams(location.search)
   const linkedNodeUUID = searchParams.get('node') || null
 
-  const [selectedNode, setSelectedNode] = useState(null)
+  const [selectedNodeUuid, setSelectedNodeUuid] = useState(null)
   const [
     clusters,
     loadingClusters,
@@ -193,14 +193,15 @@ export const NodeHealthWithTasksToggler: FC = () => {
         .filter((node) => clusterNodesUids.includes(node.uuid))
         .sort(sortNodesByTasks)
 
-      const uuid = selectedNode ? selectedNode.uuid : linkedNodeUUID || filteredNodes[0]?.uuid
-      const nodeToSelect = filteredNodes.find((node) => node.uuid === uuid)
-      setSelectedNode(nodeToSelect || null) // always update as node data refreshes
+      const uuid = selectedNodeUuid || linkedNodeUUID || filteredNodes?.[0]?.uuid
+      if (uuid !== selectedNodeUuid) {
+        setSelectedNodeUuid(uuid || null)
+      }
 
       return filteredNodes
     }
     return emptyArr
-  }, [cluster, nodes, selectedNode])
+  }, [cluster, nodes, selectedNodeUuid])
 
   const handleReload = useCallback(
     (ignoreCache) => {
@@ -210,9 +211,14 @@ export const NodeHealthWithTasksToggler: FC = () => {
     [reloadClusters, reloadNodes],
   )
 
+  const selectedNode = useMemo(() => nodes.find((node) => selectedNodeUuid === node.uuid), [
+    selectedNodeUuid,
+  ])
+
   const classes = useStyles({})
   const kubeStatusData: Pf9KubeStatusData =
-    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || ({} as Pf9KubeStatusData)
   const selectedNodeAllTasks = kubeStatusData.all_tasks || []
   const selectedNodeCompletedTasks = kubeStatusData.completed_tasks || []
   const lastSelectedNodesFailedTask = kubeStatusData.last_failed_task || []
@@ -285,7 +291,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
                     [classes.nodeCardSelected]: selectedNode && selectedNode.uuid === node.uuid,
                   })}
                   elevation={0}
-                  onClick={() => setSelectedNode(node)}
+                  onClick={() => setSelectedNodeUuid(node.uuid)}
                 >
                   <article>
                     <Tooltip title={node.name}>
