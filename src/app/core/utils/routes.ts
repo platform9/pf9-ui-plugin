@@ -357,6 +357,29 @@ export const routes = {
       name: 'CloudProviders:Add',
     }),
   },
+  virtualMachines: {
+    list: Route.register({
+      url: `${pluginRoutePrefix}/virtual-machines`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'VirtualMachines:List',
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/virtual-machines/add`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'VirtualMachines:Add',
+    }),
+  },
+  workloads: Route.register({
+    url: `${pluginRoutePrefix}/workloads`,
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+    name: 'Workloads:Pods:List',
+  }),
   apps: {
     list: Route.register({
       url: `${pluginRoutePrefix}/apps`,
@@ -435,13 +458,6 @@ export const routes = {
       name: 'Pods:Add',
     }),
   },
-  workloads: Route.register({
-    url: `${pluginRoutePrefix}/workloads`,
-    defaultParams: {
-      plugin: AppPlugins.Kubernetes,
-    },
-    name: 'Workloads:Pods:List',
-  }),
   services: {
     list: Route.register({
       url: `${pluginRoutePrefix}/workloads#services`,

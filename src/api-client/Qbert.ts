@@ -33,6 +33,7 @@ import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
 import { createUrlWithQueryString } from 'core/utils/routes'
 import { ImportedCluster } from 'k8s/components/infrastructure/importedClusters/model'
+import { GetVirtualMachines } from 'k8s/components/virtual-machines/model'
 
 type AlertManagerRaw = Omit<Omit<AlertManagerAlert, 'clusterId'>, 'id'>
 
@@ -619,6 +620,64 @@ class Qbert extends ApiService {
       options: {
         clsName: this.getClassName(),
         mthdName: 'getReplicaSets',
+      },
+    })
+  }
+
+  getVirtualMachines = async (clusterId) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/virtualmachineinstances`
+    const data = await this.client.basicGet<GetVirtualMachines>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVirtualMachines',
+      },
+    })
+    console.log(JSON.stringify(data))
+    return data.items.map((item) => ({ ...item, clusterId }))
+  }
+
+  getVirtualMachineDetails = async (clusterId, namespace, name) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachines/${name}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVirtualMachine',
+      },
+    })
+  }
+
+  createVirtualMachine = async (clusterId, namespace, body) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachines`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createVirtualMachine',
+      },
+    })
+  }
+
+  updateVirtualMachine = async (clusterId, namespace, name) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachines/${name}`
+    return this.client.basicPut({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVirtualMachine',
+      },
+    })
+  }
+
+  deleteVirtualMachine = async (clusterId, namespace, name) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachines/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteVirtualMachine',
       },
     })
   }

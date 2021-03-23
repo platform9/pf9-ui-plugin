@@ -51,6 +51,7 @@ import EditAppDeploymentPage from './components/apps/edit-app-deployment-page'
 import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 import ImportedClusterDetailsPage from './components/infrastructure/importedClusters/imported-cluster-details'
+import VirtualMachinesPage from './components/virtual-machines'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -165,6 +166,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
       requiredRoles: 'admin',
       component: UpdateCloudProviderPage,
+    },
+    {
+      name: 'Virtual Machines',
+      link: { path: '/virtual-machines', exact: true },
+      requiredRoles: 'admin',
+      component: VirtualMachinesPage,
     },
     {
       name: 'App Catalog',
@@ -386,6 +393,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
+    { name: 'Virtual Machines', icon: 'window', ...clarityLink('/kubernetes/virtual-machines') },
     {
       name: 'Apps',
       ...clarityLink('/kubernetes/apps'),
@@ -438,6 +446,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
+    { name: 'Virtual Machines', icon: 'window', link: { path: '/virtual-machines' } },
     {
       name: 'Apps',
       link: { path: '/apps' },
