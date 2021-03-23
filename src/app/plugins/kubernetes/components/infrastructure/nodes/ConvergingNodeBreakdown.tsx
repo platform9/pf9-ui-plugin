@@ -193,8 +193,8 @@ export const NodeHealthWithTasksToggler: FC = () => {
         .filter((node) => clusterNodesUids.includes(node.uuid))
         .sort(sortNodesByTasks)
 
-      const uuid = selectedNodeUuid || linkedNodeUUID || filteredNodes?.[0]?.uuid
-      if (uuid !== selectedNodeUuid) {
+      const uuid = selectedNodeUuid || linkedNodeUUID || filteredNodes?.[0]?.uuid || null
+      if (uuid && uuid !== selectedNodeUuid) {
         setSelectedNodeUuid(uuid || null)
       }
 
