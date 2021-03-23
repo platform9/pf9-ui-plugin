@@ -71,8 +71,6 @@ export const appActions = createCRUDActions(ActionDataKeys.Apps, {
         id: app.Name,
         repository: parseRepoName(app.Name),
         ...app,
-        // Score: app.Score,
-        // ...app.Chart,
       }
     })
   },
