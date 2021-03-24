@@ -32,7 +32,7 @@ pushd ${WORKSPACE}/pf9-ui-plugin/build
         echo "INFO: Starting to update DU ${du}"
         # TODO: Need a dedicated login to target DU that can modify files owned by root
         scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no /tmp/ui.tgz ${SSH_USER}@${du}:/tmp/ui.tgz
-        ssh -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${SSH_USER}@${du} "cd /opt/pf9/www/public; tar xvzpf /tmp/ui.tgz && \rm /tmp/ui.tgz"
+        ssh -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${SSH_USER}@${du} "sudo chown -R ${SSH_USER} /opt/pf9/www/public; cd /opt/pf9/www/public; tar xvzpf /tmp/ui.tgz && \rm /tmp/ui.tgz"
         echo "INFO: Update completed for DU ${du}"
     done
     IFS=${OLD_IFS}
