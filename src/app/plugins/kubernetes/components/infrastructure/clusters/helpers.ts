@@ -149,8 +149,10 @@ export const createAwsCluster = async (data) => {
     body.numMaxWorkers = data.numMaxWorkers
   }
 
-  body.externalDnsName = data.usePf9Domain ? 'auto-generate' : sanitizeUrl(data.externalDnsName)
-  body.serviceFqdn = data.usePf9Domain ? 'auto-generate' : sanitizeUrl(data.serviceFqdn)
+  body.externalDnsName = data.usePf9Domain
+    ? 'auto-generate'
+    : sanitizeUrl(data.externalDnsName || '')
+  body.serviceFqdn = data.usePf9Domain ? 'auto-generate' : sanitizeUrl(data.serviceFqdn || '')
 
   // TODO: Follow up with backend team to find out why platform9.net is not showing up in the
   // domain list and why we are hard-coding this id.
