@@ -72,16 +72,19 @@ interface Props {
   onNext: any
 }
 
-const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled', 'networkPluginOperator', 'kubevirtPluginOperator']
+const clusterAddons = [
+  'etcdBackup',
+  'enableMetallbLayer2',
+  'prometheusMonitoringEnabled',
+  'networkPluginOperator',
+  'kubevirtPluginOperator',
+]
 const trackingFields = {
   platform: CloudProviders.PhysicalMachine,
   target: ClusterCreateTypes.MultiMaster,
 }
 
-const PhysicalMultiMasterCluster: FC<Props> = ({
-  onNext,
-  ...props
-}) => {
+const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
   const { wizardContext, setWizardContext } = props
   const classes = useStyles({})
   return (
@@ -119,7 +122,6 @@ const PhysicalMultiMasterCluster: FC<Props> = ({
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Network Stack</Text>
             <NetworkStack {...props} />
-              
 
             <Divider className={classes.divider} />
             <Text variant="caption1">Application & Container Settings</Text>
@@ -226,7 +228,7 @@ const PhysicalMultiMasterCluster: FC<Props> = ({
                   setWizardContext={setWizardContext}
                 />
                 {values.networkPlugin === NetworkBackendTypes.Calico && (
-                  <CalicoNetworkFields values={values} />
+                  <CalicoNetworkFields values={wizardContext} setValues={setWizardContext} />
                 )}
               </FormFieldCard>
             </>
