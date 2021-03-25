@@ -1,20 +1,13 @@
 import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Text from 'core/elements/text'
-import BulletList from 'core/components/BulletList'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-// import { eksHelpLink } from 'k8s/links'
-// import ExternalLink from 'core/components/ExternalLink'
 import { IconInfo } from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
-// import useDataLoader from 'core/hooks/useDataLoader'
-// import { cloudProviderActions } from '../../cloudProviders/actions'
-// import { CloudProviders } from '../../cloudProviders/model'
-// import AwsCloudProviderRequirementDialog from '../../clusters/aws/AwsCloudProviderRequirementDialog'
-// import { routes } from 'core/utils/routes'
 import ComingSoonDialog from './ComingSoonDialog'
 import { trackEvent } from 'utils/tracking'
+import ExternalLink from 'core/components/ExternalLink'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
@@ -41,10 +34,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     color: theme.palette.grey[700],
   },
 }))
-const GKEReqsLeftSection = [
-  'The cluster must be a public Google Kubernetes Engine (GKE) cluster ',
-  'GKE Cluster with no Public API Server access will be in read only mode',
-]
 
 const ImportGKERequirements = ({ onComplete, platform }) => {
   const classes = useStyles({})
@@ -94,12 +83,16 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
         </Text>
         <IconInfo
           icon="info-circle"
-          title="The following requirements must be met to be able to import and manage GKE Clusters:"
-        >
-          <div className={classes.requirements}>
-            <BulletList className={classes.bulletList} items={GKEReqsLeftSection} />
-          </div>
-        </IconInfo>
+          spacer={false}
+          title={
+            <span>
+              Coming Soon. Visit{' '}
+              <ExternalLink url="https://ideas.platform9.com/">ideas.platform9.com</ExternalLink> to
+              vote for Google GKE, engage with our product team and explore all of the new features
+              planned for Platform9.
+            </span>
+          }
+        />
         <div className={classes.actionRow}>
           <SubmitButton onClick={triggerDialog}>Import GKE Clusters</SubmitButton>
         </div>
