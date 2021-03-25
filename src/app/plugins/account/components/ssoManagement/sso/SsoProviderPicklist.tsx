@@ -14,6 +14,7 @@ const options = [
   { label: 'Google', value: SsoProviders.Google },
   { label: 'Okta', value: SsoProviders.Okta },
   { label: 'OneLogin', value: SsoProviders.OneLogin },
+  { label: 'Other', value: 'other' },
 ]
 
 interface Props {
