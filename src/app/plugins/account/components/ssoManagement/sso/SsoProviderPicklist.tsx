@@ -2,19 +2,14 @@ import React, { forwardRef, useEffect } from 'react'
 import { propOr, head } from 'ramda'
 import { allKey } from 'app/constants'
 import PicklistDefault from 'core/components/Picklist'
+import { SsoProviders } from './model'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
-
-enum SsoProviders {
-  Okta = 'okta',
-  OneLogin = 'oneLogin',
-  Google = 'google',
-}
 
 const options = [
   { label: 'Google', value: SsoProviders.Google },
   { label: 'Okta', value: SsoProviders.Okta },
   { label: 'OneLogin', value: SsoProviders.OneLogin },
-  { label: 'Other', value: 'other' },
+  { label: 'Other', value: SsoProviders.Other },
 ]
 
 interface Props {

@@ -19,6 +19,7 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import { createSsoConfig, deleteSsoConfig, loadSsoConfig } from './actions'
 import Progress from 'core/components/progress/Progress'
 import SsoEnabledDialog from './SsoEnabledDialog'
+import { SsoProviders } from './model'
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -89,7 +90,7 @@ const updateSsoSettings = (data, setLoading, setDialogOpened, updateParams) => {
     }
 
     const body = {
-      provider: data.ssoProvider === 'other' ? data.ssoProviderName : data.ssoProvider,
+      provider: data.ssoProvider === SsoProviders.Other ? data.ssoProviderName : data.ssoProvider,
       entity_id: data.entityId,
       metadata_url: data.metadataUrl,
       metadata: data.metadataUrl ? undefined : data.metadata,
@@ -175,7 +176,7 @@ const SsoPage = () => {
               ssoIsEnabled={params.ssoIsEnabled}
               checked={params.enableSso}
               onClick={toggleSso}
-            ></SsoToggle>
+            />
           </FormFieldCard>
           {params.enableSso && (
             <FormFieldCard title="Configure SSO">
@@ -187,7 +188,7 @@ const SsoPage = () => {
                 value={params.ssoProvider}
                 required
               />
-              {params.ssoProvider === 'other' && (
+              {params.ssoProvider === SsoProviders.Other && (
                 <TextField
                   id="ssoProviderName"
                   label="SSO Provider Name"
