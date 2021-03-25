@@ -69,6 +69,7 @@ export const initialContext = {
   privileged: true,
   allowWorkloadsOnMaster: false,
   useRoute53: false,
+  domainId: '',
 }
 
 const columns = [
@@ -394,7 +395,9 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     - MTU Size Field
                     
                 */}
-                {values.networkPlugin === 'calico' && <CalicoNetworkFields values={values} />}
+                {values.networkPlugin === 'calico' && (
+                  <CalicoNetworkFields values={wizardContext} setValues={setWizardContext} />
+                )}
               </FormFieldCard>
             </>
           )}

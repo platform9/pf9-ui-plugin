@@ -76,16 +76,19 @@ interface Props {
   onNext: any
 }
 
-const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled', 'networkPluginOperator', 'kubevirtPluginOperator']
+const clusterAddons = [
+  'etcdBackup',
+  'enableMetallbLayer2',
+  'prometheusMonitoringEnabled',
+  'networkPluginOperator',
+  'kubevirtPluginOperator',
+]
 const trackingFields = {
   platform: CloudProviders.VirtualMachine,
   target: ClusterCreateTypes.SingleMaster,
 }
 
-const VirtualSingleMasterCluster: FC<Props> = ({
-  onNext,
-  ...props
-}) => {
+const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
   const { wizardContext, setWizardContext } = props
   const classes = useStyles({})
   return (
@@ -120,7 +123,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({
           {/* Cluster Settings */}
           <FormFieldCard title="Cluster Settings">
             <KubernetesVersion />
-            
+
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Network Stack</Text>
             <NetworkStack {...props} />
@@ -226,7 +229,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({
                   setWizardContext={setWizardContext}
                 />
                 {values.networkPlugin === NetworkBackendTypes.Calico && (
-                  <CalicoNetworkFields values={values} />
+                  <CalicoNetworkFields values={wizardContext} setValues={setWizardContext} />
                 )}
               </FormFieldCard>
             </>

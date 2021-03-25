@@ -31,7 +31,7 @@ export default function WizardMeta<T>({
   fields,
   icon,
   className,
-  showContextPreview = false,
+  showContextPreview = localStorage.getItem('enableContextPreview') === 'true',
   renderLabels = (labels) => (
     <RenderLabels keyOverrides={keyOverrides} labels={labels} inverse split />
   ),
@@ -54,7 +54,11 @@ export default function WizardMeta<T>({
         {labels && renderLabels(labels)}
       </aside>
       {children}
-      {showContextPreview && <CodeBlock>{JSON.stringify(fields, null, 2)}</CodeBlock>}
+      {showContextPreview && (
+        <CodeBlock className={classes.contextPreview} fill>
+          {JSON.stringify(fields, null, 2)}
+        </CodeBlock>
+      )}
     </div>
   )
 }
@@ -69,6 +73,9 @@ const useStyles = makeStyles<Theme, { icon: boolean }>((theme) => ({
       display: 'grid',
       gridTemplateRows: ({ icon }) => `${icon ? '140px 20px ' : ''}repeat(auto-fill, 20px)`,
       gridGap: 4,
+    },
+    contextPreview: {
+      display: 'flex',
     },
   },
 }))

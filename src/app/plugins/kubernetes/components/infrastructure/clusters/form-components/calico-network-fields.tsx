@@ -43,10 +43,12 @@ const detectionMethodLabels = {
   'skip-interface': 'IFace Name Regex List',
 }
 
-const CalicoDetectionMethods = ({ values }) => (
+const CalicoDetectionMethods = ({ values, setValues }) => (
   <>
     <PicklistField
       id="calicoDetectionMethod"
+      value={values.calicoDetectionMethod}
+      onChange={(value) => setValues({ calicoDetectionMethod: value })}
       label="Interface Detection Method"
       options={calicoDetectionOptions}
       required
@@ -54,6 +56,8 @@ const CalicoDetectionMethods = ({ values }) => (
     {values.calicoDetectionMethod !== 'first-found' && (
       <TextField
         id="calicoDetectionMethodValue"
+        value={values.calicoDetectionMethodValue}
+        onChange={(value) => setValues({ calicoDetectionMethodValue: value })}
         info="Use the first valid IP address on the first enumerated interface (same logic as first-found above) that does NOT match with any of the specified interface name regexes. Regexes are separated by commas (e.g. eth.,enp0s.)."
         label={detectionMethodLabels[values.calicoDetectionMethod] || ''}
         required
@@ -62,30 +66,41 @@ const CalicoDetectionMethods = ({ values }) => (
   </>
 )
 
-const CalicoNetworkFields = ({ values }) => (
+const CalicoNetworkFields = ({ values, setValues }) => (
   <>
     <PicklistField
       id="calicoIpIpMode"
+      value={values.calicoIpIpMode}
+      onChange={(value) => setValues({ calicoIpIpMode: value })}
       label="IP in IP Encapsulation Mode"
       options={calicoIpIpOptions}
       info={calicoIpIPHelpText[values.calicoIpIpMode] || ''}
       required
     />
-    <CalicoDetectionMethods values={values} />
+    <CalicoDetectionMethods values={values} setValues={setValues} />
     <CheckboxField
       id="calicoNatOutgoing"
+      value={values.calicoNatOutgoing}
+      onChange={(value) => setValues({ calicoNatOutgoing: value })}
       label="NAT Outgoing"
       info="Packets destined outside the POD network will be SNAT'd using the node's IP."
     />
     <TextField
       id="calicoBlockSize"
+      value={values.calicoBlockSize}
+      onChange={(value) => setValues({ calicoBlockSize: value })}
       label="Block Size"
       info={calicoBlockSizeTooltip?.[values.networkStack]}
       required
-      validations={[ipValidators?.[values.networkStack]?.blockSizeValidator, ipValidators?.[values.networkStack]?.calicoBlockSizeCIDRValidator]}
+      validations={[
+        ipValidators?.[values.networkStack]?.blockSizeValidator,
+        ipValidators?.[values.networkStack]?.calicoBlockSizeCIDRValidator,
+      ]}
     />
     <TextField
       id="mtuSize"
+      value={values.mtuSizees}
+      onChange={(value) => setValues({ mtuSize: value })}
       label="MTU Size"
       info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
       required
