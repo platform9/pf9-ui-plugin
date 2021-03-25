@@ -1,20 +1,14 @@
 import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Text from 'core/elements/text'
-import BulletList from 'core/components/BulletList'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-// import { aksHelpLink } from 'k8s/links'
-// import ExternalLink from 'core/components/ExternalLink'
 import { IconInfo } from 'core/components/validatedForm/Info'
 import Theme from 'core/themes/model'
-// import useDataLoader from 'core/hooks/useDataLoader'
-// import { cloudProviderActions } from '../../cloudProviders/actions'
-// import { CloudProviders } from '../../cloudProviders/model'
-// import { routes } from 'core/utils/routes'
 import AzureCloudProviderRequirementDialog from '../azure/AzureCloudProviderRequirementDialog'
 import ComingSoonDialog from './ComingSoonDialog'
 import { trackEvent } from 'utils/tracking'
+import ExternalLink from 'core/components/ExternalLink'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
@@ -22,6 +16,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     flexFlow: 'row nowrap',
     justifyContent: 'space-between',
     margin: theme.spacing(2, 4, 1, 4),
+  },
+  infoComingSoon: {
+    margin: theme.spacing(0, 4),
   },
   text: {
     marginTop: theme.spacing(0.5),
@@ -41,10 +38,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     color: theme.palette.grey[700],
   },
 }))
-const AzureReqsLeftSection = [
-  'The API Server for the AKS Cluster must accessable on a Public IP or Public Load balancer',
-  'AKS Cluster with no Public API Server access will be in read only mode',
-]
 
 const ImportAKSRequirements = ({ onComplete, platform }) => {
   const classes = useStyles({})
@@ -89,18 +82,15 @@ const ImportAKSRequirements = ({ onComplete, platform }) => {
         // }
       >
         <Text variant="body2" className={classes.text}>
-          Platform9 is able to connect to Azure and import AKS clusters to bring them under
-          management.
+          Coming Soon: Platform9 is building the ability to connect to Azure and import AKS clusters
+          to bring them under management.
         </Text>
-        <Text variant="body2" className={classes.text}>
-          This feature is coming soon.
-        </Text>
-        <IconInfo
-          icon="info-circle"
-          title="The following requirements must be met to be able to import and manage AKS Clusters:"
-        >
-          <div className={classes.requirements}>
-            <BulletList className={classes.bulletList} items={AzureReqsLeftSection} />
+        <IconInfo icon="info-circle" spacer={false} title="Coming Soon">
+          <div className={classes.infoComingSoon}>
+            Visit{' '}
+            <ExternalLink url="https://ideas.platform9.com/">ideas.platform9.com</ExternalLink> to
+            vote for Azure AKS, engage with our product team and explore all of the new features
+            planned for Platform9.
           </div>
         </IconInfo>
         <div className={classes.actionRow}>

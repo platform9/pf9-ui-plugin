@@ -109,7 +109,7 @@ const Info = ({
 
 export const IconInfo: FC<{
   icon: string
-  title: string
+  title: string | React.ReactNode
   spacer?: boolean
   className?: string
 }> = ({ icon, title, children, className = '', spacer = true }) => {

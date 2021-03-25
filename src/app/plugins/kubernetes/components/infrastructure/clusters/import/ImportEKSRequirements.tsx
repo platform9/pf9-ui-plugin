@@ -74,8 +74,10 @@ const ImportEKSRequirements = ({ onComplete, platform }) => {
         }
       >
         <Text variant="body2" className={classes.text}>
-          Platform9 is able to connect to AWS and import EKS clusters to bring them under
-          management.
+          Platform9 is able to connect to AWS and import existing EKS clusters to bring them under
+          management. Once connected to Platform9 you will be able to deploy Platform9 Monitoring,
+          leverage the Application Catalog to deploy apps and configure RBAC, Pods, Deployments and
+          Services.
         </Text>
         <IconInfo
           icon="info-circle"

@@ -51,6 +51,7 @@ import EditAppDeploymentPage from './components/apps/edit-app-deployment-page'
 import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 import ImportedClusterDetailsPage from './components/infrastructure/importedClusters/imported-cluster-details'
+import { isDecco } from 'core/utils/helpers'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -169,6 +170,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     {
       name: 'App Catalog',
       link: { path: '/apps', exact: true },
+      requiredFeatures: isDecco,
       component: AppsIndexPage,
     },
     {
@@ -390,6 +392,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Apps',
       ...clarityLink('/kubernetes/apps'),
       icon: 'th',
+      requiredFeatures: isDecco,
       nestedLinks: [
         { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
         { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
@@ -442,6 +445,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Apps',
       link: { path: '/apps' },
       icon: 'th',
+      requiredFeatures: isDecco,
       nestedLinks: [
         { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
         { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
