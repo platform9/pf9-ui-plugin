@@ -17,6 +17,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     justifyContent: 'space-between',
     margin: theme.spacing(2, 4, 1, 4),
   },
+  infoComingSoon: {
+    margin: theme.spacing(0, 4),
+  },
   text: {
     marginTop: theme.spacing(0.5),
     marginLeft: theme.spacing(3),
@@ -82,18 +85,14 @@ const ImportAKSRequirements = ({ onComplete, platform }) => {
           Coming Soon: Platform9 is building the ability to connect to Azure and import AKS clusters
           to bring them under management.
         </Text>
-        <IconInfo
-          icon="info-circle"
-          spacer={false}
-          title={
-            <span>
-              Coming Soon. Visit{' '}
-              <ExternalLink url="https://ideas.platform9.com/">ideas.platform9.com</ExternalLink> to
-              vote for Azure AKS, engage with our product team and explore all of the new features
-              planned for Platform9.
-            </span>
-          }
-        />
+        <IconInfo icon="info-circle" spacer={false} title="Coming Soon">
+          <div className={classes.infoComingSoon}>
+            Visit{' '}
+            <ExternalLink url="https://ideas.platform9.com/">ideas.platform9.com</ExternalLink> to
+            vote for Azure AKS, engage with our product team and explore all of the new features
+            planned for Platform9.
+          </div>
+        </IconInfo>
         <div className={classes.actionRow}>
           <SubmitButton onClick={triggerDialog}>Import AKS Clusters</SubmitButton>
         </div>

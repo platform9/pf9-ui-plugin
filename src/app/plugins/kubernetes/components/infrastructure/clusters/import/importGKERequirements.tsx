@@ -16,6 +16,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     justifyContent: 'space-between',
     margin: theme.spacing(2, 4, 1, 4),
   },
+  infoComingSoon: {
+    margin: theme.spacing(0, 4),
+  },
   text: {
     marginTop: theme.spacing(0.5),
     marginLeft: theme.spacing(3),
@@ -78,21 +81,14 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
           Coming Soon: Platform9 is building the ability to connect to Google and import GKE
           clusters to bring them under management
         </Text>
-        <Text variant="body2" className={classes.text}>
-          This feature is coming soon.
-        </Text>
-        <IconInfo
-          icon="info-circle"
-          spacer={false}
-          title={
-            <span>
-              Coming Soon. Visit{' '}
-              <ExternalLink url="https://ideas.platform9.com/">ideas.platform9.com</ExternalLink> to
-              vote for Google GKE, engage with our product team and explore all of the new features
-              planned for Platform9.
-            </span>
-          }
-        />
+        <IconInfo icon="info-circle" spacer={false} title="Coming Soon">
+          <div className={classes.infoComingSoon}>
+            Visit{' '}
+            <ExternalLink url="https://ideas.platform9.com/">ideas.platform9.com</ExternalLink> to
+            vote for Google GKE, engage with our product team and explore all of the new features
+            planned for Platform9.
+          </div>
+        </IconInfo>
         <div className={classes.actionRow}>
           <SubmitButton onClick={triggerDialog}>Import GKE Clusters</SubmitButton>
         </div>
