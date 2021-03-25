@@ -188,19 +188,14 @@ const SsoPage = () => {
                 required
               />
               {params.ssoProvider === 'other' && (
-                <>
-                  <Text variant="caption1" className={classes.wizardLabel}>
-                    SSO Provider Name
-                  </Text>
-                  <TextField
-                    id="ssoProviderName"
-                    label="SSO Provider Name"
-                    onChange={getParamsUpdater('ssoProviderName')}
-                    value={params.ssoProviderName}
-                    info="Provide a name to identify your SSO provider"
-                    required
-                  />
-                </>
+                <TextField
+                  id="ssoProviderName"
+                  label="SSO Provider Name"
+                  onChange={getParamsUpdater('ssoProviderName')}
+                  value={params.ssoProviderName}
+                  info="Provide a name to identify your SSO provider"
+                  required
+                />
               )}
               <Text variant="caption1" className={classes.wizardLabel}>
                 Entity Endpoint for your SSO Provider
