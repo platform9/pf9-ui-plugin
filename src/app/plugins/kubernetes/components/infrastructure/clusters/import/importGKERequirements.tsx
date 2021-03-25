@@ -75,8 +75,8 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
         // }
       >
         <Text variant="body2" className={classes.text}>
-          Platform9 is able to connect to Google and import GKE clusters to bring them under
-          management.
+          Coming Soon: Platform9 is building the ability to connect to Google and import GKE
+          clusters to bring them under management
         </Text>
         <Text variant="body2" className={classes.text}>
           This feature is coming soon.
