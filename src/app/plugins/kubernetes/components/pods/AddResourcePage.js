@@ -127,7 +127,11 @@ const codeMirrorValidations = [
 export const AddResourceForm = ({ resourceType = 'pod' }) => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const { params, getParamsUpdater, updateParams } = useParams({ resourceType })
+  const defaultParams = {
+    resourceType,
+    clusterId: '', // Initialize here to prevent desync with formContext
+  }
+  const { params, getParamsUpdater, updateParams } = useParams(defaultParams)
   const onComplete = useCallback(() => history.push(listRoutes[params.resourceType].toString()), [
     history,
   ])
@@ -170,6 +174,7 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
             label="Cluster"
             info="The cluster to deploy this resource on"
             onChange={getParamsUpdater('clusterId')}
+            value={params.clusterId}
             required
           />
           <PicklistField
@@ -178,7 +183,9 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
             id="namespace"
             label="Namespace"
             info="The namespace to deploy this resource on"
+            onChange={getParamsUpdater('namespace')}
             clusterId={params.clusterId}
+            value={params.namespace}
             required
           />
           <CodeMirror
