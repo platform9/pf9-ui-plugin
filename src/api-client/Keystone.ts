@@ -336,6 +336,17 @@ class Keystone extends ApiService {
     }
   }
 
+  getIdpProtocols = async () => {
+    const data = await this.client.basicGet<any>({
+      url: `${this.identityProvidersUrl}/IDP1/protocols`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getIdpProtocols',
+      },
+    })
+    return data.protocols
+  }
+
   addIdpProtocol = async (mappingId) => {
     const body = {
       protocol: {

@@ -117,6 +117,8 @@ export const mngmGroupMappingActions = createCRUDActions(ActionDataKeys.Manageme
 
 export const loadGroupRoleAssignments = async (groupId) => keystone.getGroupRoleAssignments(groupId)
 
+export const loadIdpProtocols = async () => keystone.getIdpProtocols()
+
 // Not using below at the moment, this loads once and is stored in cache,
 // and is never updated again. Setting cache to false or invalidating cache doesn't work
 // export const mngmGroupRoleAssignmentsLoader = createContextLoader(
@@ -132,7 +134,12 @@ export const loadGroupRoleAssignments = async (groupId) => keystone.getGroupRole
 //   },
 // )
 
-export const groupFormSubmission = async ({ params, existingMapping, operation }) => {
+export const groupFormSubmission = async ({
+  params,
+  existingMapping,
+  operation,
+  protocolExists,
+}) => {
   // Create/update the group and get the group id
   const groupBody = {
     name: params.name,
@@ -187,7 +194,7 @@ export const groupFormSubmission = async ({ params, existingMapping, operation }
   }
 
   // Link the IDP with the newly created mapping
-  if (!existingMapping) {
+  if (!protocolExists) {
     await keystone.addIdpProtocol(defaultGroupMappingId)
   }
 
