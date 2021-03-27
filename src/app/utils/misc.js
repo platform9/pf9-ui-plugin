@@ -180,7 +180,7 @@ export const capitalizeString = (inputStr) =>
  * @param {string} str
  * @returns {string}
  */
-export const sanitizeUrl = (str) =>
+export const sanitizeUrl = (str = '') =>
   str
     .replace(/[^a-zA-Z0-9-_.]/g, '-') // replace non-valid url characters with hyphen
     .replace(/^-+/, '') // eliminate leading hyphens

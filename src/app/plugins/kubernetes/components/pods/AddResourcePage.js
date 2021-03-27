@@ -72,7 +72,10 @@ kind: Deployment
 metadata:
   name: nginx-deployment
 spec:
-  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 3 # tells deployment to run 2 pods matching the template
   template:
     metadata:
       labels:
@@ -80,7 +83,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.7.9
+        image: nginx:1.14.2
         ports:
         - containerPort: 80
 `,

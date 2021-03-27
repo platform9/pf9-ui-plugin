@@ -32,6 +32,10 @@ import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import ClusterDeployedApps from './cluster-deployed-apps'
+import { isDecco } from 'core/utils/helpers'
+import { useSelector } from 'react-redux'
+import { prop } from 'ramda'
+import { sessionStoreKey } from 'core/session/sessionReducers'
 
 const oneSecond = 1000
 
@@ -189,6 +193,8 @@ const ClusterDetailsPage = () => {
   const [clusters, loading, reload] = useDataLoader(clusterActions.list, undefined, {
     loadingFeedback: false,
   })
+  const session = useSelector(prop(sessionStoreKey))
+  const { features } = session
   const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
   const clusterHeader = (
     <>
@@ -221,12 +227,14 @@ const ClusterDetailsPage = () => {
             <ClusterInfo />
           </div>
         </Tab>
-        <Tab value="deployedApps" label="Deployed Apps">
-          <div className={classes.tabContainer}>
-            {clusterHeader}
-            <ClusterDeployedApps cluster={cluster} />
-          </div>
-        </Tab>
+        {isDecco(features) && (
+          <Tab value="deployedApps" label="Deployed Apps">
+            <div className={classes.tabContainer}>
+              {clusterHeader}
+              <ClusterDeployedApps cluster={cluster} />
+            </div>
+          </Tab>
+        )}
       </Tabs>
     </PageContainer>
   )
