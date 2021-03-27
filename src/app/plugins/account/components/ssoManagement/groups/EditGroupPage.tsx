@@ -120,7 +120,12 @@ const EditGroupPage = () => {
 
   const submitForm = async (params) => {
     updateSubmitting(true)
-    const success = await groupFormSubmission({ params, existingMapping, operation: 'update' })
+    const success = await groupFormSubmission({
+      params,
+      existingMapping,
+      operation: 'update',
+      protocolExists: true,
+    })
     if (!success) {
       updateSubmitting(false)
       return
