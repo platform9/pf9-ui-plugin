@@ -26,6 +26,27 @@ const authMethods = {
   [LoginMethodTypes.SSO]: async (_u, _p, _t) => keystone.authenticateSso(),
 }
 
+const reauthenticateUser = async ({ email, currentPassword }) => {
+  const state = store.getState()
+  const userAuthInfo = await authenticateUser({
+    loginUsername: email,
+    password: currentPassword,
+    loginMethod: LoginMethodTypes.Local,
+    MFAcheckbox: false,
+    mfa: '',
+    reauthenticating: true,
+  })
+
+  const currentTenantId = state[preferencesStoreKey][email].root.currentTenant
+
+  await updateSession({
+    ...userAuthInfo,
+    currentTenantId,
+    password: currentPassword,
+    changeProjectScopeWithCredentials: true,
+  })
+}
+
 export const authenticateUser = async ({
   loginUsername,
   password,
@@ -195,29 +216,6 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
       options: options,
     })
 
-    // If updating password of active user, reauthenticate the user
-    const state = store.getState()
-    const activeUser = state[sessionStoreKey].userDetails
-    if (userId === activeUser.id && password != undefined) {
-      const userAuthInfo = await authenticateUser({
-        loginUsername: username,
-        password,
-        loginMethod: LoginMethodTypes.Local,
-        MFAcheckbox: false,
-        mfa: '',
-        reauthenticating: true,
-      })
-
-      const currentTenantId = state[preferencesStoreKey][username].root.currentTenant
-
-      await updateSession({
-        ...userAuthInfo,
-        currentTenantId,
-        password,
-        changeProjectScopeWithCredentials: true,
-      })
-    }
-
     if (!roleAssignments) {
       return updatedUser
     }
@@ -291,3 +289,23 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
     indexBy: 'userId',
   },
 )
+
+export const updateUserPassword = async ({ id, email, currentPassword, newPassword }) => {
+  try {
+    // User must be authenticated before making a password change request
+    await reauthenticateUser({ email, currentPassword })
+
+    const params = {
+      password: newPassword,
+      original_password: currentPassword,
+    }
+    await keystone.updateUserPassword(id, params)
+
+    // User must be authenticated again after a password change
+    await reauthenticateUser({ email, currentPassword: newPassword })
+  } catch (err) {
+    console.warn(err.message)
+    return false
+  }
+  return true
+}
