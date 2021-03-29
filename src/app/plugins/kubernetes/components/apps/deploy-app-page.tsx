@@ -19,7 +19,7 @@ import AddNewNamespaceDialog from './add-new-namespace-dialog'
 import useReactRouter from 'use-react-router'
 import AppVersionPicklistField from './app-version-picklist-field'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { appActions, appDetailsLoader } from './actions'
+import { appDetailsLoader, deployedAppActions } from './actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -132,8 +132,8 @@ const DeployAppPage = () => {
     repository,
   })
   const [repositories, loadingRepositories] = useDataLoader(repositoryActions.list)
-  const anyAppActions = appActions as any
-  const [deploy, deploying] = useDataUpdater(anyAppActions.deploy)
+  const anyDeployedAppActions = deployedAppActions as any
+  const [deploy, deploying] = useDataUpdater(anyDeployedAppActions.deploy)
 
   const defaultValues = useMemo(() => JSON.stringify(appDetail?.values, null, 1), [appDetail])
 

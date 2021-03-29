@@ -1,6 +1,14 @@
 import ApiService from 'api-client/ApiService'
 import { createUrlWithQueryString } from 'core/utils/routes'
 import config from '../../config'
+import {
+  App,
+  AppDetails,
+  DeployedApp,
+  DeployedAppDetails,
+  RepositoriesForCluster,
+  Repository,
+} from './helm.model'
 
 class Helm extends ApiService {
   public getClassName() {
@@ -28,7 +36,7 @@ class Helm extends ApiService {
 
   getRepositories = async () => {
     const url = `${this.baseUrl}/repos`
-    return this.client.basicGet({
+    return this.client.basicGet<Repository[]>({
       url,
       options: {
         clsName: this.getClassName(),
@@ -135,7 +143,7 @@ class Helm extends ApiService {
 
   getRepositoriesForCluster = async (clusterId) => {
     const url = `${this.baseUrl}/clusters/${clusterId}/repos`
-    return this.client.basicGet({
+    return this.client.basicGet<RepositoriesForCluster[]>({
       url,
       options: {
         clsName: this.getClassName(),
@@ -146,7 +154,7 @@ class Helm extends ApiService {
 
   getCharts = async () => {
     const url = `${this.baseUrl}/charts`
-    return this.client.basicGet({
+    return this.client.basicGet<App[]>({
       url,
       options: {
         clsName: this.getClassName(),
@@ -168,7 +176,7 @@ class Helm extends ApiService {
 
   getChartInfo = async (repoName, name, params) => {
     const url = createUrlWithQueryString(`${this.baseUrl}/charts/${repoName}/${name}/info`, params)
-    return this.client.basicGet({
+    return this.client.basicGet<AppDetails>({
       url,
       options: {
         clsName: this.getClassName(),
@@ -191,7 +199,7 @@ class Helm extends ApiService {
 
   getReleases = async (clusterId, namespace) => {
     const url = `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases`
-    return this.client.basicGet({
+    return this.client.basicGet<DeployedApp[]>({
       url,
       options: {
         clsName: this.getClassName(),
@@ -226,7 +234,7 @@ class Helm extends ApiService {
 
   getReleaseInfo = async (clusterId, namespace, releaseName) => {
     const url = `${this.baseUrl}/clusters/${clusterId}/namespaces/${namespace}/releases/${releaseName}`
-    return this.client.basicGet({
+    return this.client.basicGet<DeployedAppDetails>({
       url,
       options: {
         clsName: this.getClassName(),

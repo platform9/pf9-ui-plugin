@@ -15,6 +15,9 @@ import Progress from 'core/components/progress/Progress'
 import { repositoriesForClusterLoader } from 'k8s/components/repositories/actions'
 import DisconnectRepositoryDialog from 'k8s/components/repositories/disconnect-repository-dialog'
 import { allKey } from 'app/constants'
+import { IUseDataLoader } from '../nodes/model'
+import { IAppsAvailableToClusterAction, IDeployedAppsSelector } from 'k8s/components/apps/models'
+import { RepositoriesForCluster } from 'api-client/helm.model'
 import ExternalLink from 'core/components/ExternalLink'
 import BulletList from 'core/components/BulletList'
 
@@ -221,22 +224,26 @@ const ClusterDeployedApps = ({ cluster }) => {
     appsAvailableToCluster,
     loadingAppsAvailableToCluster,
     reloadAppsAvailableToCluster,
-  ] = useDataLoader(appsAvailableToClusterLoader, { clusterId: cluster.uuid })
+  ]: IUseDataLoader<IAppsAvailableToClusterAction> = useDataLoader(appsAvailableToClusterLoader, {
+    clusterId: cluster.uuid,
+  }) as any
 
-  const [deployedApps, loadingDeployedApps, reloadDeployedApps] = useDataLoader(
-    deployedAppActions.list,
-    {
-      clusterId: cluster.uuid,
-      namespace: allKey,
-    },
-  )
+  const [
+    deployedApps,
+    loadingDeployedApps,
+    reloadDeployedApps,
+  ]: IUseDataLoader<IDeployedAppsSelector> = useDataLoader(deployedAppActions.list, {
+    clusterId: cluster.uuid,
+    namespace: allKey,
+  }) as any
 
-  const [repositories, loadingRepositories, reloadRepositories] = useDataLoader(
-    repositoriesForClusterLoader,
-    {
-      clusterId: cluster.uuid,
-    },
-  )
+  const [
+    repositories,
+    loadingRepositories,
+    reloadRepositories,
+  ]: IUseDataLoader<RepositoriesForCluster> = useDataLoader(repositoriesForClusterLoader, {
+    clusterId: cluster.uuid,
+  }) as any
 
   const filteredDeployedApps = useMemo(
     () => deployedApps.filter((app) => app.status !== 'uninstalling'),
