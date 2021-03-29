@@ -146,7 +146,7 @@ const MyProfilePage = () => {
     const success = await updateUserPassword({ id: userId, email, currentPassword, newPassword })
     setUpdatingPassword(false)
     if (!success) {
-      setErrorMessage('Unable to update password')
+      setErrorMessage('Unable to update password. Current password may be incorrect')
     }
   }
 
