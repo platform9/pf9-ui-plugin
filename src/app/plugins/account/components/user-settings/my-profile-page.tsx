@@ -137,13 +137,12 @@ const MyProfilePage = () => {
   }
 
   const handlePasswordUpdate = async ({ currentPassword, newPassword, confirmedPassword }) => {
-    setUpdatingPassword(true)
     if (newPassword !== confirmedPassword) {
-      setUpdatingPassword(false)
       setErrorMessage('New passwords do not match.')
       return
     }
     setErrorMessage('')
+    setUpdatingPassword(true)
     const success = await updateUserPassword({ id: userId, email, currentPassword, newPassword })
     setUpdatingPassword(false)
     if (!success) {
