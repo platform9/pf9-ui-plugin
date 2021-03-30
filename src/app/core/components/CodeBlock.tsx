@@ -18,14 +18,14 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   pre: {
     fontWeight: 600,
     fontFamily: 'monospace',
-    display: 'inline-block',
+    display: ({ fill }) => (fill ? 'flex' : 'inline-block'),
     backgroundColor: theme.components.code.background,
     color: theme.components.code.text,
     padding: theme.spacing(),
     margin: theme.spacing(0.5),
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',
-    maxHeight: 400,
+    maxHeight: ({ fill }) => (fill ? 'initial' : 400),
     overflow: 'auto',
     flexGrow: ({ fill }) => (fill ? 1 : 0),
 

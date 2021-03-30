@@ -15,6 +15,11 @@ import Progress from 'core/components/progress/Progress'
 import { repositoriesForClusterLoader } from 'k8s/components/repositories/actions'
 import DisconnectRepositoryDialog from 'k8s/components/repositories/disconnect-repository-dialog'
 import { allKey } from 'app/constants'
+import { IUseDataLoader } from '../nodes/model'
+import { IAppsAvailableToClusterAction, IDeployedAppsSelector } from 'k8s/components/apps/models'
+import { RepositoriesForCluster } from 'api-client/helm.model'
+import ExternalLink from 'core/components/ExternalLink'
+import BulletList from 'core/components/BulletList'
 
 const useInfoCardStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -38,11 +43,13 @@ const useInfoCardStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(1),
   },
   emptyMessageDiv: {
-    marginTop: theme.spacing(2),
-    padding: theme.spacing(2),
+    padding: theme.spacing(1),
     '& p': {
       color: theme.palette.grey[700],
     },
+  },
+  emptyMessageBulletList: {
+    margin: theme.spacing(1, 0),
   },
 }))
 
@@ -53,9 +60,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     gridGap: theme.spacing(2),
     minWidth: '1200px',
     marginBottom: theme.spacing(2),
-  },
-  overviewCard: {
-    height: 'max-content',
+    alignItems: 'stretch',
   },
   repositoriesCard: {
     maxHeight: '280px',
@@ -80,8 +85,35 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const noRepositoriesMessage =
-  'There are no repositories connected to this cluster. Connect a repository to enable access to applications to deploy.'
+const NoRepositoriesMessage = () => {
+  const classes = useInfoCardStyles()
+  return (
+    <>
+      There are no Helm Application repositories connected to this cluster. Try connecting
+      <BulletList
+        className={classes.emptyMessageBulletList}
+        type="dash"
+        items={[
+          <span>
+            Ingress NGINX:{' '}
+            <ExternalLink url="https://helm.nginx.com/stable">helm.nginx.com/stable</ExternalLink>
+          </span>,
+          <span>
+            Registry Harbor:{' '}
+            <ExternalLink url="https://helm.goharbor.io">helm.goharbor.io</ExternalLink>
+          </span>,
+          <span>
+            Certificate Management:{' '}
+            <ExternalLink url="https://charts.jetstack.io">charts.jetstack.io</ExternalLink>
+          </span>,
+        ]}
+      />
+      Visit <ExternalLink url="https://artifacthub.io">artifacthub.io</ExternalLink> to explore all
+      the great Helm enabled applications
+    </>
+  )
+}
+// 'There are no repositories connected to this cluster. Connect a repository to enable access to applications to deploy.'
 
 interface InfoCardProps {
   title: string
@@ -90,7 +122,7 @@ interface InfoCardProps {
   buttonAction: (value) => void
   disableButton?: boolean
   items: any
-  emptyItemsMessage?: string
+  emptyItemsMessage?: string | React.ReactNode
 }
 
 const InfoCard = ({
@@ -192,22 +224,26 @@ const ClusterDeployedApps = ({ cluster }) => {
     appsAvailableToCluster,
     loadingAppsAvailableToCluster,
     reloadAppsAvailableToCluster,
-  ] = useDataLoader(appsAvailableToClusterLoader, { clusterId: cluster.uuid })
+  ]: IUseDataLoader<IAppsAvailableToClusterAction> = useDataLoader(appsAvailableToClusterLoader, {
+    clusterId: cluster.uuid,
+  }) as any
 
-  const [deployedApps, loadingDeployedApps, reloadDeployedApps] = useDataLoader(
-    deployedAppActions.list,
-    {
-      clusterId: cluster.uuid,
-      namespace: allKey,
-    },
-  )
+  const [
+    deployedApps,
+    loadingDeployedApps,
+    reloadDeployedApps,
+  ]: IUseDataLoader<IDeployedAppsSelector> = useDataLoader(deployedAppActions.list, {
+    clusterId: cluster.uuid,
+    namespace: allKey,
+  }) as any
 
-  const [repositories, loadingRepositories, reloadRepositories] = useDataLoader(
-    repositoriesForClusterLoader,
-    {
-      clusterId: cluster.uuid,
-    },
-  )
+  const [
+    repositories,
+    loadingRepositories,
+    reloadRepositories,
+  ]: IUseDataLoader<RepositoriesForCluster> = useDataLoader(repositoriesForClusterLoader, {
+    clusterId: cluster.uuid,
+  }) as any
 
   const filteredDeployedApps = useMemo(
     () => deployedApps.filter((app) => app.status !== 'uninstalling'),
@@ -304,7 +340,6 @@ const ClusterDeployedApps = ({ cluster }) => {
         <div className={classes.cardsContainer}>
           <InfoCard
             title="OVERVIEW"
-            className={classes.overviewCard}
             buttonText="Deploy App"
             buttonAction={() => history.push(routes.apps.list.path())}
             disableButton={numRepositories === 0}
@@ -316,7 +351,7 @@ const ClusterDeployedApps = ({ cluster }) => {
             buttonText="Connect Repository"
             buttonAction={() => history.push(routes.repositories.add.path())}
             items={repositoryFields}
-            emptyItemsMessage={noRepositoriesMessage}
+            emptyItemsMessage={<NoRepositoriesMessage />}
           />
         </div>
         <ClusterDeployedAppsTable

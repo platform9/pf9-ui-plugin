@@ -18,6 +18,8 @@ import { ClusterTag } from 'api-client/appbert.model'
 import { IAlertOverTime } from './components/alarms/model'
 import { IAlertRule } from './components/monitoring/model'
 import { IVirtualMachine } from './components/virtual-machines/model'
+import { IAppsAction } from './components/apps/models'
+import { DeployedApp, Repository } from 'api-client/helm.model'
 
 export interface GlobalState {
   cachedData: IDataKeys
@@ -37,12 +39,11 @@ export interface IDataKeys {
   KubeServices: Array<IGenericResource<GetClusterKubeServicesItem>>
   Namespaces: Array<IGenericResource<GetClusterNamespacesItem>>
   AppDetails: any // no model for this yet
-  Apps: any // no model for this yet
+  Apps: IAppsAction[]
   AppVersions: any // no model for this yet
   ApiGroups: any // no model for this yet
-  DeployedApps: any // no model for this yet
-  RepositoriesWithClusters: any // no model for this yet
-  Repositories: any // no model for this yet
+  DeployedApps: DeployedApp[]
+  Repositories: Repository[]
   CloudProviders: GetCloudProvider[]
   CloudProviderDetails: any // no model for this yet
   CloudProviderRegionDetails: any // no model for this yet
