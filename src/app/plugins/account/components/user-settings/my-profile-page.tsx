@@ -139,6 +139,7 @@ const MyProfilePage = () => {
   const handlePasswordUpdate = async ({ currentPassword, newPassword, confirmedPassword }) => {
     setUpdatingPassword(true)
     if (newPassword !== confirmedPassword) {
+      setUpdatingPassword(false)
       setErrorMessage('New passwords do not match.')
       return
     }
