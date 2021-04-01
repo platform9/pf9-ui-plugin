@@ -17,7 +17,7 @@ import { IClusterAction } from './components/infrastructure/clusters/model'
 import { ClusterTag } from 'api-client/appbert.model'
 import { IAlertOverTime } from './components/alarms/model'
 import { IAlertRule } from './components/monitoring/model'
-import { IAppsAction } from './components/apps/models'
+import { IAppsAction } from './components/app-catalog/models'
 import { DeployedApp, Repository } from 'api-client/helm.model'
 
 export interface GlobalState {

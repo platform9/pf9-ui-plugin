@@ -5,9 +5,11 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { routes } from 'core/utils/routes'
 import DataKeys from 'k8s/DataKeys'
 import { pick } from 'ramda'
-import React, { useMemo } from 'react'
-import ClusterPicklistDefault from '../common/ClusterPicklist'
-import NamespacePicklistDefault from '../common/NamespacePicklist'
+import React, { useCallback, useMemo } from 'react'
+import ClusterPicklistDefault from '../../common/ClusterPicklist'
+import NamespacePicklistDefault from '../../common/NamespacePicklist'
+import { repositoryActions } from '../repositories/actions'
+import NoRepositoriesMessage from '../repositories/no-repositories-message'
 import { deployedAppActions } from './actions'
 const ClusterPicklist: any = ClusterPicklistDefault
 const NamespacePicklist: any = NamespacePicklistDefault
@@ -19,24 +21,42 @@ const usePrefParams = createUsePrefParamsHook('Deployed Apps', listTablePrefs)
 
 const ListPage = ({ ListContainer }) => {
   return () => {
-    const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [deployedApps, loading, reload] = useDataLoader(deployedAppActions.list, params)
+    const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
+    const [deployedApps, loadingDeployedApps, reload] = useDataLoader(
+      deployedAppActions.list,
+      params,
+    )
+    const [repositories, loadingRepositories] = useDataLoader(repositoryActions.list)
 
     const filteredDeployedApps = useMemo(
       () => deployedApps.filter((app) => app.status !== 'uninstalling'),
       [deployedApps],
     )
 
+    const noRepositoriesMessage = useMemo(
+      () => (repositories && repositories.length > 0 ? null : <NoRepositoriesMessage />),
+      [repositories],
+    )
+
+    const updateClusterId = useCallback((clusterId) => {
+      updateParams({
+        clusterId,
+        namespace: null,
+      })
+    }, [])
+
     return (
       <ListContainer
-        loading={loading}
+        loading={loadingDeployedApps || loadingRepositories}
         reload={reload}
         data={filteredDeployedApps}
         getParamsUpdater={getParamsUpdater}
+        alternativeTableContent={noRepositoriesMessage}
         filters={
           <>
             <ClusterPicklist
-              onChange={getParamsUpdater('clusterId')}
+              // onChange={getParamsUpdater('clusterId')}
+              onChange={updateClusterId}
               value={params.clusterId}
               onlyMasterNodeClusters
               showAll={false}

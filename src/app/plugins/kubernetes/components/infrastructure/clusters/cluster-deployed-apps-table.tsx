@@ -7,9 +7,9 @@ import clsx from 'clsx'
 import Text from 'core/elements/text'
 import SimpleLink from 'core/components/SimpleLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import DeleteAppDeploymentDialog from 'k8s/components/apps/delete-app-deployment-dialog'
+import DeleteAppDeploymentDialog from 'k8s/components/app-catalog/deployed-apps/delete-app-deployment-dialog'
 import { routes } from 'core/utils/routes'
-import { getIcon } from 'k8s/components/apps/helpers'
+import { getIcon } from 'k8s/components/app-catalog/helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   appTable: {

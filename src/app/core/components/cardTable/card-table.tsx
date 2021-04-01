@@ -26,20 +26,47 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
+interface Props {
+  data: any[]
+  searchTarget: string
+  filters?: any
+  filterValues?: FilterValues[]
+  showSortOption?: boolean
+  sortOptions?: SortOptions[]
+  onSortChange?: any
+  sortBy?: string
+  sortTarget?: string
+  loading: boolean
+  handleRefresh: any
+  children?: any
+  emptyItemsMessage?: string | React.ReactNode
+}
+
+interface FilterValues {
+  value: string
+  target?: string
+  customFilterFn?: any
+}
+interface SortOptions {
+  label: string
+  value: string
+}
+
 const CardTable = ({
   data,
   searchTarget,
   filters,
   filterValues,
-  showSortOption,
-  sortOptions,
+  showSortOption = false,
+  sortOptions = [],
   onSortChange,
-  sortBy,
+  sortBy = 'asc',
   sortTarget,
   loading,
   handleRefresh,
   children,
-}) => {
+  emptyItemsMessage,
+}: Props) => {
   const classes = useStyles()
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -101,9 +128,13 @@ const CardTable = ({
               sortBy={sortBy}
               onRefresh={handleRefresh}
             />
-            <Grid container spacing={3} justify="flex-start">
-              {filteredData.map(children)}
-            </Grid>
+            {filteredData.length > 0 ? (
+              <Grid container spacing={3} justify="flex-start">
+                {filteredData.map(children)}
+              </Grid>
+            ) : (
+              emptyItemsMessage
+            )}
           </Paper>
         </Grid>
       </Grid>
