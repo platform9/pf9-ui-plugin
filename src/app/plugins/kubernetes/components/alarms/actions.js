@@ -30,7 +30,6 @@ export const isPrometheusCluster = (cluster) =>
 export const loadAlerts = createContextLoader(
   ActionDataKeys.Alerts,
   async (params) => {
-    console.log(params, 'load Alerts params check for prometheus only')
     const [clusterId, clusters] = await parseClusterParams(params)
     const filteredClusters = clusters.filter((cluster) => isPrometheusCluster(cluster))
     await Promise.all([clusterActions.list(), loadAlertRules(params)])
