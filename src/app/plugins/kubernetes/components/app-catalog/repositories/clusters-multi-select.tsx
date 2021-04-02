@@ -5,9 +5,9 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
-import { clusterActions } from '../infrastructure/clusters/actions'
+import { clusterActions } from '../../infrastructure/clusters/actions'
 import { ValidatedFormProps } from 'core/components/validatedForm/model'
-import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import { importedClusterActions } from '../../infrastructure/importedClusters/actions'
 import Progress from 'core/components/progress/Progress'
 
 const useStyles = makeStyles((theme: Theme) => ({

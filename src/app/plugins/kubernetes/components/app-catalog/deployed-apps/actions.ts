@@ -2,85 +2,19 @@ import { flatten } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { someAsync, mapAsync } from 'utils/async'
-import { ActionDataKeys } from 'k8s/DataKeys'
-import namespaceActions from '../namespaces/actions'
-import { makeAppsSelector, makeDeployedAppsSelector } from './selectors'
+import { someAsync } from 'utils/async'
+import DataKeys from 'k8s/DataKeys'
 import store from 'app/store'
 import { cacheActions } from 'core/caching/cacheReducers'
+import { appActions } from '../actions'
+import { makeDeployedAppsSelector } from './selectors'
+import namespaceActions from 'k8s/components/namespaces/actions'
 
 const { helm } = ApiClient.getInstance()
 const { dispatch } = store
 
-export const appDetailsLoader = createContextLoader(
-  ActionDataKeys.AppDetails,
-  async ({ repository, name, infoType = 'all', versions = true }) => {
-    const chart = await helm.getChartInfo(repository, name, {
-      info_type: infoType,
-      versions,
-    })
-    return {
-      ...chart,
-      name,
-      repository,
-    }
-  },
-  {
-    entityName: 'App Detail',
-    uniqueIdentifier: ['name', 'repository'],
-    indexBy: ['repository', 'name'],
-  },
-)
-
-export const deploymentDetailLoader = createContextLoader(
-  ActionDataKeys.DeployedAppDetails,
-  async ({ clusterId, namespace, releaseName }) => {
-    const details = helm.getReleaseInfo(clusterId, namespace, releaseName)
-    return details
-  },
-  {
-    uniqueIdentifier: 'Name',
-    indexBy: ['clusterId', 'namespace', 'releaseName'],
-  },
-)
-
-const parseRepoName = (name) => name.match(/^(\w||-)+/)[0]
-
-export const appsAvailableToClusterLoader = createContextLoader(
-  ActionDataKeys.AppsAvailableToCluster,
-  async ({ clusterId }) => {
-    const charts = await helm.getChartsForCluster(clusterId)
-    return charts.map((chart) => ({
-      ...chart,
-      repository: parseRepoName(chart.Name),
-    }))
-  },
-  {
-    uniqueIdentifier: ['Name'],
-    indexBy: 'clusterId',
-  },
-)
-
-export const appActions = createCRUDActions(ActionDataKeys.Apps, {
-  listFn: async () => {
-    const apps = await helm.getCharts()
-    return apps.map((app) => {
-      return {
-        id: app.Name,
-        repository: parseRepoName(app.Name),
-        ...app,
-      }
-    })
-  },
-
-  uniqueIdentifier: 'id',
-  entityName: 'App Catalog',
-  selectorCreator: makeAppsSelector,
-})
-
-export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps, {
+export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
   listFn: async ({ clusterId, namespace }) => {
     // Fetch dependent cache
     await appActions.list()
@@ -114,7 +48,7 @@ export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps,
       Vals: values,
     }
     const result = helm.updateRelease(clusterId, namespace, body)
-    dispatch(cacheActions.clearCache({ cacheKey: ActionDataKeys.DeployedAppDetails }))
+    dispatch(cacheActions.clearCache({ cacheKey: DataKeys.DeployedAppDetails }))
     return result
   },
   deleteFn: async ({ clusterId, namespace, name }) => {
@@ -156,3 +90,15 @@ export const deployedAppActions = createCRUDActions(ActionDataKeys.DeployedApps,
   indexBy: ['clusterId', 'namespace'],
   selectorCreator: makeDeployedAppsSelector,
 })
+
+export const deploymentDetailLoader = createContextLoader(
+  DataKeys.DeployedAppDetails,
+  async ({ clusterId, namespace, releaseName }) => {
+    const details = helm.getReleaseInfo(clusterId, namespace, releaseName)
+    return details
+  },
+  {
+    uniqueIdentifier: 'Name',
+    indexBy: ['clusterId', 'namespace', 'releaseName'],
+  },
+)
