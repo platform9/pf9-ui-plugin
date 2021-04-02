@@ -20,6 +20,7 @@ import { RootState } from 'app/store'
 import { emailValidator } from 'core/utils/fieldValidators'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import TenantsAndRoleAccessTable from './tenants-and-role-access-table'
+import { isAdminRole } from 'k8s/util/helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   userProfile: {
@@ -68,8 +69,8 @@ const MyProfilePage = () => {
 
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { userDetails } = session
-  const { id: userId, displayName, email, role } = userDetails
-  const isAdmin = role === 'admin'
+  const { id: userId, displayName, email } = userDetails
+  const isAdmin = useMemo(() => isAdminRole(session), [session])
 
   const [update, updatingUser] = useDataUpdater(mngmUserActions.update)
 

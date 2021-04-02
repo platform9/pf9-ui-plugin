@@ -26,8 +26,7 @@ const authMethods = {
   [LoginMethodTypes.SSO]: async (_u, _p, _t) => keystone.authenticateSso(),
 }
 
-const reauthenticateUser = async ({ email, currentPassword }) => {
-  const state = store.getState()
+const reauthenticateUser = async ({ email, currentPassword, currentTenantId }) => {
   const userAuthInfo = await authenticateUser({
     loginUsername: email,
     password: currentPassword,
@@ -36,8 +35,6 @@ const reauthenticateUser = async ({ email, currentPassword }) => {
     mfa: '',
     reauthenticating: true,
   })
-
-  const currentTenantId = state[preferencesStoreKey][email].root.currentTenant
 
   await updateSession({
     ...userAuthInfo,
@@ -292,8 +289,8 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
 
 export const updateUserPassword = async ({ id, email, currentPassword, newPassword }) => {
   try {
-    // User must be authenticated before making a password change request
-    await reauthenticateUser({ email, currentPassword })
+    const state = store.getState()
+    const currentTenantId = state[preferencesStoreKey][email].root.currentTenant
 
     const params = {
       password: newPassword,
@@ -302,7 +299,7 @@ export const updateUserPassword = async ({ id, email, currentPassword, newPasswo
     await keystone.updateUserPassword(id, params)
 
     // User must be authenticated again after a password change
-    await reauthenticateUser({ email, currentPassword: newPassword })
+    await reauthenticateUser({ email, currentPassword: newPassword, currentTenantId })
   } catch (err) {
     console.warn(err.message)
     return false
