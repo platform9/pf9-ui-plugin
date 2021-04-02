@@ -12,9 +12,10 @@ import moment from 'moment'
 import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
 import { parseClusterParams, clusterActions } from '../infrastructure/clusters/actions'
-
+import { makeParamsImportedClustersSelector } from 'k8s/components/infrastructure/importedClusters/selectors'
 import store from 'app/store'
 import { loadAlertRules } from '../monitoring/actions'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -24,6 +25,7 @@ export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 export const loadAlerts = createContextLoader(
   ActionDataKeys.Alerts,
   async (params) => {
+    console.log(params, 'load Alerts params check for prometheus only')
     const [clusterId, clusters] = await parseClusterParams(params)
     await Promise.all([clusterActions.list(), loadAlertRules(params)])
 
@@ -40,7 +42,7 @@ export const loadAlerts = createContextLoader(
     indexBy: 'clusterId',
     selector: alertsSelector,
     selectorCreator: makeAlertsSelector,
-    cache: false,
+    // cache: false,
   },
 )
 
@@ -57,6 +59,7 @@ const timestampSteps = {
   '1.h': [10, 'm'],
 }
 const selector = makeParamsClustersSelector()
+const importedSelector = makeParamsImportedClustersSelector()
 
 export const loadTimeSeriesAlerts = createContextLoader(
   ActionDataKeys.AlertsTimeSeries,
@@ -75,10 +78,15 @@ export const loadTimeSeriesAlerts = createContextLoader(
       healthyClusters: true,
       prometheusClusters: true,
     })
+    const prometheusImportedClusters = importedSelector(store.getState(), {
+      ...params,
+      prometheusClusters: true,
+    })
+    const allPrometheusClusters = [...prometheusClusters, ...prometheusImportedClusters]
 
     if (clusterId === allKey) {
       return someAsync(
-        pluck('uuid', prometheusClusters).map((clusterUuid) =>
+        pluck('uuid', allPrometheusClusters).map((clusterUuid) =>
           qbert.getPrometheusAlertsOverTime(clusterUuid, timePast, timeNow, step),
         ),
       ).then(flatten)
@@ -91,3 +99,22 @@ export const loadTimeSeriesAlerts = createContextLoader(
     cache: false,
   },
 )
+
+export const silenceActions = createCRUDActions(ActionDataKeys.Silences, {
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
+    return clusterId === allKey
+      ? someAsync(pluck('uuid', clusters).map(qbert.getAlertManagerSilences)).then(flatten)
+      : qbert.getAlertManagerSilences(clusterId)
+  },
+  createFn: async ({ clusterId, body }) => {
+    return qbert.createAlertManagerSilence(clusterId, body)
+  },
+  deleteFn: async ({ id }, currentItems) => {
+    const { clusterId } = await currentItems.find((x) => x.id === id)
+    const result = await qbert.deleteAlertManagerSilence(clusterId, id)
+    return result
+  },
+  uniqueIdentifier: 'id',
+  indexBy: 'clusterId',
+})

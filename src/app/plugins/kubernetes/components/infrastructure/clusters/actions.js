@@ -185,7 +185,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params) => {
   const clusters = await clusterActions.list(params)
-  const importedClusters = await importedClusterActions.list()
+  const importedClusters = await importedClusterActions.list(params)
   const collectiveClusters = [...clusters, ...importedClusters]
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
   return [clusterId, collectiveClusters]
