@@ -68,7 +68,6 @@ const createCRUDComponents = (options) => {
     onSelect,
     extraToolbarContent,
     hideDelete,
-    EmptyItemsMessage,
   } = options
 
   // List
@@ -129,7 +128,6 @@ const createCRUDComponents = (options) => {
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
         extraToolbarContent={extraToolbarContent}
         hideDelete={hideDelete}
-        EmptyItemsMessage={EmptyItemsMessage}
         alternativeTableContent={alternativeTableContent}
       />
     )
