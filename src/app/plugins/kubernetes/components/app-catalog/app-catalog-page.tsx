@@ -91,8 +91,11 @@ const AppCatalogPage = () => {
   const loading = loadingApps || loadingReposForCluster || loadingRepositories
 
   const noRepositoriesMessage = useMemo(
-    () => (repositories && repositories.length > 0 ? null : <NoRepositoriesMessage />),
-    [repositories],
+    () =>
+      loadingRepositories || (repositories && repositories.length > 0) ? null : (
+        <NoRepositoriesMessage />
+      ),
+    [loadingRepositories, repositories],
   )
 
   return (

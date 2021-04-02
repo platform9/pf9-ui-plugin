@@ -24,14 +24,14 @@ const ListPage = ({ ListContainer }) => {
 
     const noRepositoriesMessage = useMemo(
       () =>
-        repositories && repositories.length > 0 ? null : (
+        loading || (repositories && repositories.length > 0) ? null : (
           <NoRepositoriesMessage
             headerMessage={noRepositoriesHeaderMsg}
             secondaryMessage={noRepositoriesSecondaryMsg}
             showAddRepositoryLink={false}
           />
         ),
-      [repositories],
+      [loading, repositories],
     )
 
     return (

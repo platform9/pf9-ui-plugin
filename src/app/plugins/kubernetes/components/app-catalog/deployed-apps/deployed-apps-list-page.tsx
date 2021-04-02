@@ -34,8 +34,10 @@ const ListPage = ({ ListContainer }) => {
     )
 
     const noRepositoriesMessage = useMemo(
-      () => (repositories && repositories.length > 0 ? null : <NoRepositoriesMessage />),
-      [repositories],
+      () =>
+        loadingRepositories ||
+        (repositories && repositories.length > 0 ? null : <NoRepositoriesMessage />),
+      [loadingRepositories, repositories],
     )
 
     const updateClusterId = useCallback((clusterId) => {
