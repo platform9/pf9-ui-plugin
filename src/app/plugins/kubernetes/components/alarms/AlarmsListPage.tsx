@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import StatusPicklist from './StatusPicklist'
 import SeverityPicklist from './SeverityPicklist'
@@ -130,6 +130,11 @@ const ListPage = ({ ListContainer }) => {
         [allKey, alert.status].includes(params.status)
       )
     })
+
+    useEffect(() => {
+      // workaround to nullify cache on reload / cluster change to match time series graph
+      reload(true)
+    }, [params.clusterId])
 
     return (
       <>

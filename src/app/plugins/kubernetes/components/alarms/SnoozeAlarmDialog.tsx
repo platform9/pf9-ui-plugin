@@ -16,7 +16,7 @@ import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
 import { RootState } from 'app/store'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { loadAlerts, silenceActions } from './actions'
+import { loadAlerts, loadTimeSeriesAlerts, silenceActions } from './actions'
 import Progress from 'core/components/progress/Progress'
 import useDataLoader from 'core/hooks/useDataLoader'
 
@@ -92,8 +92,13 @@ const SnoozeAlarmDialog = ({ rows: [alarm], onClose, listTableParams }: Props) =
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { username } = session
   const [, , reloadAlarms] = useDataLoader(loadAlerts, listTableParams)
+  const [, , reloadTimeSeries] = useDataLoader(loadTimeSeriesAlerts, {
+    chartTime: listTableParams.chartTime,
+    clusterId: listTableParams.clusterId,
+  })
   const [handleAdd, addingSilence] = useDataUpdater(silenceActions.create, () => {
     reloadAlarms(true)
+    reloadTimeSeries(true)
     onClose()
   })
 

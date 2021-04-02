@@ -47,7 +47,6 @@ export const loadAlerts = createContextLoader(
     indexBy: 'clusterId',
     selector: alertsSelector,
     selectorCreator: makeAlertsSelector,
-    // cache: false,
   },
 )
 
@@ -78,6 +77,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
     const step = timestampSteps[chartTime].join('')
 
     const [clusterId] = await parseClusterParams(params)
+
     const prometheusClusters = selector(store.getState(), {
       ...params,
       healthyClusters: true,
