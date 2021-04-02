@@ -594,6 +594,7 @@ class ListTable extends PureComponent {
       multiSelection,
       headless,
       hideDelete,
+      alternativeTableContent,
     } = this.props
 
     if (!data) {
@@ -671,8 +672,14 @@ class ListTable extends PureComponent {
                   hideDelete={hideDelete}
                 />
               )}
-              <div className={classes.tableWrapper}>{tableContent}</div>
-              {!compactTable && this.renderPaginationControls(filteredData.length)}
+              {alternativeTableContent ? (
+                alternativeTableContent
+              ) : (
+                <div className={classes.tableWrapper}>{tableContent}</div>
+              )}
+              {!alternativeTableContent &&
+                !compactTable &&
+                this.renderPaginationControls(filteredData.length)}
             </div>
           </Grid>
         </Grid>

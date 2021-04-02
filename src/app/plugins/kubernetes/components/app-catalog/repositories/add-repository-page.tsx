@@ -13,7 +13,6 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import { routes } from 'core/utils/routes'
 import ClustersListCard from './clusters-list-card'
 import { RepositoryType, repositoryOptions } from './models'
-import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { repositoryActions } from './actions'
 import { useSelector } from 'react-redux'
@@ -21,6 +20,7 @@ import { RootState } from 'app/store'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import { pathOr, prop } from 'ramda'
 import { allKey, CustomerTiers } from 'app/constants'
+import useReactRouter from 'use-react-router'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const customerTierBlacklist = [CustomerTiers.Freedom]
 
-const AddRepoPage = () => {
+const AddRepositoryPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const anyRepositoryActions = repositoryActions as any
@@ -206,4 +206,4 @@ const AddRepoPage = () => {
   )
 }
 
-export default AddRepoPage
+export default AddRepositoryPage

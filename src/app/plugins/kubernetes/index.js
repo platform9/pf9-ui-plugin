@@ -9,7 +9,7 @@ import ScaleMastersPage from './components/infrastructure/clusters/ScaleMastersP
 import ScaleWorkersPage from './components/infrastructure/clusters/ScaleWorkersPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
-import AppsIndexPage from './components/apps/apps-index-page'
+import AppsIndexPage from './components/app-catalog/apps-index-page'
 import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
 import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
@@ -44,10 +44,10 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
 import OnboardNewNodePage from './components/infrastructure/nodes/onboard-new-node-page'
-import AddRepoPage from './components/repositories/add-repo-page'
-import DeployAppPage from './components/apps/deploy-app-page'
-import EditRepoPage from './components/repositories/edit-repo-page'
-import EditAppDeploymentPage from './components/apps/edit-app-deployment-page'
+import AddRepositoryPage from './components/app-catalog/repositories/add-repository-page'
+import DeployAppPage from './components/app-catalog/deployed-apps/deploy-app-page'
+import EditRepositoryPage from './components/app-catalog/repositories/edit-repository-page'
+import EditAppDeploymentPage from './components/app-catalog/deployed-apps/edit-app-deployment-page'
 import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 import ImportedClusterDetailsPage from './components/infrastructure/importedClusters/imported-cluster-details'
@@ -186,12 +186,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
     {
       name: 'Add Repository',
       link: { path: '/apps/repositories/add', exact: true },
-      component: AddRepoPage,
+      component: AddRepositoryPage,
     },
     {
       name: 'Edit Repository',
       link: { path: '/apps/repositories/edit/:id' },
-      component: EditRepoPage,
+      component: EditRepositoryPage,
     },
     {
       name: 'Workloads',

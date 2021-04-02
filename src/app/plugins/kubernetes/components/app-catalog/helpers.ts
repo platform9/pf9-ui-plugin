@@ -1,9 +1,11 @@
 import { includes } from 'ramda'
 
-const placeholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
+export const smallPlaceholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo.png'
+export const mediumPlaceholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@2x.png'
+export const largePlaceholderIcon = '/ui/images/app-catalog/app-cat-placeholder-logo@3x.png'
 
 export const getIcon = (icon) =>
-  icon && icon.match(/.(jpg|jpeg|png|gif)/) ? icon : placeholderIcon
+  icon && icon.match(/.(jpg|jpeg|png|gif)/) ? icon : mediumPlaceholderIcon
 
 export const getAppVersionPicklistOptions = (versions, numOptionsToShow = 15) => {
   if (!versions) {

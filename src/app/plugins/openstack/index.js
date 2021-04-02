@@ -49,7 +49,7 @@ import UpdateImagePage from './components/images/UpdateImagePage'
 
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
-import AppCatalogPage from 'k8s/components/apps/app-catalog-page'
+import AppCatalogPage from 'k8s/components/app-catalog/app-catalog-page'
 
 import SshKeysPage from './components/sshkeys/SshKeysListPage'
 import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'

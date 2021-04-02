@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const customerTierBlacklist = [CustomerTiers.Freedom]
 
-const EditRepoPage = () => {
+const EditRepositoryPage = () => {
   const classes = useStyles()
   const { history, match } = useReactRouter()
   const repoName = match.params.id
@@ -234,4 +234,4 @@ const EditRepoPage = () => {
   )
 }
 
-export default EditRepoPage
+export default EditRepositoryPage
