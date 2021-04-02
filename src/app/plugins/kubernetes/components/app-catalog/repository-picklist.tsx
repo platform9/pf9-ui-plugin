@@ -4,7 +4,7 @@ import PicklistDefault from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
 import { allKey } from 'app/constants'
-import { repositoryActions } from '../repositories/actions'
+import { repositoryActions } from './repositories/actions'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 interface Props {

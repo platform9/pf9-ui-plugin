@@ -1,40 +1,14 @@
 import { createSelector } from 'reselect'
 import { mergeLeft, pipe, propEq } from 'ramda'
-import DataKeys from 'k8s/DataKeys'
-import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
 import { allKey } from 'app/constants'
 import { filterIf } from 'utils/fp'
-import { clustersSelector } from '../infrastructure/clusters/selectors'
-import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
-import { IDeployedAppsSelector } from './models'
-
-export const appsSelector = createSelector(
-  [getDataSelector<DataKeys.Apps>(DataKeys.Apps)],
-  (rawApps) => {
-    return rawApps.map((app) => {
-      return {
-        ...app,
-        ...app.Chart,
-      }
-    })
-  },
-)
-
-export const makeAppsSelector = (
-  defaultParams = {
-    orderBy: 'name',
-    orderDirection: 'asc',
-  },
-) => {
-  return createSelector(
-    [appsSelector, (_, params) => mergeLeft(params, defaultParams)],
-    (clusters, params) => {
-      const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(clusters)
-    },
-  )
-}
+import DataKeys from 'k8s/DataKeys'
+import getDataSelector from 'core/utils/getDataSelector'
+import { appsSelector } from '../selectors'
+import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import { importedClustersSelector } from 'k8s/components/infrastructure/importedClusters/selectors'
+import { IDeployedAppsSelector } from '../models'
 
 export const deployedAppsSelector = createSelector(
   [getDataSelector<DataKeys.DeployedApps>(DataKeys.DeployedApps, ['clusterId']), appsSelector],

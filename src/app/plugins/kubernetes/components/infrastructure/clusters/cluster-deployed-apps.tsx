@@ -9,17 +9,21 @@ import ClusterDeployedAppsTable from './cluster-deployed-apps-table'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import SimpleLink from 'core/components/SimpleLink'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { appsAvailableToClusterLoader, deployedAppActions } from 'k8s/components/apps/actions'
+import { appsAvailableToClusterLoader } from 'k8s/components/app-catalog/actions'
 import clsx from 'clsx'
 import Progress from 'core/components/progress/Progress'
-import { repositoriesForClusterLoader } from 'k8s/components/repositories/actions'
-import DisconnectRepositoryDialog from 'k8s/components/repositories/disconnect-repository-dialog'
+import { repositoriesForClusterLoader } from 'k8s/components/app-catalog/repositories/actions'
+import DisconnectRepositoryDialog from 'k8s/components/app-catalog/repositories/disconnect-repository-dialog'
 import { allKey } from 'app/constants'
 import { IUseDataLoader } from '../nodes/model'
-import { IAppsAvailableToClusterAction, IDeployedAppsSelector } from 'k8s/components/apps/models'
+import {
+  IAppsAvailableToClusterAction,
+  IDeployedAppsSelector,
+} from 'k8s/components/app-catalog/models'
 import { RepositoriesForCluster } from 'api-client/helm.model'
 import ExternalLink from 'core/components/ExternalLink'
 import BulletList from 'core/components/BulletList'
+import { deployedAppActions } from 'k8s/components/app-catalog/deployed-apps/actions'
 
 const useInfoCardStyles = makeStyles((theme: Theme) => ({
   card: {

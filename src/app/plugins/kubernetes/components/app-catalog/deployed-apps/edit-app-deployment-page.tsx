@@ -15,21 +15,22 @@ import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import SimpleLink from 'core/components/SimpleLink'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import useReactRouter from 'use-react-router'
-import AppVersionPicklistField from './app-version-picklist-field'
+import AppVersionPicklistField from '../app-version-picklist-field'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { appDetailsLoader, deploymentDetailLoader, deployedAppActions } from './actions'
+import { appDetailsLoader } from '../actions'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import NamespacePicklist from '../common/NamespacePicklist'
+import NamespacePicklist from '../../common/NamespacePicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import {
   compareVersions,
   filterConnectedClusters,
   getAppVersionPicklistOptions,
   getIcon,
-} from './helpers'
-import ClusterPicklist from '../common/ClusterPicklist'
+} from '../helpers'
+import ClusterPicklist from '../../common/ClusterPicklist'
 import { repositoryActions } from '../repositories/actions'
+import { deployedAppActions, deploymentDetailLoader } from './actions'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
