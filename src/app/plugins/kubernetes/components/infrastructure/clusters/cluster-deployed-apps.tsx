@@ -218,7 +218,13 @@ const RepositoryLabel = ({ name, onClick }: RepositoryLabelProps) => {
   )
 }
 
-const ClusterDeployedApps = ({ cluster }) => {
+interface ClusterDeployedAppsProps {
+  cluster: any
+  reload?: any
+  loading?: boolean
+}
+
+const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsProps) => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const [showDialog, setShowDialog] = useState(false)
@@ -282,7 +288,7 @@ const ClusterDeployedApps = ({ cluster }) => {
       {
         id: 'version',
         label: 'Kubernetes Version',
-        value: cluster.kubeRoleVersion,
+        value: cluster.kubeRoleVersion || cluster.kubeVersion,
       },
       {
         id: 'apps',
@@ -292,7 +298,7 @@ const ClusterDeployedApps = ({ cluster }) => {
       {
         id: 'workerNodes',
         label: 'Number of Worker Nodes',
-        value: cluster.numWorkers?.toString(),
+        value: (cluster.numWorkers || cluster.workers)?.toString(),
       },
     ]
   }, [cluster, filteredDeployedApps])
