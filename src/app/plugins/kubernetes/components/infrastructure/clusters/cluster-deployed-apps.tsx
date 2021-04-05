@@ -298,7 +298,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
       {
         id: 'workerNodes',
         label: 'Number of Worker Nodes',
-        value: (cluster.numWorkers || cluster.workers)?.toString(),
+        value: cluster.numWorkers?.toString() || cluster.workers?.toString(),
       },
     ]
   }, [cluster, filteredDeployedApps])
