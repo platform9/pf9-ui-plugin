@@ -52,6 +52,8 @@ import ImportClusterPage from './components/infrastructure/clusters/import/Impor
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 import ImportedClusterDetailsPage from './components/infrastructure/importedClusters/imported-cluster-details'
 import VirtualMachinesPage from './components/virtual-machines'
+import VirtualMachineDetailPage from './components/virtual-machines/details'
+import AddVirtualMachinePage from './components/virtual-machines/add'
 
 import { isDecco } from 'core/utils/helpers'
 
@@ -174,6 +176,36 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/virtual-machines', exact: true },
       requiredRoles: 'admin',
       component: VirtualMachinesPage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/add/new', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/import/url', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/import/disk', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/clone/pvc', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Virtual Machine Details',
+      link: { path: '/virtual-machines/:clusterId/:namespace/:name', exact: true },
+      requiredRoles: 'admin',
+      component: VirtualMachineDetailPage,
     },
     {
       name: 'App Catalog',

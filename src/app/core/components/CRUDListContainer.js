@@ -41,7 +41,7 @@ const CRUDListContainer = ({
   const addEnabled = AddDialog || addUrl || addButtonConfigs
 
   const validAddButtonConfigs = addButtonConfigs
-    ? addButtonConfigs.filter((config) => config.cond())
+    ? addButtonConfigs.filter((config) => (config.cond ? config.cond() : true))
     : []
 
   const deleteConfirmText = useMemo(() => {
@@ -139,7 +139,7 @@ const CRUDListContainer = ({
                       {validAddButtonConfigs[0].label}
                     </CreateButton>
                   ) : (
-                    <DropdownButton links={validAddButtonConfigs} />
+                    <DropdownButton links={validAddButtonConfigs} addText={addText} />
                   )}
                 </PageContainerHeader>
               )}

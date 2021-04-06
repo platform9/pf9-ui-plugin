@@ -59,16 +59,17 @@ interface Link {
 
 interface Props {
   links: Link[]
+  addText?: string
 }
 
-const DropdownButton = ({ links }: Props) => {
+const DropdownButton = ({ links, addText }: Props) => {
   const classes = useStyles({})
 
   return (
     <div className={classes.dropdownContainer}>
       <Button className={classes.button}>
         <>
-          <Text variant="caption1">Add Cluster</Text>
+          <Text variant="caption1">{addText}</Text>
           <FontAwesomeIcon>angle-down</FontAwesomeIcon>
         </>
       </Button>

@@ -4,7 +4,7 @@ import Tab from 'core/components/tabs/Tab'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import VirtualMachinesListPage from './list-page'
 
-const InfrastructurePage = () => (
+const VirtualMachinesPage = () => (
   <PageContainer>
     <Tabs>
       <Tab value="virtual-machines" label="VM Instances">
@@ -13,14 +13,14 @@ const InfrastructurePage = () => (
       <Tab value="data-volumes" label="Data Volumes">
         <div>Coming soon</div>
       </Tab>
-      <Tab value="presets" label="Presets">
+      {/* <Tab value="presets" label="Presets">
         <div>Coming soon</div>
       </Tab>
       <Tab value="snapshots" label="Snapshots">
         <div>Coming soon</div>
-      </Tab>
+      </Tab> */}
     </Tabs>
   </PageContainer>
 )
 
-export default InfrastructurePage
+export default VirtualMachinesPage

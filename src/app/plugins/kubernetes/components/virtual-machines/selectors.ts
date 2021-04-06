@@ -18,6 +18,7 @@ export const virtualMachinesSelector = createSelector(
   (rawVirtualMachines, clusters, importedClusters) => {
     return rawVirtualMachines
       .map((virtualMachine) => ({
+        ...virtualMachine,
         id: virtualMachine?.metadata?.uid,
         name: virtualMachine?.metadata?.name,
         clusterName: findClusterName([...clusters, ...importedClusters], virtualMachine.clusterId),
