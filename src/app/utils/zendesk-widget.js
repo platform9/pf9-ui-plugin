@@ -79,9 +79,9 @@ export const hideZendeskWidget = () => {
   // if (existingScript) {
   //   DocumentMetaCls.removeScriptElementFromDomBody('zendesk-action')
   // }
-  const script = document.createElement('script')
-  script.id = 'zendesk-action'
-  script.textContent = `if (zE) {zE('webWidget', 'hide')}`
-  script.type = 'text/javascript'
-  document.body.appendChild(script)
+  // const script = document.createElement('script')
+  // script.id = 'zendesk-action'
+  // script.textContent = `if (zE) {zE('webWidget', 'hide')}`
+  // script.type = 'text/javascript'
+  // document.body.appendChild(script)
 }
