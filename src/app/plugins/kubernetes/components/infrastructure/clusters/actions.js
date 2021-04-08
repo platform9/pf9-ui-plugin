@@ -46,14 +46,17 @@ const getCsiDrivers = async (clusterUiid) => {
 
 export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   listFn: async () => {
-    const [rawClusters] = await Promise.all([
+    // update to use allSettled as appbert sometimes is in a failed state.
+    const [settledClusters] = await Promise.allSettled([
       qbert.getClusters(),
       // Fetch dependent caches
       clusterTagActions.list(),
       loadNodes(),
       loadResMgrHosts(),
     ])
-
+    if (settledClusters.status !== 'fulfilled') {
+      return []
+    }
     return mapAsync(async (cluster) => {
       const progressPercent =
         cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
@@ -68,7 +71,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         version,
         baseUrl,
       }
-    }, rawClusters)
+    }, settledClusters.value)
   },
   createFn: (params) => {
     if (params.clusterType === 'aws') {
