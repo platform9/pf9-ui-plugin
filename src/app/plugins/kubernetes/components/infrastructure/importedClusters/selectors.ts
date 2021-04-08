@@ -20,6 +20,7 @@ export const importedClustersSelector = createSelector(
         servicesCidr: cluster.spec?.eks?.network?.servicesCidr,
         nodeGroups: cluster.spec?.eks?.nodegroups,
         providerType: cluster.metadata?.labels?.provider,
+        workers: cluster.status?.workers,
       }
     })
   },
