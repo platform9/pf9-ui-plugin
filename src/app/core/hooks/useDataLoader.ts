@@ -7,7 +7,7 @@ import {
 } from 'core/caching/cacheReducers'
 import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
 import useScopedPreferences from 'core/session/useScopedPreferences'
-import { either, equals, find, isNil, path, pickAll, pipe, reject } from 'ramda'
+import { either, equals, find, isNil, path, pickAll, pipe, reject, whereEq } from 'ramda'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty, emptyArr } from 'utils/fp'

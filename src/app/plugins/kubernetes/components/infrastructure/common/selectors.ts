@@ -1,11 +1,11 @@
 import { createSelector } from 'reselect'
-import { toPairs } from 'ramda'
+import { toPairs as ToPairs } from 'ramda'
 import { combineHost } from 'k8s/components/infrastructure/common/combineHosts'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { HostByService, HostType } from './model'
 import { ExtensionsClass, Host } from 'api-client/resmgr.model'
-
+const toPairs: any = ToPairs
 const getIpPreview = (ips: string[] = []) =>
   // Get first IP that does not start with 192
   ips.find((ip) => ip.substring(0, 3) !== '192') || ips[0]
