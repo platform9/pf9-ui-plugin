@@ -10,12 +10,13 @@ import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import ExternalLink from 'core/components/ExternalLink'
-import { nodePrerequisitesDocumentationLink } from 'k8s/links'
+import { nodePrerequisitesDocumentationLink, pmkCliOverviewLink } from 'k8s/links'
 import {
   configureCliCommand,
   downloadAndInstallPf9CliCommand,
   runPf9CliCommand,
 } from '../clusters/constants'
+import Info from 'core/components/validatedForm/Info'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -61,31 +62,66 @@ const useStyles = makeStyles((theme: Theme) => ({
     float: 'right',
     margin: theme.spacing(1),
   },
+  collapsedContainer: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    marginLeft: theme.spacing(2),
+  },
 }))
 
-// Not super enthused about this. Need to have different content for bareos flow vs landing page.
-export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
-  const classes = useStyles({})
+export const OsRequirements = () => {
+  const classes = useStyles()
   return (
-    <>
-      <div className={classes.headerDiv}>
-        <ExternalLink
-          className={classes.externalLink}
-          url={nodePrerequisitesDocumentationLink}
-          icon="file-alt"
-        >
-          Pre-requisites Documentation
-        </ExternalLink>
-        <Text variant="h6">OS Requirements</Text>
+    <Info title="OS Requirements" expanded={false}>
+      <div className={classes.collapsedContainer}>
+        <div className={classes.headerDiv}>
+          <ExternalLink
+            className={classes.externalLink}
+            url={nodePrerequisitesDocumentationLink}
+            icon="file-alt"
+          >
+            Pre-requisites Documentation
+          </ExternalLink>
+        </div>
+        <p>
+          <Text component="span">
+            You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
+            (7.6/7.7/7.8) installed.
+          </Text>
+        </p>
       </div>
-      <p>
-        <Text component="span">
-          You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
-          (7.6/7.7/7.8) installed.
+    </Info>
+  )
+}
+
+export const CliAdvancedOptions = () => {
+  const classes = useStyles()
+  return (
+    <Info title="CLI Advanced Options" expanded={false}>
+      <div className={classes.collapsedContainer}>
+        <div className={classes.headerDiv}>
+          <ExternalLink className={classes.externalLink} url={pmkCliOverviewLink} icon="file-alt">
+            Learn more about PF9CTL
+          </ExternalLink>
+          <Text component="p" variant="subtitle2">
+            Create clusters and more directly using the CLI
+          </Text>
+        </div>
+        <p className={classes.spacer} />
+        <Text component="span" variant="body1">
+          You can use the{' '}
+          <CopyToClipboard copyText="pf9ctl">
+            <CodeBlock>pf9ctl</CodeBlock>
+          </CopyToClipboard>{' '}
+          CLI directly to use one or more PMK clusters. Type{' '}
+          <CopyToClipboard copyText="pf9ctl --help">
+            <CodeBlock>pf9ctl --help</CodeBlock>
+          </CopyToClipboard>{' '}
+          to see the full features and options the CLI supports
         </Text>
-      </p>
-      <DownloadCliWalkthrough />
-    </>
+        <p> </p>
+      </div>
+    </Info>
   )
 }
 

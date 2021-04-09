@@ -3,11 +3,12 @@ import React, { FunctionComponent } from 'react'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 // Components
-import { DownloadCliOnboardNodeWalkthrough } from './DownloadCliWalkthrough'
-import CopyToClipboard from 'core/components/CopyToClipboard'
-import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import PageContainer from 'core/components/pageContainer/PageContainer'
+import DownloadCliWalkthrough, {
+  CliAdvancedOptions,
+  OsRequirements,
+} from './DownloadCliWalkthrough'
 
 const useStyles = makeStyles((theme: Theme) => ({
   downloadCLIContainer: {
@@ -15,8 +16,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: theme.spacing(3, 2, 2, 2),
   },
   spacer: {
-    height: theme.spacing(2),
-    width: theme.spacing(2),
+    height: theme.spacing(0.5),
+  },
+  collapsedContainer: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    marginLeft: theme.spacing(2),
   },
 }))
 
@@ -31,31 +36,15 @@ const DownloadCliPage: FunctionComponent = () => {
         download and install the Platform9 CLI on that node. Follow the instructions below to
         download and install the CLI on your node
       </Text>
-      <DownloadCliOnboardNodeWalkthrough />
-
-      <p className={classes.spacer} />
-      <Text variant="h6">CLI Advanced Options</Text>
-      <p> </p>
-      <Text component="p" variant="subtitle2">
-        Create clusters and more directly using the CLI
-      </Text>
-      <p> </p>
-      <Text component="span" variant="body1">
-        You can use the{' '}
-        <CopyToClipboard copyText="pf9ctl">
-          <CodeBlock>pf9ctl</CodeBlock>
-        </CopyToClipboard>{' '}
-        CLI directly to use one or more PMK clusters. Type{' '}
-        <CopyToClipboard copyText="pf9ctl --help">
-          <CodeBlock>pf9ctl --help</CodeBlock>
-        </CopyToClipboard>{' '}
-        to see the full features and options the CLI supports
-      </Text>
-      <p> </p>
       {/* <Text variant="body1">
         See <SimpleLink src="">CLI Documentation</SimpleLink> for more info on whats supported with the
         CLI
       </Text> */}
+      <DownloadCliWalkthrough />
+      <p className={classes.spacer}></p>
+      <OsRequirements />
+      <p className={classes.spacer}></p>
+      <CliAdvancedOptions />
     </PageContainer>
   )
 }
