@@ -18,11 +18,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   spacer: {
     height: theme.spacing(0.5),
   },
-  collapsedContainer: {
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    marginLeft: theme.spacing(2),
-  },
 }))
 
 const DownloadCliPage: FunctionComponent = () => {
