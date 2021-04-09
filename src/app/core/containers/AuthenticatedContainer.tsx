@@ -75,6 +75,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     position: 'relative',
     display: 'flex',
     width: '100%',
+    minHeight: '100vh',
     backgroundColor: theme.palette.grey['000'],
   },
   content: {

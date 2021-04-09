@@ -20,6 +20,7 @@ import HeaderCard from './header-card'
 import Theme from 'core/themes/model'
 import { IUseDataLoader } from '../nodes/model'
 import { ImportedClusterSelector } from './model'
+import ClusterDeployedApps from '../clusters/cluster-deployed-apps'
 
 function ImportedClusterDetails() {
   const { match } = useReactRouter()
@@ -48,6 +49,12 @@ function ImportedClusterDetails() {
           {clusterHeader}
           <ClusterDetails cluster={cluster} reload={reload} loading={loading} />
         </Tab>
+        <Tab value="deployedApps" label="Deployed Apps">
+          {clusterHeader}
+          <div className={classes.deployedAppsContainer}>
+            <ClusterDeployedApps cluster={cluster} reload={reload} loading={loading} />
+          </div>
+        </Tab>
       </Tabs>
     </PageContainer>
   )
@@ -62,5 +69,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     top: 8,
     zIndex: 100,
     ...theme.typography.caption2,
+  },
+  deployedAppsContainer: {
+    paddingTop: theme.spacing(2),
+    maxWidth: 1234, // same maxWidth as tabContainer in ClusterDetails page
   },
 }))
