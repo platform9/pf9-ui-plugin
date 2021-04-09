@@ -101,12 +101,6 @@ export class DocumentMetaCls extends React.Component<IDocumentMetaProps, {}> {
     document.body.appendChild(script)
   }
 
-  static removeScriptElementFromDomBody(id) {
-    const script = document.getElementById(id)
-    if (!script) return
-    document.body.removeChild(script)
-  }
-
   render() {
     return null
   }

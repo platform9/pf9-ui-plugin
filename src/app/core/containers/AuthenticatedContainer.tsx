@@ -44,7 +44,12 @@ import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
-import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
+import {
+  addZendeskWidgetScriptToDomBody,
+  hideZendeskWidget,
+  showZendeskWidget,
+  zendeskIdentifyUser,
+} from 'utils/zendesk-widget'
 
 const toPairs: any = ToPairs
 
@@ -371,18 +376,27 @@ const AuthenticatedContainer = () => {
     }
   }, [])
 
+  // Add Zendesk widget script
   useEffect(() => {
-    console.log('useeffect', currentStack, customerTier)
-    // Add Zendesk widget
-    if (
-      (currentStack === AppPlugins.Kubernetes || currentStack === AppPlugins.MyAccount) &&
-      customerTier === CustomerTiers.Enterprise
-    ) {
-      addZendeskWidgetScriptToDomBody({ userId, displayName, email: name })
+    const existingScript = document.getElementById('ze-snippet')
+    // If script already exists, just re-identify the user
+    if (existingScript) {
+      zendeskIdentifyUser(displayName, name)
     } else {
-      hideZendeskWidget()
+      addZendeskWidgetScriptToDomBody({ userId, displayName, email: name })
     }
     return () => {
+      hideZendeskWidget()
+    }
+  }, [userId, displayName, name])
+
+  useEffect(() => {
+    if (
+      (currentStack === AppPlugins.Kubernetes || currentStack == AppPlugins.MyAccount) &&
+      customerTier === CustomerTiers.Enterprise
+    ) {
+      showZendeskWidget()
+    } else {
       hideZendeskWidget()
     }
   }, [currentStack, customerTier])

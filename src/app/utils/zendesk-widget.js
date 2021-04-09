@@ -6,29 +6,28 @@ const zendeskScriptUrl =
 const jwtTokenEndpoint = 'https://cs.pf9.us/support/zd/widget-auth'
 const authErrorMsg = 'Error authenticating Zendesk widget: '
 
-export const addZendeskWidgetScriptToDomBody = ({ userId, displayName, email }) => {
+export const zendeskIdentifyUser = (displayName, email) => {
   if (window.zE) {
-    window.zE('webWidget', 'show')
-    return
-  }
-
-  // const existingScript = document.getElementById('zendesk-action')
-  // if (existingScript) {
-  //   DocumentMetaCls.removeScriptElementFromDomBody('zendesk-action')
-  // }
-  // const script = document.createElement('script')
-  // script.id = 'zendesk-action'
-  // script.textContent = `if (zE) {zE('webWidget', 'show')}`
-  // script.type = 'text/javascript'
-  // document.body.appendChild(script)
-
-  const onload = () => {
     window.zE('webWidget', 'identify', {
       name: displayName,
       email,
     })
   }
+}
 
+export const showZendeskWidget = () => {
+  if (window.zE) {
+    window.zE('webWidget', 'show')
+  }
+}
+
+export const hideZendeskWidget = () => {
+  if (window.zE) {
+    window.zE('webWidget', 'hide')
+  }
+}
+
+export const addZendeskWidgetScriptToDomBody = ({ userId, displayName, email }) => {
   const userData = {
     name: displayName,
     email: email,
@@ -36,6 +35,7 @@ export const addZendeskWidgetScriptToDomBody = ({ userId, displayName, email }) 
     external_id: userId,
   }
 
+  // Specify the widget settings before adding the script
   window.zESettings = {
     analytics: true,
     answerBot: {
@@ -64,24 +64,9 @@ export const addZendeskWidgetScriptToDomBody = ({ userId, displayName, email }) 
     },
   }
 
-  DocumentMetaCls.addScriptElementToDomBody({ id: 'ze-snippet', src: zendeskScriptUrl, onload })
-}
-
-export const hideZendeskWidget = () => {
-  if (window.zE) {
-    window.zE('webWidget', 'hide')
-  }
-
-  // const zendeskScript = document.getElementById('ze-snippet')
-  // if (!zendeskScript) return
-
-  // const existingScript = document.getElementById('zendesk-action')
-  // if (existingScript) {
-  //   DocumentMetaCls.removeScriptElementFromDomBody('zendesk-action')
-  // }
-  // const script = document.createElement('script')
-  // script.id = 'zendesk-action'
-  // script.textContent = `if (zE) {zE('webWidget', 'hide')}`
-  // script.type = 'text/javascript'
-  // document.body.appendChild(script)
+  DocumentMetaCls.addScriptElementToDomBody({
+    id: 'ze-snippet',
+    src: zendeskScriptUrl,
+    onload: () => zendeskIdentifyUser(displayName, email),
+  })
 }
