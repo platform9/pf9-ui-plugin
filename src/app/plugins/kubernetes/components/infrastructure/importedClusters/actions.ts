@@ -2,7 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { intersection } from 'ramda'
-import { importedClustersSelector, makeImportedClustersSelector } from './selectors'
+import { importedClustersSelector, makeParamsImportedClustersSelector } from './selectors'
 
 const acceptedApiVersions = ['v1alpha2']
 
@@ -31,5 +31,5 @@ export const importedClusterActions = createCRUDActions(ActionDataKeys.ImportedC
   },
   uniqueIdentifier: 'uuid',
   selector: importedClustersSelector,
-  selectorCreator: makeImportedClustersSelector,
+  selectorCreator: makeParamsImportedClustersSelector,
 })

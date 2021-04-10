@@ -1088,8 +1088,50 @@ class Qbert extends ApiService {
     return alerts?.map((alert) => ({
       ...alert,
       clusterId: clusterUuid,
-      id: alert.fingerprint,
+      id: `${alert.fingerprint}-${clusterUuid}`,
     }))
+  }
+
+  getAlertManagerSilences = async (clusterId): Promise<any> => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences`
+    const silences = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getSilences',
+      },
+    })
+    return silences?.map((silence) => ({
+      ...silence,
+      clusterId: clusterId,
+    }))
+  }
+
+  createAlertManagerSilence = async (clusterId, body): Promise<any> => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences`
+    const silence = await this.client.basicPost<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createSilence',
+      },
+    })
+    return {
+      ...silence,
+      clusterId: clusterId,
+    }
+  }
+
+  deleteAlertManagerSilence = async (clusterId, silenceId): Promise<any> => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silence/${silenceId}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteSilence',
+      },
+    })
   }
 
   getPrometheusAlerts = async (clusterUuid) => {
