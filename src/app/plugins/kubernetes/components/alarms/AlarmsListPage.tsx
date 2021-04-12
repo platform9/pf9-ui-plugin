@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import StatusPicklist from './StatusPicklist'
 import SeverityPicklist from './SeverityPicklist'
@@ -24,6 +24,7 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import Progress from 'core/components/progress/Progress'
 import { IUseDataLoader } from '../infrastructure/nodes/model'
 import { IAlertSelector } from './model'
+import SnoozeAlarmDialog from './SnoozeAlarmDialog'
 const ClusterPicklist: any = ClusterPicklistDefault
 const TimePicklist: any = TimePicklistDefault
 
@@ -111,6 +112,7 @@ const ListPage = ({ ListContainer }) => {
       loadAlerts,
       params,
     ) as any
+
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
     const [timeSeriesData, timeSeriesLoading] = useDataLoader(loadTimeSeriesAlerts, {
@@ -128,6 +130,11 @@ const ListPage = ({ ListContainer }) => {
         [allKey, alert.status].includes(params.status)
       )
     })
+
+    useEffect(() => {
+      // workaround to nullify cache on reload / cluster change to match time series graph
+      reload(true)
+    }, [params.clusterId])
 
     return (
       <>
@@ -188,6 +195,9 @@ const ListPage = ({ ListContainer }) => {
           reload={reload}
           data={filteredAlerts}
           getParamsUpdater={getParamsUpdater}
+          // Todo: Instead of listTableParams to pass params through to dialog,
+          // using redux for accessing table state would be better
+          listTableParams={params}
           {...pick(listTablePrefs, params)}
         />
       </>
@@ -220,7 +230,12 @@ interface IOptions {
   cacheKey: string
   name: string
   title: string
-  showCheckboxes: boolean
+  multiSelection: boolean
+  batchActions: Array<{
+    label: string
+    icon: string
+    dialog: any
+  }>
   ListPage: any
 }
 type RenderFn<T extends keyof IAlertSelector> = (
@@ -296,7 +311,14 @@ export const options: IOptions = {
   cacheKey: ActionDataKeys.Alerts,
   name: 'Alarms',
   title: 'Alarms',
-  showCheckboxes: false,
+  batchActions: [
+    {
+      label: 'Snooze',
+      icon: 'snooze',
+      dialog: SnoozeAlarmDialog,
+    },
+  ],
+  multiSelection: false,
   ListPage,
 }
 const components = createCRUDComponents(options)

@@ -184,8 +184,9 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 // and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params) => {
+  // Maybe todo: change these to use the params selector instead to enable filtering?
   const clusters = await clusterActions.list(params)
-  const importedClusters = await importedClusterActions.list()
+  const importedClusters = await importedClusterActions.list(params)
   const collectiveClusters = [...clusters, ...importedClusters]
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
   return [clusterId, collectiveClusters]

@@ -71,6 +71,4 @@ export const someAsync = async (promises, errorHandler = (err) => console.warn(e
   return results.filter(Array.isArray).map(head)
 }
 
-export const sleep = async (ms) => (
-  await new Promise(resolve => setTimeout(resolve, ms))
-)
+export const sleep = async (ms) => await new Promise((resolve) => setTimeout(resolve, ms))

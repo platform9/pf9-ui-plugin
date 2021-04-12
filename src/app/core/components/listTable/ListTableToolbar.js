@@ -119,6 +119,7 @@ const ListTableToolbar = ({
   deleteCond,
   deleteDisabledInfo,
   hideDelete,
+  listTableParams,
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
@@ -160,7 +161,12 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <ListTableBatchActions batchActions={allActions} selected={selected} onRefresh={onRefresh} />
+      <ListTableBatchActions
+        batchActions={allActions}
+        selected={selected}
+        onRefresh={onRefresh}
+        listTableParams={listTableParams}
+      />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {Array.isArray(filters)
