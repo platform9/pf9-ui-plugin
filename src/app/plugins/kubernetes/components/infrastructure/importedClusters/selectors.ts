@@ -3,6 +3,8 @@ import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
 import { mergeLeft, pipe } from 'ramda'
 import { createSelector } from 'reselect'
+import { filterIf } from 'utils/fp'
+import { importedHasPrometheusTag } from './helpers'
 
 export const importedClustersSelector = createSelector(
   [getDataSelector<DataKeys.ImportedClusters>(DataKeys.ImportedClusters)],
@@ -26,7 +28,7 @@ export const importedClustersSelector = createSelector(
   },
 )
 
-export const makeImportedClustersSelector = (
+export const makeParamsImportedClustersSelector = (
   defaultParams = {
     orderBy: 'creationTimestamp',
     orderDirection: 'desc',
@@ -35,8 +37,11 @@ export const makeImportedClustersSelector = (
   return createSelector(
     [importedClustersSelector, (_, params) => mergeLeft(params, defaultParams)],
     (clusters, params) => {
-      const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(clusters)
+      const { orderBy, orderDirection, prometheusClusters } = params
+      return pipe<any, any, any>(
+        filterIf(prometheusClusters, importedHasPrometheusTag),
+        createSorter({ orderBy, orderDirection }),
+      )(clusters)
     },
   )
 }
