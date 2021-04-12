@@ -57,7 +57,19 @@ export const ToolbarActionIcon = ({ icon }) => {
 }
 
 const ListTableAction = withRouter(
-  ({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh, routeTo, history }) => {
+  ({
+    cond,
+    action,
+    label,
+    disabledInfo,
+    dialog,
+    icon,
+    selected,
+    onRefresh,
+    routeTo,
+    history,
+    listTableParams,
+  }) => {
     const { root, actionLabel, disabledAction } = useStyles()
     const [dialogOpened, setDialogOpened] = useState(false)
     const store = useSelector(identity)
@@ -70,6 +82,7 @@ const ListTableAction = withRouter(
           <DialogComponent
             rows={selected}
             open={dialogOpened}
+            listTableParams={listTableParams}
             onClose={(success) => {
               if (success === true && onRefresh) {
                 onRefresh()
@@ -108,9 +121,20 @@ const ListTableAction = withRouter(
   },
 )
 
-const ListTableBatchActions = ({ batchActions = [], selected = [], onRefresh }) => {
+const ListTableBatchActions = ({
+  batchActions = [],
+  selected = [],
+  onRefresh,
+  listTableParams,
+}) => {
   return batchActions.map((action) => (
-    <ListTableAction key={action.label} {...action} onRefresh={onRefresh} selected={selected} />
+    <ListTableAction
+      key={action.label}
+      {...action}
+      onRefresh={onRefresh}
+      selected={selected}
+      listTableParams={listTableParams}
+    />
   ))
 }
 

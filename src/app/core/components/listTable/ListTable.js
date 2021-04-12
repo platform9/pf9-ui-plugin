@@ -595,6 +595,7 @@ class ListTable extends PureComponent {
       headless,
       hideDelete,
       alternativeTableContent,
+      listTableParams,
     } = this.props
 
     if (!data) {
@@ -670,6 +671,7 @@ class ListTable extends PureComponent {
                   onChangeRowsPerPage={this.handleChangeRowsPerPage}
                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
                   hideDelete={hideDelete}
+                  listTableParams={listTableParams}
                 />
               )}
               {alternativeTableContent ? (
