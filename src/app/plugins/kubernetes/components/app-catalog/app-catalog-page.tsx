@@ -9,8 +9,9 @@ import { routes } from 'core/utils/routes'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { appActions } from './actions'
 import RepositoryPicklist from './repository-picklist'
-import { repositoriesForClusterLoader } from '../repositories/actions'
+import { repositoriesForClusterLoader, repositoryActions } from './repositories/actions'
 import { pluck } from 'ramda'
+import NoRepositoriesMessage from './repositories/no-repositories-message'
 
 const ClusterPicklist: any = ClusterPicklistDefault
 
@@ -34,6 +35,7 @@ const AppCatalogPage = () => {
     repositoriesForClusterLoader,
     params,
   )
+  const [repositories, loadingRepositories] = useDataLoader(repositoryActions.list)
 
   const handleRefresh = useCallback(() => reload(true), [reload])
 
@@ -86,7 +88,15 @@ const AppCatalogPage = () => {
     [handleOnClick],
   )
 
-  const loading = loadingApps || loadingReposForCluster
+  const loading = loadingApps || loadingReposForCluster || loadingRepositories
+
+  const noRepositoriesMessage = useMemo(
+    () =>
+      loadingRepositories || (repositories && repositories.length > 0) ? null : (
+        <NoRepositoriesMessage />
+      ),
+    [loadingRepositories, repositories],
+  )
 
   return (
     <>
@@ -102,6 +112,7 @@ const AppCatalogPage = () => {
         sortTarget="name"
         loading={loading}
         handleRefresh={handleRefresh}
+        emptyItemsMessage={noRepositoriesMessage}
       >
         {renderAppCards}
       </CardTable>

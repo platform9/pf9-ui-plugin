@@ -6,7 +6,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
 import { pluck } from 'ramda'
-import { appActions } from '../apps/actions'
+import { appActions } from '../actions'
 
 const { helm } = ApiClient.getInstance()
 const { dispatch } = store

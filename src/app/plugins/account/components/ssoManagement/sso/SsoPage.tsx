@@ -19,6 +19,7 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import { createSsoConfig, deleteSsoConfig, loadSsoConfig } from './actions'
 import Progress from 'core/components/progress/Progress'
 import SsoEnabledDialog from './SsoEnabledDialog'
+import { SsoProviders } from './model'
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -66,6 +67,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface State {
   enableSso: boolean
   ssoIsEnabled: boolean
+  ssoProviderName: string
   defaultAttributeMap: string
   entityId: string
   ssoProvider: string
@@ -88,11 +90,10 @@ const updateSsoSettings = (data, setLoading, setDialogOpened, updateParams) => {
     }
 
     const body = {
-      provider: data.ssoProvider,
+      provider: data.ssoProvider === SsoProviders.Other ? data.ssoProviderName : data.ssoProvider,
       entity_id: data.entityId,
       metadata_url: data.metadataUrl,
       metadata: data.metadataUrl ? undefined : data.metadata,
-      attr_map_xml: data.defaultAttributeMap,
     }
     setLoading(true)
     try {
@@ -118,6 +119,7 @@ const SsoPage = () => {
     defaultAttributeMap: '',
     entityId: '',
     ssoProvider: '',
+    ssoProviderName: '',
   })
 
   useEffect(() => {
@@ -174,7 +176,7 @@ const SsoPage = () => {
               ssoIsEnabled={params.ssoIsEnabled}
               checked={params.enableSso}
               onClick={toggleSso}
-            ></SsoToggle>
+            />
           </FormFieldCard>
           {params.enableSso && (
             <FormFieldCard title="Configure SSO">
@@ -186,6 +188,16 @@ const SsoPage = () => {
                 value={params.ssoProvider}
                 required
               />
+              {params.ssoProvider === SsoProviders.Other && (
+                <TextField
+                  id="ssoProviderName"
+                  label="SSO Provider Name"
+                  onChange={getParamsUpdater('ssoProviderName')}
+                  value={params.ssoProviderName}
+                  info="Provide a name to identify your SSO provider"
+                  required
+                />
+              )}
               <Text variant="caption1" className={classes.wizardLabel}>
                 Entity Endpoint for your SSO Provider
               </Text>

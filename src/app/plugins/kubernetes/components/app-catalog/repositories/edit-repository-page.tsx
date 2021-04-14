@@ -1,4 +1,5 @@
-import React from 'react'
+// @ts-nocheck
+import React, { useMemo } from 'react'
 import FormWrapperDefault from 'core/components/FormWrapper'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -11,11 +12,14 @@ import RadioFields from 'core/components/validatedForm/radio-fields'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { routes } from 'core/utils/routes'
-import ClustersListCard from './clusters-list-card'
-import { RepositoryType, repositoryOptions } from './models'
 import useReactRouter from 'use-react-router'
-import useDataUpdater from 'core/hooks/useDataUpdater'
+import { repositoryOptions, RepositoryType } from './models'
+import ClustersListCard from './clusters-list-card'
+import useDataLoader from 'core/hooks/useDataLoader'
 import { repositoryActions } from './actions'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { propEq } from 'ramda'
+import { emptyObj } from 'utils/fp'
 import { useSelector } from 'react-redux'
 import { RootState } from 'app/store'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
@@ -26,7 +30,7 @@ const FormWrapper: any = FormWrapperDefault // types on forward ref .js file don
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
     display: 'grid',
-    gridTemplateColumns: '480px 440px',
+    gridTemplateColumns: 'minmax(480px, max-content) 440px',
     gridGap: theme.spacing(3),
     margin: theme.spacing(3, 0, 3, 0),
   },
@@ -59,15 +63,26 @@ const useStyles = makeStyles((theme: Theme) => ({
   label: {
     ...theme.typography.body2,
   },
+  repoInfo: {
+    display: 'grid',
+    gridTemplateColumns: '120px 1fr',
+    gridTemplateRows: '40px',
+    gridGap: theme.spacing(1),
+  },
 }))
 
 const customerTierBlacklist = [CustomerTiers.Freedom]
 
-const AddRepoPage = () => {
+const EditRepositoryPage = () => {
   const classes = useStyles()
-  const { history } = useReactRouter()
+  const { history, match } = useReactRouter()
+  const repoName = match.params.id
+  const [repos, loading] = useDataLoader(repositoryActions.list)
   const anyRepositoryActions = repositoryActions as any
-  const [addRepo, addingRepo] = useDataUpdater(anyRepositoryActions.create)
+  const [updateRepo, updatingRepo] = useDataUpdater(anyRepositoryActions.update)
+  const [deleteClustersFromRepository, deletingClustersFromRepository] = useDataUpdater(
+    anyRepositoryActions.deleteClustersFromRepository,
+  )
   const [addClustersToRepository, addingClustersToRepository] = useDataUpdater(
     anyRepositoryActions.addClustersToRepository,
   )
@@ -76,36 +91,57 @@ const AddRepoPage = () => {
   const { username, features } = session
   const customerTier = pathOr(CustomerTiers.Freedom, ['customer_tier'], features)
 
-  const initialContext = {
-    repositoryType: RepositoryType.Public,
-    searchTerm: '',
-    clusters: customerTierBlacklist.includes(customerTier) ? allKey : [],
-  }
+  const repo = useMemo(() => repos.find(propEq('name', repoName)) || emptyObj, [repos])
 
-  const handleSubmit = async (wizardContext) => {
-    const [success, newRepo] = await addRepo(wizardContext)
+  const submitForm = async (wizardContext) => {
+    const [success, updatedRepo] = await updateRepo(wizardContext)
+    if (success) {
+      // Find clusters that were removed
+      const clustersToRemove = repo.clusters.filter(
+        (clusterId) => !wizardContext.clusters.includes(clusterId),
+      )
+      if (clustersToRemove.length) {
+        await deleteClustersFromRepository({ repoName: repo.name, clusterIds: clustersToRemove })
+      }
 
-    if (success && wizardContext.clusters.length) {
-      await addClustersToRepository({
-        repoName: newRepo.name,
-        clusterIds: wizardContext.clusters,
-      })
+      // Find clusters that were added
+      const clustersToAdd = wizardContext.clusters.filter(
+        (clusterId) => !repo.clusters.includes(clusterId),
+      )
+      if (clustersToAdd.length) {
+        await addClustersToRepository({
+          repoName: updatedRepo.name,
+          clusterIds: clustersToAdd,
+        })
+      }
     }
-
-    history.push(routes.repositories.list.path()), [history]
+    history.push(routes.repositories.list.path())
   }
+
+  const initialContext = useMemo(
+    () => ({
+      name: repo.name,
+      url: repo.url,
+      repositoryType: repo.private ? RepositoryType.Private : RepositoryType.Public,
+      clusters: customerTierBlacklist.includes(customerTier) ? allKey : repo.clusters,
+    }),
+    [repo],
+  )
+
+  const submitting = updatingRepo || deletingClustersFromRepository || addingClustersToRepository
 
   return (
     <>
-      <DocumentMeta title="Add Repository" />
+      <DocumentMeta title="Edit Repository" />
       <FormWrapper
-        title="Add New Repository"
+        title="Edit Repository"
         isUpdateForm={true}
-        loading={addingRepo || addingClustersToRepository}
+        loading={loading || submitting}
+        message={submitting ? 'Submitting form...' : 'Loading...'}
       >
         <Wizard
           context={initialContext}
-          onComplete={handleSubmit}
+          onComplete={submitForm}
           hideBack={true}
           submitLabel="Save"
           onCancel={() => history.push(routes.repositories.list.path())}
@@ -113,7 +149,7 @@ const AddRepoPage = () => {
           {({ wizardContext, setWizardContext, onNext }) => {
             return (
               <>
-                <WizardStep stepId="step1" label="Add Repository" keepContentMounted={false}>
+                <WizardStep stepId="step1" label="Edit Repository" keepContentMounted={false}>
                   <ValidatedForm
                     title="Add Repo"
                     elevated={false}
@@ -131,20 +167,12 @@ const AddRepoPage = () => {
                         }
                       >
                         <div className={classes.fields}>
-                          <TextField
-                            id="name"
-                            label="Repository Name"
-                            className={classes.textField}
-                            onChange={(value) => setWizardContext({ repositoryName: value })}
-                            required
-                          />
-                          <TextField
-                            id="url"
-                            label="Repository URL"
-                            className={classes.textField}
-                            onChange={(value) => setWizardContext({ repositoryUrl: value })}
-                            required
-                          />
+                          <div className={classes.repoInfo}>
+                            <Text variant="body2">Repository Name: </Text>
+                            <Text variant="caption1">{repo.name}</Text>
+                            <Text variant="body2">Repository URL: </Text>
+                            <Text variant="caption1">{repo.url}</Text>
+                          </div>
                           {wizardContext.repositoryType === RepositoryType.Private && (
                             <div className={classes.loginDetails}>
                               <TextField
@@ -187,7 +215,7 @@ const AddRepoPage = () => {
                         </div>
                       </FormFieldCard>
                       <ClustersListCard
-                        title="ASSIGN CLUSTERS"
+                        title="ADD/REMOVE CLUSTERS"
                         wizardContext={wizardContext}
                         setWizardContext={setWizardContext}
                         username={username}
@@ -206,4 +234,4 @@ const AddRepoPage = () => {
   )
 }
 
-export default AddRepoPage
+export default EditRepositoryPage
