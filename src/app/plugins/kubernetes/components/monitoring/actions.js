@@ -6,10 +6,8 @@ import { prometheusRuleActions } from 'k8s/components/prometheus/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
-import { parseClusterParams } from '../infrastructure/clusters/actions'
-import { hasPrometheusTag } from 'k8s/components/infrastructure/clusters/helpers'
-import { importedHasPrometheusTag } from 'k8s/components/infrastructure/importedClusters/helpers'
-import { isPrometheusCluster } from 'k8s/components/alarms/actions'
+import { clusterTagActions, parseClusterParams } from '../infrastructure/clusters/actions'
+import { hasPrometheusEnabled } from '../prometheus/helpers'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -20,9 +18,12 @@ export const loadAlertRules = createContextLoader(
   async (params) => {
     // Fetch dependent cache used in selector later
     await prometheusRuleActions.list()
-
+    const clustersWithTasks = await clusterTagActions.list()
     const [clusterId, clusters] = await parseClusterParams(params)
-    const filteredClusters = clusters.filter((cluster) => isPrometheusCluster(cluster))
+    const filteredClusters = clusters.filter((cluster) => {
+      const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
+      return hasPrometheusEnabled(clusterWithTasks)
+    })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', filteredClusters).map(qbert.getPrometheusAlertRules)).then(
         flatten,

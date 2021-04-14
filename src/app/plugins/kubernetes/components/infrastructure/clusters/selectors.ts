@@ -18,8 +18,8 @@ import {
   hasAppCatalogEnabled,
   hasHealthyMasterNodes,
   hasMasterNode,
-  hasPrometheusTag,
   masterlessCluster,
+  prometheusCluster,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import { nodesSelector } from 'k8s/components/infrastructure/nodes/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
@@ -111,6 +111,7 @@ export const clustersSelector = createSelector(
         etcdBackupEnabled: castFuzzyBool(
           pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster),
         ),
+        hasPrometheus: isPrometheusEnabled,
       }
     })
   },
@@ -147,7 +148,7 @@ export const makeParamsClustersSelector = (
       >(
         filterIf(masterNodeClusters, hasMasterNode),
         filterIf(masterlessClusters, masterlessCluster),
-        filterIf(prometheusClusters, hasPrometheusTag),
+        filterIf(prometheusClusters, prometheusCluster),
         filterIf(appCatalogClusters, hasAppCatalogEnabled),
         filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
         filterIf(healthyClusters, hasHealthyMasterNodes),
