@@ -13,6 +13,13 @@ import {
 } from 'k8s/links'
 import ExternalLink from 'core/components/ExternalLink'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import { useSelector } from 'react-redux'
+import { CustomerTiers } from 'app/constants'
+import { pathOr, prop } from 'ramda'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { showAndOpenZendeskWidget, showZendeskWidget } from 'utils/zendesk-widget'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { showZendeskChatOption } from 'core/utils/helpers'
 
 const useStyles = makeStyles((theme) => ({
   pageHeader: {
@@ -72,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
 
 const brandIcons = ['slack-hash']
 
-const SupportCard = ({ title, icon, body = '', src, action }) => {
+const SupportCard = ({ title, icon, body = '', src, action, onClick }) => {
   const classes = useStyles()
   return (
     <div className={classes.card}>
@@ -86,12 +93,12 @@ const SupportCard = ({ title, icon, body = '', src, action }) => {
       </header>
       <article className={classes.cardBody}>
         <Text variant="body1">{body}</Text>
-        {src.indexOf('mailto') >= 0 ? (
+        {src && src.indexOf('mailto') >= 0 ? (
           <a href={src}>
             <CardButton showPlus={false}>{action}</CardButton>
           </a>
         ) : (
-          <ExternalLink url={src}>
+          <ExternalLink url={src} onClick={onClick}>
             <CardButton showPlus={false}>{action}</CardButton>
           </ExternalLink>
         )}
@@ -102,6 +109,11 @@ const SupportCard = ({ title, icon, body = '', src, action }) => {
 
 const HelpPage = () => {
   const classes = useStyles()
+  const session = useSelector(prop(sessionStoreKey))
+  const { features } = session
+  const customerTier = pathOr(CustomerTiers.Freedom, ['customer_tier'], features)
+  const [{ lastStack }] = useScopedPreferences()
+
   return (
     <>
       <Text variant="h6" className={classes.pageHeader}>
@@ -149,6 +161,15 @@ const HelpPage = () => {
           src={slackLink}
           action="Open Slack"
         />
+        {showZendeskChatOption(lastStack, customerTier) && (
+          <SupportCard
+            title="Chat With Us"
+            icon="comments-alt"
+            src={''}
+            action="Open Chat"
+            onClick={showAndOpenZendeskWidget}
+          />
+        )}
       </div>
     </>
   )
