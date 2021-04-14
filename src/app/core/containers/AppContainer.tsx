@@ -167,12 +167,18 @@ const AppContainer = () => {
 
       // Segment tracking
       if (!analyticsOff) {
-        DocumentMetaCls.addScriptElementToDomBody('segmentCode', segmentScriptContent)
+        DocumentMetaCls.addScriptElementToDomBody({
+          id: 'segmentCode',
+          textContent: segmentScriptContent,
+        })
       }
 
       // Drift tracking code for live demo
       if (sandboxFlag) {
-        DocumentMetaCls.addScriptElementToDomBody('driftCode', driftScriptContent)
+        DocumentMetaCls.addScriptElementToDomBody({
+          id: 'driftCode',
+          textContent: driftScriptContent,
+        })
       }
 
       // Legacy DU & DDU have different conditions
