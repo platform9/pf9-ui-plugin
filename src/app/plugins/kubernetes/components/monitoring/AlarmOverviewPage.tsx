@@ -14,6 +14,8 @@ import Progress from 'core/components/progress/Progress'
 import ClusterAlarmCard from './ClusterAlarmCard'
 import AlarmOverviewClusters from './AlarmOverviewClusters'
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import RefreshButton from 'core/components/buttons/refresh-button'
+import NoContentMessage from 'core/components/NoContentMessage'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   alarmsContainer: {
@@ -29,8 +31,13 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
     marginRight: theme.spacing(2.5),
   },
   alarmFilters: {
-    display: 'flex',
-    justifyContent: 'space-between',
+    display: 'inline-grid',
+    gridTemplateColumns: 'auto auto auto',
+    columnGap: theme.spacing(2.5),
+    alignItems: 'center',
+  },
+  refreshButton: {
+    marginLeft: 0,
   },
 }))
 
@@ -150,7 +157,15 @@ const AlarmOverviewPage = () => {
                 onChange={(value) => updateParams({ ...params, order: value })}
                 value={params.order}
               />
+              <RefreshButton
+                className={classes.refreshButton}
+                onRefresh={() => {
+                  reloadAlarms(true)
+                  reloadClusters(true)
+                }}
+              />
             </div>
+            {!filteredClustersWithAlarms.length && <NoContentMessage message="No data found" />}
             {filteredClustersWithAlarms.map((cluster) => (
               <ClusterAlarmCard key={cluster.uuid} cluster={cluster} />
             ))}

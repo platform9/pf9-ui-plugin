@@ -31,10 +31,13 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
       paddingBottom: 5,
     },
   },
-  clustersList: {
+  clustersListContainer: {
+    minHeight: 200,
     marginTop: theme.spacing(1.5),
     padding: theme.spacing(1.5, 3),
     boxShadow: '0 2.5px 2.5px -1.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12)',
+  },
+  clustersList: {
     display: 'grid',
     rowGap: theme.spacing(1),
   },
@@ -47,6 +50,10 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
     display: 'grid',
     gridTemplateColumns: 'auto auto',
     columnGap: theme.spacing(3),
+  },
+  noClustersText: {
+    textAlign: 'center',
+    marginTop: theme.spacing(2),
   },
 }))
 
@@ -99,17 +106,24 @@ const AlarmOverviewClusters = () => {
           onChange={(value) => updateParams({ ...params, orderDirection: value })}
         />
       </div>
-      <div className={classes.clustersList}>
+      <div className={classes.clustersListContainer}>
+        {!filteredClusters.length && (
+          <Text className={classes.noClustersText} variant="body2">
+            No clusters with monitoring found
+          </Text>
+        )}
         {filteredClusters.map((cluster) => (
-          <div key={cluster.uuid} className={classes.clusterRow}>
-            <Text variant="body2">{cluster.name}</Text>
-            <div className={classes.clusterLinks}>
-              <ExternalLink url={cluster.usage.grafanaLink}>
-                <FontAwesomeIcon size="sm">chart-line</FontAwesomeIcon>
-              </ExternalLink>
-              <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>
-                <FontAwesomeIcon size="sm">search-plus</FontAwesomeIcon>
-              </SimpleLink>
+          <div className={classes.clustersList}>
+            <div key={cluster.uuid} className={classes.clusterRow}>
+              <Text variant="body2">{cluster.name}</Text>
+              <div className={classes.clusterLinks}>
+                <ExternalLink url={cluster.usage.grafanaLink}>
+                  <FontAwesomeIcon size="sm">chart-line</FontAwesomeIcon>
+                </ExternalLink>
+                <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>
+                  <FontAwesomeIcon size="sm">search-plus</FontAwesomeIcon>
+                </SimpleLink>
+              </div>
             </div>
           </div>
         ))}
