@@ -6,22 +6,31 @@ const zendeskScriptUrl =
 const jwtTokenEndpoint = 'https://cs.pf9.us/support/zd/widget-auth'
 const authErrorMsg = 'Error authenticating Zendesk widget: '
 
+interface IWindow extends Window {
+  zE: any
+  zESettings: any
+}
+declare var window: IWindow
+
 export const showZendeskWidget = () => {
-  if (window.zE) {
-    zE('webWidget', 'show')
+  if (!window.zE) {
+    return
   }
+  window.zE('webWidget', 'show')
 }
 
 export const hideZendeskWidget = () => {
-  if (window.zE) {
-    zE('webWidget', 'hide')
+  if (!window.zE) {
+    return
   }
+  window.zE('webWidget', 'hide')
 }
 
 export const openZendeskWidget = () => {
-  if (window.zE) {
-    zE('webWidget', 'open')
+  if (!window.zE) {
+    return
   }
+  window.zE('webWidget', 'open')
 }
 
 export const showAndOpenZendeskWidget = () => {
@@ -30,25 +39,27 @@ export const showAndOpenZendeskWidget = () => {
 }
 
 const zendeskIdentifyUser = (displayName, email) => {
-  if (window.zE) {
-    zE('webWidget', 'identify', {
-      name: displayName,
-      email,
-    })
+  if (!window.zE) {
+    return
   }
+  window.zE('webWidget', 'identify', {
+    name: displayName,
+    email,
+  })
 }
 
 const reauthenticateZendeskUser = ({ displayName, email, zeSettings }) => {
+  if (!window.zE) {
+    return
+  }
   // Re-identify the user
   zendeskIdentifyUser(displayName, email)
 
-  if (window.zE) {
-    // Update widget settings
-    zE('webWidget', 'updateSettings', zeSettings)
+  // Update widget settings
+  window.zE('webWidget', 'updateSettings', zeSettings)
 
-    // Re-authenticate the user
-    zE('webWidget', 'chat:reauthenticate')
-  }
+  // Re-authenticate the user
+  window.zE('webWidget', 'chat:reauthenticate')
 }
 
 /**
@@ -102,12 +113,13 @@ export const addZendeskWidgetScriptToDomBody = ({ userId, displayName, email }) 
   window.zESettings = zeSettings
 
   const onload = () => {
+    if (!window.zE) {
+      return
+    }
     hideZendeskWidget()
     zendeskIdentifyUser(displayName, email)
-    if (window.zE) {
-      zE('webWidget:on', 'open', () => zE('webWidget', 'show'))
-      zE('webWidget:on', 'close', () => zE('webWidget', 'hide'))
-    }
+    window.zE('webWidget:on', 'open', () => window.zE('webWidget', 'show'))
+    window.zE('webWidget:on', 'close', () => window.zE('webWidget', 'hide'))
   }
 
   DocumentMetaCls.addScriptElementToDomBody({
