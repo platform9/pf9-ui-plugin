@@ -5,24 +5,31 @@ import PicklistDefault from 'core/components/Picklist'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 const options = [
-  { label: 'warning', value: 'warning' },
-  { label: 'critical', value: 'critical' },
-  { label: 'fatal', value: 'fatal' },
+  { label: 'A to Z', value: 'asc' },
+  { label: 'Z to A', value: 'desc' },
 ]
 
 interface Props {
+  value: string
+  onChange: (value: string) => void
   name?: string
   label?: string
-  value: string
-  selectFirst: boolean
-  onChange: (value: string) => void
+  selectFirst?: boolean
+  formField?: boolean
 }
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const SeverityPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
-  // ( name = 'severity', label = 'Severity', onChange, selectFirst = true, ...rest }, ref) => {
+const AlphabeticalPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
   (props, ref) => {
-    const { onChange, value, name = 'severity', label = 'Severity', selectFirst = false } = props
+    const {
+      onChange,
+      value,
+      name = 'sortOrder',
+      label = '',
+      selectFirst = true,
+      formField = false,
+      ...rest
+    } = props
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
@@ -33,15 +40,18 @@ const SeverityPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Pro
 
     return (
       <Picklist
+        {...rest}
         name={name}
         label={label}
         value={value}
         ref={ref}
         onChange={onChange}
         options={options}
+        showAll={false}
+        formField={formField}
       />
     )
   },
 )
 
-export default SeverityPicklist
+export default AlphabeticalPicklist
