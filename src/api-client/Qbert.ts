@@ -555,7 +555,7 @@ class Qbert extends ApiService {
   }
 
   deleteDeployment = async (clusterId, namespace, name) => {
-    const url = `/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
+    const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
     return this.client.basicDelete({
       url,
       options: {
