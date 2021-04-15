@@ -300,10 +300,10 @@ const IronicSetupPage = () => {
 
   useEffect(() => {
     // workaround for UX-816 (useDataLoader hook returning loading undefined)
-    reloadNetworks()
-    reloadSubnets()
-    reloadHosts()
-    reloadImages()
+    reloadNetworks(true)
+    reloadSubnets(true)
+    reloadHosts(true)
+    reloadImages(true)
   }, [])
 
   // Determine current step
