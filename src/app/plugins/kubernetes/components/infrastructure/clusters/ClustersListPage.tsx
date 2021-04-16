@@ -127,6 +127,19 @@ const renderNodeLink = (_, { uuid, nodes }) => {
 
 const renderStats = (_, { usage }) => <ResourceUsageTables usage={usage} />
 
+const renderK8sVersion = (_, { uuid, version, canUpgrade }) => {
+  return (
+    <div>
+      <Text variant="body2">{version}</Text>
+      {canUpgrade && (
+        <SimpleLink src={routes.cluster.nodeHealth.path({ id: uuid })}>
+          Upgrade Available
+        </SimpleLink>
+      )}
+    </div>
+  )
+}
+
 const renderClusterDetailLink = (name, cluster) => (
   <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>{name}</SimpleLink>
 )
@@ -204,7 +217,7 @@ export const options = {
       render: (type) => cloudProviderTypes[type] || capitalizeString(type),
     },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
-    { id: 'version', label: 'K8 Version' },
+    { id: 'version', label: 'K8 Version', render: renderK8sVersion },
     {
       id: 'created_at',
       label: 'Created at',
