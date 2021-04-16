@@ -41,6 +41,7 @@ export const importedClustersSelector = createSelector(
         workers: cluster.status?.workers,
         usage,
         hasPrometheus: isPrometheusEnabled,
+        clusterType: 'imported',
       }
     })
   },

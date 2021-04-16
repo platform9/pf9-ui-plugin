@@ -6,7 +6,7 @@ import {
   makeAlertsSelector,
   makeTimeSeriesSelector,
 } from 'k8s/components/alarms/selectors'
-import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import { allClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import moment from 'moment'
 import { flatten, pluck } from 'ramda'
@@ -16,7 +16,6 @@ import {
   clusterActions,
   clusterTagActions,
 } from '../infrastructure/clusters/actions'
-import { makeParamsImportedClustersSelector } from 'k8s/components/infrastructure/importedClusters/selectors'
 import store from 'app/store'
 import { loadAlertRules } from '../monitoring/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -67,8 +66,7 @@ const timestampSteps = {
   '3.h': [30, 'm'],
   '1.h': [10, 'm'],
 }
-const selector = makeParamsClustersSelector()
-const importedSelector = makeParamsImportedClustersSelector()
+const selector = allClustersSelector()
 
 export const loadTimeSeriesAlerts = createContextLoader(
   ActionDataKeys.AlertsTimeSeries,
@@ -88,15 +86,10 @@ export const loadTimeSeriesAlerts = createContextLoader(
       healthyClusters: true,
       prometheusClusters: true,
     })
-    const prometheusImportedClusters = importedSelector(store.getState(), {
-      ...params,
-      prometheusClusters: true,
-    })
-    const allPrometheusClusters = [...prometheusClusters, ...prometheusImportedClusters]
 
     if (clusterId === allKey) {
       return someAsync(
-        pluck('uuid', allPrometheusClusters).map((clusterUuid) =>
+        pluck('uuid', prometheusClusters).map((clusterUuid) =>
           qbert.getPrometheusAlertsOverTime(clusterUuid, timePast, timeNow, step),
         ),
       ).then(flatten)

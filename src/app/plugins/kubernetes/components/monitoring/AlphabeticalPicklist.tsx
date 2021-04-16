@@ -2,11 +2,12 @@ import React, { forwardRef, useEffect } from 'react'
 import { propOr, head } from 'ramda'
 import { allKey } from 'app/constants'
 import PicklistDefault from 'core/components/Picklist'
+import { OrderDirection } from 'core/helpers/createSorter'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 const options = [
-  { label: 'A to Z', value: 'asc' },
-  { label: 'Z to A', value: 'desc' },
+  { label: 'A to Z', value: OrderDirection.asc },
+  { label: 'Z to A', value: OrderDirection.desc },
 ]
 
 interface Props {

@@ -1,19 +1,17 @@
 import React, { useMemo, useState } from 'react'
 import { makeStyles, Theme } from '@material-ui/core'
 import SearchBar from 'core/components/SearchBar'
-import { IClusterSelector } from '../infrastructure/clusters/model'
-import { IUseDataLoader } from '../infrastructure/nodes/model'
 import AlphabeticalPicklist from './AlphabeticalPicklist'
 import Text from 'core/elements/text'
 import Progress from 'core/components/progress/Progress'
 import { LoadingGifs } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from '../infrastructure/clusters/actions'
+import { getAllClusters } from '../infrastructure/clusters/actions'
 import { routes } from 'core/utils/routes'
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import { OrderDirection } from 'core/helpers/createSorter'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   clusterFilters: {
@@ -59,38 +57,27 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
 
 const defaultParams = {
   search: '',
-  orderDirection: 'asc',
+  orderDirection: OrderDirection.asc,
 }
 
 const AlarmOverviewClusters = () => {
   const classes = useStyles({})
   const [params, updateParams] = useState(defaultParams)
-
-  // I think I also need to grab the imported clusters here too
-  const [clusters, clustersLoading]: IUseDataLoader<IClusterSelector> = useDataLoader(
-    clusterActions.list,
-    {
-      prometheusClusters: true,
-      orderBy: 'name',
-      orderDirection: params.orderDirection,
-    },
-  ) as any
-  const [importedClusters, importedClustersLoading] = useDataLoader(importedClusterActions.list, {
+  const [allClusters, allClustersLoading] = useDataLoader(getAllClusters, {
     prometheusClusters: true,
     orderBy: 'name',
     orderDirection: params.orderDirection,
   })
 
   const filteredClusters = useMemo(() => {
-    const allClusters = [...clusters, ...importedClusters]
     return allClusters.filter((cluster) => {
       return cluster.name.includes(params.search)
     })
-  }, [clusters, importedClusters, params.search])
+  }, [allClusters, params.search])
 
   return (
     <Progress
-      loading={clustersLoading || importedClustersLoading}
+      loading={allClustersLoading}
       overlay
       renderContentOnMount
       loadingImage={LoadingGifs.BluePinkTiles}
@@ -103,7 +90,7 @@ const AlarmOverviewClusters = () => {
         />
         <AlphabeticalPicklist
           value={params.orderDirection}
-          onChange={(value) => updateParams({ ...params, orderDirection: value })}
+          onChange={(value) => updateParams({ ...params, orderDirection: OrderDirection[value] })}
         />
       </div>
       <div className={classes.clustersListContainer}>

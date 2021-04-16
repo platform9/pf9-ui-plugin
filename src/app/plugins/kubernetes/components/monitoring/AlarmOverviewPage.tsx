@@ -5,15 +5,13 @@ import { IAlertSelector } from '../alarms/model'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadAlerts } from '../alarms/actions'
 import { allKey, LoadingGifs } from 'app/constants'
-import { IClusterSelector } from '../infrastructure/clusters/model'
-import { clusterActions } from '../infrastructure/clusters/actions'
+import { getAllClusters } from '../infrastructure/clusters/actions'
 import Text from 'core/elements/text'
 import AlarmOverviewOrderPicklist from './AlarmOverviewOrderPicklist'
 import SeverityPicklist from '../alarms/SeverityPicklist'
 import Progress from 'core/components/progress/Progress'
 import ClusterAlarmCard from './ClusterAlarmCard'
 import AlarmOverviewClusters from './AlarmOverviewClusters'
-import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import RefreshButton from 'core/components/buttons/refresh-button'
 import NoContentMessage from 'core/components/NoContentMessage'
 
@@ -55,25 +53,14 @@ const AlarmOverviewPage = () => {
     loadAlerts,
     params,
   ) as any
-  const [
-    clusters,
-    clustersLoading,
-    reloadClusters,
-  ]: IUseDataLoader<IClusterSelector> = useDataLoader(clusterActions.list, {
-    prometheusClusters: true,
-    orderBy: 'name',
-  }) as any
 
-  // I should prob just make a data loader + selector for all cluster types?
-
-  const [importedClusters, importedClustersLoading] = useDataLoader(importedClusterActions.list, {
+  const [allClusters, allClustersLoading, reloadAllClusters] = useDataLoader(getAllClusters, {
     prometheusClusters: true,
     orderBy: 'name',
   })
 
   const clustersWithAlarms = useMemo(() => {
-    if (!alarmsLoading && !clustersLoading && !importedClustersLoading) {
-      const allClusters = [...clusters, ...importedClusters]
+    if (!alarmsLoading && !allClustersLoading) {
       const result = allClusters.map((cluster) => {
         const clusterAlarms = alarms.filter((alarm) => {
           return (
@@ -92,7 +79,7 @@ const AlarmOverviewPage = () => {
       return result
     }
     return []
-  }, [alarms, clusters, importedClusters, alarmsLoading, clustersLoading, importedClustersLoading])
+  }, [alarms, allClusters, alarmsLoading, allClustersLoading])
 
   const filterBySeverity = (alarms, params) => {
     return alarms.filter((alarm) => {
@@ -128,23 +115,12 @@ const AlarmOverviewPage = () => {
 
   return (
     <Progress
-      loading={alarmsLoading || clustersLoading || importedClustersLoading}
+      loading={alarmsLoading || allClustersLoading}
       overlay
       renderContentOnMount
       loadingImage={LoadingGifs.BluePinkTiles}
     >
       <div>
-        {/* Remove this after putting in a refresh button */}
-        {!params.clusterId && (
-          <div
-            onClick={() => {
-              reloadAlarms(true)
-              reloadClusters(true)
-            }}
-          >
-            Refresh
-          </div>
-        )}
         <div className={classes.overviewContainer}>
           <div className={classes.alarmsContainer}>
             <div className={classes.alarmFilters}>
@@ -161,7 +137,7 @@ const AlarmOverviewPage = () => {
                 className={classes.refreshButton}
                 onRefresh={() => {
                   reloadAlarms(true)
-                  reloadClusters(true)
+                  reloadAllClusters(true)
                 }}
               />
             </div>

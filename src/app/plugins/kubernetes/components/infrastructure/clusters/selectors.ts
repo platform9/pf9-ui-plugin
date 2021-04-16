@@ -26,6 +26,7 @@ import { combinedHostsSelector } from 'k8s/components/infrastructure/common/sele
 import { hasPrometheusEnabled } from 'k8s/components/prometheus/helpers'
 import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
 import { calculateNodeUsages } from '../common/helpers'
+import { importedClustersSelector } from '../importedClusters/selectors'
 
 export const clustersSelector = createSelector(
   [
@@ -111,6 +112,7 @@ export const clustersSelector = createSelector(
           pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster),
         ),
         hasPrometheus: isPrometheusEnabled,
+        clusterType: 'normal',
       }
     })
   },
@@ -153,6 +155,54 @@ export const makeParamsClustersSelector = (
         filterIf(healthyClusters, hasHealthyMasterNodes),
         createSorter({ orderBy, orderDirection }),
       )(clusters)
+    },
+  )
+}
+
+export const allClustersSelector = (
+  defaultParams: SortConfig = {
+    orderBy: 'name',
+    orderDirection: 'asc',
+  },
+) => {
+  return createSelector(
+    [clustersSelector, importedClustersSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (clusters, importedClusters, params) => {
+      const {
+        masterNodeClusters,
+        masterlessClusters,
+        hasControlPanel,
+        healthyClusters,
+        appCatalogClusters,
+        prometheusClusters,
+        orderBy,
+        orderDirection,
+      } = params
+      // I want to reuse the makeParamsClusterSelector etc. here instead of code
+      // repetition but I don't know how to do so
+      const filteredClusters = pipe<
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[]
+      >(
+        filterIf(masterNodeClusters, hasMasterNode),
+        filterIf(masterlessClusters, masterlessCluster),
+        filterIf(prometheusClusters, prometheusCluster),
+        filterIf(appCatalogClusters, hasAppCatalogEnabled),
+        filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
+        filterIf(healthyClusters, hasHealthyMasterNodes),
+      )(clusters)
+
+      const filteredImportedClusters = pipe<any, any>(
+        filterIf(prometheusClusters, prometheusCluster),
+      )(importedClusters)
+
+      const allClusters = [...filteredClusters, ...filteredImportedClusters]
+      return createSorter({ orderBy, orderDirection })(allClusters)
     },
   )
 }

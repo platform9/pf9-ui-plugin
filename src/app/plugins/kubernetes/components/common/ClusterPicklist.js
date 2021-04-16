@@ -5,8 +5,7 @@ import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
 import { allKey } from 'app/constants'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import { getAllClusters } from 'k8s/components/infrastructure/clusters/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ClusterPicklist = forwardRef(
@@ -31,16 +30,12 @@ const ClusterPicklist = forwardRef(
       prometheusClusters: onlyPrometheusEnabled,
       healthyClusters: onlyHealthyClusters,
     }
-    const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
-    const [importedClusters, importedClustersLoading] = useDataLoader(importedClusterActions.list)
 
-    const filteredClusters = useMemo(
-      () =>
-        filterFn
-          ? filterFn([...clusters, ...importedClusters])
-          : [...clusters, ...importedClusters],
-      [clusters, importedClusters],
-    )
+    const [allClusters, allClustersLoading] = useDataLoader(getAllClusters, defaultParams)
+
+    const filteredClusters = useMemo(() => (filterFn ? filterFn(allClusters) : allClusters), [
+      allClusters,
+    ])
 
     const options = useMemo(() => {
       // Sorting on these may be a bit weird, ask chris what's preferred
@@ -59,7 +54,7 @@ const ClusterPicklist = forwardRef(
         {...rest}
         ref={ref}
         onChange={onChange}
-        loading={loading || clustersLoading}
+        loading={loading || allClustersLoading}
         options={options}
         value={value}
       />

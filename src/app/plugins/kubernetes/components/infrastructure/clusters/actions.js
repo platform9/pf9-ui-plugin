@@ -11,6 +11,7 @@ import {
   getEtcdBackupPayload,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
+  allClustersSelector,
   clustersSelector,
   makeParamsClustersSelector,
 } from 'k8s/components/infrastructure/clusters/selectors'
@@ -185,11 +186,9 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params) => {
   // Maybe todo: change these to use the params selector instead to enable filtering?
-  const clusters = await clusterActions.list(params)
-  const importedClusters = await importedClusterActions.list(params)
-  const collectiveClusters = [...clusters, ...importedClusters]
+  const allClusters = await getAllClusters()
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
-  return [clusterId, collectiveClusters]
+  return [clusterId, allClusters]
 }
 
 export const loadSupportedRoleVersions = createContextLoader(
@@ -201,5 +200,18 @@ export const loadSupportedRoleVersions = createContextLoader(
   {
     uniqueIdentifier: 'uuid',
     cache: false,
+  },
+)
+
+export const getAllClusters = createContextLoader(
+  ActionDataKeys.AllClusters,
+  async () => {
+    const clusters = await clusterActions.list()
+    const importedClusters = await importedClusterActions.list()
+    return [...clusters, ...importedClusters]
+  },
+  {
+    uniqueIdentifier: 'uuid',
+    selectorCreator: allClustersSelector,
   },
 )
