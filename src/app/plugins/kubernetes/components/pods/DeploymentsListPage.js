@@ -11,6 +11,8 @@ import renderLabels from 'k8s/components/pods/renderLabels'
 import ExternalLink from 'core/components/ExternalLink'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import { routes } from 'core/utils/routes'
+import DeleteDeploymentDialog from './delete-deployment-dialog'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -69,9 +71,9 @@ const renderName = (name, { dashboardUrl }) => {
 
 export const options = {
   loaderFn: deploymentActions.list,
-  deleteFn: deploymentActions.delete,
-  deleteCond: () => false,
-  deleteDisabledInfo: 'Feature not yet implemented',
+  multiSelection: false,
+  deleteCond: () => true,
+  DeleteDialog: DeleteDeploymentDialog,
   addUrl: routes.deployments.add.path(),
   addText: 'Add Deployment',
   columns: [
@@ -85,6 +87,7 @@ export const options = {
   ],
   name: 'Deployments',
   title: 'Deployments',
+  cacheKey: ActionDataKeys.Deployments,
   ListPage,
 }
 const components = createCRUDComponents(options)
