@@ -1,6 +1,6 @@
 // libs
 import React from 'react'
-import { prop } from 'ramda'
+import { pathOr, prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/styles'
 // Constants
@@ -325,15 +325,20 @@ const DashboardPage = () => {
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const displayName = session?.userDetails?.displayName
+  const features = session?.features
+  // To avoid missing API errors for ironic region UX-751
+  const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
 
   return (
     <section className={classes.cardColumn}>
       <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
-      <div className={classes.dashboardMosaic}>
-        {reportsWithPerms(reports, session.userDetails.role).map((report) => (
-          <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-        ))}
-      </div>
+      {kubeRegion && (
+        <div className={classes.dashboardMosaic}>
+          {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+            <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
