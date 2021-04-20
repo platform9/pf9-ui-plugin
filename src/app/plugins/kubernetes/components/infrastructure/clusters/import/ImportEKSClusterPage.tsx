@@ -76,7 +76,7 @@ const ImportEKSClusterPage = () => {
     })
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
-    reloadImportedClusters()
+    reloadImportedClusters(true)
     history.push(routes.cluster.imported.list.path())
   }
 
