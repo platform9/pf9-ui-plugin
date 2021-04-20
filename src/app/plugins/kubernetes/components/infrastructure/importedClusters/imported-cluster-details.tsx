@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { importedClusterActions } from './actions'
@@ -23,12 +23,22 @@ import { ImportedClusterSelector } from './model'
 import ClusterDeployedApps from '../clusters/cluster-deployed-apps'
 
 function ImportedClusterDetails() {
-  const { match } = useReactRouter()
+  const { match, history } = useReactRouter()
   const classes = useStyles()
   const [clusters, loading, reload]: IUseDataLoader<ImportedClusterSelector> = useDataLoader(
     importedClusterActions.list,
   ) as any
   const cluster = clusters.find((x) => x.uuid === match.params.id)
+  useEffect(() => {
+    if (!cluster) {
+      history.push(routes.cluster.imported.list.path())
+    }
+  }, [cluster, history])
+
+  if (!cluster) {
+    return null
+  }
+
   const clusterHeader = <HeaderCard title={cluster?.name} cluster={cluster} />
   return (
     <PageContainer>
