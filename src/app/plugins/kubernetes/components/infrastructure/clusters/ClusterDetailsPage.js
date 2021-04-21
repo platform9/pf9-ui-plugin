@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import clsx from 'clsx'
@@ -188,14 +188,25 @@ const ClusterTaskError = ({ taskError }) => {
 }
 
 const ClusterDetailsPage = () => {
-  const { match } = useReactRouter()
+  const { match, history } = useReactRouter()
   const classes = useStyles()
   const [clusters, loading, reload] = useDataLoader(clusterActions.list, undefined, {
     loadingFeedback: false,
   })
   const session = useSelector(prop(sessionStoreKey))
   const { features } = session
-  const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
+  const cluster = clusters.find((x) => x.uuid === match.params.id)
+
+  useEffect(() => {
+    if (!cluster) {
+      history.push(routes.cluster.list.path())
+    }
+  }, [cluster, history])
+
+  if (!cluster) {
+    return null
+  }
+
   const clusterHeader = (
     <>
       <ClusterStatusAndUsage cluster={cluster} loading={loading} />
