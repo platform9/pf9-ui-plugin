@@ -10,18 +10,21 @@ import {
   tutorialsHelpLink,
   slackLink,
   forumHelpLink,
+  requestFormLink,
 } from 'k8s/links'
 import ExternalLink from 'core/components/ExternalLink'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import { useSelector } from 'react-redux'
 import { CustomerTiers } from 'app/constants'
 import { pathOr, prop } from 'ramda'
-import { sessionStoreKey } from 'core/session/sessionReducers'
-import { showAndOpenZendeskWidget, showZendeskWidget } from 'utils/zendesk-widget'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { showAndOpenZendeskWidget } from 'utils/zendesk-widget'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { showZendeskChatOption } from 'core/utils/helpers'
+import Theme from 'core/themes/model'
+import { RootState } from 'app/store'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   pageHeader: {
     marginBottom: theme.spacing(2),
     paddingTop: theme.spacing(2),
@@ -79,7 +82,16 @@ const useStyles = makeStyles((theme) => ({
 
 const brandIcons = ['slack-hash']
 
-const SupportCard = ({ title, icon, body = '', src, action, onClick }) => {
+interface SupportCardProps {
+  title: string
+  icon: string
+  body?: string
+  src: string
+  action: string
+  onClick?: any
+}
+
+const SupportCard = ({ title, icon, body = '', src, action, onClick }: SupportCardProps) => {
   const classes = useStyles()
   return (
     <div className={classes.card}>
@@ -109,10 +121,12 @@ const SupportCard = ({ title, icon, body = '', src, action, onClick }) => {
 
 const HelpPage = () => {
   const classes = useStyles()
-  const session = useSelector(prop(sessionStoreKey))
+  const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { features } = session
-  const customerTier = pathOr(CustomerTiers.Freedom, ['customer_tier'], features)
+  const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
   const [{ lastStack }] = useScopedPreferences()
+  const showSupportRequestOption =
+    customerTier === CustomerTiers.Growth || customerTier === CustomerTiers.Enterprise
 
   return (
     <>
@@ -161,6 +175,14 @@ const HelpPage = () => {
           src={slackLink}
           action="Open Slack"
         />
+        {showSupportRequestOption && (
+          <SupportCard
+            title="Submit a Support Request"
+            icon="file-alt"
+            src={requestFormLink}
+            action="Open Request Form"
+          />
+        )}
         {showZendeskChatOption(lastStack, customerTier) && (
           <SupportCard
             title="Chat With Us"
