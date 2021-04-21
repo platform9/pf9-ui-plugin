@@ -1,5 +1,6 @@
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
+import store from 'app/store'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
@@ -20,9 +21,10 @@ import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { mergeLeft, pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
-import { adjustWith, updateWith } from 'utils/fp'
+import { adjustWith, isNilOrEmpty, updateWith } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 import { importedClusterActions } from '../importedClusters/actions'
+import { importedClustersSelector } from '../importedClusters/selectors'
 
 const { appbert, qbert } = ApiClient.getInstance()
 
@@ -203,15 +205,23 @@ export const loadSupportedRoleVersions = createContextLoader(
   },
 )
 
-export const getAllClusters = createContextLoader(
-  ActionDataKeys.AllClusters,
-  async () => {
-    const clusters = await clusterActions.list()
-    const importedClusters = await importedClusterActions.list()
-    return [...clusters, ...importedClusters]
-  },
-  {
-    uniqueIdentifier: 'uuid',
-    selectorCreator: allClustersSelector,
-  },
-)
+const allSelector = allClustersSelector()
+
+export const getAllClusters = async (params, reload = false) => {
+  if (reload) {
+    await clusterActions.list()
+    await importedClusterActions.list()
+  } else {
+    // Match useDataLoader method of checking for nil/empty on cache
+    const normalClusters = clustersSelector(store.getState())
+    const importedClusters = importedClustersSelector(store.getState())
+    if (isNilOrEmpty(normalClusters)) {
+      await clusterActions.list()
+    }
+    if (isNilOrEmpty(importedClusters)) {
+      await importedClusterActions.list()
+    }
+  }
+  const allClusters = allSelector(store.getState(), params)
+  return allClusters
+}

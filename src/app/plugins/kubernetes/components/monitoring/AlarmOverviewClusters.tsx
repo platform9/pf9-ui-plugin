@@ -1,19 +1,24 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { makeStyles, Theme } from '@material-ui/core'
 import SearchBar from 'core/components/SearchBar'
 import AlphabeticalPicklist from './AlphabeticalPicklist'
 import Text from 'core/elements/text'
 import Progress from 'core/components/progress/Progress'
 import { LoadingGifs } from 'app/constants'
-import useDataLoader from 'core/hooks/useDataLoader'
 import { getAllClusters } from '../infrastructure/clusters/actions'
 import { routes } from 'core/utils/routes'
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { OrderDirection } from 'core/helpers/createSorter'
+import RefreshButton from 'core/components/buttons/refresh-button'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   clusterFilters: {
     display: 'flex',
     alignItems: 'center',
@@ -63,11 +68,29 @@ const defaultParams = {
 const AlarmOverviewClusters = () => {
   const classes = useStyles({})
   const [params, updateParams] = useState(defaultParams)
-  const [allClusters, allClustersLoading] = useDataLoader(getAllClusters, {
-    prometheusClusters: true,
-    orderBy: 'name',
-    orderDirection: params.orderDirection,
-  })
+  const [allClusters, setAllClusters] = useState([])
+  const [allClustersLoading, setLoading] = useState(true)
+
+  const loadClusters = useCallback(
+    async (reload) => {
+      setLoading(true)
+      const clusters = await getAllClusters(
+        {
+          prometheusClusters: true,
+          orderBy: 'name',
+          orderDirection: params.orderDirection,
+        },
+        reload,
+      )
+      setAllClusters(clusters)
+      setLoading(false)
+    },
+    [setAllClusters, setLoading, params.orderDirection],
+  )
+
+  useEffect(() => {
+    loadClusters(false)
+  }, [params.orderDirection])
 
   const filteredClusters = useMemo(() => {
     return allClusters.filter((cluster) => {
@@ -82,6 +105,14 @@ const AlarmOverviewClusters = () => {
       renderContentOnMount
       loadingImage={LoadingGifs.BluePinkTiles}
     >
+      <div className={classes.header}>
+        <Text variant="subtitle1">Healthy Clusters</Text>
+        <RefreshButton
+          onRefresh={() => {
+            loadClusters(true)
+          }}
+        />
+      </div>
       <div className={classes.clusterFilters}>
         <SearchBar
           searchTerm={params.search}
@@ -100,7 +131,7 @@ const AlarmOverviewClusters = () => {
           </Text>
         )}
         {filteredClusters.map((cluster) => (
-          <div className={classes.clustersList}>
+          <div className={classes.clustersList} key={cluster.uuid}>
             <div key={cluster.uuid} className={classes.clusterRow}>
               <Text variant="body2">{cluster.name}</Text>
               <div className={classes.clusterLinks}>

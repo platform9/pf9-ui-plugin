@@ -1,8 +1,7 @@
-import React, { useMemo, useEffect, forwardRef } from 'react'
+import React, { useMemo, useEffect, forwardRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { isEmpty, propOr, head, project } from 'ramda'
 import Picklist from 'core/components/Picklist'
-import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { getAllClusters } from 'k8s/components/infrastructure/clusters/actions'
@@ -31,7 +30,17 @@ const ClusterPicklist = forwardRef(
       healthyClusters: onlyHealthyClusters,
     }
 
-    const [allClusters, allClustersLoading] = useDataLoader(getAllClusters, defaultParams)
+    const [allClusters, setAllClusters] = useState([])
+    const [allClustersLoading, setLoading] = useState(true)
+
+    useEffect(() => {
+      const loadClusters = async () => {
+        const clusters = await getAllClusters(defaultParams)
+        setAllClusters(clusters)
+        setLoading(false)
+      }
+      loadClusters()
+    }, [])
 
     const filteredClusters = useMemo(() => (filterFn ? filterFn(allClusters) : allClusters), [
       allClusters,

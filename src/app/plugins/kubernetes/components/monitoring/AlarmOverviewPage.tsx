@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { makeStyles, Theme } from '@material-ui/core'
 import { IUseDataLoader } from '../infrastructure/nodes/model'
 import { IAlertSelector } from '../alarms/model'
@@ -6,7 +6,6 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { loadAlerts } from '../alarms/actions'
 import { allKey, LoadingGifs } from 'app/constants'
 import { getAllClusters } from '../infrastructure/clusters/actions'
-import Text from 'core/elements/text'
 import AlarmOverviewOrderPicklist from './AlarmOverviewOrderPicklist'
 import SeverityPicklist from '../alarms/SeverityPicklist'
 import Progress from 'core/components/progress/Progress'
@@ -54,10 +53,28 @@ const AlarmOverviewPage = () => {
     params,
   ) as any
 
-  const [allClusters, allClustersLoading, reloadAllClusters] = useDataLoader(getAllClusters, {
-    prometheusClusters: true,
-    orderBy: 'name',
-  })
+  const [allClusters, setAllClusters] = useState([])
+  const [allClustersLoading, setLoading] = useState(true)
+
+  const loadClusters = useCallback(
+    async (reload) => {
+      setLoading(true)
+      const clusters = await getAllClusters(
+        {
+          prometheusClusters: true,
+          orderBy: 'name',
+        },
+        reload,
+      )
+      setAllClusters(clusters)
+      setLoading(false)
+    },
+    [setAllClusters, setLoading],
+  )
+
+  useEffect(() => {
+    loadClusters(false)
+  }, [])
 
   const clustersWithAlarms = useMemo(() => {
     if (!alarmsLoading && !allClustersLoading) {
@@ -137,7 +154,7 @@ const AlarmOverviewPage = () => {
                 className={classes.refreshButton}
                 onRefresh={() => {
                   reloadAlarms(true)
-                  reloadAllClusters(true)
+                  loadClusters(true)
                 }}
               />
             </div>
@@ -147,7 +164,6 @@ const AlarmOverviewPage = () => {
             ))}
           </div>
           <div className={classes.clustersContainer}>
-            <Text variant="subtitle1">Healthy Clusters</Text>
             <AlarmOverviewClusters />
           </div>
         </div>
