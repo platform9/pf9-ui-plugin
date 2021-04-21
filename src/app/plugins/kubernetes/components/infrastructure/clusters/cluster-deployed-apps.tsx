@@ -235,7 +235,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
     loadingAppsAvailableToCluster,
     reloadAppsAvailableToCluster,
   ]: IUseDataLoader<IAppsAvailableToClusterAction> = useDataLoader(appsAvailableToClusterLoader, {
-    clusterId: cluster.uuid,
+    clusterId: cluster?.uuid,
   }) as any
 
   const [
@@ -243,7 +243,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
     loadingDeployedApps,
     reloadDeployedApps,
   ]: IUseDataLoader<IDeployedAppsSelector> = useDataLoader(deployedAppActions.list, {
-    clusterId: cluster.uuid,
+    clusterId: cluster?.uuid,
     namespace: allKey,
   }) as any
 
@@ -252,7 +252,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
     loadingRepositories,
     reloadRepositories,
   ]: IUseDataLoader<RepositoriesForCluster> = useDataLoader(repositoriesForClusterLoader, {
-    clusterId: cluster.uuid,
+    clusterId: cluster?.uuid,
   }) as any
 
   const filteredDeployedApps = useMemo(
@@ -288,7 +288,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
       {
         id: 'version',
         label: 'Kubernetes Version',
-        value: cluster.kubeRoleVersion || cluster.kubeVersion,
+        value: cluster?.kubeRoleVersion || cluster?.kubeVersion,
       },
       {
         id: 'apps',
@@ -298,7 +298,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
       {
         id: 'workerNodes',
         label: 'Number of Worker Nodes',
-        value: cluster.numWorkers?.toString() || cluster.workers?.toString(),
+        value: cluster?.numWorkers?.toString() || cluster?.workers?.toString(),
       },
     ]
   }, [cluster, filteredDeployedApps])
@@ -341,7 +341,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
       {showDialog && (
         <DisconnectRepositoryDialog
           name={activeRepository}
-          clusterId={cluster.uuid}
+          clusterId={cluster?.uuid}
           onSubmit={handleRepositoryDisconnect}
           onClose={handleDialogClose}
         />
@@ -366,7 +366,7 @@ const ClusterDeployedApps = ({ cluster, reload, loading }: ClusterDeployedAppsPr
         </div>
         <ClusterDeployedAppsTable
           apps={filteredDeployedApps}
-          clusterId={cluster.uuid}
+          clusterId={cluster?.uuid}
           history={history}
         />
       </Progress>
