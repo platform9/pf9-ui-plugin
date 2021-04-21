@@ -68,7 +68,6 @@ export const clustersSelector = createSelector(
         connectionStatus,
         masterNodesHealthStatus,
         workerNodesHealthStatus,
-        cluster.canUpgrade,
       )
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
