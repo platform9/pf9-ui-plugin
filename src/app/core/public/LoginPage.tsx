@@ -7,7 +7,7 @@ import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { forgotPasswordUrl } from 'app/constants'
+import { CustomerTiers, forgotPasswordUrl } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import { imageUrlRoot, dashboardUrl } from 'app/constants'
 import moment from 'moment'
@@ -157,6 +157,7 @@ interface Props {
   history: any
   classes: any
   ssoEnabled: boolean
+  customerTier: string
 }
 
 @(connect() as any)
@@ -294,8 +295,8 @@ class LoginPage extends React.PureComponent<Props> {
   }
 
   renderFooter = () => {
-    const { classes } = this.props
-    return (
+    const { classes, customerTier } = this.props
+    return customerTier !== CustomerTiers.OEM ? (
       <Fragment>
         <Text className={classes.paragraph} variant="caption" color="textSecondary">
           By signing in, you agree to our{' '}
@@ -305,7 +306,7 @@ class LoginPage extends React.PureComponent<Props> {
           . © 2014-{moment().year()} Platform9 Systems, Inc.
         </Text>
       </Fragment>
-    )
+    ) : null
   }
 
   render() {

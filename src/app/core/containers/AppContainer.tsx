@@ -3,6 +3,7 @@ import ApiClient from 'api-client/ApiClient'
 import { CustomWindow } from 'app/polyfills/window'
 import {
   activateUserUrl,
+  CustomerTiers,
   forgotPasswordUrl,
   loginUrl,
   loginWithCookieUrl,
@@ -138,6 +139,7 @@ const AppContainer = () => {
   const [, , getUserPrefs] = useScopedPreferences()
   const dispatch = useDispatch()
   const [loginFeatures, setLoginFeatures] = useState({ loaded: false, sso: false })
+  const [customerTier, setCustomerTier] = useState(null)
 
   useEffect(() => {
     const unlisten = history.listen((location) => {
@@ -162,6 +164,8 @@ const AppContainer = () => {
       // Ignore exception if features.json not found (for local development)
 
       const initialFeatures = await axios.get('/clarity/features.json').catch(() => null)
+      const customerTier = pathStrOr(CustomerTiers.Freedom, 'data.customer_tier', initialFeatures)
+      setCustomerTier(customerTier)
       const sandboxFlag = pathStrOr(false, 'data.experimental.sandbox', initialFeatures)
       const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', initialFeatures)
 
@@ -185,8 +189,7 @@ const AppContainer = () => {
       setLoginFeatures({
         loaded: true,
         sso:
-          (initialFeatures?.data?.experimental?.kplane &&
-            ssoEnabledTiers.includes(initialFeatures?.data?.customer_tier)) ||
+          (initialFeatures?.data?.experimental?.kplane && ssoEnabledTiers.includes(customerTier)) ||
           (!initialFeatures?.data?.experimental?.kplane &&
             pathStrOr(false, 'data.experimental.sso', initialFeatures)),
       })
@@ -288,7 +291,11 @@ const AppContainer = () => {
         <Route path={activateUserUrl} component={ActivateUserPage} />
         <Route path={loginUrl}>
           {loginFeatures.loaded && (
-            <LoginPage onAuthSuccess={setupSession} ssoEnabled={loginFeatures.sso} />
+            <LoginPage
+              onAuthSuccess={setupSession}
+              ssoEnabled={loginFeatures.sso}
+              customerTier={customerTier}
+            />
           )}
         </Route>
         <Route>
