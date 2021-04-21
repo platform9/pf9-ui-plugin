@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { makeStyles, Theme } from '@material-ui/core'
 import { IUseDataLoader } from '../infrastructure/nodes/model'
 import { IAlertSelector } from '../alarms/model'
@@ -13,6 +13,12 @@ import ClusterAlarmCard from './ClusterAlarmCard'
 import AlarmOverviewClusters from './AlarmOverviewClusters'
 import RefreshButton from 'core/components/buttons/refresh-button'
 import NoContentMessage from 'core/components/NoContentMessage'
+import { cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
+import { ActionDataKeys } from 'k8s/DataKeys'
+import { path } from 'ramda'
+import { allClustersSelector } from '../infrastructure/clusters/selectors'
+import { useSelector } from 'react-redux'
+import { GlobalState } from 'k8s/datakeys.model'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   alarmsContainer: {
@@ -53,27 +59,24 @@ const AlarmOverviewPage = () => {
     params,
   ) as any
 
-  const [allClusters, setAllClusters] = useState([])
-  const [allClustersLoading, setLoading] = useState(true)
-
-  const loadClusters = useCallback(
-    async (reload) => {
-      setLoading(true)
-      const clusters = await getAllClusters(
-        {
-          prometheusClusters: true,
-          orderBy: 'name',
-        },
-        reload,
-      )
-      setAllClusters(clusters)
-      setLoading(false)
-    },
-    [setAllClusters, setLoading],
+  const selector = allClustersSelector()
+  const allClusters = useSelector((state: GlobalState) =>
+    selector(state, {
+      prometheusClusters: true,
+      orderBy: 'name',
+    }),
   )
 
+  const clustersLoading = useSelector(
+    path([cacheStoreKey, loadingStoreKey, ActionDataKeys.Clusters]),
+  )
+  const importedClustersLoading = useSelector(
+    path([cacheStoreKey, loadingStoreKey, ActionDataKeys.ImportedClusters]),
+  )
+  const allClustersLoading = clustersLoading && importedClustersLoading
+
   useEffect(() => {
-    loadClusters(false)
+    getAllClusters()
   }, [])
 
   const clustersWithAlarms = useMemo(() => {
@@ -154,7 +157,7 @@ const AlarmOverviewPage = () => {
                 className={classes.refreshButton}
                 onRefresh={() => {
                   reloadAlarms(true)
-                  loadClusters(true)
+                  getAllClusters(true)
                 }}
               />
             </div>

@@ -207,7 +207,7 @@ export const loadSupportedRoleVersions = createContextLoader(
 
 const allSelector = allClustersSelector()
 
-export const getAllClusters = async (params, reload = false) => {
+export const getAllClusters = async (reload = false) => {
   if (reload) {
     await clusterActions.list()
     await importedClusterActions.list()
@@ -222,6 +222,6 @@ export const getAllClusters = async (params, reload = false) => {
       await importedClusterActions.list()
     }
   }
-  const allClusters = allSelector(store.getState(), params)
+  const allClusters = allSelector(store.getState())
   return allClusters
 }
