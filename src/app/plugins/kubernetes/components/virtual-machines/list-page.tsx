@@ -7,10 +7,8 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-// import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import { routes } from 'core/utils/routes'
 // import { trackEvent } from 'utils/tracking'
-// import SimpleLink from 'core/components/SimpleLink'
 import { virtualMachineActions } from './actions'
 // import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
 // import { importedClusterStatusMap } from '../infrastructure/importedClusters/model'
@@ -19,6 +17,7 @@ import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import Theme from 'core/themes/model'
 import SimpleLink from 'core/components/SimpleLink'
 import PicklistComponent from 'core/components/Picklist'
+import Text from 'core/elements/text'
 import { batchActions } from './constants'
 const Picklist: any = PicklistComponent
 const defaultParams = {
@@ -159,6 +158,14 @@ export const options = {
   name: 'Virtual Machines',
   title: 'Virtual Machines',
   batchActions: batchActions,
+  emptyText: (
+    <div>
+      <Text variant="subtitle2">No Kubevirt VMs have been deployed.</Text>
+      <SimpleLink src={routes.virtualMachines.add.path()}>
+        <Text variant="body1">Add a virtual machine now.</Text>
+      </SimpleLink>
+    </div>
+  ),
   ListPage,
 }
 const components = createCRUDComponents(options)
