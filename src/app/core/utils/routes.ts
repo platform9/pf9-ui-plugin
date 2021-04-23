@@ -1,4 +1,5 @@
 import { AppPlugins, appUrlRoot, pluginRoutePrefix } from 'app/constants'
+import { VirtualMachineCreateTypes } from 'k8s/components/virtual-machines/model'
 import URLPattern from 'url-pattern'
 
 interface GenericKVP {
@@ -48,8 +49,8 @@ export class Route<T extends OptionalGenericKVP = null> {
    * Register a route for this application
    * @param route route to register
    */
-  static register(routeOptions: IRouteOptions): Route {
-    const route = new Route(routeOptions)
+  static register<T extends OptionalGenericKVP = null>(routeOptions: IRouteOptions): Route<T> {
+    const route = new Route<T>(routeOptions)
     Route.routes.push(route)
     return route
   }
@@ -357,6 +358,65 @@ export const routes = {
       name: 'CloudProviders:Add',
     }),
   },
+  virtualMachines: {
+    list: Route.register({
+      url: `${pluginRoutePrefix}/virtual-machines`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'VirtualMachines:List',
+    }),
+    detail: Route.register<{ clusterId: string; namespace: string; name: string }>({
+      url: `${pluginRoutePrefix}/virtual-machines/:clusterId/:namespace/:name`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'VirtualMachines:Detail',
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/virtual-machines/add/new`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+        createType: VirtualMachineCreateTypes.AddNew,
+      },
+      name: 'VirtualMachines:Add:NewVM',
+    }),
+    import: {
+      url: Route.register({
+        url: `${pluginRoutePrefix}/virtual-machines/import/url`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+          createType: VirtualMachineCreateTypes.ImportURL,
+        },
+        name: 'VirtualMachines:Import:URL',
+      }),
+      disk: Route.register({
+        url: `${pluginRoutePrefix}/virtual-machines/import/disk`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+          createType: VirtualMachineCreateTypes.ImportDisk,
+        },
+        name: 'VirtualMachines:Import:Disk',
+      }),
+    },
+    clone: {
+      pvc: Route.register({
+        url: `${pluginRoutePrefix}/virtual-machines/clone/pvc`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+          createType: VirtualMachineCreateTypes.ClonePVC,
+        },
+        name: 'VirtualMachines:Clone:PVC',
+      }),
+    },
+  },
+  workloads: Route.register({
+    url: `${pluginRoutePrefix}/workloads`,
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+    name: 'Workloads:Pods:List',
+  }),
   apps: {
     list: Route.register({
       url: `${pluginRoutePrefix}/apps`,
@@ -435,13 +495,6 @@ export const routes = {
       name: 'Pods:Add',
     }),
   },
-  workloads: Route.register({
-    url: `${pluginRoutePrefix}/workloads`,
-    defaultParams: {
-      plugin: AppPlugins.Kubernetes,
-    },
-    name: 'Workloads:Pods:List',
-  }),
   services: {
     list: Route.register({
       url: `${pluginRoutePrefix}/workloads#services`,

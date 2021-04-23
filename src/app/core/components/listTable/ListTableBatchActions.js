@@ -121,21 +121,25 @@ const ListTableAction = withRouter(
   },
 )
 
-const ListTableBatchActions = ({
+export const ListTableBatchActions = ({
   batchActions = [],
   selected = [],
-  onRefresh,
-  listTableParams,
+  onRefresh = undefined,
+  listTableParams = undefined,
 }) => {
-  return batchActions.map((action) => (
-    <ListTableAction
-      key={action.label}
-      {...action}
-      onRefresh={onRefresh}
-      selected={selected}
-      listTableParams={listTableParams}
-    />
-  ))
+  return (
+    <>
+      {batchActions.map((action) => (
+        <ListTableAction
+          key={action.label}
+          {...action}
+          onRefresh={onRefresh}
+          selected={selected}
+          listTableParams={listTableParams}
+        />
+      ))}
+    </>
+  )
 }
 
 export const listTableActionPropType = PropTypes.shape({

@@ -196,6 +196,7 @@ export const options = {
       },
     },
   ],
+  addText: 'Add Cluster',
   columns: [
     { id: 'uuid', label: 'UUID', render: renderUUID, display: false },
     { id: 'name', label: 'Name', render: renderClusterDetailLink },
