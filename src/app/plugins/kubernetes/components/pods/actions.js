@@ -62,6 +62,11 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
     })
     return created
   },
+  deleteFn: async ({ clusterId, namespace, name, id }) => {
+    const result = await qbert.deleteDeployment(clusterId, namespace, name)
+    trackEvent('Delete Deployment', { clusterId, namespace, name, id })
+    return result
+  },
   service: 'qbert',
   indexBy: 'clusterId',
   selectorCreator: makeDeploymentsSelector,

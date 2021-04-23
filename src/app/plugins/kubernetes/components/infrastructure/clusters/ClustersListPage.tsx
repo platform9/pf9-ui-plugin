@@ -19,7 +19,7 @@ import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/Cluster
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { both, omit, prop } from 'ramda'
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import { cloudProviderTypes } from '../cloudProviders/selectors'
@@ -127,6 +127,24 @@ const renderNodeLink = (_, { uuid, nodes }) => {
 
 const renderStats = (_, { usage }) => <ResourceUsageTables usage={usage} />
 
+const renderK8sVersion = (_, cluster) => <K8sVersion cluster={cluster} />
+
+const K8sVersion = ({ cluster }) => {
+  const { version, canUpgrade } = cluster
+  const [showDialog, setShowDialog] = useState(false)
+  return (
+    <div>
+      <Text variant="body2">{version}</Text>
+      {canUpgrade && (
+        <SimpleLink src="" onClick={() => setShowDialog(true)}>
+          Upgrade Available
+        </SimpleLink>
+      )}
+      {showDialog && <ClusterUpgradeDialog rows={[cluster]} onClose={() => setShowDialog(false)} />}
+    </div>
+  )
+}
+
 const renderClusterDetailLink = (name, cluster) => (
   <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>{name}</SimpleLink>
 )
@@ -205,7 +223,7 @@ export const options = {
       render: (type) => cloudProviderTypes[type] || capitalizeString(type),
     },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
-    { id: 'version', label: 'K8 Version' },
+    { id: 'version', label: 'K8 Version', render: renderK8sVersion },
     {
       id: 'created_at',
       label: 'Created at',

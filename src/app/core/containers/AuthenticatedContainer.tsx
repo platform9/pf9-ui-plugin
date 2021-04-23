@@ -6,6 +6,7 @@ import {
   AppPlugins,
   appPlugins,
   clarityDashboardUrl,
+  CustomerTiers,
   dashboardUrl,
   helpUrl,
   ironicWizardUrl,
@@ -32,7 +33,7 @@ import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
 import { MessageTypes } from 'core/components/notifications/model'
 import { RootState } from 'app/store'
-import { apply, Dictionary, keys, mergeAll, prop, toPairs as ToPairs } from 'ramda'
+import { apply, Dictionary, keys, mergeAll, pathOr, prop, toPairs as ToPairs } from 'ramda'
 import pluginManager from 'core/utils/pluginManager'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import BannerContainer from 'core/components/notifications/BannerContainer'
@@ -43,6 +44,7 @@ import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
+import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
 
 const toPairs: any = ToPairs
 
@@ -321,6 +323,7 @@ const AuthenticatedContainer = () => {
     userDetails: { id: userId, name, displayName, role },
     features,
   } = session
+  const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
   const plugins = pluginManager.getPlugins()
   const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
   const showNavBar =
@@ -368,6 +371,16 @@ const AuthenticatedContainer = () => {
       clearInterval(id)
     }
   }, [])
+
+  // Add Zendesk widget script only for Enterprise users
+  useEffect(() => {
+    if (customerTier === CustomerTiers.Enterprise) {
+      addZendeskWidgetScriptToDomBody({ userId, displayName, email: name })
+    }
+    return () => {
+      hideZendeskWidget()
+    }
+  }, [userId, displayName, name, customerTier])
 
   const withStackSlider = regionFeatures?.openstack && regionFeatures?.kubernetes
 

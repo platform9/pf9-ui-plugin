@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
   value: {
     display: 'block',
-    wordBreak: 'break-all',
+    wordBreak: 'break-word',
   },
 }))
 
