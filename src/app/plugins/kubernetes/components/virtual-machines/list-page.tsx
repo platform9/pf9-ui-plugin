@@ -18,7 +18,9 @@ import renderLabels from '../pods/renderLabels'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import Theme from 'core/themes/model'
 import SimpleLink from 'core/components/SimpleLink'
-
+import PicklistComponent from 'core/components/Picklist'
+import { batchActions } from './constants'
+const Picklist: any = PicklistComponent
 const defaultParams = {
   clusterId: allKey,
 }
@@ -56,6 +58,12 @@ const ListPage = ({ ListContainer }) => {
               value={params.namespace}
               clusterId={params.clusterId}
               disabled={!params.clusterId}
+            />
+            <Picklist
+              label="Power State"
+              options={[{ label: 'Powered-On', value: 'powered-on' }]}
+              value={'powered-on'}
+              disabled
             />
           </>
         }
@@ -108,20 +116,20 @@ export const options = {
   addButtonConfigs: [
     {
       label: 'New Virtual Machine',
-      link: routes.virtualMachines.add.new.path(),
+      link: routes.virtualMachines.add.path(),
     },
-    {
-      label: 'Import with URL',
-      link: routes.virtualMachines.add.importURL.path(),
-    },
-    {
-      label: 'Import with Disk',
-      link: routes.virtualMachines.add.importDisk.path(),
-    },
-    {
-      label: 'Clone from PVC',
-      link: routes.virtualMachines.add.clonePVC.path(),
-    },
+    // {
+    //   label: 'Import with URL',
+    //   link: routes.virtualMachines.import.url.path(),
+    // },
+    // {
+    //   label: 'Import with Disk',
+    //   link: routes.virtualMachines.import.disk.path(),
+    // },
+    // {
+    //   label: 'Clone from PVC',
+    //   link: routes.virtualMachines.clone.pvc.path(),
+    // },
   ],
   // deleteFn: podActions.delete,
   addText: 'Add Virtual Machine',
@@ -150,6 +158,7 @@ export const options = {
   ],
   name: 'Virtual Machines',
   title: 'Virtual Machines',
+  batchActions: batchActions,
   ListPage,
 }
 const components = createCRUDComponents(options)

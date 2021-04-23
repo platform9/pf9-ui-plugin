@@ -54,19 +54,17 @@ export const virtualMachineDetailsLoader = createContextLoader(
   async ({ clusterId, namespace, name }) => {
     const vm = await qbert.getVirtualMachineDetails(clusterId, namespace, name)
     const disks = vm?.spec?.domain?.devices?.disks || []
-    const volumeSpecs = vm?.spec?.volumes || []
-    const volumes = disks.map((disk) => volumeSpecs.find((volume) => volume.name === disk.name))
-    const promises = findVolumeSpecPromises(clusterId, namespace, volumes)
-    const data = await Promise.all(promises)
-    debugger
+    const volumes = vm?.spec?.volumes || []
+    const volumesByDisk = disks.map((disk) => volumes.find((volume) => volume.name === disk.name))
+    const volumePromises = findVolumeSpecPromises(clusterId, namespace, volumesByDisk)
+    const volumeDetails = await Promise.all(volumePromises)
     // const vmFs = await qbert.getVirtualMachineFileSystemList(clusterId, namespace, name)
-    return vm
+    return { ...vm, clusterId, namespace, name, volumeDetails }
   },
   {
-    cache: false,
     entityName: 'Virtual Machine Detail',
     uniqueIdentifier: 'metadata.uid',
-    indexBy: 'clusterId',
+    indexBy: ['clusterId', 'namespace', 'name'],
   },
 )
 
@@ -74,8 +72,10 @@ export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines,
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
     return clusterId === allKey
-      ? someAsync(pluck<any, any>('uuid', clusters).map(qbert.getVirtualMachines)).then(flatten)
-      : qbert.getVirtualMachines(clusterId)
+      ? someAsync(pluck<any, any>('uuid', clusters).map(qbert.getVirtualMachineInstances)).then(
+          flatten,
+        )
+      : qbert.getVirtualMachineInstances(clusterId)
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
@@ -86,6 +86,16 @@ export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines,
       name: vm?.metadata?.name,
     })
     return vm
+  },
+  deleteFn: async ({ clusterId, namespace, name }) => {
+    return qbert.deleteVirtualMachine(clusterId, namespace, name)
+  },
+  customOperations: {
+    powerVm: async ({ clusterId, namespace, name }) => {
+      // TODO this is currently disabled, figure out how to use vm and vmi to determine the power on action
+      const deleted = await qbert.powerVirtualMachine(clusterId, namespace, name, false)
+      return deleted
+    },
   },
   uniqueIdentifier: 'metadata.uid',
   indexBy: 'clusterId',

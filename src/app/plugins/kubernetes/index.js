@@ -173,6 +173,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'Virtual Machines',
+      flag: 'Early Access',
       link: { path: '/virtual-machines', exact: true },
       requiredRoles: 'admin',
       component: VirtualMachinesPage,
@@ -428,7 +429,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
-    { name: 'Virtual Machines', icon: 'window', ...clarityLink('/kubernetes/virtual-machines') },
+    {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      icon: 'window',
+      ...clarityLink('/kubernetes/virtual-machines'),
+    },
     {
       name: 'Apps',
       ...clarityLink('/kubernetes/apps'),
@@ -482,7 +488,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
-    { name: 'Virtual Machines', icon: 'window', link: { path: '/virtual-machines' } },
+    {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      icon: 'window',
+      link: { path: '/virtual-machines' },
+    },
     {
       name: 'Apps',
       link: { path: '/apps' },

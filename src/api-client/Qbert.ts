@@ -625,8 +625,20 @@ class Qbert extends ApiService {
     })
   }
 
-  getVirtualMachines = async (clusterId) => {
+  getVirtualMachineInstances = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/virtualmachineinstances`
+    const data = await this.client.basicGet<GetVirtualMachines>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVirtualMachineInstances',
+      },
+    })
+    return data.items.map((item) => ({ ...item, clusterId }))
+  }
+
+  getVirtualMachines = async (clusterId) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/virtualmachines`
     const data = await this.client.basicGet<GetVirtualMachines>({
       url,
       options: {
@@ -634,7 +646,6 @@ class Qbert extends ApiService {
         mthdName: 'getVirtualMachines',
       },
     })
-    console.log(JSON.stringify(data))
     return data.items.map((item) => ({ ...item, clusterId }))
   }
 
@@ -647,7 +658,6 @@ class Qbert extends ApiService {
         mthdName: 'getVirtualMachineDetails',
       },
     })
-    console.log(JSON.stringify(data))
     return data
   }
 
@@ -663,12 +673,11 @@ class Qbert extends ApiService {
         mthdName: 'getVirtualMachineVolumeDetails',
       },
     })
-    console.log(JSON.stringify(data))
     return data
   }
 
   createVirtualMachine = async (clusterId, namespace, body) => {
-    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances`
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachines`
     return this.client.basicPost({
       url,
       body,
@@ -697,6 +706,19 @@ class Qbert extends ApiService {
       options: {
         clsName: this.getClassName(),
         mthdName: 'deleteVirtualMachine',
+      },
+    })
+  }
+
+  powerVirtualMachine = async (clusterId, namespace, name, powerOn = true) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/subresources.kubevirt.io/v1/namespaces/${namespace}/virtualmachines/${name}/${
+      powerOn ? 'start' : 'stop'
+    }`
+    return this.client.basicPut({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'powerVirtualMachine',
       },
     })
   }

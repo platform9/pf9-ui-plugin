@@ -373,16 +373,16 @@ export const routes = {
       },
       name: 'VirtualMachines:Detail',
     }),
-    add: {
-      new: Route.register({
-        url: `${pluginRoutePrefix}/virtual-machines/add/new`,
-        defaultParams: {
-          plugin: AppPlugins.Kubernetes,
-          createType: VirtualMachineCreateTypes.AddNew,
-        },
-        name: 'VirtualMachines:Add:NewVM',
-      }),
-      importURL: Route.register({
+    add: Route.register({
+      url: `${pluginRoutePrefix}/virtual-machines/add/new`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+        createType: VirtualMachineCreateTypes.AddNew,
+      },
+      name: 'VirtualMachines:Add:NewVM',
+    }),
+    import: {
+      url: Route.register({
         url: `${pluginRoutePrefix}/virtual-machines/import/url`,
         defaultParams: {
           plugin: AppPlugins.Kubernetes,
@@ -390,7 +390,7 @@ export const routes = {
         },
         name: 'VirtualMachines:Import:URL',
       }),
-      importDisk: Route.register({
+      disk: Route.register({
         url: `${pluginRoutePrefix}/virtual-machines/import/disk`,
         defaultParams: {
           plugin: AppPlugins.Kubernetes,
@@ -398,7 +398,9 @@ export const routes = {
         },
         name: 'VirtualMachines:Import:Disk',
       }),
-      clonePVC: Route.register({
+    },
+    clone: {
+      pvc: Route.register({
         url: `${pluginRoutePrefix}/virtual-machines/clone/pvc`,
         defaultParams: {
           plugin: AppPlugins.Kubernetes,

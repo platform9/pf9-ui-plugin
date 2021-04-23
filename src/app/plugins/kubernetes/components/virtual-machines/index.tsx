@@ -10,9 +10,9 @@ const VirtualMachinesPage = () => (
       <Tab value="virtual-machines" label="VM Instances">
         <VirtualMachinesListPage />
       </Tab>
-      <Tab value="data-volumes" label="Data Volumes">
+      {/* <Tab value="data-volumes" label="Data Volumes">
         <div>Coming soon</div>
-      </Tab>
+      </Tab> */}
       {/* <Tab value="presets" label="Presets">
         <div>Coming soon</div>
       </Tab>

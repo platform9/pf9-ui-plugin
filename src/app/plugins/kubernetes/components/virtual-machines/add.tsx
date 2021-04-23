@@ -2,7 +2,6 @@ import React, { useCallback } from 'react'
 import jsYaml from 'js-yaml'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import TextField from 'core/components/validatedForm/TextField'
 import SubmitButton from 'core/components/SubmitButton'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { codeMirrorOptions } from 'app/constants'
@@ -15,24 +14,25 @@ import FormWrapper from 'core/components/FormWrapper'
 import moize from 'moize'
 import Progress from 'core/components/progress/Progress'
 import { customValidator, requiredValidator } from 'core/utils/fieldValidators'
-import { makeStyles } from '@material-ui/styles'
-import Theme from 'core/themes/model'
+// import { makeStyles } from '@material-ui/styles'
+// import Theme from 'core/themes/model'
 import { virtualMachineActions } from './actions'
 import { Route, routes } from 'core/utils/routes'
 import { VirtualMachineCreateTypes } from './model'
 
-import newVM from './add-templates/new-vm.yaml'
-import importUrl from './add-templates/import-url.yaml'
-import importDisk from './add-templates/import-disk.yaml'
-import clonePVC from './add-templates/clone-pvc.yaml'
-import Button from 'core/elements/button'
+// import newVM from './add-templates/new-vm.yaml'
+// import importUrl from './add-templates/import-url.yaml'
+// import importDisk from './add-templates/import-disk.yaml'
+// import clonePVC from './add-templates/clone-pvc.yaml'
+// import Button from 'core/elements/button'
 import DocumentMeta from 'core/components/DocumentMeta'
+import VMPicklist from './vm-picklist'
 
-const useStyles = makeStyles<Theme>((theme) => ({
-  templateButton: {
-    alignSelf: 'flex-start',
-  },
-}))
+// const useStyles = makeStyles<Theme>((theme) => ({
+//   templateButton: {
+//     alignSelf: 'flex-start',
+//   },
+// }))
 
 const findVMCreateType = (): VirtualMachineCreateTypes => {
   const currentRoute = Route.getCurrentRoute()
@@ -51,12 +51,12 @@ const formTitleByType = {
   [VirtualMachineCreateTypes.ClonePVC]: 'Add a VM - Cloning an Exisiting PVC',
 }
 
-const yamlTemplates = {
-  [VirtualMachineCreateTypes.AddNew]: newVM,
-  [VirtualMachineCreateTypes.ImportURL]: importUrl,
-  [VirtualMachineCreateTypes.ImportDisk]: importDisk,
-  [VirtualMachineCreateTypes.ClonePVC]: clonePVC,
-}
+// const yamlTemplates = {
+//   [VirtualMachineCreateTypes.AddNew]: newVM,
+//   [VirtualMachineCreateTypes.ImportURL]: importUrl,
+//   [VirtualMachineCreateTypes.ImportDisk]: importDisk,
+//   [VirtualMachineCreateTypes.ClonePVC]: clonePVC,
+// }
 
 const moizedYamlLoad = moize(jsYaml.safeLoad, {
   maxSize: 10,
@@ -72,35 +72,43 @@ const codeMirrorValidations = [
       return false
     }
   }, 'Provided YAML code is invalid'),
-  // customValidator((yaml, formFields) => {
-  //   try {
-  //     const body = moizedYamlLoad(yaml)
-  //     return body.kind.toLowerCase() === formFields?.resourceType?.toLowerCase()
-  //   } catch (err) {
-  //     return true
-  //   }
-  // }, 'Resource type does not match with selected resource type above'),
+  customValidator((yaml) => {
+    try {
+      const body = moizedYamlLoad(yaml)
+      return body?.apiVersion?.toLowerCase() === 'kubevirt.io/v1'
+    } catch (err) {
+      return true
+    }
+  }, 'Kubevirt API version must be "kubevirt.io/v1"'),
+  customValidator((yaml, formValues, rest) => {
+    try {
+      const body = moizedYamlLoad(yaml)
+      return body?.kind === formValues.vmType
+    } catch (err) {
+      return true
+    }
+  }, 'Kubevirt API kind must match the Virtual Machine type'),
 ]
 
 export const AddVirtualMachineForm = () => {
-  const classes = useStyles()
   const { history } = useReactRouter()
   const vmType = findVMCreateType()
   const formattedTitle = formTitleByType[vmType]
-  const { params, getParamsUpdater, updateParams } = useParams({
+  const { params, getParamsUpdater } = useParams({
     clusterId: undefined,
     yaml: undefined,
+    vmType: 'VirtualMachine',
   })
   const onComplete = useCallback(() => history.push(routes.virtualMachines.list.path()), [history])
 
   const [handleAdd, adding] = useDataUpdater(virtualMachineActions.create, onComplete)
-  const insertYamlTemplate = useCallback(
-    () =>
-      updateParams({
-        yaml: yamlTemplates[vmType],
-      }),
-    [params],
-  )
+  // const insertYamlTemplate = useCallback(
+  //   () =>
+  //     updateParams({
+  //       yaml: yamlTemplates[vmType],
+  //     }),
+  //   [params],
+  // )
 
   return (
     <FormWrapper title={formattedTitle} backUrl={routes.virtualMachines.list.path()}>
@@ -110,7 +118,6 @@ export const AddVirtualMachineForm = () => {
           onSubmit={handleAdd}
           formActions={<SubmitButton>Create VM Instance</SubmitButton>}
         >
-          <TextField id="name" label="Name" required />
           <PicklistField
             DropdownComponent={ClusterPicklist}
             id="clusterId"
@@ -128,6 +135,13 @@ export const AddVirtualMachineForm = () => {
             clusterId={params.clusterId}
             required
           />
+          <PicklistField
+            DropdownComponent={VMPicklist}
+            id="vmType"
+            label="VM Type"
+            info="The kubevirt kind, VirtualMachine or VirtualMachineInstance"
+            required
+          />
           <CodeMirror
             id="yaml"
             label="YAML Resource"
@@ -136,7 +150,7 @@ export const AddVirtualMachineForm = () => {
             value={params.yaml}
             options={codeMirrorOptions}
           />
-          <Button
+          {/* <Button
             className={classes.templateButton}
             variant="light"
             color="secondary"
@@ -144,7 +158,7 @@ export const AddVirtualMachineForm = () => {
             type="button"
           >
             Use YAML Template
-          </Button>
+          </Button> */}
         </ValidatedForm>
       </Progress>
     </FormWrapper>
