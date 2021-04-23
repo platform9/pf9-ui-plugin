@@ -6,32 +6,36 @@ import {
   makeAlertsSelector,
   makeTimeSeriesSelector,
 } from 'k8s/components/alarms/selectors'
-import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import { allClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import moment from 'moment'
 import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
-import { parseClusterParams, clusterActions } from '../infrastructure/clusters/actions'
-import { makeParamsImportedClustersSelector } from 'k8s/components/infrastructure/importedClusters/selectors'
+import {
+  parseClusterParams,
+  clusterActions,
+  clusterTagActions,
+} from '../infrastructure/clusters/actions'
 import store from 'app/store'
 import { loadAlertRules } from '../monitoring/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { hasPrometheusTag } from 'k8s/components/infrastructure/clusters/helpers'
-import { importedHasPrometheusTag } from 'k8s/components/infrastructure/importedClusters/helpers'
+import { prometheusCluster } from 'k8s/components/infrastructure/clusters/helpers'
+import { hasPrometheusEnabled } from '../prometheus/helpers'
 
 const { qbert } = ApiClient.getInstance()
 
 export const alertsCacheKey = 'alerts'
 export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 
-export const isPrometheusCluster = (cluster) =>
-  hasPrometheusTag(cluster) || importedHasPrometheusTag(cluster)
-
 export const loadAlerts = createContextLoader(
   ActionDataKeys.Alerts,
   async (params) => {
+    const clustersWithTasks = await clusterTagActions.list()
     const [clusterId, clusters] = await parseClusterParams(params)
-    const filteredClusters = clusters.filter((cluster) => isPrometheusCluster(cluster))
+    const filteredClusters = clusters.filter((cluster) => {
+      const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
+      return hasPrometheusEnabled(clusterWithTasks)
+    })
     await Promise.all([clusterActions.list(), loadAlertRules(params)])
 
     if (clusterId === allKey) {
@@ -62,8 +66,7 @@ const timestampSteps = {
   '3.h': [30, 'm'],
   '1.h': [10, 'm'],
 }
-const selector = makeParamsClustersSelector()
-const importedSelector = makeParamsImportedClustersSelector()
+const selector = allClustersSelector()
 
 export const loadTimeSeriesAlerts = createContextLoader(
   ActionDataKeys.AlertsTimeSeries,
@@ -83,15 +86,10 @@ export const loadTimeSeriesAlerts = createContextLoader(
       healthyClusters: true,
       prometheusClusters: true,
     })
-    const prometheusImportedClusters = importedSelector(store.getState(), {
-      ...params,
-      prometheusClusters: true,
-    })
-    const allPrometheusClusters = [...prometheusClusters, ...prometheusImportedClusters]
 
     if (clusterId === allKey) {
       return someAsync(
-        pluck('uuid', allPrometheusClusters).map((clusterUuid) =>
+        pluck('uuid', prometheusClusters).map((clusterUuid) =>
           qbert.getPrometheusAlertsOverTime(clusterUuid, timePast, timeNow, step),
         ),
       ).then(flatten)

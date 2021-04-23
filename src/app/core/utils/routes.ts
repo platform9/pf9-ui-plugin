@@ -738,6 +738,13 @@ export const routes = {
       },
       name: 'Monitoring:Alarms:List',
     }),
+    overview: Route.register({
+      url: `${pluginRoutePrefix}/alarms#overview`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Monitoring:Overview',
+    }),
     alarms: Route.register({
       url: `${pluginRoutePrefix}/alarms#alarms`,
       defaultParams: {

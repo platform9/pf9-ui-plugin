@@ -110,8 +110,8 @@ export const hasHealthyMasterNodes = propSatisfies(
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
-export const hasPrometheusTag = pathEq(['tags', 'pf9-system:monitoring'], 'true')
-// export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+export const hasPrometheusTag = pathEq(['hasPrometheus', 'pf9-system:monitoring'], 'true')
+export const prometheusCluster = propSatisfies(isTruthy, 'hasPrometheus')
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 export const createAwsCluster = async (data) => {
