@@ -135,6 +135,9 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(2),
     maxWidth: 1234,
   },
+  headerCard: {
+    marginTop: theme.spacing(2),
+  },
   detailsHeader: {
     display: 'grid',
     gridTemplateColumns: '434px repeat(3, 250px)',
@@ -249,9 +252,13 @@ const ClusterDetailsPage = () => {
         )}
         {cluster.hasPrometheus && (
           <Tab value="alarms" label="Alarms">
-            <div className={classes.tabContainer}>
-              <ClusterAlarms cluster={cluster} loading={loading} />
-            </div>
+            <ClusterAlarms
+              cluster={cluster}
+              loading={loading}
+              headerCard={() => (
+                <ClusterStatus cluster={cluster} loading={loading} className={classes.headerCard} />
+              )}
+            />
           </Tab>
         )}
       </Tabs>
@@ -261,7 +268,7 @@ const ClusterDetailsPage = () => {
 
 export default ClusterDetailsPage
 
-const ClusterStatusAndUsage = ({ cluster, loading }) => {
+const ClusterStatus = ({ cluster, loading, className }) => {
   const { usage = emptyObj, name, links = emptyObj, cloudProviderType = '', version } = cluster
   const classes = useStyles()
   const clusterLinks = {
@@ -270,28 +277,37 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   }
   const deployment = cloudProviderTypes[cloudProviderType] || capitalizeString(cloudProviderType)
   return (
+    <HeaderCard
+      title={name}
+      subtitle={`${deployment} - ${version}`}
+      icon="project-diagram"
+      links={clusterLinks}
+      className={className}
+    >
+      <ClusterConnectionStatus
+        iconStatus
+        className={classes.statusColor}
+        variant="header"
+        cluster={cluster}
+        message={loading ? 'loading' : undefined}
+      />
+      <ClusterHealthStatus
+        iconStatus
+        className={classes.statusColor}
+        variant="header"
+        cluster={cluster}
+        message={loading ? 'loading' : undefined}
+      />
+    </HeaderCard>
+  )
+}
+
+const ClusterStatusAndUsage = ({ cluster, loading }) => {
+  const { usage = emptyObj } = cluster
+  const classes = useStyles()
+  return (
     <div className={classes.detailsHeader}>
-      <HeaderCard
-        title={name}
-        subtitle={`${deployment} - ${version}`}
-        icon="project-diagram"
-        links={clusterLinks}
-      >
-        <ClusterConnectionStatus
-          iconStatus
-          className={classes.statusColor}
-          variant="header"
-          cluster={cluster}
-          message={loading ? 'loading' : undefined}
-        />
-        <ClusterHealthStatus
-          iconStatus
-          className={classes.statusColor}
-          variant="header"
-          cluster={cluster}
-          message={loading ? 'loading' : undefined}
-        />
-      </HeaderCard>
+      <ClusterStatus cluster={cluster} loading={loading} />
       <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
       <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
       <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
@@ -299,11 +315,19 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   )
 }
 
-export const HeaderCard = ({ title, subtitle, icon, loading = false, links, children }) => {
+export const HeaderCard = ({
+  title,
+  subtitle,
+  icon,
+  loading = false,
+  links,
+  children,
+  className,
+}) => {
   const hasLinks = !!links.grafana || !!links.dashboard || !!links.kubeconfig
   const classes = useStyles({ hasLinks })
   return (
-    <Card className={classes.headerCardContainer} elevation={0}>
+    <Card className={clsx(classes.headerCardContainer, className)} elevation={0}>
       <header className={classes.headerCardHeader}>
         <Tooltip title={title} interactive>
           <Text variant="subtitle1" component="h1">

@@ -1,13 +1,5 @@
 import React, { useMemo, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { emptyObj } from 'utils/fp'
-import { capitalizeString } from 'utils/misc'
-import { cloudProviderTypes } from '../cloudProviders/selectors'
-import { HeaderCard } from './ClusterDetailsPage'
-import {
-  ClusterConnectionStatus as ClusterConnectionStatusDefault,
-  ClusterHealthStatus as ClusterHealthStatusDefault,
-} from './ClusterStatus'
 import Theme from 'core/themes/model'
 import TimePicklistDefault from 'k8s/components/alarms/TimePicklist'
 import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
@@ -27,13 +19,8 @@ import SnoozeAlarmDialog from 'k8s/components/alarms/SnoozeAlarmDialog'
 import StatusPicklist from 'k8s/components/alarms/StatusPicklist'
 import SeverityPicklist from 'k8s/components/alarms/SeverityPicklist'
 const TimePicklist: any = TimePicklistDefault
-const ClusterConnectionStatus: any = ClusterConnectionStatusDefault
-const ClusterHealthStatus: any = ClusterHealthStatusDefault
 
 const useStyles = makeStyles((theme: Theme) => ({
-  statusColor: {
-    color: theme.palette.grey[700],
-  },
   alarmsHeader: {
     display: 'flex',
   },
@@ -45,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     '& .progressContent.loading': {
       display: 'none',
     },
+    marginTop: theme.spacing(2),
   },
   chart: {
     marginTop: theme.spacing(2),
@@ -53,10 +41,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'inline-grid',
     gridTemplateColumns: 'auto auto auto',
     gridGap: theme.spacing(2.5),
-  },
-  statusPicker: {
-    flexGrow: 0,
-    marginRight: '20px',
   },
 }))
 
@@ -180,8 +164,7 @@ const AlarmsTable = ({ alarms, reload, params }: Props) => {
   return <TableComponent data={alarms} listTableParams={params} />
 }
 
-const ClusterAlarms = ({ cluster, loading }) => {
-  const { usage = emptyObj, name, links = emptyObj, cloudProviderType = '', version } = cluster
+const ClusterAlarms = ({ cluster, loading, headerCard }) => {
   const classes = useStyles()
   const [params, setParams] = useState({
     severity: allKey,
@@ -210,36 +193,10 @@ const ClusterAlarms = ({ cluster, loading }) => {
     )
   })
 
-  const deployment = cloudProviderTypes[cloudProviderType] || capitalizeString(cloudProviderType)
-  const clusterLinks = {
-    grafana: usage.grafanaLink,
-    ...links,
-  }
-
   return (
     <>
       <div className={classes.alarmsHeader}>
-        <HeaderCard
-          title={name}
-          subtitle={`${deployment} - ${version}`}
-          icon="project-diagram"
-          links={clusterLinks}
-        >
-          <ClusterConnectionStatus
-            iconStatus
-            className={classes.statusColor}
-            variant="header"
-            cluster={cluster}
-            message={loading ? 'loading' : undefined}
-          />
-          <ClusterHealthStatus
-            iconStatus
-            className={classes.statusColor}
-            variant="header"
-            cluster={cluster}
-            message={loading ? 'loading' : undefined}
-          />
-        </HeaderCard>
+        {headerCard()}
         <div className={classes.chartContainer}>
           <div className={classes.filters}>
             <StatusPicklist
