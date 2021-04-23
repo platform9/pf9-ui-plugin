@@ -56,7 +56,7 @@ const useParams = <T extends Dictionary<any>>(defaultParams?: T): UseParamsRetur
       dispatch({
         // FIXME: zipObj return types are too loose so we are forced to use a type cast here
         type: 'merge',
-        payload: zipObj<ValueOf<T>, any>(keys, values) as Partial<T>,
+        payload: zipObj<ValueOf<T>>(keys, values) as Partial<T>,
       }),
     )
   }, [])
@@ -131,7 +131,7 @@ export const createUsePrefParamsHook = <T extends Dictionary<any>>(
         // FIXME: zipObj return types are too loose so we are forced to use a type cast here
         // eslint-disable-next-line @typescript-eslint/promise-function-async
         (...values: Array<ValueOf<T>>) =>
-          updateParams(zipObj<ValueOf<T>, any>(keys, values) as Partial<T>),
+          updateParams(zipObj<ValueOf<T>>(keys, values) as Partial<T>),
       )
     }, [updateParamsBase])
 
