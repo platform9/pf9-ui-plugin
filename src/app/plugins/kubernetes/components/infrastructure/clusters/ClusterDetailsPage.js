@@ -36,6 +36,7 @@ import { isDecco } from 'core/utils/helpers'
 import { useSelector } from 'react-redux'
 import { prop } from 'ramda'
 import { sessionStoreKey } from 'core/session/sessionReducers'
+import ClusterAlarms from './cluster-alarms'
 
 const oneSecond = 1000
 
@@ -246,6 +247,13 @@ const ClusterDetailsPage = () => {
             </div>
           </Tab>
         )}
+        {cluster.hasPrometheus && (
+          <Tab value="alarms" label="Alarms">
+            <div className={classes.tabContainer}>
+              <ClusterAlarms cluster={cluster} loading={loading} />
+            </div>
+          </Tab>
+        )}
       </Tabs>
     </PageContainer>
   )
@@ -291,7 +299,7 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   )
 }
 
-const HeaderCard = ({ title, subtitle, icon, loading = false, links, children }) => {
+export const HeaderCard = ({ title, subtitle, icon, loading = false, links, children }) => {
   const hasLinks = !!links.grafana || !!links.dashboard || !!links.kubeconfig
   const classes = useStyles({ hasLinks })
   return (

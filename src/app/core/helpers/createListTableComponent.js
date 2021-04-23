@@ -28,6 +28,7 @@ const createListTableComponent = ({
     rowActions = undefined,
     loading = false,
     onSortChange = undefined,
+    listTableParams = undefined,
   }) => {
     const [{ visibleColumns, columnsOrder, rowsPerPage }, updatePrefs] = useScopedPreferences(name)
 
@@ -62,6 +63,7 @@ const createListTableComponent = ({
         loading={loading}
         compactTable={compactTable}
         batchActions={batchActions}
+        listTableParams={listTableParams}
       />
     )
   }
