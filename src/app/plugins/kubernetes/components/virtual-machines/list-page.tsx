@@ -160,7 +160,7 @@ export const options = {
   batchActions: batchActions,
   emptyText: (
     <div>
-      <Text variant="subtitle2">No Kubevirt VMs have been deployed.</Text>
+      <Text variant="subtitle2">No KubeVirt VMs have been deployed.</Text>
       <SimpleLink src={routes.virtualMachines.add.path()}>
         <Text variant="body1">Add a virtual machine now.</Text>
       </SimpleLink>

@@ -16,16 +16,15 @@ export default function KubevirtLandingPage() {
           Early Access
         </Text>
         <Text variant="subtitle1">
-          Get started with <br /> Kubevirt for VM Management
+          Get started with <br /> KubeVirt for VM Management
         </Text>
         <Text variant="body1" className={classes.middleText}>
-          Kubevirt makes it possible for virtual machines to be managed by Kubernetes.
-          <br /> You will need to install and run Kubevirt to create and manage VMs in a Kubernetes
-          cluster.
+          KubeVirt makes it possible for virtual machines to be managed by Kubernetes.
         </Text>
         <Text>
-          Install Kubevirt from{' '}
+          Install KubeVirt from the{' '}
           <SimpleLink src={routes.cluster.add.path()}>Cluster Creation Page.</SimpleLink>
+          and start deploying and managing VMs in your Kubernetes clusters now.
         </Text>
       </div>
     </article>

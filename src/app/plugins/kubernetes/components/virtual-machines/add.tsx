@@ -48,7 +48,7 @@ const formTitleByType = {
   [VirtualMachineCreateTypes.AddNew]: 'Create a New VM Instance',
   [VirtualMachineCreateTypes.ImportURL]: 'Add a VM - Import an Image from URL',
   [VirtualMachineCreateTypes.ImportDisk]: 'Add a VM - Import an Image on a Disk',
-  [VirtualMachineCreateTypes.ClonePVC]: 'Add a VM - Cloning an Exisiting PVC',
+  [VirtualMachineCreateTypes.ClonePVC]: 'Add a VM - Cloning an Existing PVC',
 }
 
 // const yamlTemplates = {
@@ -79,7 +79,7 @@ const codeMirrorValidations = [
     } catch (err) {
       return true
     }
-  }, 'Kubevirt API version must be "kubevirt.io/v1"'),
+  }, 'KubeVirt API version must be "kubevirt.io/v1"'),
   customValidator((yaml, formValues, rest) => {
     try {
       const body = moizedYamlLoad(yaml)
@@ -87,7 +87,7 @@ const codeMirrorValidations = [
     } catch (err) {
       return true
     }
-  }, 'Kubevirt API kind must match the Virtual Machine type'),
+  }, 'KubeVirt API kind must match the Virtual Machine type'),
 ]
 
 export const AddVirtualMachineForm = () => {
@@ -139,7 +139,7 @@ export const AddVirtualMachineForm = () => {
             DropdownComponent={VMPicklist}
             id="vmType"
             label="VM Type"
-            info="The kubevirt kind, VirtualMachine or VirtualMachineInstance"
+            info="The kubeVirt kind, VirtualMachine or VirtualMachineInstance"
             required
           />
           <CodeMirror

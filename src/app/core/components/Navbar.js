@@ -135,10 +135,7 @@ const styles = (theme) => ({
     color: ({ stack = 'kubernetes' }) => [theme.components.sidebar[stack].activeText, '!important'],
 
     '&:hover *': {
-      color: ({ stack = 'kubernetes' }) => [
-        theme.components.sidebar[stack].hoverText,
-        '!important',
-      ],
+      color: ({ stack = 'kubernetes' }) => [theme.components.sidebar[stack].hoverText],
     },
   },
   navHeading: {
