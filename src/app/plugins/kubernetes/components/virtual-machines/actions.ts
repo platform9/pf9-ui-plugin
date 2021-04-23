@@ -77,9 +77,9 @@ export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines,
         )
       : qbert.getVirtualMachineInstances(clusterId)
   },
-  createFn: async ({ clusterId, namespace, yaml }) => {
+  createFn: async ({ clusterId, namespace, yaml, vmType }) => {
     const body = jsYaml.safeLoad(yaml)
-    const vm: any = await qbert.createVirtualMachine(clusterId, namespace, body)
+    const vm: any = await qbert.createVirtualMachine(clusterId, namespace, body, vmType)
     trackEvent('Create New VM', {
       clusterId,
       namespace,

@@ -676,8 +676,9 @@ class Qbert extends ApiService {
     return data
   }
 
-  createVirtualMachine = async (clusterId, namespace, body) => {
-    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachines`
+  createVirtualMachine = async (clusterId, namespace, body, vmType = '') => {
+    const virtualMachineType = `${vmType.toLowerCase()}s`
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/${virtualMachineType}`
     return this.client.basicPost({
       url,
       body,

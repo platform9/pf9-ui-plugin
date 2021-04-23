@@ -20,7 +20,7 @@ const VirtualMachinesPage = () => {
     <PageContainer>
       <DocumentMeta title="Virtual Machines" />
       <Progress loading={loadingClusters || loadingImportedClusters} renderContentOnMount={false}>
-        {hasKubevirtClusters ? (
+        {!hasKubevirtClusters ? (
           <KubevirtLandingPage />
         ) : (
           <Tabs>
