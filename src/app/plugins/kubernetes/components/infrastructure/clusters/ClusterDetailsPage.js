@@ -254,7 +254,6 @@ const ClusterDetailsPage = () => {
           <Tab value="alarms" label="Alarms">
             <ClusterAlarms
               cluster={cluster}
-              loading={loading}
               headerCard={() => (
                 <ClusterStatus cluster={cluster} loading={loading} className={classes.headerCard} />
               )}

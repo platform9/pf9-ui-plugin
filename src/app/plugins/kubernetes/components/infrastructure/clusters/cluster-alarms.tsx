@@ -164,7 +164,7 @@ const AlarmsTable = ({ alarms, reload, params }: Props) => {
   return <TableComponent data={alarms} listTableParams={params} />
 }
 
-const ClusterAlarms = ({ cluster, loading, headerCard }) => {
+const ClusterAlarms = ({ cluster, headerCard }) => {
   const classes = useStyles()
   const [params, setParams] = useState({
     severity: allKey,
