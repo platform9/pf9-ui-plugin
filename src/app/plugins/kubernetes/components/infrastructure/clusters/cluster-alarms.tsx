@@ -196,7 +196,7 @@ const ClusterAlarms = ({ cluster, headerCard }) => {
   return (
     <>
       <div className={classes.alarmsHeader}>
-        {headerCard()}
+        {headerCard}
         <div className={classes.chartContainer}>
           <div className={classes.filters}>
             <StatusPicklist

@@ -69,7 +69,7 @@ function ImportedClusterDetails() {
         {cluster.hasPrometheus && (
           <Tab value="alarms" label="Alarms">
             <div className={classes.tabContainer}>
-              <ClusterAlarms cluster={cluster} headerCard={() => clusterHeader} />
+              <ClusterAlarms cluster={cluster} headerCard={clusterHeader} />
             </div>
           </Tab>
         )}
