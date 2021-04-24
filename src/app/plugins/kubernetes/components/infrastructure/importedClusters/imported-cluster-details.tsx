@@ -21,6 +21,7 @@ import Theme from 'core/themes/model'
 import { IUseDataLoader } from '../nodes/model'
 import { ImportedClusterSelector } from './model'
 import ClusterDeployedApps from '../clusters/cluster-deployed-apps'
+import ClusterAlarms from '../clusters/cluster-alarms'
 
 function ImportedClusterDetails() {
   const { match, history } = useReactRouter()
@@ -65,6 +66,13 @@ function ImportedClusterDetails() {
             <ClusterDeployedApps cluster={cluster} reload={reload} loading={loading} />
           </div>
         </Tab>
+        {cluster.hasPrometheus && (
+          <Tab value="alarms" label="Alarms">
+            <div className={classes.tabContainer}>
+              <ClusterAlarms cluster={cluster} headerCard={clusterHeader} />
+            </div>
+          </Tab>
+        )}
       </Tabs>
     </PageContainer>
   )
