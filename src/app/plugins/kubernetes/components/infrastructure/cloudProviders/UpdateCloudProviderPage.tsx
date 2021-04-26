@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
@@ -7,7 +7,7 @@ import AwsCloudProviderVerification from './AwsCloudProviderVerification'
 import AzureCloudProviderVerification from './AzureCloudProviderVerification'
 import { objSwitchCase, onlyDefinedValues } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
-import { Theme } from '@material-ui/core'
+import Theme from 'core/themes/model'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
@@ -20,6 +20,8 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { pick } from 'ramda'
 import { routes } from 'core/utils/routes'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import clsx from 'clsx'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -48,6 +50,34 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'grid',
     gridGap: theme.spacing(2),
   },
+  spaceRight: {
+    marginRight: theme.spacing(4),
+  },
+  checkIcon: {
+    color: theme.palette.green[500],
+    marginRight: theme.spacing(1),
+    alignSelf: 'center',
+  },
+  timesIcon: {
+    color: theme.palette.red[500],
+    marginRight: theme.spacing(1),
+    alignSelf: 'center',
+  },
+  calloutFields: {
+    display: 'grid',
+    gridGap: theme.spacing(0.5),
+    marginBottom: theme.spacing(1),
+  },
+  label: {
+    display: 'grid',
+    gridTemplateColumns: 'min-content 1fr',
+  },
+  value: {
+    marginLeft: theme.spacing(4),
+  },
+  noneText: {
+    color: theme.palette.grey[300],
+  },
 }))
 
 const formCpBody = (data) => {
@@ -60,6 +90,8 @@ const formCpBody = (data) => {
   }
   return {}
 }
+
+const getAvailableText = (available) => (available ? 'Available' : 'Unavailable')
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
@@ -90,6 +122,78 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     })(initialValues.type)
   }, [initialValues.type])
 
+  const getAwsCalloutFields = useCallback((wizardContext) => {
+    return [
+      {
+        label: `Regions ${getAvailableText(wizardContext.regionsAvailable)}`,
+        available: wizardContext.regionsAvailable,
+        value: wizardContext.regionOptionLabel,
+      },
+      {
+        label: `Route 53 Domain ${getAvailableText(wizardContext.route53DomainsAvailable)}`,
+        available: wizardContext.route53DomainsAvailable,
+        value: wizardContext.awsDomainOptionLabel,
+      },
+      {
+        label: `SSH Keys ${getAvailableText(wizardContext.sshKeysAvailable)}`,
+        available: wizardContext.sshKeysAvailable,
+        value: wizardContext.sshKey,
+      },
+    ]
+  }, [])
+
+  const getAzureCalloutFields = useCallback((wizardContext) => {
+    return [
+      {
+        label: `Regions ${getAvailableText(wizardContext.regionsAvailable)}`,
+        available: wizardContext.regionsAvailable,
+        value: wizardContext.regionOptionLabel,
+      },
+    ]
+  }, [])
+
+  const getCalloutFields = useCallback(
+    (wizardContext) => {
+      return initialValues.type === CloudProviders.Aws
+        ? getAwsCalloutFields(wizardContext)
+        : getAzureCalloutFields(wizardContext)
+    },
+    [initialValues.type],
+  )
+
+  const renderCustomCalloutFields = useCallback(
+    (wizardContext) => {
+      const calloutFields = getCalloutFields(wizardContext)
+      return (
+        <div>
+          {calloutFields.map(({ label, available, value }) => {
+            const icon = available ? 'check-circle' : 'times-circle'
+            const iconClass = available ? 'checkIcon' : 'timesIcon'
+            return (
+              <div key={label} className={classes.calloutFields}>
+                <div className={classes.label}>
+                  <FontAwesomeIcon className={classes[iconClass]} solid>
+                    {icon}
+                  </FontAwesomeIcon>
+                  <Text variant="body2" className={classes.spaceRight}>
+                    {label}
+                  </Text>
+                </div>
+                <Text
+                  variant="caption1"
+                  className={clsx(classes.value, value ? '' : classes['noneText'])}
+                >
+                  {value || 'none'}
+                </Text>
+              </div>
+            )
+          })}
+        </div>
+      )
+    },
+    [getCalloutFields],
+  )
+
   return (
     <>
       <DocumentMeta title="Update Cloud Provider" bodyClasses={['form-view']} />
@@ -103,11 +207,13 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
           hideAllButtons
         >
           {({ wizardContext, setWizardContext, onNext, handleNext }) => {
+            console.log('wizardContext', wizardContext)
             return (
               <WizardMeta
                 className={classes.updateCloudProvider}
                 fields={wizardContext}
                 icon={<CloudProviderCard active type={wizardContext.type} />}
+                extraSidebarContent={renderCustomCalloutFields(wizardContext)}
               >
                 <WizardStep stepId="step1" label="Update Cloud Provider">
                   <div className={classes.form}>

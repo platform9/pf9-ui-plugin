@@ -135,3 +135,12 @@ export const defaultAxiosConfig = Object.freeze({
 export const publicSlackLink = 'https://kplane.slack.com'
 export const supportEmail = 'support-ft@platform9.com'
 export const pmkftSignupLink = 'https://platform9.com/signup-flow/?sandbox=kubernetes'
+
+// User Preferences
+export const enum UserPreferenceKeys {
+  AwsCloudProviderDefaultRegion = 'awsCloudProviderDefaultRegion',
+  AzureCloudProviderDefaultRegion = 'azureCloudProviderDefaultRegion',
+}
+
+// Global Preferences
+export const enum GlobalPreferenceKeys {}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -17,25 +17,48 @@ import { getIcon, getIconClass, RegionAvailability } from './helpers'
 import { CloudProviders } from './model'
 import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
 import SshKeyField from '../clusters/form-components/ssh-key-picklist'
+import Button from 'core/elements/button'
+import { userPreferenceStoreActions } from 'k8s/components/common/preference-store/actions'
+import { UserPreferenceKeys } from 'app/constants'
+import { useSelector } from 'react-redux'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { prop } from 'ramda'
+import { RootState } from 'app/store'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 
 const useStyles = makeStyles((theme: Theme) => ({
+  info: {
+    display: 'grid',
+    gridTemplateColumns: 'min-content 1fr',
+  },
   spaceRight: {
     marginRight: theme.spacing(4),
   },
   checkIcon: {
     color: theme.palette.green[500],
     marginRight: theme.spacing(1),
+    alignSelf: 'center',
   },
   timesIcon: {
     color: theme.palette.red[500],
     marginRight: theme.spacing(1),
+    alignSelf: 'center',
   },
   circleIcon: {
     color: theme.palette.grey['200'],
     marginRight: theme.spacing(1),
+    alignSelf: 'center',
   },
   smallLink: {
     marginTop: '6px',
+  },
+  regionSelection: {
+    display: 'grid',
+    gridTemplateColumns: '60% 40%',
+  },
+  setDefaultButton: {
+    alignSelf: 'center',
+    justifySelf: 'flex-end',
   },
 }))
 
@@ -46,47 +69,67 @@ interface Props {
 
 const getRoute53String = (classes, loading, regionId, available) =>
   loading || !regionId
-    ? 'Region needed for Route 53'
+    ? 'Select a region to validate Route53 Configuration'
     : available
     ? 'Route 53 Domains Available'
     : 'Route 53 Domains Unavailable'
 
 const getSshKeyString = (classes, loading, regionId, available) =>
   loading || !regionId
-    ? 'Region needed for SSH keys'
+    ? 'Select a Region to validate SSH Key availability'
     : available
     ? 'SSH Keys Detected'
     : 'No SSH Keys Detected'
 
-const Route53Availability = ({ domains, loading, regionId }) => {
+const Route53Availability = ({ domains, loading, regionId, setWizardContext }) => {
   const classes = useStyles({})
   const available = domains?.length
+  useEffect(() => {
+    if (setWizardContext) {
+      setWizardContext(!loading && regionId && !!available)
+    }
+  }, [loading, regionId, available])
+
   return (
-    <Text variant="body2" className={classes.spaceRight}>
+    <div className={classes.info}>
       <FontAwesomeIcon className={getIconClass(classes, loading, regionId, available)} solid>
         {getIcon(classes, loading, regionId, available)}
       </FontAwesomeIcon>
-      {getRoute53String(classes, loading, regionId, available)}
-    </Text>
+      <Text variant="body2" className={classes.spaceRight}>
+        {getRoute53String(classes, loading, regionId, available)}
+      </Text>
+    </div>
   )
 }
 
-const SshKeyAvailability = ({ keypairs, loading, regionId }) => {
+const SshKeyAvailability = ({ keypairs, loading, regionId, setWizardContext }) => {
   const classes = useStyles({})
   const available = keypairs?.length
+  useEffect(() => {
+    if (setWizardContext) {
+      setWizardContext(!loading && regionId && !!available)
+    }
+  }, [loading, regionId, available])
 
   return (
-    <Text variant="body2" className={classes.spaceRight}>
+    <div className={classes.info}>
       <FontAwesomeIcon className={getIconClass(classes, loading, regionId, available)} solid>
         {getIcon(classes, loading, regionId, available)}
       </FontAwesomeIcon>
-      {getSshKeyString(classes, loading, regionId, available)}
-    </Text>
+      <Text variant="body2" className={classes.spaceRight}>
+        {getSshKeyString(classes, loading, regionId, available)}
+      </Text>
+    </div>
   )
 }
 
 const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props) => {
   const classes = useStyles({})
+  const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
+  const {
+    userDetails: { id: userId },
+  } = session
+  const [hasRegionDefault, setHasRegionDefault] = useState(false)
 
   const [regions, regionsLoading] = useDataLoader(loadCloudProviderDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
@@ -97,8 +140,29 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
     cloudProviderRegionId: wizardContext.region,
   })
 
+  const [[defaultRegion]] = useDataLoader(userPreferenceStoreActions.list, {
+    userId,
+    key: UserPreferenceKeys.AwsCloudProviderDefaultRegion,
+  })
+  const [setUserPreference] = useDataUpdater(userPreferenceStoreActions.create)
+
+  useEffect(() => {
+    if (defaultRegion) {
+      setHasRegionDefault(true)
+    }
+  }, [defaultRegion])
+
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
+
+  const handleSetUserDefault = async (region) => {
+    setHasRegionDefault(true)
+    setUserPreference({
+      userId,
+      key: UserPreferenceKeys.AwsCloudProviderDefaultRegion,
+      value: region,
+    })
+  }
 
   return (
     <>
@@ -107,7 +171,13 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability classes={classes} regions={regions} />
+              <RegionAvailability
+                classes={classes}
+                regions={regions}
+                setWizardContext={(isAvailable) =>
+                  setWizardContext({ regionsAvailable: isAvailable })
+                }
+              />
             )}
           </>
         }
@@ -120,19 +190,36 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         <Text variant="body2">
           Platform9 deploys Kubernetes clusters into specified AWS Regions.
         </Text>
-        <CloudProviderRegionField
-          cloudProviderType={CloudProviders.Aws}
-          onChange={(value) => setWizardContext({ region: value })}
-          values={wizardContext}
-        />
+        <div className={classes.regionSelection}>
+          <CloudProviderRegionField
+            cloudProviderType={CloudProviders.Aws}
+            onChange={(value, label) =>
+              setWizardContext({ region: value, regionOptionLabel: label })
+            }
+            values={wizardContext}
+          />
+
+          <Button
+            color="primary"
+            variant="light"
+            className={classes.setDefaultButton}
+            disabled={!wizardContext.region || hasRegionDefault}
+            onClick={() => handleSetUserDefault(wizardContext.region)}
+          >
+            Set As Default
+          </Button>
+        </div>
       </FormFieldCard>
       <FormFieldCard
-        title="Route 53 Domain Name Registration"
+        title="AWS Native Clusters: Route53 Domains (Optional)"
         middleHeader={
           <Route53Availability
             loading={loading}
             regionId={wizardContext.region}
             domains={domains}
+            setWizardContext={(isAvailable) =>
+              setWizardContext({ route53DomainsAvailable: isAvailable })
+            }
           />
         }
         link={
@@ -142,7 +229,8 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         }
       >
         <Text variant="body2">
-          Platform9 utilizes Route53 Domains to route traffic to clusters under management.
+          Platform9 can utilize Route53 Domains to route traffic to AWS Native Clusters. Route53 is
+          optional and not required for EKS.
         </Text>
         <PicklistField
           DropdownComponent={ClusterDomainPicklist}
@@ -151,6 +239,9 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
           cloudProviderId={wizardContext.cloudProviderId}
           cloudProviderRegionId={wizardContext.region}
           disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
+          onChange={(value, label) =>
+            setWizardContext({ awsDomain: value, awsDomainOptionLabel: label })
+          }
         />
         {wizardContext.region && !loading && !domains.length && (
           <Info>
@@ -165,12 +256,13 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         )}
       </FormFieldCard>
       <FormFieldCard
-        title="SSH Key"
+        title="AWS Native Clusters: SSH Keys"
         middleHeader={
           <SshKeyAvailability
             loading={loading}
             regionId={wizardContext.region}
             keypairs={keypairs}
+            setWizardContext={(isAvailable) => setWizardContext({ sshKeysAvailable: isAvailable })}
           />
         }
         link={
@@ -179,8 +271,16 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
           </ExternalLink>
         }
       >
-        <Text variant="body2">SSH Keys are required for access to manage EC2 Instances.</Text>
-        <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={wizardContext} info="" />
+        <Text variant="body2">
+          When building AWS Native Clusters, SSH Keys are required to access and configure EC2
+          Instances. SSH Keys are not required to Manage EKS Clusters.
+        </Text>
+        <SshKeyField
+          dropdownComponent={AwsClusterSshKeyPicklist}
+          values={wizardContext}
+          info=""
+          onChange={(value) => setWizardContext({ sshKey: value })}
+        />
       </FormFieldCard>
     </>
   )

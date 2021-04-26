@@ -44,7 +44,13 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability classes={classes} regions={regions}></RegionAvailability>
+              <RegionAvailability
+                classes={classes}
+                regions={regions}
+                setWizardContext={(isAvailable) =>
+                  setWizardContext({ regionsAvailable: isAvailable })
+                }
+              ></RegionAvailability>
             )}
           </>
         }
@@ -59,7 +65,7 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
         </Text>
         <CloudProviderRegionField
           cloudProviderType={CloudProviders.Azure}
-          onChange={(value) => setWizardContext({ region: value })}
+          onChange={(value, label) => setWizardContext({ region: value, regionOptionLabel: label })}
           values={wizardContext}
         />
       </FormFieldCard>

@@ -16,6 +16,7 @@ interface Props<T extends {}> {
   showContextPreview?: boolean
   keyOverrides?: { [key: string]: string }
   renderLabels?: (labels) => JSX.Element
+  extraSidebarContent?: JSX.Element
 }
 
 /*
@@ -31,6 +32,7 @@ export default function WizardMeta<T>({
   fields,
   icon,
   className,
+  extraSidebarContent = null,
   showContextPreview = localStorage.getItem('enableContextPreview') === 'true',
   renderLabels = (labels) => (
     <RenderLabels keyOverrides={keyOverrides} labels={labels} inverse split />
@@ -51,7 +53,8 @@ export default function WizardMeta<T>({
             <div />
           </>
         )}
-        {labels && renderLabels(labels)}
+        {Object.entries(labels).length > 0 && renderLabels(labels)}
+        {extraSidebarContent}
       </aside>
       {children}
       {showContextPreview && (

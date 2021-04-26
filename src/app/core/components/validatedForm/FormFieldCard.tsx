@@ -46,8 +46,9 @@ export const useStyles = makeStyles<Theme, ContainerProps>((theme) => ({
   },
   titleRight: {
     width: '45%',
-    display: 'flex',
-    justifyContent: 'space-between',
+    display: 'grid',
+    gridTemplateColumns: '1fr max-content',
+    gridGap: theme.spacing(1),
     color: theme.palette.grey[700],
   },
 }))
