@@ -1,5 +1,5 @@
 import React from 'react'
-import { allPass } from 'ramda'
+
 import { makeStyles } from '@material-ui/styles'
 
 import { pmkCliOverviewLink } from 'k8s/links'
@@ -7,14 +7,14 @@ import { defaultEtcBackupPath } from 'app/constants'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 
 import ExternalLink from 'core/components/ExternalLink'
-import { masterNodeLengthValidator } from 'core/utils/fieldValidators'
+
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import FormReviewTable from 'core/components/validatedForm/review-table'
 import WizardStep from 'core/components/wizard/WizardStep'
 
 import ClusterNameField from '../../form-components/name'
-import ClusterHostChooser, { isConnected, isUnassignedNode } from '../ClusterHostChooser'
+
 import KubernetesVersion from '../../form-components/kubernetes-version'
 
 import Theme from 'core/themes/model'
@@ -118,16 +118,7 @@ const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext
               Not Seeing Any Nodes?
             </ExternalLink>
           }
-        >
-          <ClusterHostChooser
-            id="masterNodes"
-            selection="single"
-            filterFn={allPass([isConnected, isUnassignedNode])}
-            onChange={(value) => setWizardContext({ masterNodes: value })}
-            validations={[masterNodeLengthValidator]}
-            required
-          />
-        </FormFieldCard>
+        ></FormFieldCard>
 
         <FormFieldCard title="Default Settings for New Cluster">
           <FormReviewTable data={wizardContext} columns={columns} />
