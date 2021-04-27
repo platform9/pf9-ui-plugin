@@ -95,7 +95,7 @@ const options = {
   title: 'Deployed Apps',
   uniqueIdentifier: 'name',
   multiSelection: false,
-  searchTarget: 'name',
+  searchTargets: ['name'],
   ListPage,
 }
 
