@@ -1,8 +1,10 @@
 import React from 'react'
-import { makeStyles, Theme } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Text from 'core/elements/text'
 import { pathStr } from 'utils/fp'
+import { hexToRGBA } from 'core/utils/colorHelpers'
+import Theme from 'core/themes/model'
 
 interface StyleProps {
   type?: string
@@ -19,11 +21,11 @@ const useStyles = makeStyles<Theme, Partial<StyleProps>>((theme: Theme) => ({
     border: ({ active, type }) => {
       if (active) {
         if (type === 'fatal') {
-          return `1px solid #f9dcd8`
+          return `1px solid ${hexToRGBA(theme.palette.red[500], 0.2)}`
         } else if (type === 'critical') {
-          return `1px solid #fde3d0`
+          return `1px solid ${hexToRGBA(theme.palette.orange[500], 0.2)}`
         } else if (type === 'warning') {
-          return `1px solid #fdf5d1`
+          return `1px solid ${hexToRGBA(theme.palette.yellow[500], 0.2)}`
         }
       }
       return 'none'
@@ -31,7 +33,6 @@ const useStyles = makeStyles<Theme, Partial<StyleProps>>((theme: Theme) => ({
     cursor: ({ count }) => (count ? 'pointer' : ''),
     color: ({ count }) => (count ? '' : theme.palette.grey[300]),
     background: ({ type, active, count }) => {
-      // No good matches in palette, use hex values to match zeplin
       if (active) {
         return 'none'
       }
@@ -39,11 +40,11 @@ const useStyles = makeStyles<Theme, Partial<StyleProps>>((theme: Theme) => ({
         return theme.palette.grey[200]
       }
       if (type === 'fatal') {
-        return '#f9dcd8'
+        return hexToRGBA(theme.palette.red[500], 0.2)
       } else if (type === 'critical') {
-        return '#fde3d0'
+        return hexToRGBA(theme.palette.orange[500], 0.2)
       } else if (type === 'warning') {
-        return '#fdf5d1'
+        return hexToRGBA(theme.palette.yellow[500], 0.2)
       } else {
         return ''
       }
