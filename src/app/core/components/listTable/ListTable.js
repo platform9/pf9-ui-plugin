@@ -318,7 +318,7 @@ class ListTable extends PureComponent {
   }
 
   handleSearch = (value) => {
-    if (this.props.searchTarget) {
+    if (this.props.searchTargets) {
       this.setState({
         searchTerm: value,
       })
@@ -404,9 +404,11 @@ class ListTable extends PureComponent {
     }, data)
   }
 
-  filterBySearch = (data, target) => {
+  filterBySearch = (data, targets) => {
     const { searchTerm } = this.state
-    return data.filter((ele) => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter((ele) =>
+      targets.some((target) => ele[target].match(new RegExp(searchTerm, 'i')) !== null),
+    )
   }
 
   pluckDataIds = (rows) => rows.map(this.getRowId)
@@ -428,14 +430,14 @@ class ListTable extends PureComponent {
   }
 
   getFilteredRows = () => {
-    const { searchTarget, data, filters, onSortChange } = this.props
+    const { searchTargets, data, filters, onSortChange } = this.props
     const { searchTerm } = this.state
 
     const sortedData = onSortChange ? data : this.sortData(data)
     const searchData =
       !searchTerm || searchTerm.length < minSearchLength
         ? sortedData
-        : this.filterBySearch(sortedData, searchTarget)
+        : this.filterBySearch(sortedData, searchTargets)
     return filters ? this.applyFilters(searchData) : searchData
   }
 
@@ -758,7 +760,7 @@ ListTable.propTypes = {
   onColumnsChange: PropTypes.func,
 
   showCheckboxes: PropTypes.bool,
-  searchTarget: PropTypes.string,
+  searchTargets: PropTypes.arrayOf(PropTypes.string),
 
   canEditColumns: PropTypes.bool,
   canDragColumns: PropTypes.bool,

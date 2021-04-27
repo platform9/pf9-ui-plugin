@@ -280,6 +280,7 @@ export const options = {
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
+  searchTargets: ['name', 'uuid'],
   multiSelection: false,
   deleteCond: both(isAdmin, canDeleteCluster),
   DeleteDialog: ClusterDeleteDialog,
