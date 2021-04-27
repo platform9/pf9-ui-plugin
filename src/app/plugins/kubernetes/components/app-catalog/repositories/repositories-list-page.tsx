@@ -77,7 +77,7 @@ export const options = {
   cacheKey: DataKeys.Repositories,
   uniqueIdentifier: 'name',
   multiSelection: false,
-  searchTarget: 'name',
+  searchTargets: ['name'],
   ListPage,
 }
 

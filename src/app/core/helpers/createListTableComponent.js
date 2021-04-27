@@ -11,7 +11,7 @@ const createListTableComponent = ({
   displayName = name,
   columns,
   uniqueIdentifier = 'id',
-  searchTarget = 'name',
+  searchTargets = ['name'],
   paginate = true,
   showCheckboxes = true,
   multiSelection = true,
@@ -50,7 +50,7 @@ const createListTableComponent = ({
         paginate={paginate}
         showCheckboxes={showCheckboxes}
         multiSelection={multiSelection}
-        searchTarget={searchTarget}
+        searchTargets={searchTargets}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
