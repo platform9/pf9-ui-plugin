@@ -319,7 +319,7 @@ export const HeaderCard = ({
   subtitle,
   icon,
   loading = false,
-  links,
+  links = {},
   children,
   className,
 }) => {

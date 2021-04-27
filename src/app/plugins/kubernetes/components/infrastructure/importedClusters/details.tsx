@@ -5,9 +5,9 @@ import { ImportedClusterSelector } from './model'
 import { CloudProviders } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
 import { formatDate } from 'utils/misc'
-import { getFieldsForCard, IClusterDetailFields } from '../clusters/ClusterInfo'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import Text from 'core/elements/text'
+import { getFieldsForCard, IDetailFields } from '../clusters/helpers'
 
 const renderVPCField = (vpc: any = {}) => {
   const privateAccess = vpc?.privateAccess
@@ -35,13 +35,13 @@ const renderLoggingFields = (target) => (data) => {
   return Array.from(tags).map((tag) => <div>{tag}</div>)
 }
 
-const eksOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
+const eksOverviewFields: Array<IDetailFields<ImportedClusterSelector>> = [
   { id: 'spec.eks.eksVersion', title: 'EKS Version', required: true },
   { id: 'spec.eks.network.vpc.clusterSecurityGroupId', title: 'Cluster Security Group ID' },
 ]
 
 // Common
-const clusterOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
+const clusterOverviewFields: Array<IDetailFields<ImportedClusterSelector>> = [
   { id: 'status.controlPlaneEndpoint', title: 'Api Server Endpoint' },
   {
     id: 'created_at',
@@ -51,7 +51,7 @@ const clusterOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>
   },
 ]
 
-const networkingFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
+const networkingFields: Array<IDetailFields<ImportedClusterSelector>> = [
   { id: 'spec.eks.network.vpc', title: 'VPC', required: true, render: renderVPCField },
   { id: 'containerCidr', title: 'Container CIDR', required: true },
   { id: 'servicesCidr', title: 'Services CIDR', required: true },
@@ -62,7 +62,7 @@ const networkingFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
     render: (subnets) => subnets.map((net) => <div>{net}</div>),
   },
 ]
-const loggingFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
+const loggingFields: Array<IDetailFields<ImportedClusterSelector>> = [
   {
     id: 'spec.eks.logging.clusterLogging',
     title: 'Enabled',

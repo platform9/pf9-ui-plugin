@@ -6,41 +6,16 @@ import Text from 'core/elements/text'
 import { makeStyles, withStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { path } from 'ramda'
 import { IClusterSelector } from './model'
 import { CloudProviders, CloudProvidersFriendlyName } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
 import { castBoolToStr, formatDate } from 'utils/misc'
 import ExternalLink from 'core/components/ExternalLink'
 import { applicationLoadBalancer } from 'k8s/links'
-
-export interface IClusterDetailFields<T> {
-  id: string
-  title: string
-  required?: boolean
-  helpMessage?: string | React.ReactNode
-  condition?: (cluster: T) => boolean
-  render?: (value: any) => string | React.ReactNode
-}
-
-export function getFieldsForCard<T>(fields: Array<IClusterDetailFields<T>>, cluster: T) {
-  const fieldsToDisplay = {}
-  fields.forEach((field) => {
-    const { id, title, required = false, condition, render, helpMessage } = field
-    const shouldRender = condition ? condition(cluster) : true
-    const value = path<string | boolean>(id.split('.'), cluster)
-    if (shouldRender && (required || !!value || value === false)) {
-      fieldsToDisplay[title] = {
-        value: render ? render(value) : value,
-        helpMessage,
-      }
-    }
-  })
-  return fieldsToDisplay
-}
+import { getFieldsForCard, IDetailFields } from './helpers'
 
 // Common
-const clusterOverviewFields: Array<IClusterDetailFields<IClusterSelector>> = [
+const clusterOverviewFields: Array<IDetailFields<IClusterSelector>> = [
   {
     id: 'created_at',
     title: 'Cluster Created',

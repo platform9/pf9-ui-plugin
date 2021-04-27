@@ -11,7 +11,7 @@ import { routes } from 'core/utils/routes'
 import React from 'react'
 import useReactRouter from 'use-react-router'
 import { formatDate } from 'utils/misc'
-import { getFieldsForCard } from '../infrastructure/clusters/ClusterInfo'
+import { getFieldsForCard } from '../infrastructure/clusters/helpers'
 import { virtualMachineDetailsLoader } from './actions'
 import { batchActions } from './constants'
 
