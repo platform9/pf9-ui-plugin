@@ -94,6 +94,7 @@ const updateSsoSettings = (data, setLoading, setDialogOpened, updateParams) => {
       entity_id: data.entityId,
       metadata_url: data.metadataUrl,
       metadata: data.metadataUrl ? undefined : data.metadata,
+      attr_map_xml: data.defaultAttributeMap,
     }
     setLoading(true)
     try {
@@ -247,6 +248,7 @@ const SsoPage = () => {
               <div className={classes.attributeMapButtons}>
                 <Button
                   className={classes.outlinedButton}
+                  type="button"
                   onClick={() => updateParams({ defaultAttributeMap: '' })}
                 >
                   Clear XML
@@ -259,7 +261,7 @@ const SsoPage = () => {
                 >
                   {
                     // @ts-ignore
-                    <Button>
+                    <Button type="button">
                       <FontAwesomeIcon size="sm" className={classes.copyIcon}>
                         copy
                       </FontAwesomeIcon>

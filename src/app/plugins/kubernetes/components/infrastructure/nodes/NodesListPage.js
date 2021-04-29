@@ -284,6 +284,7 @@ export const options = {
   name: 'Nodes',
   title: 'Nodes',
   uniqueIdentifier: 'uuid',
+  searchTargets: ['name', 'uuid'],
   multiSelection: false,
   batchActions: [
     {

@@ -39,6 +39,7 @@ const ClusterNodes = () => {
         columns: tableColumns,
         emptyText: 'Nothing yet, waiting for nodes...',
         uniqueIdentifier: 'uuid',
+        searchTargets: ['name', 'uuid'],
         onReload: handleRefresh,
         showCheckboxes: true,
         multiSelection: false,
