@@ -33,12 +33,12 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
   {
     id: 'isMaster',
     title: 'Is Master',
-    render: castBoolToStr(),
+    render: castBoolToStr('True', 'False'),
   },
   {
     id: 'masterless',
     title: 'Masterless',
-    render: castBoolToStr(),
+    render: castBoolToStr('True', 'False'),
   },
   {
     id: 'status',
@@ -47,7 +47,7 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
   {
     id: 'api_responding',
     title: 'API Responding',
-    render: castBoolToStr(),
+    render: castBoolToStr('True', 'False'),
   },
   {
     id: 'projectId',
@@ -98,7 +98,7 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
   {
     id: 'isAuthorized',
     title: 'Is Authorized',
-    render: castBoolToStr(),
+    render: castBoolToStr('True', 'False'),
   },
 ]
 
