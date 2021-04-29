@@ -46,6 +46,7 @@ import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { bareOSClusterTracking } from '../../tracking'
+import CustomApiFlags from '../../form-components/custom-api-flag'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -257,6 +258,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               info="Enable the Helm Application Catalog on this cluster"
             /> */}
 
+              <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
               <TagsField />
             </>
           )}

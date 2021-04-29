@@ -236,6 +236,7 @@ export const createBareOSCluster = async (data) => {
     'deployKubevirt',
     'deployLuigiOperator',
   ]
+
   const body = pick(keysToPluck, data)
 
   if (data.enableMetallb) {
@@ -281,6 +282,18 @@ const createGenericCluster = async (body, data) => {
 
   if (data.kubeRoleVersion) {
     body.kubeRoleVersion = data.kubeRoleVersion
+  }
+
+  if (data.apiServerFlags) {
+    body.apiServerFlags = data.apiServerFlags?.split(',')
+  }
+
+  if (data.controllerManagerFlags) {
+    body.controllerManagerFlags = data.controllerManagerFlags?.split(',')
+  }
+
+  if (data.schedulerFlags) {
+    body.schedulerFlags = data.schedulerFlags?.split(',')
   }
 
   // Calico is required when ipv6 is selected

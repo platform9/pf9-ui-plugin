@@ -42,6 +42,7 @@ import WorkerNodeInstanceTypeField from '../../form-components/worker-node-insta
 import { ClusterCreateTypes } from '../../model'
 import { awsClusterTracking } from '../../tracking'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import CustomApiFlags from '../../form-components/custom-api-flag'
 
 export const initialContext = {
   template: 'small',
@@ -436,6 +437,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 <CustomAmiField />
 
                 {/* Tags */}
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
                 <TagsField />
               </FormFieldCard>
             </>
