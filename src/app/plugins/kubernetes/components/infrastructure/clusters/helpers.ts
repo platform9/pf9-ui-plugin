@@ -2,9 +2,9 @@ import ApiClient from 'api-client/ApiClient'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { isAdminRole } from 'k8s/util/helpers'
-import { compose, path, pick, prop, propEq, propSatisfies } from 'ramda'
+import { pathEq, pick, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
-import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
+import { sanitizeUrl } from 'utils/misc'
 import { CloudProviders } from '../cloudProviders/model'
 import { hasConvergingNodes } from './ClusterStatusUtils'
 import { NetworkStackTypes } from './constants'
@@ -110,7 +110,8 @@ export const hasHealthyMasterNodes = propSatisfies(
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
-export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+export const hasPrometheusTag = pathEq(['hasPrometheus', 'pf9-system:monitoring'], 'true')
+export const prometheusCluster = propSatisfies(isTruthy, 'hasPrometheus')
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 export const createAwsCluster = async (data) => {

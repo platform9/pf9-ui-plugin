@@ -23,6 +23,7 @@ export const slackLink = 'https://slack.platform9.io'
 export const forumHelpLink = `${communityBaseUrl}/`
 export const pf9PmkArchitectureDigLink = `${k8sBaseUrl}/multimaster-architecture-platform9-managed-kubernetes/`
 export const pmkDocumentationLink = `${k8sBaseUrl}/introduction/overview`
+export const requestFormLink = `${pf9SupportBaseUrl}/hc/en-us/requests/new?ticket_form_id=360000924873`
 
 // Aws
 export const awsPrerequisitesLink = `${k8sBaseUrl}/aws/`
@@ -49,8 +50,7 @@ export const kubectlInstallationDocumentationLink = `${pf9DocOrigin}/kubernetes/
 
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
-export const nodePrerequisitesDocumentationLink =
-  'https://platform9.com/blog/support/managed-container-cloud-requirements-checklist'
+export const nodePrerequisitesDocumentationLink = `${k8sBaseUrl}/quickstart#supported-operating-systems`
 
 // CLI
 export const pmkCliOverviewLink = `${k8sBaseUrl}/PMK-CLI/`

@@ -44,7 +44,7 @@ const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
   }, [appbertData])
 
   useEffect(() => {
-    reloadAppbert()
+    reloadAppbert(true)
   }, [])
 
   const toggleMonitoring = useCallback(async () => {

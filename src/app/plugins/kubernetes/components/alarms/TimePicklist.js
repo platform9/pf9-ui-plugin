@@ -14,25 +14,16 @@ const options = [
 ]
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const TimePicklist = forwardRef(
-  ({ onChange, selectFirst, ...rest }, ref) => {
-    // Select the first item as soon as data is loaded
-    useEffect(() => {
-      if (selectFirst) {
-        onChange(propOr(allKey, 'value', head(options)))
-      }
-    }, [])
+const TimePicklist = forwardRef(({ onChange, selectFirst, ...rest }, ref) => {
+  // Select the first item as soon as data is loaded
+  useEffect(() => {
+    if (selectFirst) {
+      onChange(propOr(allKey, 'value', head(options)))
+    }
+  }, [])
 
-    return (
-      <Picklist
-        {...rest}
-        ref={ref}
-        onChange={onChange}
-        options={options}
-      />
-    )
-  },
-)
+  return <Picklist {...rest} ref={ref} onChange={onChange} options={options} />
+})
 
 TimePicklist.propTypes = {
   ...Picklist.propTypes,

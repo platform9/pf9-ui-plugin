@@ -1,5 +1,6 @@
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
+import store from 'app/store'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
@@ -11,6 +12,7 @@ import {
   getEtcdBackupPayload,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
+  allClustersSelector,
   clustersSelector,
   makeParamsClustersSelector,
 } from 'k8s/components/infrastructure/clusters/selectors'
@@ -19,9 +21,10 @@ import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { mergeLeft, pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
-import { adjustWith, updateWith } from 'utils/fp'
+import { adjustWith, isNilOrEmpty, updateWith } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 import { importedClusterActions } from '../importedClusters/actions'
+import { importedClustersSelector } from '../importedClusters/selectors'
 
 const { appbert, qbert } = ApiClient.getInstance()
 
@@ -46,14 +49,17 @@ const getCsiDrivers = async (clusterUiid) => {
 
 export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   listFn: async () => {
-    const [rawClusters] = await Promise.all([
+    // update to use allSettled as appbert sometimes is in a failed state.
+    const [settledClusters] = await Promise.allSettled([
       qbert.getClusters(),
       // Fetch dependent caches
       clusterTagActions.list(),
       loadNodes(),
       loadResMgrHosts(),
     ])
-
+    if (settledClusters.status !== 'fulfilled') {
+      return []
+    }
     return mapAsync(async (cluster) => {
       const progressPercent =
         cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
@@ -68,7 +74,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         version,
         baseUrl,
       }
-    }, rawClusters)
+    }, settledClusters.value)
   },
   createFn: (params) => {
     if (params.clusterType === 'aws') {
@@ -181,11 +187,10 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 // and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params) => {
-  const clusters = await clusterActions.list(params)
-  const importedClusters = await importedClusterActions.list()
-  const collectiveClusters = [...clusters, ...importedClusters]
+  // Maybe todo: change these to use the params selector instead to enable filtering?
+  const allClusters = await getAllClusters()
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
-  return [clusterId, collectiveClusters]
+  return [clusterId, allClusters]
 }
 
 export const loadSupportedRoleVersions = createContextLoader(
@@ -199,3 +204,24 @@ export const loadSupportedRoleVersions = createContextLoader(
     cache: false,
   },
 )
+
+const allSelector = allClustersSelector()
+
+export const getAllClusters = async (reload = false) => {
+  if (reload) {
+    await clusterActions.list()
+    await importedClusterActions.list()
+  } else {
+    // Match useDataLoader method of checking for nil/empty on cache
+    const normalClusters = clustersSelector(store.getState())
+    const importedClusters = importedClustersSelector(store.getState())
+    if (isNilOrEmpty(normalClusters)) {
+      await clusterActions.list()
+    }
+    if (isNilOrEmpty(importedClusters)) {
+      await importedClusterActions.list()
+    }
+  }
+  const allClusters = allSelector(store.getState())
+  return allClusters
+}

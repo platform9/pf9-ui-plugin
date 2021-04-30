@@ -123,7 +123,7 @@ const EditRepositoryPage = () => {
       name: repo.name,
       url: repo.url,
       repositoryType: repo.private ? RepositoryType.Private : RepositoryType.Public,
-      clusters: repo.clusters,
+      clusters: customerTierBlacklist.includes(customerTier) ? allKey : repo.clusters,
     }),
     [repo],
   )

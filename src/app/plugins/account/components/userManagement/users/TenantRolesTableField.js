@@ -102,7 +102,7 @@ const TenantRolesTableField = withFormContext(
       <FormControl id={id} error={hasError} className={classes.root}>
         <ListTable
           onSortChange={noop}
-          searchTarget="name"
+          searchTargets={['name']}
           columns={columns}
           data={rows}
           rowsPerPage={10}

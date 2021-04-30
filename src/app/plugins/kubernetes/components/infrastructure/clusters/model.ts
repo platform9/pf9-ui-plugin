@@ -22,12 +22,7 @@ export enum BareOsRequiredNodes {
   'multi-master' = 2,
 }
 
-export type HealthStatus =
-  | 'healthy'
-  | 'partially_healthy'
-  | 'unhealthy'
-  | 'unknown'
-  | 'needs_upgrade'
+export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 
 interface IClusterAsyncAction {
   progressPercent: any

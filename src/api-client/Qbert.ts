@@ -33,6 +33,8 @@ import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
 import { createUrlWithQueryString } from 'core/utils/routes'
 import { ImportedCluster } from 'k8s/components/infrastructure/importedClusters/model'
+import { GetVirtualMachineDetails, GetVirtualMachines } from 'k8s/components/virtual-machines/model'
+import { convertVolumeTypeToApiParam } from 'k8s/components/virtual-machines/helpers'
 
 type AlertManagerRaw = Omit<Omit<AlertManagerAlert, 'clusterId'>, 'id'>
 
@@ -555,7 +557,7 @@ class Qbert extends ApiService {
   }
 
   deleteDeployment = async (clusterId, namespace, name) => {
-    const url = `/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
+    const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
     return this.client.basicDelete({
       url,
       options: {
@@ -619,6 +621,105 @@ class Qbert extends ApiService {
       options: {
         clsName: this.getClassName(),
         mthdName: 'getReplicaSets',
+      },
+    })
+  }
+
+  getVirtualMachineInstances = async (clusterId) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/virtualmachineinstances`
+    const data = await this.client.basicGet<GetVirtualMachines>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVirtualMachineInstances',
+      },
+    })
+    return data.items.map((item) => ({ ...item, clusterId }))
+  }
+
+  getVirtualMachines = async (clusterId) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/virtualmachines`
+    const data = await this.client.basicGet<GetVirtualMachines>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVirtualMachines',
+      },
+    })
+    return data.items.map((item) => ({ ...item, clusterId }))
+  }
+
+  getVirtualMachineDetails = async (clusterId, namespace, name) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`
+    const data = await this.client.basicGet<GetVirtualMachineDetails>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVirtualMachineDetails',
+      },
+    })
+    return data
+  }
+
+  getVirtualMachineVolumeDetails = async (clusterId, namespace, volumeType, name) => {
+    // cdi.kubevirt.io/v1beta1/namespaces/default/datavolumes/dv-rootfs
+    const url = `/clusters/${clusterId}/k8sapi/apis/cdi.kubevirt.io/v1beta1/namespaces/${namespace}/${convertVolumeTypeToApiParam(
+      volumeType,
+    )}/${name}`
+    const data = await this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVirtualMachineVolumeDetails',
+      },
+    })
+    return data
+  }
+
+  createVirtualMachine = async (clusterId, namespace, body, vmType = '') => {
+    const virtualMachineType = `${vmType.toLowerCase()}s`
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/${virtualMachineType}`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createVirtualMachine',
+      },
+    })
+  }
+
+  updateVirtualMachine = async (clusterId, namespace, name) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`
+    return this.client.basicPut({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVirtualMachine',
+      },
+    })
+  }
+
+  deleteVirtualMachine = async (clusterId, namespace, name) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteVirtualMachine',
+      },
+    })
+  }
+
+  powerVirtualMachine = async (clusterId, namespace, name, powerOn = true) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/subresources.kubevirt.io/v1/namespaces/${namespace}/virtualmachines/${name}/${
+      powerOn ? 'start' : 'stop'
+    }`
+    return this.client.basicPut({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'powerVirtualMachine',
       },
     })
   }
@@ -1088,8 +1189,50 @@ class Qbert extends ApiService {
     return alerts?.map((alert) => ({
       ...alert,
       clusterId: clusterUuid,
-      id: alert.fingerprint,
+      id: `${alert.fingerprint}-${clusterUuid}`,
     }))
+  }
+
+  getAlertManagerSilences = async (clusterId): Promise<any> => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences`
+    const silences = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getSilences',
+      },
+    })
+    return silences?.map((silence) => ({
+      ...silence,
+      clusterId: clusterId,
+    }))
+  }
+
+  createAlertManagerSilence = async (clusterId, body): Promise<any> => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences`
+    const silence = await this.client.basicPost<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createSilence',
+      },
+    })
+    return {
+      ...silence,
+      clusterId: clusterId,
+    }
+  }
+
+  deleteAlertManagerSilence = async (clusterId, silenceId): Promise<any> => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silence/${silenceId}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteSilence',
+      },
+    })
   }
 
   getPrometheusAlerts = async (clusterUuid) => {

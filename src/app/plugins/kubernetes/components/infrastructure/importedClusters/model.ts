@@ -16,6 +16,7 @@ export interface ImportedClusterSelector extends ImportedCluster {
   containerCidr: ImportedCluster['spec']['eks']['network']['containerCidr']
   servicesCidr: ImportedCluster['spec']['eks']['network']['servicesCidr']
   nodeGroups: ImportedCluster['spec']['eks']['nodegroups']
+  hasPrometheus: boolean
 }
 
 export interface ImportedCluster {

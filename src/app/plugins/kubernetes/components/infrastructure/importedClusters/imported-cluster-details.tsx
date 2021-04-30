@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { importedClusterActions } from './actions'
@@ -20,14 +20,26 @@ import HeaderCard from './header-card'
 import Theme from 'core/themes/model'
 import { IUseDataLoader } from '../nodes/model'
 import { ImportedClusterSelector } from './model'
+import ClusterDeployedApps from '../clusters/cluster-deployed-apps'
+import ClusterAlarms from '../clusters/cluster-alarms'
 
 function ImportedClusterDetails() {
-  const { match } = useReactRouter()
+  const { match, history } = useReactRouter()
   const classes = useStyles()
   const [clusters, loading, reload]: IUseDataLoader<ImportedClusterSelector> = useDataLoader(
     importedClusterActions.list,
   ) as any
   const cluster = clusters.find((x) => x.uuid === match.params.id)
+  useEffect(() => {
+    if (!cluster) {
+      history.push(routes.cluster.imported.list.path())
+    }
+  }, [cluster, history])
+
+  if (!cluster) {
+    return null
+  }
+
   const clusterHeader = <HeaderCard title={cluster?.name} cluster={cluster} />
   return (
     <PageContainer>
@@ -48,6 +60,19 @@ function ImportedClusterDetails() {
           {clusterHeader}
           <ClusterDetails cluster={cluster} reload={reload} loading={loading} />
         </Tab>
+        <Tab value="deployedApps" label="Deployed Apps">
+          {clusterHeader}
+          <div className={classes.deployedAppsContainer}>
+            <ClusterDeployedApps cluster={cluster} reload={reload} loading={loading} />
+          </div>
+        </Tab>
+        {cluster.hasPrometheus && (
+          <Tab value="alarms" label="Alarms">
+            <div className={classes.tabContainer}>
+              <ClusterAlarms cluster={cluster} headerCard={clusterHeader} />
+            </div>
+          </Tab>
+        )}
       </Tabs>
     </PageContainer>
   )
@@ -62,5 +87,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     top: 8,
     zIndex: 100,
     ...theme.typography.caption2,
+  },
+  deployedAppsContainer: {
+    paddingTop: theme.spacing(2),
+    maxWidth: 1234, // same maxWidth as tabContainer in ClusterDetails page
   },
 }))
