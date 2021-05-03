@@ -1,12 +1,15 @@
 import { By, until } from 'selenium-webdriver'
-import { driver } from './setup'
+import { browser } from './setup'
+import { DEFAULT_TIMEOUT } from './constants'
 
-export const DEFAULT_TIMEOUT = 2000
+export const waitForClass = (className, timeout = DEFAULT_TIMEOUT) =>
+  browser.wait(until.elementLocated(By.className(className)), timeout)
 
-export const untilClass = (className, timeout = DEFAULT_TIMEOUT) =>
-  driver.wait(until.elementLocated(By.className(className)), timeout)
+export const waitForId = (className, timeout = DEFAULT_TIMEOUT) =>
+  browser.wait(until.elementLocated(By.className(className)), timeout)
 
-export const elementByClass = className => driver.findElement(By.className(className))
+export const elementByClass = (className) => browser.findElement(By.className(className))
+export const elementById = (id) => browser.findElement(By.id(id))
 
 export const setTextField = async (element, text) => {
   await element.clear()

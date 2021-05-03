@@ -331,7 +331,9 @@ const DashboardPage = () => {
 
   return (
     <section className={classes.cardColumn}>
-      <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
+      <Text id="dashboard-title" variant="h5">
+        Welcome{displayName ? ` ${displayName}` : ''}!
+      </Text>
       {kubeRegion && (
         <div className={classes.dashboardMosaic}>
           {reportsWithPerms(reports, session.userDetails.role).map((report) => (

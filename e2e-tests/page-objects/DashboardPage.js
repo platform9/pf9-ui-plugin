@@ -1,17 +1,25 @@
 import { navigateTo } from '../setup'
-import {
-  untilClass,
-} from '../helpers'
+import { waitForClass, waitForId } from '../helpers'
 
 class DashboardPage {
-  async goto () {
-    await navigateTo('/')
-    this.dashboardPageElement = await untilClass('dashboard-page')
+  async goto() {
+    await navigateTo('/ui/kubernetes/dashboard')
+    this.dashboardPageElement = await waitForClass('dashboard-page')
   }
 
-  async isPresent () {
+  async cardsArePresent() {
     try {
-      await untilClass('dashboard-page')
+      await Promise.all([
+        waitForId('user-card'),
+        waitForId('tenant-card'),
+        waitForId('deployment-card'),
+        waitForId('service-card'),
+        waitForId('cloud-card'),
+        waitForId('pod-card'),
+        waitForId('cluster-card'),
+        waitForId('node-card'),
+      ])
+
       return true
     } catch (err) {
       return false

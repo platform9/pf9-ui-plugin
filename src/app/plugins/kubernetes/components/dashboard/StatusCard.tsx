@@ -145,7 +145,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
   const GraphComponent = graphType === 'donut' ? DonutWidget : PieUsageWidget
 
   return (
-    <div className={clsx(contentContainer, className)}>
+    <div id={`${entity}-card`} className={clsx(contentContainer, className)}>
       <header className={header}>
         <Link to={route} className={cardTitleLink}>
           <Text variant="h1" className={text}>

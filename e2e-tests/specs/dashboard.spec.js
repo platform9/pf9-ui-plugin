@@ -1,13 +1,12 @@
+import ApiClient from 'api-client/ApiClient'
+
 require('isomorphic-fetch')
 
 const config = require('../../config')
 const registry = require('../../src/app/utils/registry')
 
-const keystone = require('../../src/app/plugins/openstack/api/keystone')
-const {
-  getUnscopedToken,
-  getScopedProjects,
-} = keystone
+const { keystone } = ApiClient.getInstance()
+const { getUnscopedToken, getScopedProjects } = keystone
 
 describe('keystone', () => {
   beforeAll(() => {
@@ -41,6 +40,18 @@ describe('keystone', () => {
         const tenants = await getScopedProjects()
         expect(tenants.length).toBeGreaterThan(0)
       })
+    })
+
+    describe('display dashboard elements', () => {
+      it('display the dashboard title', async () => {
+        const tenants = await getScopedProjects()
+        expect(tenants.length).toBeGreaterThan(0)
+      })
+
+      // it('show a list of cards', async () => {
+      //   const tenants = await getScopedProjects()
+      //   expect(tenants.length).toBeGreaterThan(0)
+      // })
     })
   })
 })

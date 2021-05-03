@@ -71,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const Alert = ({
+  id = undefined,
   className = undefined,
   children,
   message,
@@ -86,7 +87,7 @@ const Alert = ({
   }
 
   return (
-    <Paper className={clsx(classes.root, className)} elevation={0}>
+    <Paper id={id} className={clsx(classes.root, className)} elevation={0}>
       <FontAwesomeIcon className={clsx(classes.icon, classes.iconVariant, classes[variant])}>
         {variantIcon[variant]}
       </FontAwesomeIcon>

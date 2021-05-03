@@ -7,9 +7,9 @@ import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { CustomerTiers, forgotPasswordUrl } from 'app/constants'
+import { CustomerTiers, forgotPasswordUrl, imageUrlRoot, dashboardUrl } from 'app/constants'
 import { pathJoin } from 'utils/misc'
-import { imageUrlRoot, dashboardUrl } from 'app/constants'
+
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
@@ -372,8 +372,11 @@ class LoginPage extends React.PureComponent<Props> {
                     </div>
                   </>
                 )}
-                {loginFailed && <Alert small variant="error" message="Login failed" />}
+                {loginFailed && (
+                  <Alert small id="login-failed" variant="error" message="Login failed" />
+                )}
                 <Button
+                  id="login-submit"
                   type="submit"
                   disabled={loading}
                   className={classes.signinButton}

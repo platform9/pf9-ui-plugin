@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+  app-serve:
+    build: .
+    image: pf9-ui-plugin
+    command: yarn server
+    expose:
+      - 4200
+
+  app-e2e-tests:
+    image: pf9-ui-plugin
+    command: dockerize -wait tcp://app-serve:4200
+      -wait tcp://selenium-chrome-standalone:4444
+      -timeout 10s -wait-retry-interval 1s bash -c "npm run e2e"
+    depends_on:
+      - app-serve
+      - selenium-chrome-standalone
+
+  selenium-chrome-standalone:
+    image: selenium/standalone-chrome
+    expose:
+      - 44444

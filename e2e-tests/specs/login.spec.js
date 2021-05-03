@@ -1,4 +1,4 @@
-import { driver } from '../setup'
+import { browser } from '../setup'
 import LoginPage from '../page-objects/LoginPage'
 import DashboardPage from '../page-objects/DashboardPage'
 
@@ -13,7 +13,7 @@ describe('login', () => {
   })
 
   afterAll(async () => {
-    await driver.quit()
+    await browser.quit()
   })
 
   describe('login form', () => {
@@ -25,7 +25,7 @@ describe('login', () => {
 
       it('should show an error when the user uses bad credentials', async () => {
         await loginPage.login('badUsername', 'badPassword')
-        const result = await loginPage.getStatus()
+        const result = await loginPage.getLoginError()
         expect(result).toEqual('Login attempt failed.')
       })
 
