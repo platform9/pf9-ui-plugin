@@ -72,7 +72,6 @@ import {
 } from './apiResources/apiResourceActions'
 // TODO
 // import { deployApplication } from './applications'
-import { getRepositoriesForCluster } from './repositories/actions'
 import path from 'path'
 
 const router = express.Router()
@@ -235,8 +234,6 @@ router.get(
 router.get(`${monocularClusterBaseV1}/releases`, tokenValidator, getReleases)
 router.get(`${monocularClusterBaseV1}/releases/:releaseName`, tokenValidator, getRelease)
 router.delete(`${monocularClusterBaseV1}/releases/:releaseName`, tokenValidator, deleteRelease)
-
-router.get(`${monocularClusterBaseV1}/repos`, tokenValidator, getRepositoriesForCluster)
 
 // Managed Prometheus
 const monitoringBase = `${clusterK8sApiBase}/apis/monitoring.coreos.com/v1`

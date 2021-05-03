@@ -15,7 +15,6 @@ const env = process.env.NODE_ENV || 'development'
 const isDev = env === 'development'
 const isProd = env === 'production'
 const bugsnagKey = '3eb58c77ada2a9db70fc7a8e81e97b99'
-
 const extractCSS = new MiniCssExtractPlugin({
   // Options similar to the same options in webpackOptions.output
   // both options are optional
