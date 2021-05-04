@@ -78,10 +78,6 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
     title: 'Cluster Unique ID',
   },
   {
-    id: 'clusterUuid',
-    title: 'Cluster Unique ID',
-  },
-  {
     id: 'clusterName',
     title: 'Cluster Name',
     render: (value, node) =>
