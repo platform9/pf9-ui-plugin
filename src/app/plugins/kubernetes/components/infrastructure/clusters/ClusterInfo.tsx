@@ -1,5 +1,5 @@
 import React from 'react'
-import InfoPanel from 'core/components/InfoPanel'
+import InfoPanel, { getFieldsForCard, IDetailFields } from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
 import Text from 'core/elements/text'
@@ -12,7 +12,6 @@ import Theme from 'core/themes/model'
 import { castBoolToStr, formatDate } from 'utils/misc'
 import ExternalLink from 'core/components/ExternalLink'
 import { applicationLoadBalancer } from 'k8s/links'
-import { getFieldsForCard, IDetailFields } from './helpers'
 
 // Common
 const clusterOverviewFields: Array<IDetailFields<IClusterSelector>> = [

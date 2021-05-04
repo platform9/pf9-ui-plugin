@@ -2,7 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { isAdminRole } from 'k8s/util/helpers'
-import { path, pathEq, pick, prop, propEq, propSatisfies } from 'ramda'
+import { pathEq, pick, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { sanitizeUrl } from 'utils/misc'
 import { CloudProviders } from '../cloudProviders/model'
@@ -326,34 +326,4 @@ const createGenericCluster = async (body, data) => {
   // The POST call only returns the `uuid` and that's it.
   // We need to perform a GET afterwards and return that to add to the cache.
   return qbert.getClusterDetails(uuid)
-}
-
-export interface IDetailFields<T> {
-  id: string
-  title: string
-  required?: boolean
-  helpMessage?: string | React.ReactNode
-  condition?: (cluster: T) => boolean
-  render?: (value: any, item: any) => string | React.ReactNode
-}
-
-/**
- * Gets fields for the InfoPanel component
- *
- * Ex. getFieldsForCard(fields, cluster)
- */
-export function getFieldsForCard<T>(fields: Array<IDetailFields<T>>, item: T) {
-  const fieldsToDisplay = {}
-  fields.forEach((field) => {
-    const { id, title, required = false, condition, render, helpMessage } = field
-    const shouldRender = condition ? condition(item) : true
-    const value = path<string | boolean>(id.split('.'), item)
-    if (shouldRender && (required || !!value || value === false)) {
-      fieldsToDisplay[title] = {
-        value: render ? render(value, item) : value,
-        helpMessage,
-      }
-    }
-  })
-  return fieldsToDisplay
 }

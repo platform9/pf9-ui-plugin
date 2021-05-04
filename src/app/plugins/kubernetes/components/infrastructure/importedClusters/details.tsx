@@ -1,5 +1,5 @@
 import React from 'react'
-import InfoPanel from 'core/components/InfoPanel'
+import InfoPanel, { getFieldsForCard, IDetailFields } from 'core/components/InfoPanel'
 import { makeStyles } from '@material-ui/styles'
 import { ImportedClusterSelector } from './model'
 import { CloudProviders } from '../cloudProviders/model'
@@ -7,7 +7,6 @@ import Theme from 'core/themes/model'
 import { formatDate } from 'utils/misc'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import Text from 'core/elements/text'
-import { getFieldsForCard, IDetailFields } from '../clusters/helpers'
 
 const renderVPCField = (vpc: any = {}) => {
   const privateAccess = vpc?.privateAccess
