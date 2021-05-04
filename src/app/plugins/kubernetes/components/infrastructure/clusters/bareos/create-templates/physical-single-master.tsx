@@ -3,7 +3,7 @@ import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { allPass } from 'ramda'
 
-import { pmkCliOverviewLink } from 'k8s/links'
+import { pmkCliOverviewLink, bareOSSingleMasterSetupDocsLink } from 'k8s/links'
 import { defaultEtcBackupPath } from 'app/constants'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 
@@ -107,7 +107,7 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           <FormFieldCard
             title={`Name your ${ClusterCreateTypeNames[ClusterCreateTypes.SingleMaster]} Cluster`}
             link={
-              <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
+              <ExternalLink textVariant="caption2" url={bareOSSingleMasterSetupDocsLink}>
                 BareOS Cluster Help
               </ExternalLink>
             }
