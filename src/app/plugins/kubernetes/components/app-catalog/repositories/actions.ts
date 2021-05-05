@@ -54,10 +54,6 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
       name,
       url,
     })
-    console.log('Repository Added', {
-      name,
-      url,
-    })
 
     return result
   },
@@ -77,9 +73,6 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
 
     trackEvent('Repository Removed', {
-      name,
-    })
-    console.log('Repository Removed', {
       name,
     })
   },

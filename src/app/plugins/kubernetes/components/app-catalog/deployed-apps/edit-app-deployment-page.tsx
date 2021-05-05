@@ -31,7 +31,6 @@ import {
 import ClusterPicklist from '../../common/ClusterPicklist'
 import { repositoryActions } from '../repositories/actions'
 import { deployedAppActions, deploymentDetailLoader } from './actions'
-import { trackEvent } from 'utils/tracking'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -206,14 +205,6 @@ const EditAppDeploymentPage = () => {
       values: vals,
     })
     if (success) {
-      trackEvent('Application Updated', {
-        cluster: clusterId,
-        appName: deploymentName,
-      })
-      console.log('Application Updated', {
-        cluster: clusterId,
-        appName: deploymentName,
-      })
       history.push(routes.apps.list.path())
     } else {
       setErrorMessage('ERROR: Cannot edit deployed app')

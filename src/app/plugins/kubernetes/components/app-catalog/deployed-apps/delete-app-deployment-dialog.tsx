@@ -8,7 +8,6 @@ import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import Button from 'core/elements/button'
-import { trackEvent } from 'utils/tracking'
 
 const useStyles = makeStyles((theme: Theme) => ({
   dialogTextContent: {
@@ -35,14 +34,6 @@ const DeleteAppDeploymentDialog = ({ name, chart, clusterId, namespace, onClose 
 
   const handleAppDeploymentDeletion = () => {
     deleteAppDeployment({ clusterId, namespace, name })
-    trackEvent('Application Deleted', {
-      cluster: clusterId,
-      appName: name,
-    })
-    console.log('Application Deleted', {
-      cluster: clusterId,
-      appName: name,
-    })
   }
 
   return (
