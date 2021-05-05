@@ -6,6 +6,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
 import { pluck } from 'ramda'
+import { trackEvent } from 'utils/tracking'
 import { appActions } from '../actions'
 
 const { helm } = ApiClient.getInstance()
@@ -49,6 +50,15 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.Apps }))
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
 
+    trackEvent('Repository Added', {
+      name,
+      url,
+    })
+    console.log('Repository Added', {
+      name,
+      url,
+    })
+
     return result
   },
   updateFn: async ({ name, url, username, password }) => {
@@ -65,6 +75,13 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
 
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.Apps }))
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
+
+    trackEvent('Repository Removed', {
+      name,
+    })
+    console.log('Repository Removed', {
+      name,
+    })
   },
   customOperations: {
     updateRepositories: async ({ repositories }, currentItems) => {

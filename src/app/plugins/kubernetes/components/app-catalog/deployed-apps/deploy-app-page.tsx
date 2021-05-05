@@ -27,6 +27,7 @@ import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import { filterConnectedClusters, getAppVersionPicklistOptions, getIcon } from '../helpers'
 import ClusterPicklist from '../../common/ClusterPicklist'
 import { repositoryActions } from '../repositories/actions'
+import { trackEvent } from 'utils/tracking'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -173,6 +174,14 @@ const DeployAppPage = () => {
       values: vals,
     })
     if (success) {
+      trackEvent('Application Deployed', {
+        cluster: clusterId,
+        appName: deploymentName,
+      })
+      console.log('Application Deployed', {
+        cluster: clusterId,
+        appName: deploymentName,
+      })
       history.push(routes.apps.list.path())
     } else {
       setErrorMessage('ERROR: Cannot deploy app')
