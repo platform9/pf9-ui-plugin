@@ -83,7 +83,13 @@ const AddRepositoryPage = () => {
   }
 
   const handleSubmit = async (wizardContext) => {
-    const [success, newRepo] = await addRepo(wizardContext)
+    const { name, url, username, password } = wizardContext
+    const [success, newRepo] = await addRepo({
+      name: name.replace(/\s+/g, '_'), // Replace all whitespaces with underscores
+      url,
+      username,
+      password,
+    })
 
     if (success && wizardContext.clusters.length) {
       await addClustersToRepository({
