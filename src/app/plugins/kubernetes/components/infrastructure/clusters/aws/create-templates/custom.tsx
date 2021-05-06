@@ -412,11 +412,12 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
         onNext={awsClusterTracking.wZStepThree(trackingFields)}
       >
         <ValidatedForm
-          classes={{ root: classes.validatedFormContainer }}
           fullWidth
+          classes={{ root: classes.validatedFormContainer }}
           initialValues={wizardContext}
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
+          withAddonManager
           elevated={false}
         >
           {({ values }) => (
@@ -438,7 +439,13 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
                 {/* Tags */}
                 <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
+
                 <TagsField />
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={['enableTopologyManager']}
+                />
               </FormFieldCard>
             </>
           )}

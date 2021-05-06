@@ -239,8 +239,10 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         <ValidatedForm
           initialValues={wizardContext}
           onSubmit={setWizardContext}
-          triggerSubmit={onNext}
           title="Advanced Configuration"
+          triggerSubmit={onNext}
+          elevated={false}
+          withAddonManager
         >
           {({ values }) => (
             <>
@@ -248,6 +250,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
 
               <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
               <TagsField />
+              <AddonTogglers
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                addons={['enableTopologyManager']}
+              />
             </>
           )}
         </ValidatedForm>
