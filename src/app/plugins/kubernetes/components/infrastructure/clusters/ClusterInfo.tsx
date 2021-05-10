@@ -205,11 +205,27 @@ const csiDriverFields = [
   },
 ]
 
+const etcdBackupFields = [
+  {
+    id: 'etcdBackup.isEtcdBackupEnabled',
+    title: 'ETCD Backup',
+    required: true,
+    render: castBoolToStr(),
+  },
+  { id: 'etcdBackup.storageProperties.localPath', title: 'ETCD Data Directory' },
+  {
+    id: 'etcdBackup.taskStatus',
+    title: 'Task Status',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+]
+
 const overviewStats = (cluster) => getFieldsForCard(clusterOverviewFields, cluster)
 const bareOsNetworkingProps = (cluster) => getFieldsForCard(bareOsNetworkingFields, cluster)
 const awsCloudProps = (cluster) => getFieldsForCard(awsCloudFields, cluster)
 const azureCloudProps = (cluster) => getFieldsForCard(azureCloudFields, cluster)
 const csiDriverProps = (driver: any) => getFieldsForCard(csiDriverFields, driver)
+const etcdBackupProps = (cluster) => getFieldsForCard(etcdBackupFields, cluster)
 
 const renderCloudInfo = (cluster) => {
   switch (cluster.cloudProviderType) {
@@ -232,6 +248,13 @@ const useStyles = makeStyles<Theme>((theme) => ({
     alignItems: 'start',
     justifyItems: 'start',
   },
+  column: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+  card: {
+    width: 'inherit',
+  },
   text: {
     color: theme.palette.common.white,
   },
@@ -248,15 +271,24 @@ const ClusterInfo = () => {
 
   const overview = overviewStats(cluster)
   const csiDrivers = cluster?.csiDrivers?.drivers || []
+  const etcdBackupFields = etcdBackupProps(cluster)
 
   return (
     <div className={classes.clusterInfo}>
-      <InfoPanel title="Overview" items={overview} />
-
-      {renderCloudInfo(cluster)}
-      {csiDrivers.length > 0 && (
-        <InfoPanel title="CSI Driver Details" items={csiDrivers.map(csiDriverProps)} />
-      )}
+      <div className={classes.column}>
+        <InfoPanel className={classes.card} title="Overview" items={overview} />
+        {csiDrivers.length > 0 && (
+          <InfoPanel
+            className={classes.card}
+            title="CSI Driver Details"
+            items={csiDrivers.map(csiDriverProps)}
+          />
+        )}
+      </div>
+      <div className={classes.column}>
+        {renderCloudInfo(cluster)}
+        <InfoPanel className={classes.card} title="ETCD Backup" items={etcdBackupFields} />
+      </div>
     </div>
   )
 }
