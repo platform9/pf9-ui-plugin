@@ -15,6 +15,7 @@ import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
 import { routes } from 'core/utils/routes'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
   ({
@@ -110,7 +111,7 @@ const ClusterStatusSpan: FC<Props> = (props) => {
 
 export default ClusterStatusSpan
 
-const renderErrorStatus = (nodesDetailsUrl, variant) => (
+export const renderErrorStatus = (nodesDetailsUrl, variant, text) => (
   <ClusterStatusSpan
     iconStatus
     title="Click the link to view more details"
@@ -118,7 +119,7 @@ const renderErrorStatus = (nodesDetailsUrl, variant) => (
     variant={variant}
   >
     <SimpleLink variant="error" src={nodesDetailsUrl}>
-      Error
+      {text}
     </SimpleLink>
   </ClusterStatusSpan>
 )
@@ -174,7 +175,13 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
         </ClusterStatusSpan>
       )}
       {cluster.taskError &&
-        renderErrorStatus(routes.cluster.detail.path({ id: cluster.uuid }), variant)}
+        renderErrorStatus(routes.cluster.detail.path({ id: cluster.uuid }), variant, 'Error')}
+      {clockDriftDetectedInNodes(cluster.nodes) &&
+        renderErrorStatus(
+          routes.cluster.nodes.path({ id: cluster.uuid }),
+          variant,
+          'Node Clock Drift',
+        )}
     </div>
   )
 }
