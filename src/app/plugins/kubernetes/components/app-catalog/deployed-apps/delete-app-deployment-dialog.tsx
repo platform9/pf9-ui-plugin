@@ -32,7 +32,9 @@ const DeleteAppDeploymentDialog = ({ name, chart, clusterId, namespace, onClose 
     onClose,
   )
 
-  const handleAppDeploymentDeletion = () => deleteAppDeployment({ clusterId, namespace, name })
+  const handleAppDeploymentDeletion = () => {
+    deleteAppDeployment({ clusterId, namespace, name })
+  }
 
   return (
     <Dialog open onClose={onClose}>
