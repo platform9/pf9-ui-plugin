@@ -130,7 +130,7 @@ const renderStats = (_, { usage }) => <ResourceUsageTables usage={usage} />
 const renderK8sVersion = (_, cluster) => <K8sVersion cluster={cluster} />
 
 const upgradeClusterHelpText =
-  'An upgrade to newer version of Kubernetes is now available for this cluster. Click here or select the upgrade action for the cluster from infrastructure -> clusters view to see more details'
+  'An upgrade to newer version of Kubernetes is now available for this cluster. Click here or select the upgrade action for the cluster to see more details.'
 
 const K8sVersion = ({ cluster }) => {
   const { version, canUpgrade } = cluster
