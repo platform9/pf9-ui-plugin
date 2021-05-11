@@ -79,24 +79,6 @@ const clusterOverviewFields: Array<IClusterDetailFields<IClusterSelector>> = [
   { id: 'privileged', title: 'Privileged', required: true, render: castBoolToStr() },
   { id: 'uuid', title: 'Unique ID', required: true },
   { id: 'dockerRoot', title: 'Docker Root Directory', required: true },
-  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: castBoolToStr() },
-  {
-    id: 'etcdBackup.storageProperties.localPath',
-    title: 'ETCD Backup Storage Path',
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
-  {
-    id: 'etcdBackup.intervalInMins',
-    title: 'ETCD Backup Interval',
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
-  { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
-  {
-    id: 'etcdVersion',
-    title: 'ETCD version',
-    required: true,
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
   { id: 'k8sApiPort', title: 'K8S API Server port', required: true },
   { id: 'mtuSize', title: 'MTU size', required: true },
   { id: 'flannelIfaceLabel', title: 'Flannel interface' },
@@ -206,16 +188,27 @@ const csiDriverFields = [
 ]
 
 const etcdBackupFields = [
-  {
-    id: 'etcdBackup.isEtcdBackupEnabled',
-    title: 'ETCD Backup',
-    required: true,
-    render: castBoolToStr(),
-  },
-  { id: 'etcdBackup.storageProperties.localPath', title: 'ETCD Data Directory' },
+  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: castBoolToStr() },
   {
     id: 'etcdBackup.taskStatus',
     title: 'Task Status',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  {
+    id: 'etcdBackup.storageProperties.localPath',
+    title: 'ETCD Backup Storage Path',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  {
+    id: 'etcdBackup.intervalInMins',
+    title: 'ETCD Backup Interval',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
+  {
+    id: 'etcdVersion',
+    title: 'ETCD version',
+    required: true,
     condition: (cluster) => !!cluster.etcdBackupEnabled,
   },
 ]
