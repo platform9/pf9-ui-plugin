@@ -220,16 +220,40 @@ const azureCloudProps = (cluster) => getFieldsForCard(azureCloudFields, cluster)
 const csiDriverProps = (driver: any) => getFieldsForCard(csiDriverFields, driver)
 const etcdBackupProps = (cluster) => getFieldsForCard(etcdBackupFields, cluster)
 
-const renderCloudInfo = (cluster) => {
+const renderCloudInfo = (cluster, classes) => {
   switch (cluster.cloudProviderType) {
     case 'aws':
-      return <InfoPanel title="Cloud Properties" items={awsCloudProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={awsCloudProps(cluster)}
+        />
+      )
     case 'local':
-      return <InfoPanel title="Networking" items={bareOsNetworkingProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Networking"
+          items={bareOsNetworkingProps(cluster)}
+        />
+      )
     case 'azure':
-      return <InfoPanel title="Cloud Properties" items={azureCloudProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={azureCloudProps(cluster)}
+        />
+      )
     default:
-      return <InfoPanel title="Cloud Properties" items={{ 'Data not found': '' }} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={{ 'Data not found': '' }}
+        />
+      )
   }
 }
 
@@ -279,7 +303,7 @@ const ClusterInfo = () => {
         )}
       </div>
       <div className={classes.column}>
-        {renderCloudInfo(cluster)}
+        {renderCloudInfo(cluster, classes)}
         <InfoPanel className={classes.card} title="ETCD Backup" items={etcdBackupFields} />
       </div>
     </div>
