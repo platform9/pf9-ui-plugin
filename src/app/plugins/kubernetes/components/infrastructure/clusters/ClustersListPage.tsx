@@ -129,6 +129,9 @@ const renderStats = (_, { usage }) => <ResourceUsageTables usage={usage} />
 
 const renderK8sVersion = (_, cluster) => <K8sVersion cluster={cluster} />
 
+const upgradeClusterHelpText =
+  'An upgrade to newer version of Kubernetes is now available for this cluster. Click here or select the upgrade action for the cluster to see more details.'
+
 const K8sVersion = ({ cluster }) => {
   const { version, canUpgrade } = cluster
   const [showDialog, setShowDialog] = useState(false)
@@ -136,9 +139,11 @@ const K8sVersion = ({ cluster }) => {
     <div>
       <Text variant="body2">{version}</Text>
       {canUpgrade && (
-        <SimpleLink src="" onClick={() => setShowDialog(true)}>
-          Upgrade Available
-        </SimpleLink>
+        <Tooltip title={upgradeClusterHelpText}>
+          <SimpleLink src="" onClick={() => setShowDialog(true)}>
+            Upgrade Available
+          </SimpleLink>
+        </Tooltip>
       )}
       {showDialog && <ClusterUpgradeDialog rows={[cluster]} onClose={() => setShowDialog(false)} />}
     </div>
