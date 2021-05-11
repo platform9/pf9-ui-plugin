@@ -7,10 +7,13 @@ const nodeRegistrationOptions = [
   {
     label: 'Use Node IP address for Cluster Creation',
     value: 'ipAddress',
+  },
+  {
+    label: 'Use Node Hostname for Cluster Creation ',
+    value: 'hostname',
     info:
       'Warning: DNS Resolution must be working to use Hostname. Failure to resolve a hostname will result in cluster error.',
   },
-  { label: 'Use Node Hostname for Cluster Creation ', value: 'hostname' },
 ]
 
 const NodeRegistrationChooser = ({ wizardContext, setWizardContext }) => {
