@@ -1,7 +1,7 @@
 import React, { FC, PureComponent } from 'react'
 import { FormControl, FormControlLabel, FormHelperText, Radio, WithStyles } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { withInfoTooltip } from 'app/core/components/InfoTooltip'
+import InfoTooltip, { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import { ValidatedFormProps } from './model'
@@ -20,6 +20,8 @@ const styles = (theme) => ({
 interface OptionType {
   value: string | number
   label: string | number
+  info?: string
+  infoPlacement?: string
 }
 interface FormProps {
   id: string
@@ -60,17 +62,19 @@ const RadioFields = compose(
         <div className={classes.root}>
           {options.map((option) => (
             <FormControl key={option.value} className={classes.formControl} error={hasError}>
-              <FormControlLabel
-                classes={formControlLabelClasses}
-                label={option.label}
-                control={
-                  <Radio
-                    color="primary"
-                    checked={option.value === value}
-                    onChange={() => this.handleChange(option.value)}
-                  />
-                }
-              />
+              <InfoTooltip info={option.info} placement={option.infoPlacement}>
+                <FormControlLabel
+                  classes={formControlLabelClasses}
+                  label={option.label}
+                  control={
+                    <Radio
+                      color="primary"
+                      checked={option.value === value}
+                      onChange={() => this.handleChange(option.value)}
+                    />
+                  }
+                />
+              </InfoTooltip>
               {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
             </FormControl>
           ))}

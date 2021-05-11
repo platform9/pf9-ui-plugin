@@ -43,6 +43,7 @@ import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { bareOSClusterTracking } from '../../tracking'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import CustomApiFlags from '../../form-components/custom-api-flag'
+import NodeRegistrationChooser from '../../form-components/node-registration-chooser'
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
@@ -122,6 +123,10 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
             <Divider className={classes.divider} />
             <Text variant="caption1">Cluster Network Stack</Text>
             <NetworkStack {...props} />
+
+            <Divider className={classes.divider} />
+            <Text variant="caption1">Node Registration</Text>
+            <NodeRegistrationChooser {...props} />
 
             <Divider className={classes.divider} />
             <Text variant="caption1">Application & Container Settings</Text>
