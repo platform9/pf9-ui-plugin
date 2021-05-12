@@ -45,12 +45,15 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
+import { themeActions } from 'core/session/themeReducers'
+import { ThemeConfig } from 'account/components/theme/model'
+import { preferencesActions } from 'core/session/preferencesReducers'
 
 const toPairs: any = ToPairs
 
 declare let window: CustomWindow
 
-const { keystone } = ApiClient.getInstance()
+const { keystone, preferenceStore } = ApiClient.getInstance()
 
 interface StyleProps {
   path?: string
@@ -301,6 +304,49 @@ const loadRegionFeatures = async (setRegionFeatures, setStacks, dispatch, histor
   }
 }
 
+const loadCustomTheme = async (dispatch) => {
+  try {
+    const response = await preferenceStore.getGlobalPreference('theme')
+    const customTheme: ThemeConfig = JSON.parse(response.value.replace(/'/g, '"'))
+    dispatch(
+      preferencesActions.updateLogo({
+        logoUrl: customTheme.logoUrl,
+      }),
+    )
+    dispatch(
+      themeActions.updateThemeComponent({
+        components: [
+          { pathTo: ['header', 'background'], value: customTheme.headerColor },
+          {
+            pathTo: ['sidebar', AppPlugins.MyAccount, 'background'],
+            value: customTheme.sidenavColor,
+          },
+          {
+            pathTo: ['sidebar', AppPlugins.Kubernetes, 'background'],
+            value: customTheme.sidenavColor,
+          },
+          {
+            pathTo: ['sidebar', AppPlugins.OpenStack, 'background'],
+            value: customTheme.sidenavColor,
+          },
+          {
+            pathTo: ['sidebar', AppPlugins.BareMetal, 'background'],
+            value: customTheme.sidenavColor,
+          },
+        ],
+      }),
+    )
+  } catch (err) {
+    // Reset the store if it's not available
+    dispatch(
+      preferencesActions.updateLogo({
+        logoUrl: '',
+      }),
+    )
+    console.error(err)
+  }
+}
+
 const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
 const AuthenticatedContainer = () => {
@@ -370,6 +416,10 @@ const AuthenticatedContainer = () => {
       Bugsnag.setUser()
       clearInterval(id)
     }
+  }, [])
+
+  useEffect(() => {
+    loadCustomTheme(dispatch)
   }, [])
 
   // Add Zendesk widget script only for Enterprise users

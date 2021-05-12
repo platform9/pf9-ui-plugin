@@ -128,6 +128,11 @@ export const passwordValidator = new FieldValidator(
     ])(value),
 )
 
+export const colorHexValidator = new FieldValidator(
+  (hex) => fieldIsUnset(hex) || /^#[a-f0-9]{6}$/i.test(hex),
+  'Color is invalid',
+)
+
 export const validators = {
   email: emailValidator,
   password: passwordValidator,

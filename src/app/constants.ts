@@ -55,6 +55,7 @@ export enum CustomerTiers {
 }
 
 export const ssoEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
+export const themeEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 
 export enum ClusterCloudPlatforms {
   EKS = 'eks',

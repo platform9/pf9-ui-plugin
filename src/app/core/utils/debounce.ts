@@ -15,6 +15,7 @@ export default (
   ms: number = 100,
   setTimeout: any = global.setTimeout,
 ) => {
+  console.log(fn, ms, 'debounce declaration')
   return (...args: any[]) => {
     clear(fn)
     const id: any = setTimeout(() => {
