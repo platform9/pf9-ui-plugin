@@ -15,6 +15,12 @@ const {
   name: 'preferences',
   initialState: {},
   reducers: {
+    updateLogo: (state, { payload }) => {
+      return {
+        ...state,
+        logoUrl: payload.logoUrl,
+      }
+    },
     updatePrefs: (state, { payload }: PayloadAction<PreferencesState>) => {
       return over(lensPath([payload.username, payload.key]), mergeLeft(payload.prefs), state)
     },

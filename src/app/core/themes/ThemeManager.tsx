@@ -2,10 +2,13 @@ import { createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
 import defaultTheme from 'core/themes/relianceLight'
 import * as CSS from 'csstype'
-import React, { useEffect, useMemo, useState, useCallback, useContext } from 'react'
+import React, { useEffect, useMemo, useCallback, useContext } from 'react'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import AppTheme from 'core/themes/model'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
+import { useDispatch, useSelector } from 'react-redux'
+import { themeActions } from 'core/session/themeReducers'
+import { themeSelector } from './selectors'
 
 const CustomThemeContext = React.createContext<{
   theme: Theme
@@ -28,11 +31,20 @@ export const loadingStyles: CSS.Properties = {
 }
 
 const ThemeManager = ({ children }) => {
+  const dispatch = useDispatch()
   const [{ themeName = 'default' }] = useScopedPreferences()
-  const [jsonTheme, setJsonTheme] = useState<AppTheme>(defaultTheme)
+  // Todo:
+  // Replace jsonTheme with the selector & setJsonTheme with the dispatch
+  // Custom theme needs to be merged with defaultTheme?
+  useEffect(() => {
+    dispatch(themeActions.updateTheme(defaultTheme))
+  }, [])
+  const jsonTheme = useSelector(themeSelector)
+  // const [jsonTheme, setJsonTheme] = useState<AppTheme>(defaultTheme)
   const setCustomTheme = useCallback<(theme: AppTheme) => void>(
     (customTheme: AppTheme) => {
-      setJsonTheme({ ...jsonTheme, ...customTheme })
+      dispatch(themeActions.updateTheme(customTheme))
+      // setJsonTheme({ ...jsonTheme, ...customTheme })
     },
     [jsonTheme],
   )
@@ -40,15 +52,15 @@ const ThemeManager = ({ children }) => {
   useEffect(() => {
     const loadTheme = async () => {
       try {
-        const jsonTheme =
-          themeName !== 'default' ? await import(`core/themes/${themeName}.json`) : defaultTheme
-        if (!jsonTheme) {
-          console.error(`Unable to load ${themeName}.json`)
+        const loadedTheme =
+          themeName !== 'default' ? await import(`core/themes/${themeName}.ts`) : defaultTheme
+        if (!loadedTheme) {
+          console.error(`Unable to load ${themeName}.ts`)
           return
         }
-        console.info(`Loaded ${themeName}.json`)
+        console.info(`Loaded ${themeName}.ts`)
 
-        setJsonTheme(jsonTheme)
+        dispatch(themeActions.updateTheme(loadedTheme))
       } catch (err) {
         console.error(err)
       }
