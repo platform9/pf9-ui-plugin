@@ -226,7 +226,7 @@ const NodeStatus = ({ node, cluster }) => {
   return (
     <HeaderCard title={node?.name} icon="cube" subtitle="" className="">
       <ClusterStatusSpan
-        title={`Recommended RAM Capacity: ${
+        title={`Recommended Minimum RAM Capacity: ${
           nodeHardwareRequirements[clusterType][HardwareType.RAM]
         } GB`}
         status={
@@ -238,7 +238,7 @@ const NodeStatus = ({ node, cluster }) => {
         {`RAM Capacity: ${totalRamCapacity?.toFixed(2)} GB`}
       </ClusterStatusSpan>
       <ClusterStatusSpan
-        title={`Recommended Available Disk Space: ${minAvailableDiskSpace} GB`}
+        title={`Recommended Minimum Available Disk Space: ${minAvailableDiskSpace} GB`}
         status={availableDiskSpace >= minAvailableDiskSpace ? 'ok' : 'fail'}
         variant="header"
         iconStatus
@@ -246,7 +246,7 @@ const NodeStatus = ({ node, cluster }) => {
         {`Available Disk Space: ${availableDiskSpace?.toFixed(2)} GB`}
       </ClusterStatusSpan>
       <ClusterStatusSpan
-        title={`Recommended Total Disk Space: ${
+        title={`Recommended Minimum Total Disk Space: ${
           nodeHardwareRequirements[clusterType][HardwareType.Disk]
         } GB`}
         status={
