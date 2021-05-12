@@ -42,7 +42,7 @@ import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { bareOSClusterTracking } from '../../tracking'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
-
+import CustomApiFlags from '../../form-components/custom-api-flag'
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
@@ -249,6 +249,7 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           {({ values }) => (
             <>
               <AdvancedApiConfigFields values={values} />
+              <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
               <TagsField />
             </>
           )}

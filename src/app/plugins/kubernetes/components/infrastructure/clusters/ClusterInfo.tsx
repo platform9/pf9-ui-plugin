@@ -53,24 +53,6 @@ const clusterOverviewFields: Array<IDetailFields<IClusterSelector>> = [
   { id: 'privileged', title: 'Privileged', required: true, render: castBoolToStr() },
   { id: 'uuid', title: 'Unique ID', required: true },
   { id: 'dockerRoot', title: 'Docker Root Directory', required: true },
-  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: castBoolToStr() },
-  {
-    id: 'etcdBackup.storageProperties.localPath',
-    title: 'ETCD Backup Storage Path',
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
-  {
-    id: 'etcdBackup.intervalInMins',
-    title: 'ETCD Backup Interval',
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
-  { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
-  {
-    id: 'etcdVersion',
-    title: 'ETCD version',
-    required: true,
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
   { id: 'k8sApiPort', title: 'K8S API Server port', required: true },
   { id: 'mtuSize', title: 'MTU size', required: true },
   { id: 'flannelIfaceLabel', title: 'Flannel interface' },
@@ -179,22 +161,73 @@ const csiDriverFields = [
   },
 ]
 
+const etcdBackupFields = [
+  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: castBoolToStr() },
+  {
+    id: 'etcdBackup.taskStatus',
+    title: 'Task Status',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  {
+    id: 'etcdBackup.storageProperties.localPath',
+    title: 'ETCD Backup Storage Path',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  {
+    id: 'etcdBackup.intervalInMins',
+    title: 'ETCD Backup Interval',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
+  {
+    id: 'etcdVersion',
+    title: 'ETCD version',
+    required: true,
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+]
+
 const overviewStats = (cluster) => getFieldsForCard(clusterOverviewFields, cluster)
 const bareOsNetworkingProps = (cluster) => getFieldsForCard(bareOsNetworkingFields, cluster)
 const awsCloudProps = (cluster) => getFieldsForCard(awsCloudFields, cluster)
 const azureCloudProps = (cluster) => getFieldsForCard(azureCloudFields, cluster)
 const csiDriverProps = (driver: any) => getFieldsForCard(csiDriverFields, driver)
+const etcdBackupProps = (cluster) => getFieldsForCard(etcdBackupFields, cluster)
 
-const renderCloudInfo = (cluster) => {
+const renderCloudInfo = (cluster, classes) => {
   switch (cluster.cloudProviderType) {
     case 'aws':
-      return <InfoPanel title="Cloud Properties" items={awsCloudProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={awsCloudProps(cluster)}
+        />
+      )
     case 'local':
-      return <InfoPanel title="Networking" items={bareOsNetworkingProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Networking"
+          items={bareOsNetworkingProps(cluster)}
+        />
+      )
     case 'azure':
-      return <InfoPanel title="Cloud Properties" items={azureCloudProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={azureCloudProps(cluster)}
+        />
+      )
     default:
-      return <InfoPanel title="Cloud Properties" items={{ 'Data not found': '' }} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={{ 'Data not found': '' }}
+        />
+      )
   }
 }
 
@@ -205,6 +238,13 @@ const useStyles = makeStyles<Theme>((theme) => ({
     gridGap: '16px',
     alignItems: 'start',
     justifyItems: 'start',
+  },
+  column: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+  card: {
+    width: 'inherit',
   },
   text: {
     color: theme.palette.common.white,
@@ -222,15 +262,24 @@ const ClusterInfo = () => {
 
   const overview = overviewStats(cluster)
   const csiDrivers = cluster?.csiDrivers?.drivers || []
+  const etcdBackupFields = etcdBackupProps(cluster)
 
   return (
     <div className={classes.clusterInfo}>
-      <InfoPanel title="Overview" items={overview} />
-
-      {renderCloudInfo(cluster)}
-      {csiDrivers.length > 0 && (
-        <InfoPanel title="CSI Driver Details" items={csiDrivers.map(csiDriverProps)} />
-      )}
+      <div className={classes.column}>
+        <InfoPanel className={classes.card} title="Overview" items={overview} />
+        {csiDrivers.length > 0 && (
+          <InfoPanel
+            className={classes.card}
+            title="CSI Driver Details"
+            items={csiDrivers.map(csiDriverProps)}
+          />
+        )}
+      </div>
+      <div className={classes.column}>
+        {renderCloudInfo(cluster, classes)}
+        <InfoPanel className={classes.card} title="ETCD Backup" items={etcdBackupFields} />
+      </div>
     </div>
   )
 }

@@ -56,6 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'flex-end',
     color: theme.palette.grey[700],
     textAlign: 'right',
+    whiteSpace: 'nowrap',
   },
   rowValue: {
     marginLeft: theme.spacing(0.5),

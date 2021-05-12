@@ -88,6 +88,7 @@ export const options = {
   rowActions: [],
   title: 'Cloud Providers',
   uniqueIdentifier: 'uuid',
+  searchTargets: ['name', 'uuid'],
   multiSelection: false,
 }
 
