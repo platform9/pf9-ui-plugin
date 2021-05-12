@@ -33,18 +33,13 @@ export const loadingStyles: CSS.Properties = {
 const ThemeManager = ({ children }) => {
   const dispatch = useDispatch()
   const [{ themeName = 'default' }] = useScopedPreferences()
-  // Todo:
-  // Replace jsonTheme with the selector & setJsonTheme with the dispatch
-  // Custom theme needs to be merged with defaultTheme?
   useEffect(() => {
     dispatch(themeActions.updateTheme(defaultTheme))
   }, [])
   const jsonTheme = useSelector(themeSelector)
-  // const [jsonTheme, setJsonTheme] = useState<AppTheme>(defaultTheme)
   const setCustomTheme = useCallback<(theme: AppTheme) => void>(
     (customTheme: AppTheme) => {
       dispatch(themeActions.updateTheme(customTheme))
-      // setJsonTheme({ ...jsonTheme, ...customTheme })
     },
     [jsonTheme],
   )
