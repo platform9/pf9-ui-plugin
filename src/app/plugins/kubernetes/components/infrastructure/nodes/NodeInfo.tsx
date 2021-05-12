@@ -32,12 +32,12 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
   {
     id: 'isMaster',
     title: 'Is Master',
-    render: castBoolToStr('True', 'False'),
+    render: castBoolToStr(),
   },
   {
     id: 'masterless',
     title: 'Masterless',
-    render: castBoolToStr('True', 'False'),
+    render: castBoolToStr(),
   },
   {
     id: 'status',
@@ -46,7 +46,7 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
   {
     id: 'api_responding',
     title: 'API Responding',
-    render: castBoolToStr('True', 'False'),
+    render: castBoolToStr(),
   },
   {
     id: 'projectId',
@@ -55,6 +55,7 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
   {
     id: 'startKube',
     title: 'Start Kube',
+    render: castBoolToStr(),
   },
   {
     id: 'actualKubeRoleVersion',
@@ -93,7 +94,7 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
   {
     id: 'isAuthorized',
     title: 'Is Authorized',
-    render: castBoolToStr('True', 'False'),
+    render: castBoolToStr(),
   },
 ]
 
@@ -140,13 +141,19 @@ const getNodeDetails = (node) => getFieldsForCard(k8sNodeDetailsFields, node)
 const getMiscNodeDetails = (node) => getFieldsForCard(miscFields, node)
 
 const renderNetworkInterfaceDetails = (interfaces, primaryNetwork) => {
-  return interfaces.map(([interfaceName, interfaceIp]) => (
-    <DetailRow
-      key={interfaceIp}
-      label={interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName}
-      value={interfaceIp}
-    />
-  ))
+  return (
+    <table>
+      <tbody>
+        {interfaces.map(([interfaceName, interfaceIp]) => (
+          <DetailRow
+            key={interfaceIp}
+            label={interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName}
+            value={interfaceIp}
+          />
+        ))}
+      </tbody>
+    </table>
+  )
 }
 
 const NodeInfo = () => {

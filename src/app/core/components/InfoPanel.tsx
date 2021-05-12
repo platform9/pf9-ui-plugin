@@ -69,7 +69,7 @@ interface DetailRowProps {
 // @ts-ignore
 const DetailRowDiv = withStyles(styles)(({ classes, items }: DetailRowProps) => {
   return Object.entries(items).map(([name, { value, helpMessage }]) => (
-    <DetailRow label={name} value={value} helpMessage={helpMessage} />
+    <DetailRow key={name} label={name} value={value} helpMessage={helpMessage} />
   ))
 })
 

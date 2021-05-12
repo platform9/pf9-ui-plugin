@@ -25,6 +25,16 @@ import { variantIcon } from 'core/components/Alert'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hasClockDrift, meetsHardwareRequirement } from './helper'
+import { clusterActions } from '../clusters/actions'
+import { IClusterSelector } from '../clusters/model'
+import {
+  ClusterType,
+  HardwareType,
+  minAvailableDiskSpace,
+  nodeHardwareRequirements,
+} from '../clusters/bareos/constants'
+import { getAvailableSpace } from '../clusters/bareos/ClusterHostChooser'
 
 // Styles
 const useStyles = makeStyles((theme: Theme) => ({
@@ -65,7 +75,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  clockSkewErrorMessage: {
+  clockDriftErrorMessage: {
     maxHeight: 165,
     fontSize: 14,
     padding: theme.spacing(0, 2),
@@ -76,7 +86,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontWeight: 300,
     lineHeight: '15px',
   },
-  clockSkewErrorAlert: {
+  clockDriftErrorAlert: {
     maxHeight: 224,
     maxWidth: 'inherit',
     padding: theme.spacing(0, 2, 2, 2),
@@ -98,13 +108,19 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const ClusterDetailsPage: FC = () => {
+const NodeDetailsPage: FC = () => {
   const { match } = useReactRouter()
   const classes = useStyles({})
-  const [nodes, loading] = useDataLoader(loadNodes)
+  const [nodes, loadingNodes] = useDataLoader(loadNodes)
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+
   const selectedNode: INodesSelector =
     nodes.find((x: INodesSelector) => x.uuid === match.params.id) || {}
+  const cluster: IClusterSelector = selectedNode.clusterUuid
+    ? clusters.find((cluster) => cluster.uuid === selectedNode.clusterUuid)
+    : {}
   const message = selectedNode?.message as any
+  const loadingSomething = loadingNodes || loadingClusters
 
   return (
     <PageContainer
@@ -115,10 +131,10 @@ const ClusterDetailsPage: FC = () => {
         </SimpleLink>
       }
     >
-      <Progress loading={loading} message="Loading Nodes..." minHeight={200}>
+      <Progress loading={loadingSomething} message="Loading Nodes..." minHeight={200}>
         <div className={classes.nodeInfoContainer}>
-          <NodeStatusAndUsage node={selectedNode} loading={loading} />
-          {message?.warn && <NodeClockSkewError errorMessage={message?.warn[0]} />}
+          <NodeStatusAndUsage node={selectedNode} cluster={cluster} loading={loadingSomething} />
+          {hasClockDrift(selectedNode) && <NodeClockSkewError errorMessage={message?.warn[0]} />}
           <NodeInfo />
         </div>
       </Progress>
@@ -129,13 +145,13 @@ const ClusterDetailsPage: FC = () => {
 const NodeClockSkewError = ({ errorMessage }) => {
   const classes = useStyles()
   return (
-    <div className={classes.clockSkewErrorAlert}>
+    <div className={classes.clockDriftErrorAlert}>
       <header>
         <FontAwesomeIcon>{variantIcon.error}</FontAwesomeIcon>
-        <Text variant="caption1">Clock Skew Detected</Text>
+        <Text variant="caption1">Clock Drift Detected</Text>
         <CopyToClipboard copyText={errorMessage} copyIcon="copy" codeBlock={false} />
       </header>
-      <CodeBlock className={classes.clockSkewErrorMessage}>{errorMessage}</CodeBlock>
+      <CodeBlock className={classes.clockDriftErrorMessage}>{errorMessage}</CodeBlock>
     </div>
   )
 }
@@ -169,7 +185,7 @@ export const DetailRow: FC<{
   )
 }
 
-const NodeStatusAndUsage = ({ node, loading }) => {
+const NodeStatusAndUsage = ({ node, cluster, loading }) => {
   const classes = useStyles()
   const usage = useMemo(
     () => ({
@@ -189,7 +205,7 @@ const NodeStatusAndUsage = ({ node, loading }) => {
   )
   return (
     <div className={classes.detailsHeader}>
-      <NodeStatus node={node} />
+      <NodeStatus node={node} cluster={cluster} />
       <UsageWidget title="Compute" stats={usage.compute} units="GHz" />
 
       <UsageWidget title="Memory" stats={usage.memory} units="GiB" />
@@ -199,20 +215,58 @@ const NodeStatusAndUsage = ({ node, loading }) => {
   )
 }
 
-const NodeStatus = ({ node }) => {
-  const { name, message } = node
+const NodeStatus = ({ node, cluster }) => {
+  const clusterType =
+    cluster?.nodes?.length === 1 ? ClusterType.SingleNodeCluster : ClusterType.MultiNodeCluster
+  const totalRamCapacity = node?.combined?.usage?.memory?.max
+  const totalDiskSpace = node?.combined?.usage?.disk?.max
+  const availableDiskSpace = getAvailableSpace(node?.combined?.usage?.disk)
+  const nodeHasClockDrift = hasClockDrift(node)
+
   return (
-    <HeaderCard title={name} icon="cube" subtitle="" className="">
+    <HeaderCard title={node?.name} icon="cube" subtitle="" className="">
       <ClusterStatusSpan
-        title="Clock Skew"
-        status={message?.warn ? 'error' : 'ok'}
+        title={`Recommended RAM Capacity: ${
+          nodeHardwareRequirements[clusterType][HardwareType.RAM]
+        } GB`}
+        status={
+          meetsHardwareRequirement(totalRamCapacity, clusterType, HardwareType.RAM) ? 'ok' : 'fail'
+        }
         variant="header"
         iconStatus
       >
-        {message?.warn ? 'Clock Skew Detected' : 'No Clock Skew Detected'}
+        {`RAM Capacity: ${totalRamCapacity?.toFixed(2)} GB`}
+      </ClusterStatusSpan>
+      <ClusterStatusSpan
+        title={`Recommended Available Disk Space: ${minAvailableDiskSpace} GB`}
+        status={availableDiskSpace >= minAvailableDiskSpace ? 'ok' : 'fail'}
+        variant="header"
+        iconStatus
+      >
+        {`Available Disk Space: ${availableDiskSpace?.toFixed(2)} GB`}
+      </ClusterStatusSpan>
+      <ClusterStatusSpan
+        title={`Recommended Total Disk Space: ${
+          nodeHardwareRequirements[clusterType][HardwareType.Disk]
+        } GB`}
+        status={
+          meetsHardwareRequirement(totalDiskSpace, clusterType, HardwareType.Disk) ? 'ok' : 'fail'
+        }
+        variant="header"
+        iconStatus
+      >
+        {`Total Disk Space: ${totalDiskSpace?.toFixed(2)} GB`}
+      </ClusterStatusSpan>
+      <ClusterStatusSpan
+        title={`Host clock ${nodeHasClockDrift ? 'is' : 'is not'} out of sync`}
+        status={nodeHasClockDrift ? 'error' : 'ok'}
+        variant="header"
+        iconStatus
+      >
+        {nodeHasClockDrift ? 'Clock Drift Detected' : 'No Clock Drift Detected'}
       </ClusterStatusSpan>
     </HeaderCard>
   )
 }
 
-export default ClusterDetailsPage
+export default NodeDetailsPage
