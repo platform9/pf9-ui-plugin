@@ -17,11 +17,12 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
   },
 })
-interface OptionType {
+export interface OptionType {
   value: string | number
   label: string | number
   info?: string
   infoPlacement?: string
+  disabled?: boolean
 }
 interface FormProps {
   id: string
@@ -60,17 +61,18 @@ const RadioFields = compose(
 
       return (
         <div className={classes.root}>
-          {options.map((option) => (
-            <FormControl key={option.value} className={classes.formControl} error={hasError}>
-              <InfoTooltip info={option.info} placement={option.infoPlacement}>
+          {options.map(({ label, value: optionValue, info, infoPlacement, disabled = false }) => (
+            <FormControl key={optionValue} className={classes.formControl} error={hasError}>
+              <InfoTooltip info={info} placement={infoPlacement}>
                 <FormControlLabel
                   classes={formControlLabelClasses}
-                  label={option.label}
+                  label={label}
                   control={
                     <Radio
                       color="primary"
-                      checked={option.value === value}
-                      onChange={() => this.handleChange(option.value)}
+                      checked={optionValue === value}
+                      onChange={() => this.handleChange(optionValue)}
+                      disabled={disabled}
                     />
                   }
                 />

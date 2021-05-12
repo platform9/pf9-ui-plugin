@@ -111,44 +111,54 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           withAddonManager
           elevated={false}
         >
-          {/* <PollingData loading={loading} onReload={reload} hidden /> */}
-          {/* Cluster Name */}
-          <FormFieldCard
-            title={`Name your ${ClusterCreateTypeNames[ClusterCreateTypes.SingleMaster]} Cluster`}
-            link={
-              <ExternalLink textVariant="caption2" url={bareOSSingleMasterSetupDocsLink}>
-                BareOS Cluster Help
-              </ExternalLink>
-            }
-          >
-            <ClusterNameField setWizardContext={setWizardContext} />
-          </FormFieldCard>
+          {({ setFieldValue, values }) => (
+            <>
+              {/* <PollingData loading={loading} onReload={reload} hidden /> */}
+              {/* Cluster Name */}
+              <FormFieldCard
+                title={`Name your ${
+                  ClusterCreateTypeNames[ClusterCreateTypes.SingleMaster]
+                } Cluster`}
+                link={
+                  <ExternalLink textVariant="caption2" url={bareOSSingleMasterSetupDocsLink}>
+                    BareOS Cluster Help
+                  </ExternalLink>
+                }
+              >
+                <ClusterNameField setWizardContext={setWizardContext} />
+              </FormFieldCard>
 
-          {/* Cluster Settings */}
-          <FormFieldCard title="Cluster Settings">
-            <KubernetesVersion />
+              {/* Cluster Settings */}
+              <FormFieldCard title="Cluster Settings">
+                <KubernetesVersion />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Network Stack</Text>
-            <NetworkStack {...props} />
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Network Stack</Text>
+                <NetworkStack {...props} />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Node Registration</Text>
-            <NodeRegistrationChooser {...props} />
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Node Registration</Text>
+                <NodeRegistrationChooser
+                  values={values}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Application & Container Settings</Text>
-            <PrivilegedContainers {...props} />
-            <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Application & Container Settings</Text>
+                <PrivilegedContainers {...props} />
+                <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Add-Ons</Text>
-            <AddonTogglers
-              addons={clusterAddons}
-              wizardContext={wizardContext}
-              setWizardContext={setWizardContext}
-            />
-          </FormFieldCard>
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Add-Ons</Text>
+                <AddonTogglers
+                  addons={clusterAddons}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
+              </FormFieldCard>
+            </>
+          )}
         </ValidatedForm>
       </WizardStep>
       <WizardStep
