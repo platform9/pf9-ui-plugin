@@ -145,6 +145,13 @@ MyAccount.registerPlugin = (pluginManager) => {
       name: 'Custom Theme',
       link: { path: routes.customTheme.toString(userAccountPrefix) },
       icon: 'palette',
+      requiredRoles: 'admin',
+      requiredFeatures: (features) => {
+        if (!features || !features.experimental) {
+          return false
+        }
+        return features.experimental.kplane
+      },
     },
   ]
 
