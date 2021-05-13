@@ -13,6 +13,7 @@ export interface INodesSelector extends Node {
   status: string
   combined: ICombinedHost
   logs: string
+  message: ICombinedHost['resmgr']['message']
 }
 
 export interface Resmgr {

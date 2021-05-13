@@ -28,15 +28,17 @@ export const nodesSelector = createSelector(
     return rawNodes
       .map((node) => {
         const usage = calculateNodeUsages([combinedHostsObj[node.uuid]]) // expects array
+        const combined = combinedHostsObj[node.uuid]
         return {
           ...node,
           // if hostagent is not responding, then the nodes info is outdated
           // set the status to disconnected manually
           status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
-          combined: combinedHostsObj[node.uuid],
+          combined: combined,
           // qbert v3 link fails authorization so we have to use v1 link for logs
           logs: `${qbertUrl}/logs/${node.uuid}`.replace(/\/v3\//, '/v1/'),
           usage,
+          message: combined?.resmgr?.message,
         }
       })
       .filter((node) => path(['combined', 'cloudStack'], node) !== 'openstack')
