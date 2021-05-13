@@ -174,7 +174,7 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
           )}
         </ClusterStatusSpan>
       )}
-      {cluster.taskError &&
+      {(cluster.taskError || cluster.etcdBackup?.taskErrorDetail) &&
         renderErrorStatus(routes.cluster.detail.path({ id: cluster.uuid }), variant, 'Error')}
       {clockDriftDetectedInNodes(cluster.nodes) &&
         renderErrorStatus(

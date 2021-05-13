@@ -10,6 +10,7 @@ import { cacheActions } from 'core/caching/cacheReducers'
 import { appActions } from '../actions'
 import { makeDeployedAppsSelector } from './selectors'
 import namespaceActions from 'k8s/components/namespaces/actions'
+import { trackEvent } from 'utils/tracking'
 
 const { helm } = ApiClient.getInstance()
 const { dispatch } = store
@@ -49,6 +50,12 @@ export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
     }
     const result = helm.updateRelease(clusterId, namespace, body)
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.DeployedAppDetails }))
+
+    trackEvent('Application Updated ', {
+      cluster: clusterId,
+      appName: deploymentName,
+    })
+
     return result
   },
   deleteFn: async ({ clusterId, namespace, name }) => {
@@ -56,6 +63,11 @@ export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
       Name: name,
     }
     await helm.deleteRelease(clusterId, namespace, data)
+
+    trackEvent('Application Deleted', {
+      cluster: clusterId,
+      appName: name,
+    })
   },
   customOperations: {
     deploy: async (
@@ -82,6 +94,11 @@ export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
 
       // Refetch the list of deployed apps under this clusterId and namespace
       deployedAppActions.list({ clusterId, namespace }, true)
+
+      trackEvent('Application Deployed', {
+        cluster: clusterId,
+        appName: deploymentName,
+      })
 
       return prevItems
     },
