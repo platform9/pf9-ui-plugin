@@ -63,7 +63,7 @@ const columns = [
   { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
   { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
   { id: 'calicoBlockSize', label: 'Block Size' },
-  { id: 'mtuSize', label: 'Block Size' },
+  { id: 'mtuSize', label: 'MTU Size' },
   {
     id: 'etcdBackup',
     label: 'ETCD Backup',
