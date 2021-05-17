@@ -19,7 +19,7 @@ import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { mergeLeft, pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
-import { adjustWith, updateWith } from 'utils/fp'
+import { adjustWith, updateWith, emptyObj } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 import { importedClusterActions } from '../importedClusters/actions'
 
@@ -50,7 +50,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       qbert.getClusters(),
       // Fetch dependent caches
       clusterTagActions.list(),
-      loadNodes(),
+      loadNodes(emptyObj, true),
       loadResMgrHosts(),
     ])
 
