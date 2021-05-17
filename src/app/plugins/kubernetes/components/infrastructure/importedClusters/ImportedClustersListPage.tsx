@@ -43,6 +43,7 @@ const columns = [
 ]
 
 export const options = {
+  addText: 'Add Cluster',
   addButtonConfigs: [
     {
       label: 'Create Cluster',

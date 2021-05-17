@@ -17,8 +17,17 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const RegionsChecklist = ({ cloudProviderId, onChange, value, className }) => {
+interface Props {
+  cloudProviderId: string
+  onChange: any
+  value: string[]
+  className: string
+  clusters?: any
+}
+
+const RegionsChecklist = ({ cloudProviderId, onChange, value, className, clusters }: Props) => {
   const classes = useStyles()
+  console.log(clusters, 'clusters')
 
   const handleChange = (e, region) => {
     if (onChange) {
@@ -30,13 +39,33 @@ const RegionsChecklist = ({ cloudProviderId, onChange, value, className }) => {
     cloudProviderId: cloudProviderId,
   })
 
+  const regionCount = useMemo(() => {
+    // Currently only AKS passes this, assume location as prop to index by
+    if (clusters) {
+      return clusters.reduce((accum, cluster) => {
+        return {
+          ...accum,
+          [cluster.location]: cluster?.clusters?.length,
+        }
+      }, {})
+    }
+    return null
+  }, [clusters])
+
   const regions = useMemo(() => {
-    return details
+    const regionList = details
       .map((r) => {
         return r.RegionName
       })
       .sort()
-  }, [details])
+    if (regionCount) {
+      return regionList.filter((region) => regionCount[region])
+    }
+    return regionList
+  }, [details, regionCount])
+
+  console.log(regionCount, 'regionCount')
+  console.log(regions)
 
   return (
     <div className={clsx(classes.nowrap, className)}>
@@ -47,7 +76,7 @@ const RegionsChecklist = ({ cloudProviderId, onChange, value, className }) => {
         {regions.map((region) => (
           <FormControlLabel
             key={region}
-            label={region}
+            label={regionCount ? `${region} (${regionCount[region]})` : region}
             control={
               <Checkbox
                 onChange={(e) => handleChange(e, region)}

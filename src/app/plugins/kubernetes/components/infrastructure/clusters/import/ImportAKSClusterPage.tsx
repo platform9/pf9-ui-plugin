@@ -1,9 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import Wizard from 'core/components/wizard/Wizard'
-// import useDataUpdater from 'core/hooks/useDataUpdater'
 import useReactRouter from 'use-react-router'
-// import { clusterActions } from '../actions'
 import { routes } from 'core/utils/routes'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
@@ -25,7 +23,6 @@ import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
-import Bugsnag from '@bugsnag/js'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -49,35 +46,32 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const title = 'Import EKS Clusters'
+const title = 'Import AKS Clusters'
 const initialContext = {
   cloudProviderId: '',
   regions: [],
   selectedClusters: {},
   finalSelectedClusters: [],
 }
-const ImportEKSClusterPage = () => {
+const ImportAKSClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const [cloudProviders] = useDataLoader(cloudProviderActions.list)
   const [, , reloadImportedClusters] = useDataLoader(importedClusterActions.list)
-  const providerType = CloudProviders.Aws
+  const providerType = CloudProviders.Azure
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (data) => {
     setSubmitting(true)
-    const metadata = {
+    trackEvent('Import AKS Clusters', {
       cloud_provider_id: data.cloudProviderId,
       regions: data.regions,
       clusters: data.finalSelectedClusters.map((cluster) => cluster.id),
-    }
-    Bugsnag.leaveBreadcrumb('Attempting to import EKS clusters', metadata)
-    trackEvent('Import EKS Clusters', metadata)
+    })
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,
     })
-
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
     reloadImportedClusters(true)
@@ -105,7 +99,7 @@ const ImportEKSClusterPage = () => {
             fields={wizardContext}
             icon={<CloudProviderCard active type={providerType} />}
           >
-            <WizardStep stepId="selectProvider" label="Select AWS Provider">
+            <WizardStep stepId="selectProvider" label="Select AKS Provider">
               <ValidatedForm
                 classes={{ root: classes.validatedFormContainer }}
                 initialValues={wizardContext}
@@ -113,13 +107,13 @@ const ImportEKSClusterPage = () => {
                 triggerSubmit={onNext}
                 elevated={false}
               >
-                <FormFieldCard title="Select AWS Provider">
+                <FormFieldCard title="Select AKS Provider">
                   <PicklistField
                     DropdownComponent={CloudProviderPicklist}
                     id="cloudProviderId"
-                    label="AWS Provider"
-                    info="Find EKS clusters to import from the selected cloud provider."
-                    type={CloudProviders.Aws}
+                    label="AKS Provider"
+                    info="Find AKS clusters to import from the selected cloud provider."
+                    type={CloudProviders.Azure}
                     onChange={(value) => setWizardContext({ cloudProviderId: value })}
                     value={wizardContext.cloudProviderId}
                     required
@@ -137,7 +131,7 @@ const ImportEKSClusterPage = () => {
               >
                 <FormFieldCard title="Select Regions">
                   <PresetField
-                    label="AWS Provider:"
+                    label="AKS Provider:"
                     value={getCloudProviderName(wizardContext.cloudProviderId)}
                   />
                 </FormFieldCard>
@@ -148,6 +142,7 @@ const ImportEKSClusterPage = () => {
                       onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
                       value={wizardContext.regions}
                       className={classes.regions}
+                      clusters={wizardContext.clusterList}
                     />
                     <ClustersChecklists
                       cloudProviderId={wizardContext.cloudProviderId}
@@ -159,7 +154,8 @@ const ImportEKSClusterPage = () => {
                       value={wizardContext.selectedClusters}
                       selectedRegions={wizardContext.regions}
                       className={classes.clusters}
-                      stack="eks"
+                      stack="aks"
+                      onClustersLoad={(clusters) => setWizardContext({ clusterList: clusters })}
                     />
                   </div>
                 </FormFieldCard>
@@ -173,9 +169,9 @@ const ImportEKSClusterPage = () => {
                 triggerSubmit={onNext}
                 elevated={false}
               >
-                <FormFieldCard title="Review & Confirm EKS Clusters to Import">
+                <FormFieldCard title="Review & Confirm AKS Clusters to Import">
                   <PresetField
-                    label="AWS Provider:"
+                    label="AKS Provider:"
                     value={getCloudProviderName(wizardContext.cloudProviderId)}
                   />
                   <ReviewClustersTable
@@ -194,4 +190,4 @@ const ImportEKSClusterPage = () => {
   )
 }
 
-export default ImportEKSClusterPage
+export default ImportAKSClusterPage

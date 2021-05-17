@@ -15,12 +15,16 @@ const determineVpc = (cluster) => {
   return filteredChoices.length ? filteredChoices.join(' + ') : 'None'
 }
 
-export const discoverExternalClusters = async ({ provider, cloudProviderId, regions }) => {
+export const discoverExternalClusters = async ({
+  provider,
+  cloudProviderId,
+  regions = undefined,
+}) => {
   const body = {
     provider,
     cloudProviderID: cloudProviderId,
     providerDetails: {
-      regions: regions,
+      regions,
     },
   }
 
