@@ -6,6 +6,7 @@ import { pathEq, pick, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { sanitizeUrl } from 'utils/misc'
 import { CloudProviders } from '../cloudProviders/model'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 import { hasConvergingNodes } from './ClusterStatusUtils'
 import { NetworkStackTypes } from './constants'
 import { CalicoDetectionTypes } from './form-components/calico-network-fields'
@@ -30,7 +31,8 @@ export const canScaleMasters = ([cluster]) =>
 export const canScaleWorkers = ([cluster]) =>
   clusterNotBusy(cluster) && !isAzureAutoscalingCluster(cluster)
 
-export const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
+export const canUpgradeCluster = ([cluster]) =>
+  !!cluster && cluster.canUpgrade && !clockDriftDetectedInNodes(cluster.nodes)
 
 export const canDeleteCluster = ([cluster]) =>
   !['creating', 'deleting'].includes(cluster.taskStatus)
