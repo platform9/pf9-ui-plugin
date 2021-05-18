@@ -161,13 +161,13 @@ const SsoPage = () => {
   return (
     <div className={classes.ssoPage}>
       <DocumentMeta title="SSO Management" bodyClasses={['form-view']} />
-      <ValidatedForm
-        classes={{ root: classes.validatedFormContainer }}
-        elevated={false}
-        formActions={<>{params.enableSso && <SubmitButton>Save</SubmitButton>}</>}
-        onSubmit={() => updateSsoSettings(params, setLoading, setDialogOpened, updateParams)}
-      >
-        <Progress loading={loading}>
+      <Progress loading={loading}>
+        <ValidatedForm
+          classes={{ root: classes.validatedFormContainer }}
+          elevated={false}
+          formActions={<>{params.enableSso && <SubmitButton>Save</SubmitButton>}</>}
+          onSubmit={() => updateSsoSettings(params, setLoading, setDialogOpened, updateParams)}
+        >
           <FormFieldCard title="Enterprise Single Sign On">
             <Text variant="body2">
               Enterprise Single Sign On supports SAML 2.0 identity integration for seamless access
@@ -272,9 +272,9 @@ const SsoPage = () => {
               </div>
             </FormFieldCard>
           )}
-        </Progress>
-        {dialogOpened && <SsoEnabledDialog onClose={() => setDialogOpened(false)} />}
-      </ValidatedForm>
+          {dialogOpened && <SsoEnabledDialog onClose={() => setDialogOpened(false)} />}
+        </ValidatedForm>
+      </Progress>
     </div>
   )
 }
