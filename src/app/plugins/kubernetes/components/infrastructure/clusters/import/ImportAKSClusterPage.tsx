@@ -23,6 +23,7 @@ import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
+import { ClusterCloudPlatforms } from 'app/constants'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -154,7 +155,7 @@ const ImportAKSClusterPage = () => {
                       value={wizardContext.selectedClusters}
                       selectedRegions={wizardContext.regions}
                       className={classes.clusters}
-                      stack="aks"
+                      stack={ClusterCloudPlatforms.AKS}
                       onClustersLoad={(clusters) => setWizardContext({ clusterList: clusters })}
                     />
                   </div>

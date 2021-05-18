@@ -8,6 +8,7 @@ import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { ClusterCloudPlatforms } from 'app/constants'
 
 const renderImported = (_, { pf9Registered }) =>
   pf9Registered ? <Text variant="caption2">Imported</Text> : null
@@ -72,6 +73,60 @@ const ClustersChecklists = ({
   const [allClusters, setAllClusters] = useState([])
   const [loadingByRegion, setLoadingByRegion] = useState({})
 
+  const fetchClusters = useMemo(() => {
+    return {
+      eks: ({ selectedRegions, cloudProviderId, stack }) => {
+        const unpopulatedRegions = selectedRegions.filter((region) => !loadingByRegion[region])
+        if (!unpopulatedRegions.length) {
+          return
+        }
+        setLoadingClusters(true)
+        const placeholderResult = unpopulatedRegions.reduce(
+          (accum, region) => ({ ...accum, [region]: true }),
+          loadingByRegion,
+        )
+        setLoadingByRegion(placeholderResult)
+        const retrieveClusters = async () => {
+          try {
+            const result = await discoverExternalClusters({
+              provider: stack,
+              cloudProviderId,
+              regions: unpopulatedRegions,
+            })
+            const populatedRegions = allClusters.map((region) => region.region)
+            const missingRegions = result.filter(
+              (region) => !populatedRegions.includes(region.region),
+            )
+            setAllClusters([...allClusters, ...missingRegions])
+          } finally {
+            setLoadingClusters(false)
+          }
+        }
+        retrieveClusters()
+      },
+      aks: ({ allRegions, cloudProviderId, stack }) => {
+        setLoadingClusters(true)
+        const getClusters = async () => {
+          try {
+            const externalClusters = await discoverExternalClusters({
+              provider: stack,
+              cloudProviderId: cloudProviderId,
+            })
+            setAllClusters(externalClusters)
+            if (onClustersLoad) {
+              onClustersLoad(externalClusters)
+            }
+          } finally {
+            setLoadingClusters(false)
+          }
+        }
+        if (allRegions.length) {
+          getClusters()
+        }
+      },
+    }
+  }, [])
+
   const allRegions = useMemo(() => {
     return details
       .map((r) => {
@@ -84,71 +139,19 @@ const ClustersChecklists = ({
     if (!allClusters.length) {
       return {}
     }
-    if (stack === 'eks') {
+    if (stack === ClusterCloudPlatforms.EKS) {
       return indexBy(prop('region'), allClusters)
-    } else if (stack === 'aks') {
+    } else if (stack === ClusterCloudPlatforms.AKS) {
       return indexBy(prop('location'), allClusters)
     }
     return {}
   }, [allClusters, stack])
 
-  // Perhaps EKS and AKS are different enough that they could have separate components?
-  // EKS cluster retrieval
   useEffect(() => {
-    if (stack !== 'eks') {
-      return
+    if (fetchClusters[stack]) {
+      fetchClusters[stack]({ selectedRegions, allRegions, cloudProviderId, stack })
     }
-    const unpopulatedRegions = selectedRegions.filter((region) => !loadingByRegion[region])
-    if (!unpopulatedRegions.length) {
-      return
-    }
-    setLoadingClusters(true)
-    const placeholderResult = unpopulatedRegions.reduce(
-      (accum, region) => ({ ...accum, [region]: true }),
-      loadingByRegion,
-    )
-    setLoadingByRegion(placeholderResult)
-    const retrieveClusters = async () => {
-      try {
-        const result = await discoverExternalClusters({
-          provider: stack,
-          cloudProviderId,
-          regions: unpopulatedRegions,
-        })
-        const populatedRegions = allClusters.map((region) => region.region)
-        const missingRegions = result.filter((region) => !populatedRegions.includes(region.region))
-        setAllClusters([...allClusters, ...missingRegions])
-      } finally {
-        setLoadingClusters(false)
-      }
-    }
-    retrieveClusters()
-  }, [selectedRegions, stack])
-
-  // AKS cluster retrieval
-  useEffect(() => {
-    if (stack !== 'aks') {
-      return
-    }
-    setLoadingClusters(true)
-    const getClusters = async () => {
-      try {
-        const externalClusters = await discoverExternalClusters({
-          provider: stack,
-          cloudProviderId: cloudProviderId,
-        })
-        setAllClusters(externalClusters)
-        if (onClustersLoad) {
-          onClustersLoad(externalClusters)
-        }
-      } finally {
-        setLoadingClusters(false)
-      }
-    }
-    if (allRegions.length) {
-      getClusters()
-    }
-  }, [allRegions, cloudProviderId, stack])
+  }, [selectedRegions, allRegions, stack])
 
   return (
     <div className={className}>

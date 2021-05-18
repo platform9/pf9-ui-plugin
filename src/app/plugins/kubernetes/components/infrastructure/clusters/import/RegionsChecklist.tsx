@@ -27,7 +27,6 @@ interface Props {
 
 const RegionsChecklist = ({ cloudProviderId, onChange, value, className, clusters }: Props) => {
   const classes = useStyles()
-  console.log(clusters, 'clusters')
 
   const handleChange = (e, region) => {
     if (onChange) {
@@ -63,9 +62,6 @@ const RegionsChecklist = ({ cloudProviderId, onChange, value, className, cluster
     }
     return regionList
   }, [details, regionCount])
-
-  console.log(regionCount, 'regionCount')
-  console.log(regions)
 
   return (
     <div className={clsx(classes.nowrap, className)}>

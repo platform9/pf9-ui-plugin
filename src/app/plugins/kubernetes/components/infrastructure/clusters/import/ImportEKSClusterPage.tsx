@@ -26,6 +26,7 @@ import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
 import Bugsnag from '@bugsnag/js'
+import { ClusterCloudPlatforms } from 'app/constants'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -159,7 +160,7 @@ const ImportEKSClusterPage = () => {
                       value={wizardContext.selectedClusters}
                       selectedRegions={wizardContext.regions}
                       className={classes.clusters}
-                      stack="eks"
+                      stack={ClusterCloudPlatforms.EKS}
                     />
                   </div>
                 </FormFieldCard>
