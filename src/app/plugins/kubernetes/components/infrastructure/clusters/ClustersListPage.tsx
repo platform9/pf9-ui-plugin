@@ -36,6 +36,7 @@ import {
   isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -316,6 +317,10 @@ export const options = {
       icon: 'level-up',
       label: 'Upgrade Cluster',
       dialog: ClusterUpgradeDialog,
+      disabledInfo: ([cluster]) =>
+        !!cluster && clockDriftDetectedInNodes(cluster.nodes)
+          ? 'Cannot upgrade cluster: clock drift detected in at least one node'
+          : 'Cannot upgrade cluster',
     },
     {
       cond: both(isAdmin, notBusy),

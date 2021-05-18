@@ -1,0 +1,17 @@
+   0.0 TEL | Telepresence 0.108 launched at Wed Apr 28 13:56:04 2021
+   0.0 TEL |   /usr/local/bin/telepresence -s serenity:serenity --run yarn dev
+   0.0 TEL | uname: uname_result(system='Darwin', node='jruddell-pf9.local', release='19.6.0', version='Darwin Kernel Version 19.6.0: Thu Jun 18 20:49:00 PDT 2020; root:xnu-6153.141.1~1/RELEASE_X86_64', machine='x86_64')
+   0.0 TEL | Platform: darwin
+   0.0 TEL | WSL: False
+   0.0 TEL | Python 3.9.1 (default, Dec 29 2020, 08:52:17)
+   0.0 TEL | [Clang 12.0.0 (clang-1200.0.32.28)]
+   0.0 TEL | BEGIN SPAN main.py:40(main)
+   0.0 TEL | BEGIN SPAN startup.py:83(set_kube_command)
+   0.0 TEL | Found kubectl -> /usr/local/bin/kubectl
+   0.0 TEL | [1] Capturing: kubectl config current-context
+   0.6   1 | error: current-context is not set
+   0.6 TEL | [1] exit 1 in 0.60 secs.
+   0.6 >>> | 
+   0.6 >>> | No current-context set. Please use the --context option to explicitly set the context.
+   0.6 >>> | 
+   0.6 TEL | EXITING with status code 255
