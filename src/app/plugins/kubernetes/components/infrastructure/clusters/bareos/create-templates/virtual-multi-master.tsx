@@ -65,7 +65,7 @@ export const initialContext = {
   calicoIPv4: 'autodetect',
   calicoIPv6: 'none',
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
-  useHostname: 'false',
+  useHostname: false,
   nodeRegistrationType: 'ipAddress',
 }
 

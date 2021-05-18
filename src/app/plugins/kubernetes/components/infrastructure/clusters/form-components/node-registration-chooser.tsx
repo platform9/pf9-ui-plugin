@@ -36,7 +36,7 @@ const NodeRegistrationChooser = ({ values, wizardContext, setWizardContext }) =>
   return (
     <RadioFields
       id="nodeRegistrationType"
-      value={wizardContext['nodeRegistrationType']}
+      value={wizardContext.nodeRegistrationType}
       options={nodeRegistrationOptions}
       onChange={handleChange}
     />
