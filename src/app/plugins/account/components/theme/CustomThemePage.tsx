@@ -140,7 +140,7 @@ const updateTheme = (data, setLoading, setSavedDialogOpened, updateParams, dispa
     setLoading(true)
     try {
       await updateThemeConfig(body)
-      updateSessionTheme()(dispatch, data, theme)
+      updateSessionTheme(dispatch, data, theme)
       updateParams({ themeIsEnabled: true })
       // Show user a dialog saying theme configuration successful
       setSavedDialogOpened(true)
