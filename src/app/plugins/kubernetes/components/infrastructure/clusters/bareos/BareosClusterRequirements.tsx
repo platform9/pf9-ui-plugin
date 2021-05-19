@@ -18,6 +18,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { allPass } from 'ramda'
 import { isConnected, isUnassignedNode } from './ClusterHostChooser'
 import InsufficientNodesNodesDialog from './InsufficientNodesDialog'
+import { ClusterType, HardwareType, nodeHardwareRequirements } from './constants'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -156,13 +157,53 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
         </Text>
         <BulletList className={classes.bulletList} items={nodeServices} />
         <IconInfo icon="info-circle" title="Minimum Hardware Requirements:">
+          <Text variant="body2" className={classes.text}>
+            Single node clusters:
+          </Text>
           <div className={classes.requirements}>
-            <HardwareSpec title="4 VCPUs" icon="microchip" />
-            <HardwareSpec title="16GB RAM" icon="memory" />
-            <HardwareSpec title="30GB HDD" icon="hdd" />
+            <HardwareSpec
+              title={`${
+                nodeHardwareRequirements[ClusterType.SingleNodeCluster][HardwareType.CPU]
+              } CPUs`}
+              icon="microchip"
+            />
+            <HardwareSpec
+              title={`${
+                nodeHardwareRequirements[ClusterType.SingleNodeCluster][HardwareType.RAM]
+              } GB RAM`}
+              icon="memory"
+            />
+            <HardwareSpec
+              title={`${
+                nodeHardwareRequirements[ClusterType.SingleNodeCluster][HardwareType.Disk]
+              } GB HDD`}
+              icon="hdd"
+            />
+          </div>
+          <Text variant="body2" className={classes.text}>
+            Multi-node clusters (for each node):
+          </Text>
+          <div className={classes.requirements}>
+            <HardwareSpec
+              title={`${
+                nodeHardwareRequirements[ClusterType.MultiNodeCluster][HardwareType.CPU]
+              } CPUs`}
+              icon="microchip"
+            />
+            <HardwareSpec
+              title={`${
+                nodeHardwareRequirements[ClusterType.MultiNodeCluster][HardwareType.RAM]
+              } GB RAM`}
+              icon="memory"
+            />
+            <HardwareSpec
+              title={`${
+                nodeHardwareRequirements[ClusterType.MultiNodeCluster][HardwareType.Disk]
+              } GB HDD`}
+              icon="hdd"
+            />
           </div>
         </IconInfo>
-
         <div className={classes.actionRow}>
           <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
           <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
