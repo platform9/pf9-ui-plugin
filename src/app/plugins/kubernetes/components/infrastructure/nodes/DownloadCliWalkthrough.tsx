@@ -85,7 +85,7 @@ export const OsRequirements = () => {
         </div>
         <p>
           <Text component="span">
-            You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
+            You will need a physical or virtual machine with Ubuntu (18.04/20.04) or CentOS
             (7.6/7.7/7.8) installed.
           </Text>
         </p>
