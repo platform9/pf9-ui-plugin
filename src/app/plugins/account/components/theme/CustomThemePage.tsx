@@ -10,7 +10,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
 import ThemeToggle from './ThemeToggle'
 import AccountUpgradeDialog from './AccountUpgradeDialog'
-import { AppPlugins, CustomerTiers, themeEnabledTiers } from 'app/constants'
+import { CustomerTiers, themeEnabledTiers } from 'app/constants'
 import { pathOr, prop } from 'ramda'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from 'app/store'
@@ -19,7 +19,7 @@ import InlineTooltip from 'core/components/InlineTooltip'
 import TextField from 'core/components/validatedForm/TextField'
 import clsx from 'clsx'
 import { hexToRgb, rgbToHex } from 'core/utils/colorHelpers'
-import { deleteThemeConfig, getThemeConfig, updateThemeConfig } from './actions'
+import { deleteThemeConfig, getThemeConfig, updateThemeConfig, updateSessionTheme } from './actions'
 import ThemeEnabledDialog from './ThemeEnabledDialog'
 import { ThemeConfig } from './model'
 import { themeActions } from 'core/session/themeReducers'
@@ -138,35 +138,9 @@ const updateTheme = (data, setLoading, setSavedDialogOpened, updateParams, dispa
       logoUrl: data.logoUrl,
     }
     setLoading(true)
-    const themeUpdateBody = {
-      components: [
-        { pathTo: ['header', 'background'], value: data.headerHex || theme.palette.grey[900] },
-        {
-          pathTo: ['sidebar', AppPlugins.MyAccount, 'background'],
-          value: data.sidenavHex || theme.palette.grey[200],
-        },
-        {
-          pathTo: ['sidebar', AppPlugins.Kubernetes, 'background'],
-          value: data.sidenavHex || theme.palette.grey[800],
-        },
-        {
-          pathTo: ['sidebar', AppPlugins.OpenStack, 'background'],
-          value: data.sidenavHex || theme.palette.grey[800],
-        },
-        {
-          pathTo: ['sidebar', AppPlugins.BareMetal, 'background'],
-          value: data.sidenavHex || theme.palette.grey[800],
-        },
-      ],
-    }
     try {
       await updateThemeConfig(body)
-      dispatch(
-        preferencesActions.updateLogo({
-          logoUrl: data.logoUrl,
-        }),
-      )
-      dispatch(themeActions.updateThemeComponent(themeUpdateBody))
+      updateSessionTheme()(dispatch, data, theme)
       updateParams({ themeIsEnabled: true })
       // Show user a dialog saying theme configuration successful
       setSavedDialogOpened(true)
