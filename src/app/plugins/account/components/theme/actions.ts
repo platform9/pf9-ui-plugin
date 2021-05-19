@@ -17,34 +17,32 @@ export const updateThemeConfig = async (config) =>
 
 export const deleteThemeConfig = async () => preferenceStore.deleteGlobalPreference('theme')
 
-export const updateSessionTheme = () => {
-  return (dispatch, settings, theme) => {
-    const themeUpdateBody = {
-      components: [
-        { pathTo: ['header', 'background'], value: settings.headerHex || theme.palette.grey[900] },
-        {
-          pathTo: ['sidebar', AppPlugins.MyAccount, 'background'],
-          value: settings.sidenavHex || theme.palette.grey[200],
-        },
-        {
-          pathTo: ['sidebar', AppPlugins.Kubernetes, 'background'],
-          value: settings.sidenavHex || theme.palette.grey[800],
-        },
-        {
-          pathTo: ['sidebar', AppPlugins.OpenStack, 'background'],
-          value: settings.sidenavHex || theme.palette.grey[800],
-        },
-        {
-          pathTo: ['sidebar', AppPlugins.BareMetal, 'background'],
-          value: settings.sidenavHex || theme.palette.grey[800],
-        },
-      ],
-    }
-    dispatch(
-      preferencesActions.updateLogo({
-        logoUrl: settings.logoUrl,
-      }),
-    )
-    dispatch(themeActions.updateThemeComponent(themeUpdateBody))
+export const updateSessionTheme = (dispatch, settings, theme) => {
+  const themeUpdateBody = {
+    components: [
+      { pathTo: ['header', 'background'], value: settings.headerHex || theme.palette.grey[900] },
+      {
+        pathTo: ['sidebar', AppPlugins.MyAccount, 'background'],
+        value: settings.sidenavHex || theme.palette.grey[200],
+      },
+      {
+        pathTo: ['sidebar', AppPlugins.Kubernetes, 'background'],
+        value: settings.sidenavHex || theme.palette.grey[800],
+      },
+      {
+        pathTo: ['sidebar', AppPlugins.OpenStack, 'background'],
+        value: settings.sidenavHex || theme.palette.grey[800],
+      },
+      {
+        pathTo: ['sidebar', AppPlugins.BareMetal, 'background'],
+        value: settings.sidenavHex || theme.palette.grey[800],
+      },
+    ],
   }
+  dispatch(
+    preferencesActions.updateLogo({
+      logoUrl: settings.logoUrl,
+    }),
+  )
+  dispatch(themeActions.updateThemeComponent(themeUpdateBody))
 }
