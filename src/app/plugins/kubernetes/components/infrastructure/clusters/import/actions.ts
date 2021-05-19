@@ -44,14 +44,19 @@ export const discoverExternalClusters = async ({
   return mappedData
 }
 
-export const registerExternalClusters = async ({ cloudProviderId, clusters }) => {
+export const registerExternalClusters = async ({
+  cloudProviderId,
+  clusters,
+  stack,
+  detailsKey,
+}) => {
   const registerExternalClusterPromises = clusters.map((cluster) => {
     const body = {
       id: cluster.id,
-      provider: 'eks',
+      provider: stack,
       cloudProviderID: cloudProviderId,
       providerDetails: {
-        region: cluster.region,
+        [detailsKey]: cluster[detailsKey],
       },
     }
     return qbert.registerExternalCluster(body)

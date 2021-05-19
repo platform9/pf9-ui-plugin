@@ -77,6 +77,8 @@ const ImportEKSClusterPage = () => {
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,
+      stack: ClusterCloudPlatforms.EKS,
+      detailsKey: 'region',
     })
 
     setSubmitting(false)

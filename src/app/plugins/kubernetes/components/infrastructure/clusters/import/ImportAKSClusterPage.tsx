@@ -72,6 +72,8 @@ const ImportAKSClusterPage = () => {
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,
+      stack: ClusterCloudPlatforms.AKS,
+      detailsKey: 'resourceGroup',
     })
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
