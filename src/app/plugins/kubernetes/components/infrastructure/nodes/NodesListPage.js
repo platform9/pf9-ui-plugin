@@ -31,6 +31,8 @@ import ResourceUsageTables from '../common/ResourceUsageTables'
 import NodesStatePicklist from './nodes-state-picklist'
 import NodeAuthDialog from './NodeAuthDialog'
 import { NodeState } from './model'
+import { clockDriftDetectedInNodes, hasClockDrift } from './helper'
+import { renderErrorStatus } from '../clusters/ClusterStatus'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -214,9 +216,13 @@ export const renderNodeHealthStatus = (_, node, onClick = undefined) => {
     fields.label
   )
   return (
-    <ClusterStatusSpan title={fields.label} status={fields.status}>
-      {onClick ? <SimpleLink onClick={() => onClick(node)}>{fields.label}</SimpleLink> : content}
-    </ClusterStatusSpan>
+    <>
+      <ClusterStatusSpan title={fields.label} status={fields.status}>
+        {onClick ? <SimpleLink onClick={() => onClick(node)}>{fields.label}</SimpleLink> : content}
+      </ClusterStatusSpan>
+      {hasClockDrift(node) &&
+        renderErrorStatus(routes.nodes.detail.path({ id: node.uuid }), 'table', 'Node Clock Drift')}
+    </>
   )
 }
 

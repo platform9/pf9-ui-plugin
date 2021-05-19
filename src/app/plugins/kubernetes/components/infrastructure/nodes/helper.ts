@@ -24,3 +24,12 @@ export const meetsHardwareRequirement = (
   if (!value) return false
   return value >= nodeHardwareRequirements[clusterType][hardwareType]
 }
+
+/**
+ * Checks whether or not any node in the nodes array have clock drift
+ * @param nodes Array of nodes
+ * @returns True if clock drift is detected in any of the nodes. False if none of the nodes have clock drift
+ */
+export const clockDriftDetectedInNodes = (nodes) => {
+  return nodes && !!nodes.find((node) => hasClockDrift(node))
+}
