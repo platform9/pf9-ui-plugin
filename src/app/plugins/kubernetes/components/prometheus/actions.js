@@ -173,7 +173,7 @@ export const prometheusAlertManagerActions = createCRUDActions(
         namespace,
         name,
       })
-      await qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
+      await qbert.deletePrometheusAlertManager(clusterUuid, namespace, name)
       trackEvent('Delete Prometheus Alert Manager', { clusterUuid, namespace, name })
     },
     successMessage: (updatedItems, prevItems, { uid }, operation) =>

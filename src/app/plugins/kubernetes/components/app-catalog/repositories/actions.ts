@@ -42,7 +42,7 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
     })
   },
   createFn: async ({ name, url, username, password }) => {
-    Bugsnag.leaveBreadcrumb('Attempting to create repository', { name, url, username, password })
+    Bugsnag.leaveBreadcrumb('Attempting to create repository', { name, url })
     const body = {
       name,
       url,

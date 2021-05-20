@@ -304,8 +304,7 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
   ActionDataKeys.ManagementUsersRoleAssignments,
   async ({ userId }) => {
     Bugsnag.leaveBreadcrumb('Attempting to get user role assignments')
-    const result = (await keystone.getUserRoleAssignments(userId)) || emptyArr
-    return result
+    return (await keystone.getUserRoleAssignments(userId)) || emptyArr
   },
   {
     uniqueIdentifier: ['user.id', 'scope.project.id', 'role.id'],

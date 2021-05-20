@@ -8,7 +8,7 @@ const actions = {
   updateUserPassword: async ({ oldPassword, confirmPassword, userId }) => {
     Bugsnag.leaveBreadcrumb('Attempting to update user password', { userId })
     const body = { original_password: oldPassword, password: confirmPassword }
-    const result = keystone.updateUserPassword(userId, body)
+    const result = await keystone.updateUserPassword(userId, body)
     trackEvent('Update User Password', { userId })
     return result
   },

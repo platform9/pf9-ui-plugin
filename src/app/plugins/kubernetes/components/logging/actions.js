@@ -9,7 +9,7 @@ const { qbert } = ApiClient.getInstance()
 
 const loggingActions = createCRUDActions(ActionDataKeys.Loggings, {
   listFn: async (params) => {
-    Bugsnag.leaveBreadcrumb('Attempting to get loggins')
+    Bugsnag.leaveBreadcrumb('Attempting to get loggings')
     const clusters = await clusterActions.list()
     return mapAsync(async (cluster) => {
       return {

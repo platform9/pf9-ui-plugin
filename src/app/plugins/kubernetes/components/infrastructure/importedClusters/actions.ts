@@ -3,7 +3,6 @@ import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { intersection } from 'ramda'
-import { trackEvent } from 'utils/tracking'
 import { clusterTagActions } from '../clusters/actions'
 import { importedClustersSelector, makeParamsImportedClustersSelector } from './selectors'
 
@@ -41,9 +40,8 @@ export const importedClusterActions = createCRUDActions(ActionDataKeys.ImportedC
     return settledClusters.value
   },
   deleteFn: async ({ uuid }) => {
-    Bugsnag.leaveBreadcrumb('Attempting to deregister imported cluster', { clusterId: uuid })
+    Bugsnag.leaveBreadcrumb('Attempting to detach imported cluster', { clusterId: uuid })
     await qbert.deregisterExternalCluster(uuid)
-    trackEvent('Deregister Imported Cluster', { clusterId: uuid })
   },
   uniqueIdentifier: 'uuid',
   selector: importedClustersSelector,

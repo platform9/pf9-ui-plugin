@@ -16,7 +16,7 @@ export const namespacesCacheKey = 'namespaces'
 
 const namespaceActions = createCRUDActions(DataKeys.Namespaces, {
   listFn: async (params) => {
-    Bugsnag.leaveBreadcrumb('Attempting to get namespaces')
+    Bugsnag.leaveBreadcrumb('Attempting to get namespaces', params)
     const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterNamespaces)).then(flatten)

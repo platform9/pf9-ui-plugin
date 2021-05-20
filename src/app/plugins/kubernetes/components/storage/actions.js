@@ -15,8 +15,8 @@ const { qbert } = ApiClient.getInstance()
 
 const storageClassActions = createCRUDActions(ActionDataKeys.StorageClasses, {
   listFn: async (params, loadFromContext) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get storage classes', params)
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
-    Bugsnag.leaveBreadcrumb('Attempting to get storage classes', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterStorageClasses)).then(flatten)
     }

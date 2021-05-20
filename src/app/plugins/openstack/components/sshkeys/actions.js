@@ -13,8 +13,7 @@ const injectIds = (x) => ({ ...x, id: x.id || uuid.v4() })
 const sshKeyActions = createCRUDActions(sshCacheKey, {
   listFn: async () => {
     Bugsnag.leaveBreadcrumb('Attempting to get ssh keys')
-    const result = (await nova.getSshKeys()).map(injectIds)
-    return result
+    return (await nova.getSshKeys()).map(injectIds)
   },
   createFn: async (data) => {
     Bugsnag.leaveBreadcrumb('Attempting to create ssh key', data)

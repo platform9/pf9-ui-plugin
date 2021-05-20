@@ -76,8 +76,8 @@ export const virtualMachineDetailsLoader = createContextLoader(
 
 export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines, {
   listFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get VM instances', params)
     const [clusterId, clusters] = await parseClusterParams(params)
-    Bugsnag.leaveBreadcrumb('Attempting to get VM instances', { clusterId })
     return clusterId === allKey
       ? someAsync(pluck<any, any>('uuid', clusters).map(qbert.getVirtualMachineInstances)).then(
           flatten,

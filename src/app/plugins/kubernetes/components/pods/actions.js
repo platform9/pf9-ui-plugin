@@ -16,8 +16,8 @@ const { qbert } = ApiClient.getInstance()
 
 export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   listFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get pods', params)
     const [clusterId, clusters] = await parseClusterParams(params)
-    Bugsnag.leaveBreadcrumb('Attempting to get pods', { clusterId })
     return clusterId === allKey
       ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
       : qbert.getClusterPods(clusterId)
@@ -47,8 +47,8 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
 
 export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
   listFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster deployments', params)
     const [clusterId, clusters] = await parseClusterParams(params)
-    Bugsnag.leaveBreadcrumb('Attempting to get cluster deployments', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterDeployments)).then(flatten)
     }
@@ -90,8 +90,8 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
 
 export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
   listFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster services', params)
     const [clusterId, clusters] = await parseClusterParams(params)
-    Bugsnag.leaveBreadcrumb('Attempting to get cluster services', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterKubeServices)).then(flatten)
     }

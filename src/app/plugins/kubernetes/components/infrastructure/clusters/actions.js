@@ -41,10 +41,10 @@ export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
   uniqueIdentifier: 'uuid',
 })
 
-const getCsiDrivers = async (clusterUiid) => {
+const getCsiDrivers = async (clusterUuid) => {
+  Bugsnag.leaveBreadcrumb('Attempting to get cluster CSI drivers', { clusterId: clusterUuid })
   try {
-    Bugsnag.leaveBreadcrumb('Attempting to get cluster csi drivers')
-    return await qbert.getClusterCsiDrivers(clusterUiid)
+    return await qbert.getClusterCsiDrivers(clusterUuid)
   } catch (e) {
     console.warn(e)
     return null
@@ -82,7 +82,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     }, settledClusters.value)
   },
   createFn: (params) => {
-    Bugsnag.leaveBreadcrumb('Attempting to create cluster')
+    Bugsnag.leaveBreadcrumb('Attempting to create cluster', params)
     if (params.clusterType === 'aws') {
       return createAwsCluster(params)
     }
@@ -114,7 +114,6 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   deleteFn: async ({ uuid }) => {
     Bugsnag.leaveBreadcrumb('Attempting to delete cluster', { clusterId: uuid })
     await qbert.deleteCluster(uuid)
-    trackEvent('Delete Cluster', { uuid })
     // Delete cluster Segment tracking is done in ClusterDeleteDialog.tsx because that code
     // has more context about the cluster name, etc.
 
@@ -158,7 +157,10 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       const body = {
         tags: { ...(cluster.tags || {}), [key]: val },
       }
-      Bugsnag.leaveBreadcrumb('Attempting to update cluster tag', { clusterId: cluster.uuid, body })
+      Bugsnag.leaveBreadcrumb('Attempting to update cluster tag', {
+        clusterId: cluster.uuid,
+        ...body,
+      })
       await qbert.updateCluster(cluster.uuid, body)
       trackEvent('Cluster Tag Update', { clusterId: cluster.uuid })
       return updateWith(

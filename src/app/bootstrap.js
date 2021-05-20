@@ -4,14 +4,15 @@ import { setupFromConfig } from 'utils/registry'
 import config from '../../config'
 import ApiClient from 'api-client/ApiClient'
 import './app.css'
+import { version } from '../../package.json'
 // import './all.min.css'
 
 Bugsnag.start({
   releaseStage: process.env.NODE_ENV,
   apiKey: process.env.BUGSNAG_KEY,
   plugins: [new BugsnagPluginReact()],
-  appVersion: process.env.VERSION,
-  enabledReleaseStages: ['production'],
+  appVersion: version,
+  enabledReleaseStages: ['production', 'development'],
 })
 
 setupFromConfig(config)

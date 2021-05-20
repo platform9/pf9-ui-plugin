@@ -14,7 +14,7 @@ import { makeGroupsSelector } from './selectors'
 const { keystone } = ApiClient.getInstance()
 export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroups, {
   listFn: async () => {
-    Bugsnag.leaveBreadcrumb('Attempting to get sso groups')
+    Bugsnag.leaveBreadcrumb('Attempting to get SSO groups')
     const [groups] = await Promise.all([
       keystone.getGroups(),
       // Fetch dependent caches
@@ -23,7 +23,7 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
     return groups
   },
   createFn: async ({ roleAssignments, ...params }) => {
-    Bugsnag.leaveBreadcrumb('Attempting to create sso group', { roleAssignments, ...params })
+    Bugsnag.leaveBreadcrumb('Attempting to create SSO group', { ...params })
     const createdGroup = await keystone.createGroup(params)
 
     await tryCatchAsync(
@@ -42,7 +42,7 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
     return createdGroup
   },
   updateFn: async ({ groupId, roleAssignments, prevRoleAssignmentsArr, ...params }, prevItems) => {
-    Bugsnag.leaveBreadcrumb('Attempting to update sso group', { groupId, ...params })
+    Bugsnag.leaveBreadcrumb('Attempting to update SSO group', { groupId, ...params })
     // Not using this loader atm
     // const prevRoleAssignmentsArr = await mngmGroupRoleAssignmentsLoader({
     //   groupId,
@@ -93,7 +93,7 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
     return updatedGroup
   },
   deleteFn: async ({ id }) => {
-    Bugsnag.leaveBreadcrumb('Attempting to delete sso group', { id })
+    Bugsnag.leaveBreadcrumb('Attempting to delete SSO group', { groupId: id })
     const groupMappings = await mngmGroupMappingActions.list()
     const mapping = await groupMappings[0]
     const updatedMappingRules = mapping.rules.filter((rule) => id !== rule.local[0]?.group?.id)

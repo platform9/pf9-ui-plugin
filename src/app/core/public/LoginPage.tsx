@@ -195,7 +195,6 @@ class LoginPage extends React.PureComponent<Props> {
     this.setState({ loginFailed: false, loading: true })
     Bugsnag.leaveBreadcrumb('Attempting PF9 Sign In', {
       loginUsername,
-      password,
       loginMethod,
       MFAcheckbox,
       mfa,

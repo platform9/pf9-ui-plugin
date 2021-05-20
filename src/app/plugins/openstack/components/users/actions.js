@@ -13,7 +13,7 @@ const userActions = createCRUDActions(usersCacheKey, {
     return keystone.getUsers()
   },
   createFn: async ({ data }) => {
-    Bugsnag.leaveBreadcrumb('Attempting to create user', { id: user.id, name: user.name })
+    Bugsnag.leaveBreadcrumb('Attempting to create user', data)
     const user = await keystone.createUser(data)
     trackEvent('Create User', {
       id: user.id,
