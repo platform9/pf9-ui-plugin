@@ -100,10 +100,8 @@ export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines,
   },
   customOperations: {
     powerVm: async ({ clusterId, namespace, name }) => {
-      Bugsnag.leaveBreadcrumb('Attempting to power VM', { clusterId, namespace, name })
       // TODO this is currently disabled, figure out how to use vm and vmi to determine the power on action
       const deleted = await qbert.powerVirtualMachine(clusterId, namespace, name, false)
-      trackEvent('Power VM', { clusterId, namespace, name })
       return deleted
     },
   },
