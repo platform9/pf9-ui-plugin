@@ -49,7 +49,7 @@ import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendes
 import { themeActions } from 'core/session/themeReducers'
 import { ThemeConfig } from 'account/components/theme/model'
 import { preferencesActions } from 'core/session/preferencesReducers'
-import { componentUpdaterObject } from 'core/themes/helpers'
+import { componentUpdaterObject } from 'account/components/theme/helpers'
 
 const toPairs: any = ToPairs
 
