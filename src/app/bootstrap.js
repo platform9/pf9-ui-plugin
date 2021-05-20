@@ -12,7 +12,7 @@ Bugsnag.start({
   apiKey: process.env.BUGSNAG_KEY,
   plugins: [new BugsnagPluginReact()],
   appVersion: version,
-  enabledReleaseStages: ['production', 'development'],
+  enabledReleaseStages: ['production'],
 })
 
 setupFromConfig(config)
