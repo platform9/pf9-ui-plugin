@@ -150,7 +150,7 @@ const AppContainer = () => {
       trackPage(url)
       const route = Routes.find(url)
       if (route) {
-        Bugsnag.leaveBreadcrumb(route.name)
+        Bugsnag.leaveBreadcrumb(route.name, {}, 'navigation')
       }
       if (features?.experimental?.sandbox) {
         appCuesSetAnonymous()
@@ -179,7 +179,7 @@ const AppContainer = () => {
       const airgapped = pathStrOr(false, 'data.experimental.airgapped', initialFeatures)
       const duVersion = pathOr(
         null,
-        ['data', 'versioning', 'packages', 'pf9-du.x86_64'],
+        ['data', 'versioning', 'packages', 'pf9-du.x86_64', 'version'],
         initialFeatures,
       )
 
