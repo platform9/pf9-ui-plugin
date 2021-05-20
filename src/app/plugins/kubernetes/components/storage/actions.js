@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey, notFoundErr } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -15,6 +16,7 @@ const { qbert } = ApiClient.getInstance()
 const storageClassActions = createCRUDActions(ActionDataKeys.StorageClasses, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+    Bugsnag.leaveBreadcrumb('Attempting to get storage classes', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterStorageClasses)).then(flatten)
     }
@@ -26,11 +28,13 @@ const storageClassActions = createCRUDActions(ActionDataKeys.StorageClasses, {
       throw new Error(notFoundErr)
     }
     const { clusterId, name } = item
+    Bugsnag.leaveBreadcrumb('Attempting to delete storage class', { clusterId, name })
     const result = await qbert.deleteStorageClass(clusterId, name)
-    trackEvent('Delete Storage', { clusterId, name })
+    trackEvent('Delete Storage Class', { clusterId, name })
     return result
   },
   createFn: async ({ clusterId, storageClassYaml }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create storage class', { clusterId, storageClassYaml })
     const body = yaml.safeLoad(storageClassYaml)
     const created = await qbert.createStorageClass(clusterId, body)
     trackEvent('Create Storage Class', {

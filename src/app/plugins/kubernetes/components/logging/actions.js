@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -8,6 +9,7 @@ const { qbert } = ApiClient.getInstance()
 
 const loggingActions = createCRUDActions(ActionDataKeys.Loggings, {
   listFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get loggins')
     const clusters = await clusterActions.list()
     return mapAsync(async (cluster) => {
       return {
@@ -17,12 +19,15 @@ const loggingActions = createCRUDActions(ActionDataKeys.Loggings, {
     }, clusters)
   },
   createFn: async (data) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create logging', data)
     return qbert.createLogging(data)
   },
   deleteFn: async ({ cluster }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete logging', { cluster })
     await qbert.deleteLogging(cluster)
   },
   updateFn: async (data) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update logging', data)
     return qbert.updateLogging(data)
   },
 })

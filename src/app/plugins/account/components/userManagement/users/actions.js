@@ -17,6 +17,8 @@ import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { isNilOrEmpty } from 'utils/fp'
 import { preferencesStoreKey, preferencesActions } from 'core/session/preferencesReducers'
 import { LoginMethodTypes } from './helpers'
+import Bugsnag from '@bugsnag/js'
+import { trackEvent } from 'utils/tracking'
 
 const { keystone, clemency, setActiveRegion } = ApiClient.getInstance()
 
@@ -142,14 +144,28 @@ export const updateSession = async ({
 }
 
 export const credentialActions = createCRUDActions(ActionDataKeys.ManagementCredentials, {
-  listFn: async () => keystone.getCredentials(),
-  createFn: async (params) => await keystone.addCredential(params),
-  deleteFn: async ({ id }) => await keystone.deleteCredential(id),
+  listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get credentials')
+    return keystone.getCredentials()
+  },
+  createFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to add new credentials')
+    const result = await keystone.addCredential(params)
+    trackEvent('Add New Credentials')
+    return result
+  },
+  deleteFn: async ({ id }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete credential', { id })
+    const result = await keystone.deleteCredential(id)
+    trackEvent('Delete Credentials', { id })
+    return result
+  },
   entityName: 'Credential',
 })
 
 export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get users')
     const [users] = await Promise.all([
       keystone.getUsers(),
       // Make sure the derived data gets loaded as well
@@ -159,11 +175,14 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     return users
   },
   deleteFn: async ({ id }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete user', { userId: id })
     await keystone.deleteUser(id)
     // We must invalidate the tenants cache so that they will not contain the deleted user
     mngmTenantActions.invalidateCache()
+    trackEvent('Delete User', { userId: id })
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new user', { username, displayname })
     const defaultTenantId = pipe(keys, head)(roleAssignments)
     const createdUser = password
       ? await keystone.createUser({
@@ -196,12 +215,14 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     )(null)
     // We must invalidate the tenants cache so that they will contain the newly created user
     mngmTenantActions.invalidateCache()
+    trackEvent('Create New User', { userId: createdUser.id })
     return createdUser
   },
   updateFn: async (
     { id: userId, username, displayname, password, enabled = true, roleAssignments, options },
     prevItems,
   ) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update user', { userId })
     // Perform the api calls to update the user and the tenant/role assignments
     const updatedUser = await keystone.updateUser(userId, {
       username,
@@ -260,6 +281,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
     mngmTenantActions.invalidateCache()
     // Refresh the user/roles cache
     await mngmUserRoleAssignmentsLoader({ userId }, true)
+    trackEvent('Update User', { userId })
     return updatedUser
   },
   entityName: 'User',
@@ -280,7 +302,11 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
 
 export const mngmUserRoleAssignmentsLoader = createContextLoader(
   ActionDataKeys.ManagementUsersRoleAssignments,
-  async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
+  async ({ userId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get user role assignments')
+    const result = (await keystone.getUserRoleAssignments(userId)) || emptyArr
+    return result
+  },
   {
     uniqueIdentifier: ['user.id', 'scope.project.id', 'role.id'],
     indexBy: 'userId',
@@ -288,6 +314,7 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
 )
 
 export const updateUserPassword = async ({ id, email, currentPassword, newPassword }) => {
+  Bugsnag.leaveBreadcrumb('Attempting to update user password', { userId: id })
   try {
     const state = store.getState()
     const currentTenantId = state[preferencesStoreKey][email].root.currentTenant
@@ -297,7 +324,7 @@ export const updateUserPassword = async ({ id, email, currentPassword, newPasswo
       original_password: currentPassword,
     }
     await keystone.updateUserPassword(id, params)
-
+    trackEvent('Update User Password', { userId: id })
     // User must be authenticated again after a password change
     await reauthenticateUser({ email, currentPassword: newPassword, currentTenantId })
   } catch (err) {

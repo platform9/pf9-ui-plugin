@@ -10,6 +10,7 @@ import { makeVirtualMachinesSelector } from './selectors'
 import { trackEvent } from 'utils/tracking'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { vmVolumeTypes, VMVolumeTypes, Volume } from './model'
+import Bugsnag from '@bugsnag/js'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -52,6 +53,11 @@ export const findVolumeSpecPromises = (clusterId, namespace, volumes: Volume[] =
 export const virtualMachineDetailsLoader = createContextLoader(
   DataKeys.VirtualMachineDetails,
   async ({ clusterId, namespace, name }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load virtual machine details', {
+      clusterId,
+      namespace,
+      name,
+    })
     const vm = await qbert.getVirtualMachineDetails(clusterId, namespace, name)
     const disks = vm?.spec?.domain?.devices?.disks || []
     const volumes = vm?.spec?.volumes || []
@@ -71,6 +77,7 @@ export const virtualMachineDetailsLoader = createContextLoader(
 export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
+    Bugsnag.leaveBreadcrumb('Attempting to get VM instances', { clusterId })
     return clusterId === allKey
       ? someAsync(pluck<any, any>('uuid', clusters).map(qbert.getVirtualMachineInstances)).then(
           flatten,
@@ -78,6 +85,7 @@ export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines,
       : qbert.getVirtualMachineInstances(clusterId)
   },
   createFn: async ({ clusterId, namespace, yaml, vmType }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new VM', { clusterId, namespace, yaml, vmType })
     const body = jsYaml.safeLoad(yaml)
     const vm: any = await qbert.createVirtualMachine(clusterId, namespace, body, vmType)
     trackEvent('Create New VM', {
@@ -92,8 +100,10 @@ export const virtualMachineActions = createCRUDActions(DataKeys.VirtualMachines,
   },
   customOperations: {
     powerVm: async ({ clusterId, namespace, name }) => {
+      Bugsnag.leaveBreadcrumb('Attempting to power VM', { clusterId, namespace, name })
       // TODO this is currently disabled, figure out how to use vm and vmi to determine the power on action
       const deleted = await qbert.powerVirtualMachine(clusterId, namespace, name, false)
+      trackEvent('Power VM', { clusterId, namespace, name })
       return deleted
     },
   },

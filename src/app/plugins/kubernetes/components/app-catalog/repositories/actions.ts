@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import store from 'app/store'
@@ -15,6 +16,7 @@ const { dispatch } = store
 export const repositoriesForClusterLoader = createContextLoader(
   DataKeys.RepositoriesForCluster,
   async ({ clusterId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get repositories for cluster', { clusterId })
     if (clusterId !== allKey) {
       const repos: any = await helm.getRepositoriesForCluster(clusterId)
       return repos.map((repo) => ({ ...repo, clusterId }))
@@ -29,6 +31,7 @@ export const repositoriesForClusterLoader = createContextLoader(
 
 export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get all repositories')
     const [repos]: any = await Promise.all([helm.getRepositories(), appActions.list()])
     return repos.map((repo) => {
       const clusterIds = pluck<any, string>('cluster_uuid', repo.clusters)
@@ -39,6 +42,7 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
     })
   },
   createFn: async ({ name, url, username, password }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create repository', { name, url, username, password })
     const body = {
       name,
       url,
@@ -50,7 +54,7 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.Apps }))
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
 
-    trackEvent('Repository Added', {
+    trackEvent('Add Repository', {
       name,
       url,
     })
@@ -64,42 +68,59 @@ export const repositoryActions = createCRUDActions(ActionDataKeys.Repositories, 
       username: username || undefined,
       password: password || undefined,
     }
-    return helm.updateRepositoryCredentials(body)
+    Bugsnag.leaveBreadcrumb('Attempting to update repository', { name, url })
+    const result = await helm.updateRepositoryCredentials(body)
+    trackEvent('Update Repository', { name, url })
+    return result
   },
   deleteFn: async ({ name }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete repository', { name })
+
     await helm.deleteRepository(name)
 
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.Apps }))
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
 
-    trackEvent('Repository Removed', {
+    trackEvent('Remove Repository', {
       name,
     })
   },
   customOperations: {
     updateRepositories: async ({ repositories }, currentItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to update repositories', { repositories })
       const body = repositories.map((repo) => ({ name: repo.name }))
       await helm.updateRepositories(body)
+      trackEvent('Update Repositories', { repositories })
       return currentItems
     },
     addClustersToRepository: async ({ repoName, clusterIds }, currentItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to attach clusters to repository', {
+        repoName,
+        clusterIds,
+      })
       const body = clusterIds.map((id) => ({ cluster_uuid: id }))
       await helm.addClustersToRepository(repoName, body)
 
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.AppsAvailableToCluster }))
 
+      trackEvent('Attach Clusters to Repository', { repoName, clusterIds })
       return currentItems.map((repo) =>
         repo.name === repoName ? { ...repo, clusters: [...repo.clusters, ...clusterIds] } : repo,
       )
     },
     deleteClustersFromRepository: async ({ repoName, clusterIds }, currentItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to delete clusters from repository', {
+        repoName,
+        clusterIds,
+      })
       const body = clusterIds.map((id) => ({ cluster_uuid: id }))
       await helm.deleteClustersFromRepository(repoName, body)
 
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.RepositoriesForCluster }))
       dispatch(cacheActions.clearCache({ cacheKey: DataKeys.AppsAvailableToCluster }))
 
+      trackEvent('Detach Clusters From Repository', { repoName, clusterIds })
       return currentItems.map((repo) => {
         if (repo.name !== repoName) {
           return repo

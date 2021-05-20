@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
@@ -14,6 +15,7 @@ import {
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { flatten, pluck, propEq, uniq } from 'ramda'
 import { someAsync } from 'utils/async'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -37,6 +39,7 @@ const rbacApiGroupsToRules = (apiGroups) => {
 const loadCoreApiResources = createContextLoader(
   ActionDataKeys.CoreApiResources,
   async ({ clusterId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load core API resources', { clusterId })
     const response = await qbert.getCoreApiResourcesList(clusterId)
     return response.resources
   },
@@ -49,6 +52,7 @@ const loadCoreApiResources = createContextLoader(
 const loadApiResources = createContextLoader(
   ActionDataKeys.ApiResources,
   async ({ clusterId, apiGroup }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load API resources', { clusterId, apiGroup })
     try {
       const response = await qbert.getApiResourcesList({ clusterId, apiGroup })
       return response.resources
@@ -66,6 +70,7 @@ const loadApiResources = createContextLoader(
 export const apiGroupsLoader = createContextLoader(
   ActionDataKeys.ApiGroups,
   async ({ clusterId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load API groups', { clusterId })
     const response = await qbert.getApiGroupList(clusterId)
     const apiGroups = response.groups
     const groupVersions = uniq(apiGroups.map((apiGroup) => apiGroup.preferredVersion.groupVersion))
@@ -90,6 +95,7 @@ export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
     // const { clusterId } = params
     // const clusters = await clusterActions.list({ healthyClusters: true })
     const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
+    Bugsnag.leaveBreadcrumb('Attempting to get kube roles', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterRoles)).then(flatten)
     }
@@ -106,6 +112,8 @@ export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
       },
       rules,
     }
+    Bugsnag.leaveBreadcrumb('Attempting to create kube role', body)
+    trackEvent('Create Kube Role', body)
     return qbert.createClusterRole(data.clusterId, data.namespace, body)
   },
   updateFn: async (data) => {
@@ -118,9 +126,12 @@ export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
       },
       rules,
     }
+    Bugsnag.leaveBreadcrumb('Attempting to update kube role', body)
+    trackEvent('Update Kube Role', body)
     return qbert.updateClusterRole(data.clusterId, data.namespace, data.name, body)
   },
   deleteFn: async ({ id }, currentItems) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete kube role', { id })
     const { qbert } = ApiClient.getInstance()
     const item = currentItems.find(propEq('id', id))
     if (!item) {
@@ -128,6 +139,7 @@ export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
     }
     const { clusterId, namespace, name } = item
     await qbert.deleteClusterRole(clusterId, namespace, name)
+    trackEvent('Delete Kube Role', { id })
   },
   uniqueIdentifier,
   entityName: 'Role',
@@ -140,12 +152,17 @@ export const clusterRoleActions = createCRUDActions(ActionDataKeys.ClusterRoles,
     // const { clusterId } = params
     // const clusters = await clusterActions.list({ healthyClusters: true })
     const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster roles', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoles)).then(flatten)
     }
     return qbert.getClusterClusterRoles(clusterId)
   },
   createFn: async (data) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create cluster role', {
+      clusterId: data.clusterId,
+      name: data.name,
+    })
     const rules = rbacApiGroupsToRules(data.rbac)
     const body = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
@@ -155,9 +172,14 @@ export const clusterRoleActions = createCRUDActions(ActionDataKeys.ClusterRoles,
       },
       rules,
     }
+    trackEvent('Create Cluster Role', { clusterId: data.clusterId, name: data.name })
     return qbert.createClusterClusterRole(data.clusterId, body)
   },
   updateFn: async (data) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update cluster role', {
+      clusterId: data.clusterId,
+      name: data.name,
+    })
     const rules = rbacApiGroupsToRules(data.rbac)
     const body = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
@@ -167,6 +189,7 @@ export const clusterRoleActions = createCRUDActions(ActionDataKeys.ClusterRoles,
       },
       rules,
     }
+    trackEvent('Update Cluster Role', { clusterId: data.clusterId, name: data.name })
     return qbert.updateClusterClusterRole(data.clusterId, data.name, body)
   },
   deleteFn: async ({ id }, currentItems) => {
@@ -176,6 +199,8 @@ export const clusterRoleActions = createCRUDActions(ActionDataKeys.ClusterRoles,
       throw new Error(`Unable to find cluster role with id: ${id}`)
     }
     const { clusterId, name } = item
+    Bugsnag.leaveBreadcrumb('Attempting to delete cluster role', { id, clusterId, name })
+    trackEvent('Delete Cluster Role', { id, clusterId, name })
     await qbert.deleteClusterClusterRole(clusterId, name)
   },
   uniqueIdentifier,
@@ -189,12 +214,15 @@ export const roleBindingActions = createCRUDActions(ActionDataKeys.RoleBindings,
     // const { clusterId } = params
     // const clusters = await clusterActions.list({ healthyClusters: true })
     const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
+    Bugsnag.leaveBreadcrumb('Attempting to get role bindings', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterRoleBindings)).then(flatten)
     }
     return qbert.getClusterRoleBindings(clusterId)
   },
   createFn: async (data) => {
+    const { clusterId, namespace, name } = data
+    Bugsnag.leaveBreadcrumb('Attempting to create role binding', { clusterId, namespace, name })
     const users = data.users.map((user) => ({
       kind: 'User',
       name: user,
@@ -224,10 +252,12 @@ export const roleBindingActions = createCRUDActions(ActionDataKeys.RoleBindings,
         apiGroup: 'rbac.authorization.k8s.io',
       },
     }
-
+    trackEvent('Create Role Binding', { clusterId, namespace, name })
     return qbert.createClusterRoleBinding(data.clusterId, data.namespace, body)
   },
   updateFn: async (data) => {
+    const { clusterId, namespace, name } = data
+    Bugsnag.leaveBreadcrumb('Attempting to update role binding', { clusterId, namespace, name })
     const users = data.users.map((user) => ({
       kind: 'User',
       name: user,
@@ -250,6 +280,7 @@ export const roleBindingActions = createCRUDActions(ActionDataKeys.RoleBindings,
       subjects,
       roleRef: data.roleRef,
     }
+    trackEvent('Update Role Binding', { clusterId, namespace, name })
     return qbert.updateClusterRoleBinding(data.clusterId, data.namespace, data.name, body)
   },
   deleteFn: async ({ id }, currentItems) => {
@@ -259,7 +290,9 @@ export const roleBindingActions = createCRUDActions(ActionDataKeys.RoleBindings,
       throw new Error(`Unable to find role binding with id: ${id}`)
     }
     const { clusterId, namespace, name } = item
+    Bugsnag.leaveBreadcrumb('Attempting to delete role binding', { clusterId, namespace, name, id })
     await qbert.deleteClusterRoleBinding(clusterId, namespace, name)
+    trackEvent('Delete Role Binding', { clusterId, namespace, name, id })
   },
   uniqueIdentifier,
   entityName: 'Role Binding',
@@ -272,6 +305,7 @@ export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.Cluste
     // const { clusterId } = params
     // const clusters = await clusterActions.list({ healthyClusters: true })
     const [clusterId, clusters] = await parseClusterParams({ ...params, healthyClusters: true })
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster role bindings', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoleBindings)).then(
         flatten,
@@ -280,6 +314,8 @@ export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.Cluste
     return qbert.getClusterClusterRoleBindings(clusterId)
   },
   createFn: async (data) => {
+    const { clusterId, name } = data
+    Bugsnag.leaveBreadcrumb('Attempting to create cluster role binding', { clusterId, name })
     const users = data.users.map((user) => ({
       kind: 'User',
       name: user,
@@ -308,10 +344,12 @@ export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.Cluste
         apiGroup: 'rbac.authorization.k8s.io',
       },
     }
-
+    trackEvent('Create Cluster Role Binding', { clusterId, name })
     return qbert.createClusterClusterRoleBinding(data.clusterId, body)
   },
   updateFn: async (data) => {
+    const { clusterId, name } = data
+    Bugsnag.leaveBreadcrumb('Attempting to update cluster role binding', { clusterId, name })
     const users = data.users.map((user) => ({
       kind: 'User',
       name: user,
@@ -334,9 +372,11 @@ export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.Cluste
       subjects,
       roleRef: data.roleRef,
     }
+    trackEvent('Update Cluster Role Binding', { clusterId, name })
     return qbert.updateClusterClusterRoleBinding(data.clusterId, data.name, body)
   },
   deleteFn: async ({ id }, currentItems) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete cluster role binding', { id })
     const { qbert } = ApiClient.getInstance()
     const item = currentItems.find(propEq('id', id))
     if (!item) {
@@ -344,6 +384,7 @@ export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.Cluste
     }
     const { clusterId, name } = item
     await qbert.deleteClusterClusterRoleBinding(clusterId, name)
+    trackEvent('Delete Cluster Role Binding', { id })
   },
   uniqueIdentifier,
   entityName: 'Cluster Role Binding',

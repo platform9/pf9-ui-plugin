@@ -21,7 +21,7 @@ import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import { sessionStoreKey, sessionActions, SessionState } from 'core/session/sessionReducers'
 import { cacheActions } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
-import { prop, propEq, head } from 'ramda'
+import { prop, propEq, head, pathOr } from 'ramda'
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
@@ -41,6 +41,9 @@ import { updateClarityStore } from 'utils/clarityHelper'
 import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 import Theme from 'core/themes/model'
+import { Route as Routes } from 'core/utils/routes'
+import Bugsnag from '@bugsnag/js'
+import { version } from '../../../../package.json'
 
 const { setActiveRegion } = ApiClient.getInstance()
 
@@ -143,7 +146,12 @@ const AppContainer = () => {
 
   useEffect(() => {
     const unlisten = history.listen((location) => {
-      trackPage(`${location.pathname}${location.hash}`)
+      const url = `${location.pathname}${location.hash}`
+      trackPage(url)
+      const route = Routes.find(url)
+      if (route) {
+        Bugsnag.leaveBreadcrumb(route.name)
+      }
       if (features?.experimental?.sandbox) {
         appCuesSetAnonymous()
       }
@@ -169,6 +177,18 @@ const AppContainer = () => {
       const sandboxFlag = pathStrOr(false, 'data.experimental.sandbox', initialFeatures)
       const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', initialFeatures)
       const airgapped = pathStrOr(false, 'data.experimental.airgapped', initialFeatures)
+      const duVersion = pathOr(
+        null,
+        ['data', 'versioning', 'packages', 'pf9-du.x86_64'],
+        initialFeatures,
+      )
+
+      Bugsnag.addMetadata('Info', {
+        customerTier,
+        appVersion: process.env.VERSION,
+        packageVersion: version,
+        duVersion,
+      })
 
       // Segment tracking
       if (!analyticsOff && !airgapped) {

@@ -19,6 +19,7 @@ import Input from 'core/elements/input'
 import Button from 'core/elements/button'
 import { LoginMethodTypes } from 'app/plugins/account/components/userManagement/users/helpers'
 import { authenticateUser } from 'app/plugins/account/components/userManagement/users/actions'
+import Bugsnag from '@bugsnag/js'
 
 const styles = (theme) => ({
   page: {
@@ -192,6 +193,13 @@ class LoginPage extends React.PureComponent<Props> {
     const { onAuthSuccess } = this.props
     const { username: loginUsername, password, loginMethod, MFAcheckbox, mfa } = this.state
     this.setState({ loginFailed: false, loading: true })
+    Bugsnag.leaveBreadcrumb('Attempting PF9 Sign In', {
+      loginUsername,
+      password,
+      loginMethod,
+      MFAcheckbox,
+      mfa,
+    })
 
     const { username, unscopedToken, expiresAt, issuedAt, isSsoToken } = await authenticateUser({
       loginUsername,

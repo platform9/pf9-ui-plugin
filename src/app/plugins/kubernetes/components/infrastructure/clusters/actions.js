@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import store from 'app/store'
@@ -30,9 +31,11 @@ const { appbert, qbert } = ApiClient.getInstance()
 
 export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster tags')
     return appbert.getClusterTags()
   },
   updateFn: async ({ clusterId, pkg, on }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to toggle addon', { clusterId, pkg, on })
     return appbert.toggleAddon(clusterId, pkg, on)
   },
   uniqueIdentifier: 'uuid',
@@ -40,6 +43,7 @@ export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
 
 const getCsiDrivers = async (clusterUiid) => {
   try {
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster csi drivers')
     return await qbert.getClusterCsiDrivers(clusterUiid)
   } catch (e) {
     console.warn(e)
@@ -49,6 +53,7 @@ const getCsiDrivers = async (clusterUiid) => {
 
 export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get clusters')
     // update to use allSettled as appbert sometimes is in a failed state.
     const [settledClusters] = await Promise.allSettled([
       qbert.getClusters(),
@@ -77,6 +82,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     }, settledClusters.value)
   },
   createFn: (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create cluster')
     if (params.clusterType === 'aws') {
       return createAwsCluster(params)
     }
@@ -95,6 +101,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
     }
 
+    Bugsnag.leaveBreadcrumb('Attempting to update cluster', { clusterId: uuid, ...body })
     await qbert.updateCluster(uuid, body)
     trackEvent('Update Cluster', { uuid })
 
@@ -105,7 +112,9 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     return body
   },
   deleteFn: async ({ uuid }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete cluster', { clusterId: uuid })
     await qbert.deleteCluster(uuid)
+    trackEvent('Delete Cluster', { uuid })
     // Delete cluster Segment tracking is done in ClusterDeleteDialog.tsx because that code
     // has more context about the cluster name, etc.
 
@@ -121,6 +130,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         spotPrice: spotPrice || 0.001,
         spotWorkerFlavor: cluster.cloudProperties.workerFlavor,
       }
+      Bugsnag.leaveBreadcrumb('Attempting to scale cluster', { clusterId: cluster.uuid, ...body })
       await qbert.updateCluster(cluster.uuid, body)
       trackEvent('Scale Cluster', { clusterUuid: cluster.uuid, numSpotWorkers, numWorkers })
 
@@ -135,6 +145,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       )
     },
     upgradeCluster: async ({ cluster, upgradeType }, prevItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster', { clusterId: cluster.uuid })
       await qbert.upgradeCluster(cluster.uuid, upgradeType)
       trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
 
@@ -147,9 +158,9 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       const body = {
         tags: { ...(cluster.tags || {}), [key]: val },
       }
-
+      Bugsnag.leaveBreadcrumb('Attempting to update cluster tag', { clusterId: cluster.uuid, body })
       await qbert.updateCluster(cluster.uuid, body)
-
+      trackEvent('Cluster Tag Update', { clusterId: cluster.uuid })
       return updateWith(
         propEq('uuid', cluster.uuid),
         {
@@ -160,6 +171,10 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       )
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to attach nodes to cluster', {
+        clusterId: cluster.uuid,
+        numNodes: (nodes || []).length,
+      })
       await qbert.attach(cluster.uuid, nodes)
       trackEvent('Cluster Attach Nodes', {
         numNodes: (nodes || []).length,
@@ -169,6 +184,10 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       return prevItems
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to detach nodes from cluster', {
+        clusterId: cluster.uuid,
+        numNodes: (nodes || []).length,
+      })
       await qbert.detach(cluster.uuid, nodes)
       trackEvent('Cluster Detach Nodes', {
         numNodes: (nodes || []).length,

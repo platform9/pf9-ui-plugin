@@ -1,7 +1,9 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { intersection } from 'ramda'
+import { trackEvent } from 'utils/tracking'
 import { clusterTagActions } from '../clusters/actions'
 import { importedClustersSelector, makeParamsImportedClustersSelector } from './selectors'
 
@@ -10,11 +12,13 @@ const acceptedApiVersions = ['v1alpha2']
 const { qbert } = ApiClient.getInstance()
 
 export const getImportedClusters = async () => {
+  Bugsnag.leaveBreadcrumb('Attempting to get imported clusters')
   await qbert.getImportedClusters()
 }
 
 export const importedClusterActions = createCRUDActions(ActionDataKeys.ImportedClusters, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get imported clusters')
     try {
       const rawSunpikeApis = await qbert.getSunpikeApis()
       const sunpikeApis = rawSunpikeApis.versions?.map((version) => version.version)
@@ -37,7 +41,9 @@ export const importedClusterActions = createCRUDActions(ActionDataKeys.ImportedC
     return settledClusters.value
   },
   deleteFn: async ({ uuid }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to deregister imported cluster', { clusterId: uuid })
     await qbert.deregisterExternalCluster(uuid)
+    trackEvent('Deregister Imported Cluster', { clusterId: uuid })
   },
   uniqueIdentifier: 'uuid',
   selector: importedClustersSelector,

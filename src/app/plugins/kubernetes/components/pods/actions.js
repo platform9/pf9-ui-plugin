@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -16,11 +17,13 @@ const { qbert } = ApiClient.getInstance()
 export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
+    Bugsnag.leaveBreadcrumb('Attempting to get pods', { clusterId })
     return clusterId === allKey
       ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
       : qbert.getClusterPods(clusterId)
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new pod', { clusterId, namespace, yaml })
     const body = jsYaml.safeLoad(yaml)
     const pod = await qbert.createPod(clusterId, namespace, body)
     trackEvent('Create New Pod', {
@@ -32,6 +35,7 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
+    Bugsnag.leaveBreadcrumb('Attempting to delete pod', { id, clusterId, namespace, name })
     const result = await qbert.deletePod(clusterId, namespace, name)
     trackEvent('Delete Pod', { clusterId, namespace, name, id })
     return result
@@ -44,12 +48,18 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
 export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster deployments', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterDeployments)).then(flatten)
     }
     return qbert.getClusterDeployments(clusterId)
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new cluster deployment', {
+      clusterId,
+      namespace,
+      yaml,
+    })
     const body = jsYaml.safeLoad(yaml)
     // Also need to refresh the list of pods
     podActions.invalidateCache()
@@ -63,6 +73,12 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
     return created
   },
   deleteFn: async ({ clusterId, namespace, name, id }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete cluster deployment', {
+      clusterId,
+      namespace,
+      name,
+      id,
+    })
     const result = await qbert.deleteDeployment(clusterId, namespace, name)
     trackEvent('Delete Deployment', { clusterId, namespace, name, id })
     return result
@@ -75,12 +91,18 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
 export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster services', { clusterId })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterKubeServices)).then(flatten)
     }
     return qbert.getClusterKubeServices(clusterId)
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new cluster service', {
+      clusterId,
+      namespace,
+      yaml,
+    })
     const body = jsYaml.safeLoad(yaml)
     const created = await qbert.createService(clusterId, namespace, body)
     trackEvent('Create New Service', {
@@ -100,6 +122,12 @@ export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
+    Bugsnag.leaveBreadcrumb('Attempting to delete cluster service', {
+      id,
+      clusterId,
+      namespace,
+      name,
+    })
     const result = await qbert.deleteService(clusterId, namespace, name)
     trackEvent('Delete Service', { clusterId, namespace, name, id })
     return result

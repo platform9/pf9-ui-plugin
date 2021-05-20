@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import { makeFilteredTenantsSelector } from 'account/components/userManagement/tenants/selectors'
 import { mngmUserActions } from 'account/components/userManagement/users/actions'
 import ApiClient from 'api-client/ApiClient'
@@ -8,11 +9,13 @@ import DataKeys from 'k8s/DataKeys'
 import { always, find, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
+import { trackEvent } from 'utils/tracking'
 
 const { keystone } = ApiClient.getInstance()
 
 export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get all tenants and all users')
     const [allTenantsAllUsers] = await Promise.all([
       keystone.getAllTenantsAllUsers(),
       // Make sure the derived data gets loaded as well
@@ -21,9 +24,12 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
     return allTenantsAllUsers
   },
   deleteFn: async ({ id }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete tenant', { tenantId: id })
     await keystone.deleteProject(id)
+    trackEvent('Delete Tenant', { tenantId: id })
   },
   createFn: async ({ name, description, roleAssignments }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new tenant', { name, description })
     const createdTenant = await keystone.createProject({
       name,
       description,
@@ -31,6 +37,7 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
       domain_id: 'default',
       is_domain: false,
     })
+    trackEvent('Create New Tenant', { name, description })
     const users = await mngmUserActions.list()
     await tryCatchAsync(
       () =>
@@ -51,6 +58,7 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
     }
   },
   updateFn: async ({ id: tenantId, name, description, roleAssignments }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update tenant', { tenantId, name, description })
     const prevRoleAssignmentsArr = await mngmTenantRoleAssignmentsLoader({
       tenantId,
     })
@@ -108,6 +116,7 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
     ])
 
     const userKeys = Object.keys(roleAssignments)
+    trackEvent('Update Tenant', { tenantId })
     return {
       ...updatedTenant,
       users: users.filter((user) => userKeys.includes(user.id)),
@@ -133,7 +142,11 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
 
 export const mngmTenantRoleAssignmentsLoader = createContextLoader(
   DataKeys.ManagementTenantsRoleAssignments,
-  async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId)) || emptyArr,
+  async ({ tenantId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get tenant role assignments')
+    const result = await keystone.getTenantRoleAssignments(tenantId)
+    return result || emptyArr
+  },
   {
     uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],
     indexBy: 'tenantId',

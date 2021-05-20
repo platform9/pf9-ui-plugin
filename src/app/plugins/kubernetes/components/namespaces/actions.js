@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -15,6 +16,7 @@ export const namespacesCacheKey = 'namespaces'
 
 const namespaceActions = createCRUDActions(DataKeys.Namespaces, {
   listFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get namespaces')
     const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterNamespaces)).then(flatten)
@@ -22,6 +24,7 @@ const namespaceActions = createCRUDActions(DataKeys.Namespaces, {
     return qbert.getClusterNamespaces(clusterId)
   },
   createFn: async ({ clusterId, name }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new namespace', { clusterId, name })
     const body = { metadata: { name } }
     const created = await qbert.createNamespace(clusterId, body)
     trackEvent('WZ Create New Namespace', {
@@ -37,6 +40,7 @@ const namespaceActions = createCRUDActions(DataKeys.Namespaces, {
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, name } = currentItems.find((ns) => ns.id === id)
+    Bugsnag.leaveBreadcrumb('Attempting to delete namespace', { id, clusterId, name })
     const response = await qbert.deleteNamespace(clusterId, name)
     trackEvent('WZ Delete Namespace', {
       id,

@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
 import { ClusterTag } from 'api-client/appbert.model'
@@ -48,6 +49,10 @@ const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
   }, [])
 
   const toggleMonitoring = useCallback(async () => {
+    Bugsnag.leaveBreadcrumb(
+      `Attempting to toggle monitoring ${enabled ? 'off' : 'on'} for imported cluster`,
+      { clusterId: cluster.uuid },
+    )
     try {
       const pkgs: any = await appbert.getPackages()
       const monPkg = pkgs.find((pkg) => pkg.name === 'pf9-mon')
