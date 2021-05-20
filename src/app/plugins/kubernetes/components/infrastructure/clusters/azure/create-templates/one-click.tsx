@@ -28,7 +28,7 @@ export const initialContext = {
   enableCAS: false,
   runtimeConfigOption: 'default',
   useAllAvailabilityZones: true,
-  assignPublicIps: false,
+  assignPublicIps: true,
   masterSku: 'Standard_B4MS',
   workerSku: 'Standard_B4MS',
   ami: 'ubuntu',
