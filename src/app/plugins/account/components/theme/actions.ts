@@ -2,7 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import { preferencesActions } from 'core/session/preferencesReducers'
 import { themeActions } from 'core/session/themeReducers'
 import { AppPlugins, GlobalPreferences } from 'app/constants'
-import { componentUpdaterObject } from 'core/themes/helpers'
+import { componentUpdaterObject } from 'account/components/theme/helpers'
 
 const { preferenceStore } = ApiClient.getInstance()
 

@@ -1,6 +1,5 @@
 import { assocPath, path } from 'ramda'
 import Theme, { Components } from './model'
-import defaultTheme from 'core/themes/relianceLight'
 
 interface IColor {
   '000'?: string
@@ -558,11 +557,4 @@ export interface TextBase {
   letterSpacing: string
   fontStretch?: string
   fontStyle?: string
-}
-
-export const componentUpdaterObject = (path, value) => {
-  return {
-    pathTo: path,
-    value: value || path(['components', ...path], defaultTheme),
-  }
 }
