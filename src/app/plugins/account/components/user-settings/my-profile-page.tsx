@@ -1,21 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { makeStyles, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
 import Theme from 'core/themes/model'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import Text from 'core/elements/text'
-import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { sessionActions, SessionState, sessionStoreKey } from 'core/session/sessionReducers'
-import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { prop } from 'ramda'
-import { mngmUserActions, mngmUserRoleAssignmentsLoader } from '../userManagement/users/actions'
+import { mngmUserActions, updateUserPassword } from '../userManagement/users/actions'
 import UserPasswordField from '../userManagement/users/UserPasswordField'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Avatar from 'core/components/Avatar'
-import { pathStr } from 'utils/fp'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import ApiClient from 'api-client/ApiClient'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,6 +19,8 @@ import Progress from 'core/components/progress/Progress'
 import { RootState } from 'app/store'
 import { emailValidator } from 'core/utils/fieldValidators'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import TenantsAndRoleAccessTable from './tenants-and-role-access-table'
+import { isAdminRole } from 'k8s/util/helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   userProfile: {
@@ -55,55 +53,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   confirmPasswordField: {
     gridColumn: '2',
   },
-  tableHeader: {
-    color: theme.palette.grey[500],
-  },
-  table: {
-    width: 'inherit',
-    margin: theme.spacing(0, 1, 2, 1),
-    '& th.MuiTableCell-head': {
-      borderBottom: `1px solid ${theme.palette.grey['700']}`,
-    },
-  },
 }))
 
 const { setActiveRegion } = ApiClient.getInstance()
-
-const TenantsTable = ({ data }) => {
-  const classes = useStyles()
-  return (
-    <Table className={classes.table} size="small" aria-label="simple table">
-      <TableHead>
-        <TableRow>
-          <TableCell>
-            <Text className={classes.tableHeader} variant="caption2">
-              Tenant Name
-            </Text>
-          </TableCell>
-          <TableCell>
-            <Text className={classes.tableHeader} variant="caption2">
-              Tenant Description
-            </Text>
-          </TableCell>
-          <TableCell>
-            <Text className={classes.tableHeader} variant="caption2">
-              Role
-            </Text>
-          </TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {data.map((tenant) => (
-          <TableRow key={tenant.id}>
-            <TableCell>{tenant.name}</TableCell>
-            <TableCell>{tenant.description}</TableCell>
-            <TableCell>{tenant.roleName}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-}
 
 const MyProfilePage = () => {
   const classes = useStyles()
@@ -113,46 +65,26 @@ const MyProfilePage = () => {
   const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
   const [userUpdated, setUserUpdated] = useState(false)
   const userIdFormFieldSetter = useRef(null)
+  const [updatingPassword, setUpdatingPassword] = useState(false)
 
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { userDetails } = session
   const { id: userId, displayName, email } = userDetails
+  const isAdmin = useMemo(() => isAdminRole(session), [session])
 
-  const [userTenants, loadingUserTenants] = useDataLoader(loadUserTenants)
-  const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
-    userId,
-  })
   const [update, updatingUser] = useDataUpdater(mngmUserActions.update)
+
   const userInfo = useMemo(
     () => ({
       id: userId,
       username: email,
       displayname: displayName || '',
       email,
-      roleAssignments: roleAssignments.reduce(
-        (acc, roleAssignment) => ({
-          ...acc,
-          [pathStr('scope.project.id', roleAssignment)]: pathStr('role.id', roleAssignment),
-        }),
-        {},
-      ),
     }),
-    [displayName, email, roleAssignments],
+    [displayName, email],
   )
-  const tenantsAndRoles = useMemo(
-    () =>
-      userTenants.map((tenant) => {
-        const userRoleAssignments = roleAssignments.find(
-          (roleAssignment) => tenant.id === pathStr('scope.project.id', roleAssignment),
-        )
-        return {
-          ...tenant,
-          roleName: pathStr('role.name', userRoleAssignments),
-        }
-      }),
-    [userTenants, roleAssignments],
-  )
-  const loadingSomething = loadingUserTenants || loadingRoleAssignments || updatingUser
+
+  const loadingSomething = updatingUser || updatingPassword
 
   useEffect(() => {
     // Reset the initial values for the user ID form with the new updated values
@@ -210,21 +142,20 @@ const MyProfilePage = () => {
       setErrorMessage('New passwords do not match.')
       return
     }
-
-    const user = {
-      ...userInfo,
-      password: newPassword,
-    }
-
     setErrorMessage('')
-    await update(user)
+    setUpdatingPassword(true)
+    const success = await updateUserPassword({ id: userId, email, currentPassword, newPassword })
+    setUpdatingPassword(false)
+    if (!success) {
+      setErrorMessage('Unable to update password. Current password may be incorrect')
+    }
   }
 
   return (
     <div className={classes.userProfile}>
       <DocumentMeta title="User Settings" bodyClasses={['form-view']} />
       <Progress
-        message={updatingUser ? 'Updating user ...' : 'Loading user ...'}
+        message={updatingUser || updatingPassword ? 'Updating user ...' : 'Loading user ...'}
         loading={loadingSomething}
       >
         <ValidatedForm
@@ -244,9 +175,15 @@ const MyProfilePage = () => {
                   id="email"
                   label="Email"
                   validations={[emailValidator]}
+                  disabled={!isAdmin}
                 />
-                <TextField className={classes.inputField} id="displayname" label="Display Name" />
-                <SubmitButton className={classes.button}>Update</SubmitButton>
+                <TextField
+                  className={classes.inputField}
+                  id="displayname"
+                  label="Display Name"
+                  disabled={!isAdmin}
+                />
+                {isAdmin && <SubmitButton className={classes.button}>Update</SubmitButton>}
               </div>
             </div>
           </FormFieldCard>
@@ -259,6 +196,12 @@ const MyProfilePage = () => {
           {({ values }) => (
             <FormFieldCard title="Password">
               <div className={classes.passwordForm}>
+                <UserPasswordField
+                  id="currentPassword"
+                  label="Current Password"
+                  value={values.currentPassword}
+                  showPasswordRequirements={false}
+                />
                 <UserPasswordField
                   id="newPassword"
                   label="New Password"
@@ -276,9 +219,11 @@ const MyProfilePage = () => {
             </FormFieldCard>
           )}
         </ValidatedForm>
-        <FormFieldCard className={classes.form} title="Tenants & Role Access">
-          <TenantsTable data={tenantsAndRoles} />
-        </FormFieldCard>
+        {isAdmin && (
+          <FormFieldCard className={classes.form} title="Tenants & Role Access">
+            <TenantsAndRoleAccessTable userId={userId} />
+          </FormFieldCard>
+        )}
       </Progress>
     </div>
   )

@@ -45,7 +45,7 @@ const NetworkBackendField = ({
     info={
       wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
     }
-    disabled={wizardContext.networkStack !== NetworkStackTypes.IPv4}
+    disabled={wizardContext.deployKubevirt || wizardContext.networkStack !== NetworkStackTypes.IPv4}
     required
   />
 )
