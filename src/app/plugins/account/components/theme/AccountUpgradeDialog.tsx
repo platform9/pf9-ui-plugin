@@ -24,9 +24,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   onClose: () => void
+  feature: string
 }
 
-const AccountUpgradeDialog = ({ onClose }: Props) => {
+const AccountUpgradeDialog = ({ onClose, feature }: Props) => {
   const classes = useStyles({})
 
   return (
@@ -36,9 +37,7 @@ const AccountUpgradeDialog = ({ onClose }: Props) => {
           <Text variant="body1">Upgrade your account</Text>
         </div>
         <div className={classes.dialogContent}>
-          <Text variant="body2">
-            Custom Theme is only available to enterprise users of Platform9.
-          </Text>
+          <Text variant="body2">{feature} is only available to enterprise users of Platform9.</Text>
           <Text variant="body2">
             Upgrade your account now to access this feature and other great features including
             tailored support with a designated account and customer success team.

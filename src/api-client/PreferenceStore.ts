@@ -27,11 +27,8 @@ class PreferenceStore extends ApiService {
 
   updateGlobalPreference = async (key, value) => {
     const jsonString = JSON.stringify(value)
-    // Convert all double quotes to single quotes to
-    // accommodate backend
-    const convertedString = jsonString.replace(/"/g, "'")
     const body = {
-      value: convertedString,
+      value: jsonString,
     }
     return this.client.basicPut({
       url: `${this.baseUrl}/global/${key}`,

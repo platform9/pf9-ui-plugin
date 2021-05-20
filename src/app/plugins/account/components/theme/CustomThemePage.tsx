@@ -265,7 +265,9 @@ const CustomThemePage = () => {
   return (
     <div>
       <DocumentMeta title="Custom Theme" bodyClasses={['form-view']} />
-      {dialogOpened && <AccountUpgradeDialog onClose={() => setDialogOpened(false)} />}
+      {dialogOpened && (
+        <AccountUpgradeDialog feature="Custom Theme" onClose={() => setDialogOpened(false)} />
+      )}
       <Progress loading={loading}>
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}

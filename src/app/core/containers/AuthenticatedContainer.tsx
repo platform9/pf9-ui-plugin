@@ -8,6 +8,7 @@ import {
   clarityDashboardUrl,
   CustomerTiers,
   dashboardUrl,
+  GlobalPreferences,
   helpUrl,
   ironicWizardUrl,
   logoutUrl,
@@ -48,6 +49,7 @@ import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendes
 import { themeActions } from 'core/session/themeReducers'
 import { ThemeConfig } from 'account/components/theme/model'
 import { preferencesActions } from 'core/session/preferencesReducers'
+import { componentUpdaterObject } from 'core/themes/helpers'
 
 const toPairs: any = ToPairs
 
@@ -306,8 +308,9 @@ const loadRegionFeatures = async (setRegionFeatures, setStacks, dispatch, histor
 
 const loadCustomTheme = async (dispatch) => {
   try {
-    const response = await preferenceStore.getGlobalPreference('theme')
-    const customTheme: ThemeConfig = JSON.parse(response.value.replace(/'/g, '"'))
+    const response = await preferenceStore.getGlobalPreference(GlobalPreferences.Theme)
+    const customTheme: ThemeConfig = JSON.parse(response.value)
+
     dispatch(
       preferencesActions.updateLogo({
         logoUrl: customTheme.logoUrl,
@@ -316,23 +319,23 @@ const loadCustomTheme = async (dispatch) => {
     dispatch(
       themeActions.updateThemeComponent({
         components: [
-          { pathTo: ['header', 'background'], value: customTheme.headerColor },
-          {
-            pathTo: ['sidebar', AppPlugins.MyAccount, 'background'],
-            value: customTheme.sidenavColor,
-          },
-          {
-            pathTo: ['sidebar', AppPlugins.Kubernetes, 'background'],
-            value: customTheme.sidenavColor,
-          },
-          {
-            pathTo: ['sidebar', AppPlugins.OpenStack, 'background'],
-            value: customTheme.sidenavColor,
-          },
-          {
-            pathTo: ['sidebar', AppPlugins.BareMetal, 'background'],
-            value: customTheme.sidenavColor,
-          },
+          componentUpdaterObject(['header', 'background'], customTheme.headerColor),
+          componentUpdaterObject(
+            ['sidebar', AppPlugins.MyAccount, 'background'],
+            customTheme.sidenavColor,
+          ),
+          componentUpdaterObject(
+            ['sidebar', AppPlugins.Kubernetes, 'background'],
+            customTheme.sidenavColor,
+          ),
+          componentUpdaterObject(
+            ['sidebar', AppPlugins.OpenStack, 'background'],
+            customTheme.sidenavColor,
+          ),
+          componentUpdaterObject(
+            ['sidebar', AppPlugins.BareMetal, 'background'],
+            customTheme.sidenavColor,
+          ),
         ],
       }),
     )

@@ -1,14 +1,15 @@
 import ApiClient from 'api-client/ApiClient'
 import { preferencesActions } from 'core/session/preferencesReducers'
 import { themeActions } from 'core/session/themeReducers'
-import { AppPlugins } from 'app/constants'
+import { AppPlugins, GlobalPreferences } from 'app/constants'
+import { componentUpdaterObject } from 'core/themes/helpers'
 
 const { preferenceStore } = ApiClient.getInstance()
 
 export const getThemeConfig = async () => {
-  const response = await preferenceStore.getGlobalPreference('theme')
+  const response = await preferenceStore.getGlobalPreference(GlobalPreferences.Theme)
   // Need to convert single quotes back to double quotes
-  const config = JSON.parse(response.value.replace(/'/g, '"'))
+  const config = JSON.parse(response.value)
   return config
 }
 
@@ -20,23 +21,11 @@ export const deleteThemeConfig = async () => preferenceStore.deleteGlobalPrefere
 export const updateSessionTheme = (dispatch, settings, theme) => {
   const themeUpdateBody = {
     components: [
-      { pathTo: ['header', 'background'], value: settings.headerHex || theme.palette.grey[900] },
-      {
-        pathTo: ['sidebar', AppPlugins.MyAccount, 'background'],
-        value: settings.sidenavHex || theme.palette.grey[200],
-      },
-      {
-        pathTo: ['sidebar', AppPlugins.Kubernetes, 'background'],
-        value: settings.sidenavHex || theme.palette.grey[800],
-      },
-      {
-        pathTo: ['sidebar', AppPlugins.OpenStack, 'background'],
-        value: settings.sidenavHex || theme.palette.grey[800],
-      },
-      {
-        pathTo: ['sidebar', AppPlugins.BareMetal, 'background'],
-        value: settings.sidenavHex || theme.palette.grey[800],
-      },
+      componentUpdaterObject(['header', 'background'], settings.headerHex),
+      componentUpdaterObject(['sidebar', AppPlugins.MyAccount, 'background'], settings.sidenavHex),
+      componentUpdaterObject(['sidebar', AppPlugins.Kubernetes, 'background'], settings.sidenavHex),
+      componentUpdaterObject(['sidebar', AppPlugins.OpenStack, 'background'], settings.sidenavHex),
+      componentUpdaterObject(['sidebar', AppPlugins.BareMetal, 'background'], settings.sidenavHex),
     ],
   }
   dispatch(
