@@ -50,7 +50,7 @@ const AddNodeStep = ({
       return false
     }
 
-    const selectedNodeUuids = wizardContext[nodeFieldId]
+    const selectedNodeUuids = wizardContext[nodeFieldId] || []
     const hasClockDrift = checkNodesForClockDrift(selectedNodeUuids, allNodes)
     if (hasClockDrift) {
       setErrorMessage(clockDriftErrorMessage)
