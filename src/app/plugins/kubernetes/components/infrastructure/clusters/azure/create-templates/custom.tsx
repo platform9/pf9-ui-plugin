@@ -239,7 +239,10 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 />
 
                 {/* SSH Key */}
-                <SshKeyTextField />
+                <SshKeyTextField
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 {/* Template Chooser */}
                 <ClusterTemplatesField

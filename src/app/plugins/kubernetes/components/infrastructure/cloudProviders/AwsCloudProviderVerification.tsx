@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -52,9 +52,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   smallLink: {
     marginTop: '6px',
   },
-  regionSelection: {
+  selectionArea: {
     display: 'grid',
-    gridTemplateColumns: '60% 40%',
+    gridTemplateColumns: '80% 20%',
   },
   setDefaultButton: {
     alignSelf: 'center',
@@ -129,7 +129,6 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
   const {
     userDetails: { id: userId },
   } = session
-  const [hasRegionDefault, setHasRegionDefault] = useState(false)
 
   const [regions, regionsLoading] = useDataLoader(loadCloudProviderDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
@@ -144,19 +143,33 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
     userId,
     key: UserPreferenceKeys.AwsCloudProviderDefaultRegion,
   })
+  const [[awsDefaultDomain]] = useDataLoader(userPreferenceStoreActions.list, {
+    userId,
+    key: UserPreferenceKeys.AwsRoute53DefaultDomain,
+  })
+  const [[awsSshKey]] = useDataLoader(userPreferenceStoreActions.list, {
+    userId,
+    key: UserPreferenceKeys.AwsDefaultSshKey,
+  })
   const [setUserPreference] = useDataUpdater(userPreferenceStoreActions.create)
 
   useEffect(() => {
     if (defaultRegion) {
-      setHasRegionDefault(true)
+      setWizardContext({ defaultRegion })
     }
-  }, [defaultRegion])
+    if (awsDefaultDomain) {
+      setWizardContext({ defaultRoute53Domain: awsDefaultDomain })
+    }
+    if (awsSshKey) {
+      setWizardContext({ defaultSshKey: awsSshKey })
+    }
+  }, [defaultRegion, awsDefaultDomain, awsSshKey])
 
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
-  const handleSetUserDefault = async (region) => {
-    setHasRegionDefault(true)
+  const handleSetUserDefault = async (key, region) => {
+    setWizardContext({ [key]: region })
     setUserPreference({
       userId,
       key: UserPreferenceKeys.AwsCloudProviderDefaultRegion,
@@ -190,7 +203,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         <Text variant="body2">
           Platform9 deploys Kubernetes clusters into specified AWS Regions.
         </Text>
-        <div className={classes.regionSelection}>
+        <div className={classes.selectionArea}>
           <CloudProviderRegionField
             cloudProviderType={CloudProviders.Aws}
             onChange={(value, label) =>
@@ -203,8 +216,8 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
-            disabled={!wizardContext.region || hasRegionDefault}
-            onClick={() => handleSetUserDefault(wizardContext.region)}
+            disabled={!wizardContext.region}
+            onClick={() => handleSetUserDefault('defaultRegion', wizardContext.region)}
           >
             Set As Default
           </Button>
@@ -232,17 +245,30 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
           Platform9 can utilize Route53 Domains to route traffic to AWS Native Clusters. Route53 is
           optional and not required for EKS.
         </Text>
-        <PicklistField
-          DropdownComponent={ClusterDomainPicklist}
-          id="awsDomain"
-          label="Route 53 Domain"
-          cloudProviderId={wizardContext.cloudProviderId}
-          cloudProviderRegionId={wizardContext.region}
-          disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
-          onChange={(value, label) =>
-            setWizardContext({ awsDomain: value, awsDomainOptionLabel: label })
-          }
-        />
+        <div className={classes.selectionArea}>
+          <PicklistField
+            DropdownComponent={ClusterDomainPicklist}
+            id="awsDomain"
+            label="Route 53 Domain"
+            cloudProviderId={wizardContext.cloudProviderId}
+            cloudProviderRegionId={wizardContext.region}
+            disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
+            onChange={(value, label) =>
+              setWizardContext({ awsDomain: value, awsDomainOptionLabel: label })
+            }
+          />
+          <Button
+            color="primary"
+            variant="light"
+            className={classes.setDefaultButton}
+            disabled={!wizardContext.awsDomain}
+            onClick={() =>
+              handleSetUserDefault('defaultRoute53Domain', wizardContext.awsDomainOptionLabel)
+            }
+          >
+            Set As Default
+          </Button>
+        </div>
         {wizardContext.region && !loading && !domains.length && (
           <Info>
             <div>No registered Route53 Domains have been detected.</div>
@@ -275,12 +301,23 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
           When building AWS Native Clusters, SSH Keys are required to access and configure EC2
           Instances. SSH Keys are not required to Manage EKS Clusters.
         </Text>
-        <SshKeyField
-          dropdownComponent={AwsClusterSshKeyPicklist}
-          values={wizardContext}
-          info=""
-          onChange={(value) => setWizardContext({ sshKey: value })}
-        />
+        <div className={classes.selectionArea}>
+          <SshKeyField
+            dropdownComponent={AwsClusterSshKeyPicklist}
+            values={wizardContext}
+            info=""
+            onChange={(value) => setWizardContext({ sshKey: value })}
+          />
+          <Button
+            color="primary"
+            variant="light"
+            className={classes.setDefaultButton}
+            disabled={!wizardContext.sshKey}
+            onClick={() => handleSetUserDefault('defaultSshKey', wizardContext.sshKey)}
+          >
+            Set As Default
+          </Button>
+        </div>
       </FormFieldCard>
     </>
   )

@@ -7,9 +7,11 @@ const sshKeyValidator = customValidator((value) => {
   return isKeyValid(value)
 }, 'You must enter a valid SSH key')
 
-export default ({ validations = [sshKeyValidator] }) => (
+export default ({ wizardContext, setWizardContext, validations = [sshKeyValidator] }) => (
   <TextField
     id="sshKey"
+    value={wizardContext.sshKey}
+    onChange={(value) => setWizardContext({ sshKey: value })}
     label="Public SSH key"
     info="Copy/paste your SSH public key"
     size="small"

@@ -4,12 +4,16 @@ import Button from 'core/elements/button'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
+import InfoTooltipWrapper from 'core/components/InfoTooltipWrapper'
 
 const useStyles = makeStyles((theme: Theme) => ({
   inCardSubmit: {
     marginTop: theme.spacing(2.5),
   },
 }))
+
+const updateButtonTooltipMsg =
+  'An Azure Cloud Provider cannot be changed. To update the Service Principle, recreate the cloud provider.'
 
 interface Props {
   wizardContext: any
@@ -74,11 +78,13 @@ const AzureCloudProviderFields = ({
       />
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {showSubmitInCard && (
-        <div className={inCardSubmit}>
-          <Button disabled type="submit">
-            Update Cloud Provider
-          </Button>
-        </div>
+        <InfoTooltipWrapper info={updateButtonTooltipMsg}>
+          <div className={inCardSubmit}>
+            <Button disabled type="submit">
+              Update Cloud Provider
+            </Button>
+          </div>
+        </InfoTooltipWrapper>
       )}
     </>
   )

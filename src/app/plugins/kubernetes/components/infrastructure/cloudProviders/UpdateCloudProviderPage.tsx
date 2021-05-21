@@ -91,8 +91,6 @@ const formCpBody = (data) => {
   return {}
 }
 
-const getAvailableText = (available) => (available ? 'Available' : 'Unavailable')
-
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
 
@@ -122,53 +120,33 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     })(initialValues.type)
   }, [initialValues.type])
 
-  const getAwsCalloutFields = useCallback((wizardContext) => {
+  const getCalloutFields = useCallback((wizardContext) => {
     return [
       {
-        label: `Regions ${getAvailableText(wizardContext.regionsAvailable)}`,
-        available: wizardContext.regionsAvailable,
-        value: wizardContext.regionOptionLabel,
+        label: `Default Region`,
+        value: wizardContext.defaultRegion,
       },
       {
-        label: `Route 53 Domain ${getAvailableText(wizardContext.route53DomainsAvailable)}`,
-        available: wizardContext.route53DomainsAvailable,
-        value: wizardContext.awsDomainOptionLabel,
+        label: `Default Route53 (Optional)`,
+        value: wizardContext.defaultRoute53Domain,
+        renderCond: wizardContext.type === CloudProviders.Aws,
       },
       {
-        label: `SSH Keys ${getAvailableText(wizardContext.sshKeysAvailable)}`,
-        available: wizardContext.sshKeysAvailable,
-        value: wizardContext.sshKey,
+        label: `Default SSH Key`,
+        value: wizardContext.defaultSshKey,
       },
     ]
   }, [])
-
-  const getAzureCalloutFields = useCallback((wizardContext) => {
-    return [
-      {
-        label: `Regions ${getAvailableText(wizardContext.regionsAvailable)}`,
-        available: wizardContext.regionsAvailable,
-        value: wizardContext.regionOptionLabel,
-      },
-    ]
-  }, [])
-
-  const getCalloutFields = useCallback(
-    (wizardContext) => {
-      return initialValues.type === CloudProviders.Aws
-        ? getAwsCalloutFields(wizardContext)
-        : getAzureCalloutFields(wizardContext)
-    },
-    [initialValues.type],
-  )
 
   const renderCustomCalloutFields = useCallback(
     (wizardContext) => {
       const calloutFields = getCalloutFields(wizardContext)
       return (
         <div>
-          {calloutFields.map(({ label, available, value }) => {
-            const icon = available ? 'check-circle' : 'times-circle'
-            const iconClass = available ? 'checkIcon' : 'timesIcon'
+          {calloutFields.map(({ label, value, renderCond = true }) => {
+            if (!renderCond) return null
+            const icon = value ? 'check-circle' : 'times-circle'
+            const iconClass = value ? 'checkIcon' : 'timesIcon'
             return (
               <div key={label} className={classes.calloutFields}>
                 <div className={classes.label}>
@@ -207,7 +185,6 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
           hideAllButtons
         >
           {({ wizardContext, setWizardContext, onNext, handleNext }) => {
-            console.log('wizardContext', wizardContext)
             return (
               <WizardMeta
                 className={classes.updateCloudProvider}
@@ -234,6 +211,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                           toggleIamPolicy
                           showSubmitInCard
                           updateWizard
+                          setDefaultValueForTextfields
                         />
                       </FormFieldCard>
                       <VerificationFields

@@ -140,6 +140,9 @@ export const pmkftSignupLink = 'https://platform9.com/signup-flow/?sandbox=kuber
 export const enum UserPreferenceKeys {
   AwsCloudProviderDefaultRegion = 'awsCloudProviderDefaultRegion',
   AzureCloudProviderDefaultRegion = 'azureCloudProviderDefaultRegion',
+  AwsDefaultSshKey = 'awsDefaultSshKey',
+  AzureDefaultSshKey = 'azureDefaultSshKey',
+  AwsRoute53DefaultDomain = 'awsRoute53DefaultDomain',
 }
 
 // Global Preferences
