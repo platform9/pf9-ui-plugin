@@ -38,6 +38,11 @@ export const nodesSelector = createSelector(
           // qbert v3 link fails authorization so we have to use v1 link for logs
           logs: `${qbertUrl}/logs/${node.uuid}`.replace(/\/v3\//, '/v1/'),
           usage,
+          roles: combined?.roles,
+          operatingSystem: combined?.resmgr?.info?.os_info || combined?.osInfo,
+          primaryNetwork: combined?.qbert?.primaryIp,
+          networkInterfaces: combined?.networkInterfaces || {},
+          cpuArchitecture: combined?.resmgr?.info?.arch,
           message: combined?.resmgr?.message,
         }
       })

@@ -94,6 +94,7 @@ const updateSsoSettings = (data, setLoading, setDialogOpened, updateParams) => {
       entity_id: data.entityId,
       metadata_url: data.metadataUrl,
       metadata: data.metadataUrl ? undefined : data.metadata,
+      attr_map_xml: data.defaultAttributeMap,
     }
     setLoading(true)
     try {
@@ -160,13 +161,13 @@ const SsoPage = () => {
   return (
     <div className={classes.ssoPage}>
       <DocumentMeta title="SSO Management" bodyClasses={['form-view']} />
-      <ValidatedForm
-        classes={{ root: classes.validatedFormContainer }}
-        elevated={false}
-        formActions={<>{params.enableSso && <SubmitButton>Save</SubmitButton>}</>}
-        onSubmit={() => updateSsoSettings(params, setLoading, setDialogOpened, updateParams)}
-      >
-        <Progress loading={loading}>
+      <Progress loading={loading}>
+        <ValidatedForm
+          classes={{ root: classes.validatedFormContainer }}
+          elevated={false}
+          formActions={<>{params.enableSso && <SubmitButton>Save</SubmitButton>}</>}
+          onSubmit={() => updateSsoSettings(params, setLoading, setDialogOpened, updateParams)}
+        >
           <FormFieldCard title="Enterprise Single Sign On">
             <Text variant="body2">
               Enterprise Single Sign On supports SAML 2.0 identity integration for seamless access
@@ -247,6 +248,7 @@ const SsoPage = () => {
               <div className={classes.attributeMapButtons}>
                 <Button
                   className={classes.outlinedButton}
+                  type="button"
                   onClick={() => updateParams({ defaultAttributeMap: '' })}
                 >
                   Clear XML
@@ -259,7 +261,7 @@ const SsoPage = () => {
                 >
                   {
                     // @ts-ignore
-                    <Button>
+                    <Button type="button">
                       <FontAwesomeIcon size="sm" className={classes.copyIcon}>
                         copy
                       </FontAwesomeIcon>
@@ -270,9 +272,9 @@ const SsoPage = () => {
               </div>
             </FormFieldCard>
           )}
-        </Progress>
-        {dialogOpened && <SsoEnabledDialog onClose={() => setDialogOpened(false)} />}
-      </ValidatedForm>
+          {dialogOpened && <SsoEnabledDialog onClose={() => setDialogOpened(false)} />}
+        </ValidatedForm>
+      </Progress>
     </div>
   )
 }

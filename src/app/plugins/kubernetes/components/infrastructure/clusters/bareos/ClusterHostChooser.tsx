@@ -119,9 +119,9 @@ export const hasClockDrift = (node) => node.message && node.message.warn && !!no
 
 const emptyNode: INodesSelector = {} as any
 
-const getAvailableSpace = (resource) => {
-  if (!resource) return 0
-  return resource.max - resource.current
+export const getAvailableSpace = (disk) => {
+  if (!disk) return 0
+  return disk.max - disk.current
 }
 
 const ResourceStatus = ({ hasEnough, hooverText = '', children }) => {

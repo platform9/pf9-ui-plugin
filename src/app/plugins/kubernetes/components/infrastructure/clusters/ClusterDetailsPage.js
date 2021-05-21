@@ -176,14 +176,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ClusterTaskError = ({ taskError }) => {
+const clusterTaskErrorTitle = 'Error Impacting Cluster Availability'
+const etcdBackupTaskErrorTitle = 'ETCD Backup Error'
+
+const ClusterTaskError = ({ title, taskError }) => {
   const classes = useStyles()
   const formattedError = cleanupStacktrace(taskError)
   return (
     <div className={classes.taskErrorAlert}>
       <header>
         <FontAwesomeIcon>{variantIcon.error}</FontAwesomeIcon>
-        <Text variant="caption1">Error Impacting Cluster Availability</Text>
+        <Text variant="caption1">{title}</Text>
         <CopyToClipboard copyText={formattedError} copyIcon="copy" codeBlock={false} />
       </header>
       <CodeBlock className={classes.taskErrorMessage}>{formattedError}</CodeBlock>
@@ -214,7 +217,15 @@ const ClusterDetailsPage = () => {
   const clusterHeader = (
     <>
       <ClusterStatusAndUsage cluster={cluster} loading={loading} />
-      {cluster.taskError && <ClusterTaskError taskError={cluster.taskError} />}
+      {cluster.taskError && (
+        <ClusterTaskError title={clusterTaskErrorTitle} taskError={cluster.taskError} />
+      )}
+      {cluster.etcdBackup?.taskErrorDetail && (
+        <ClusterTaskError
+          title={etcdBackupTaskErrorTitle}
+          taskError={cluster.etcdBackup.taskErrorDetail}
+        />
+      )}
     </>
   )
   return (
@@ -319,7 +330,7 @@ export const HeaderCard = ({
   subtitle,
   icon,
   loading = false,
-  links,
+  links = {},
   children,
   className,
 }) => {

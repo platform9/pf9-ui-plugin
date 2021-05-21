@@ -39,6 +39,8 @@ import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { bareOSClusterTracking } from '../../tracking'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import AddNodeStep from '../../AddNodeStep'
+import CustomApiFlags from '../../form-components/custom-api-flag'
+import NodeRegistrationChooser from '../../form-components/node-registration-chooser'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -61,6 +63,8 @@ export const initialContext = {
   calicoIPv4: 'autodetect',
   calicoIPv6: 'none',
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
+  useHostname: false,
+  nodeRegistrationType: 'ipAddress',
 }
 
 interface Props {
@@ -100,39 +104,53 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           withAddonManager
           elevated={false}
         >
-          {/* Cluster Name */}
-          <FormFieldCard
-            title={`Name your ${ClusterCreateTypeNames[ClusterCreateTypes.MultiMaster]} Cluster`}
-            link={
-              <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
-                BareOS Cluster Help
-              </ExternalLink>
-            }
-          >
-            <ClusterNameField setWizardContext={setWizardContext} />
-          </FormFieldCard>
+          {({ setFieldValue, values }) => (
+            <>
+              {/* Cluster Name */}
+              <FormFieldCard
+                title={`Name your ${
+                  ClusterCreateTypeNames[ClusterCreateTypes.MultiMaster]
+                } Cluster`}
+                link={
+                  <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
+                    BareOS Cluster Help
+                  </ExternalLink>
+                }
+              >
+                <ClusterNameField setWizardContext={setWizardContext} />
+              </FormFieldCard>
 
-          {/* Cluster Settings */}
-          <FormFieldCard title="Cluster Settings">
-            <KubernetesVersion />
+              {/* Cluster Settings */}
+              <FormFieldCard title="Cluster Settings">
+                <KubernetesVersion />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Network Stack</Text>
-            <NetworkStack {...props} />
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Network Stack</Text>
+                <NetworkStack {...props} />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Application & Container Settings</Text>
-            <PrivilegedContainers {...props} />
-            <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Node Registration</Text>
+                <NodeRegistrationChooser
+                  values={values}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Add-Ons</Text>
-            <AddonTogglers
-              wizardContext={wizardContext}
-              setWizardContext={setWizardContext}
-              addons={clusterAddons}
-            />
-          </FormFieldCard>
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Application & Container Settings</Text>
+                <PrivilegedContainers {...props} />
+                <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
+
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Add-Ons</Text>
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={clusterAddons}
+                />
+              </FormFieldCard>
+            </>
+          )}
         </ValidatedForm>
       </WizardStep>
       <WizardStep
@@ -232,6 +250,7 @@ const PhysicalMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           {({ values }) => (
             <>
               <AdvancedApiConfigFields values={values} />
+              <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
               <TagsField />
             </>
           )}

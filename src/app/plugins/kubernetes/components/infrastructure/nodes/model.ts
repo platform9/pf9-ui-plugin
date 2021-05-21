@@ -13,6 +13,11 @@ export interface INodesSelector extends Node {
   status: string
   combined: ICombinedHost
   logs: string
+  roles: ICombinedHost['roles']
+  operatingSystem: ICombinedHost['resmgr']['info']['os_info']
+  primaryNetwork: ICombinedHost['qbert']['primaryIp']
+  networkInterfaces: ICombinedHost['networkInterfaces']
+  cpuArchitecture: ICombinedHost['resmgr']['info']['arch']
   message: ICombinedHost['resmgr']['message']
 }
 

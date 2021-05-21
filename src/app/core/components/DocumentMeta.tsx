@@ -96,7 +96,9 @@ export class DocumentMetaCls extends React.Component<IDocumentMetaProps, {}> {
     const script = document.createElement('script')
     script.id = id
     script.textContent = textContent
-    script.src = src
+    if (src) {
+      script.src = src
+    }
     script.onload = onload
     document.body.appendChild(script)
   }

@@ -51,6 +51,7 @@ export const initialContext = {
   calicoIPv4: 'autodetect',
   calicoIPv6: 'none',
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
+  useHostname: false,
 }
 
 const columns = [
@@ -65,7 +66,7 @@ const columns = [
   { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
   { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
   { id: 'calicoBlockSize', label: 'Block Size' },
-  { id: 'mtuSize', label: 'Block Size' },
+  { id: 'mtuSize', label: 'MTU Size' },
   {
     id: 'privileged',
     label: 'Privileged',

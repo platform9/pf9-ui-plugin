@@ -18,7 +18,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { allPass } from 'ramda'
 import { isConnected, isUnassignedNode } from './ClusterHostChooser'
 import InsufficientNodesNodesDialog from './InsufficientNodesDialog'
-import { ClusterType, nodeHardwareRequirements, HardwareType } from './constants'
+import { ClusterType, HardwareType, nodeHardwareRequirements } from './constants'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -204,7 +204,6 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
             />
           </div>
         </IconInfo>
-
         <div className={classes.actionRow}>
           <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
           <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
