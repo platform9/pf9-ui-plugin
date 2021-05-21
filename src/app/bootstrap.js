@@ -37,19 +37,26 @@ const loadTheme = async () => {
     const response = await preferenceStore.getGlobalPreference(GlobalPreferences.Theme)
     const customTheme = JSON.parse(response.value)
 
-    store.dispatch(
-      preferencesActions.updateLogo({
-        logoUrl: customTheme.logoUrl,
-      }),
-    )
+    if (!customTheme) {
+      return
+    }
+
+    if (customTheme.logoUrl) {
+      store.dispatch(
+        preferencesActions.updateLogo({
+          logoUrl: customTheme.logoUrl,
+        }),
+      )
+    } else {
+      // Todo: Wait for store to rehydrate, check for presence of a custom logo
+      // and reset if there is one present
+      store.dispatch(preferencesActions.resetGlobalPrefs())
+    }
+
     store.dispatch(themeActions.updateThemeComponent(generateThemeUpdatePayload(customTheme)))
   } catch (err) {
-    // Reset the store if it's not available
-    store.dispatch(
-      preferencesActions.updateLogo({
-        logoUrl: '',
-      }),
-    )
+    // Reset the prefs if store not available
+    store.dispatch(preferencesActions.resetGlobalPrefs())
     console.error(err)
   }
 }

@@ -21,6 +21,12 @@ const {
         logoUrl: payload.logoUrl,
       }
     },
+    resetGlobalPrefs: (state) => {
+      return {
+        ...state,
+        logoUrl: '',
+      }
+    },
     updatePrefs: (state, { payload }: PayloadAction<PreferencesState>) => {
       return over(lensPath([payload.username, payload.key]), mergeLeft(payload.prefs), state)
     },
