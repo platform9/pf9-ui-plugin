@@ -45,7 +45,7 @@ import Text from 'core/elements/text'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import { azureClusterTracking } from '../../tracking'
 import { ClusterCreateTypes } from '../../model'
-
+import CustomApiFlags from '../../form-components/custom-api-flag'
 export const initialContext = {
   template: 'small',
   masterSku: 'Standard_A1_v2',
@@ -406,6 +406,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                /> */}
 
                 {/* Tags */}
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
                 <TagsField />
               </FormFieldCard>
             </>

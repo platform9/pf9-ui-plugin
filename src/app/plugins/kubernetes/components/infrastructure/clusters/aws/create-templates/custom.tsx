@@ -42,6 +42,7 @@ import WorkerNodeInstanceTypeField from '../../form-components/worker-node-insta
 import { ClusterCreateTypes } from '../../model'
 import { awsClusterTracking } from '../../tracking'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import CustomApiFlags from '../../form-components/custom-api-flag'
 
 export const initialContext = {
   template: 'small',
@@ -132,7 +133,7 @@ const templateOptions = [
 // small (single dev) - 1 node master + worker - select instance type (default t2.small)
 // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
 // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-const handleTemplateChoice = ({ setFieldValue }) => (option) => {
+const handleTemplateChoice = ({ setFieldValue, setWizardContext }) => (option) => {
   const options = {
     small: {
       numMasters: 1,
@@ -170,6 +171,7 @@ const handleTemplateChoice = ({ setFieldValue }) => (option) => {
       setFieldValue(key)(value)
     })
   })
+  setWizardContext(options[option])
 }
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -250,6 +252,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                   options={templateOptions}
                   onChange={handleTemplateChoice({
                     setFieldValue,
+                    setWizardContext,
                   })}
                 />
 
@@ -436,6 +439,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 <CustomAmiField />
 
                 {/* Tags */}
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
                 <TagsField />
               </FormFieldCard>
             </>

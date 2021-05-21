@@ -15,7 +15,7 @@ export const HostsList = createListTableComponent({
   emptyText: 'No hosts found.',
   name: 'HostsList',
   columns,
-  searchTarget: 'hypervisor_hostname',
+  searchTargets: ['hypervisor_hostname'],
 })
 
 class HostsListContainer extends React.PureComponent {

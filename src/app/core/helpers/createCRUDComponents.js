@@ -59,7 +59,7 @@ const createCRUDComponents = (options) => {
     debug,
     name,
     nameProp,
-    searchTarget = 'name',
+    searchTargets = ['name'],
     multiSelection = true,
     showCheckboxes,
     headlessTable,
@@ -102,7 +102,7 @@ const createCRUDComponents = (options) => {
         editCond={editCond}
         editDisabledInfo={editDisabledInfo}
         multiSelection={multiSelection}
-        searchTarget={searchTarget}
+        searchTargets={searchTargets}
         uniqueIdentifier={uniqueIdentifier}
         showCheckboxes={showCheckboxes}
         compactTable={compactTable}

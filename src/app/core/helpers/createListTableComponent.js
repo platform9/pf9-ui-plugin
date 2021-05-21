@@ -11,7 +11,7 @@ const createListTableComponent = ({
   displayName = name,
   columns,
   uniqueIdentifier = 'id',
-  searchTarget = 'name',
+  searchTargets = ['name'],
   paginate = true,
   showCheckboxes = true,
   multiSelection = true,
@@ -28,6 +28,7 @@ const createListTableComponent = ({
     rowActions = undefined,
     loading = false,
     onSortChange = undefined,
+    listTableParams = undefined,
   }) => {
     const [{ visibleColumns, columnsOrder, rowsPerPage }, updatePrefs] = useScopedPreferences(name)
 
@@ -49,7 +50,7 @@ const createListTableComponent = ({
         paginate={paginate}
         showCheckboxes={showCheckboxes}
         multiSelection={multiSelection}
-        searchTarget={searchTarget}
+        searchTargets={searchTargets}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
@@ -62,6 +63,7 @@ const createListTableComponent = ({
         loading={loading}
         compactTable={compactTable}
         batchActions={batchActions}
+        listTableParams={listTableParams}
       />
     )
   }

@@ -6,6 +6,7 @@ import { pathEq, pick, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { sanitizeUrl } from 'utils/misc'
 import { CloudProviders } from '../cloudProviders/model'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 import { hasConvergingNodes } from './ClusterStatusUtils'
 import { NetworkStackTypes } from './constants'
 import { CalicoDetectionTypes } from './form-components/calico-network-fields'
@@ -30,7 +31,8 @@ export const canScaleMasters = ([cluster]) =>
 export const canScaleWorkers = ([cluster]) =>
   clusterNotBusy(cluster) && !isAzureAutoscalingCluster(cluster)
 
-export const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
+export const canUpgradeCluster = ([cluster]) =>
+  !!cluster && cluster.canUpgrade && !clockDriftDetectedInNodes(cluster.nodes)
 
 export const canDeleteCluster = ([cluster]) =>
   !['creating', 'deleting'].includes(cluster.taskStatus)
@@ -110,8 +112,8 @@ export const hasHealthyMasterNodes = propSatisfies(
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
-export const hasPrometheusTag = pathEq(['tags', 'pf9-system:monitoring'], 'true')
-// export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+export const hasPrometheusTag = pathEq(['hasPrometheus', 'pf9-system:monitoring'], 'true')
+export const prometheusCluster = propSatisfies(isTruthy, 'hasPrometheus')
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 export const createAwsCluster = async (data) => {
@@ -235,7 +237,9 @@ export const createBareOSCluster = async (data) => {
     'appCatalogEnabled',
     'deployKubevirt',
     'deployLuigiOperator',
+    'useHostname',
   ]
+
   const body = pick(keysToPluck, data)
 
   if (data.enableMetallb) {
@@ -281,6 +285,18 @@ const createGenericCluster = async (body, data) => {
 
   if (data.kubeRoleVersion) {
     body.kubeRoleVersion = data.kubeRoleVersion
+  }
+
+  if (data.apiServerFlags) {
+    body.apiServerFlags = data.apiServerFlags?.split(',')
+  }
+
+  if (data.controllerManagerFlags) {
+    body.controllerManagerFlags = data.controllerManagerFlags?.split(',')
+  }
+
+  if (data.schedulerFlags) {
+    body.schedulerFlags = data.schedulerFlags?.split(',')
   }
 
   // Calico is required when ipv6 is selected

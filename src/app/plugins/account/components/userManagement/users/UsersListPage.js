@@ -62,7 +62,7 @@ export const options = {
   name: 'Users',
   title: 'Users',
   uniqueIdentifier: 'id',
-  searchTarget: 'username',
+  searchTargets: ['username', 'id'],
   nameProp: 'username',
   multiSelection: false,
   batchActions: [

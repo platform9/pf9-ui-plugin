@@ -99,7 +99,7 @@ export const inCluster = (clusterUuid: string) => (node: INodesSelector) =>
   node.clusterUuid === clusterUuid
 
 const emptyNode: INodesSelector = {} as any
-const getAvailableSpace = (disk) => {
+export const getAvailableSpace = (disk) => {
   if (!disk) return 0
   return disk.max - disk.current
 }

@@ -51,6 +51,10 @@ import EditAppDeploymentPage from './components/app-catalog/deployed-apps/edit-a
 import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 import ImportedClusterDetailsPage from './components/infrastructure/importedClusters/imported-cluster-details'
+import VirtualMachinesPage from './components/virtual-machines'
+import VirtualMachineDetailPage from './components/virtual-machines/details'
+import AddVirtualMachinePage from './components/virtual-machines/add'
+
 import { isDecco } from 'core/utils/helpers'
 
 class Kubernetes extends React.PureComponent {
@@ -166,6 +170,43 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
       requiredRoles: 'admin',
       component: UpdateCloudProviderPage,
+    },
+    {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      link: { path: '/virtual-machines', exact: true },
+      requiredRoles: 'admin',
+      component: VirtualMachinesPage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/add/new', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/import/url', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/import/disk', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/clone/pvc', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Virtual Machine Details',
+      link: { path: '/virtual-machines/:clusterId/:namespace/:name', exact: true },
+      requiredRoles: 'admin',
+      component: VirtualMachineDetailPage,
     },
     {
       name: 'App Catalog',
@@ -389,6 +430,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
     {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      icon: 'window',
+      ...clarityLink('/kubernetes/virtual-machines'),
+    },
+    {
       name: 'Apps',
       ...clarityLink('/kubernetes/apps'),
       icon: 'th',
@@ -441,6 +488,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       ],
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
+    {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      icon: 'window',
+      link: { path: '/virtual-machines' },
+    },
     {
       name: 'Apps',
       link: { path: '/apps' },

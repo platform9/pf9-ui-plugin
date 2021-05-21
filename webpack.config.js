@@ -68,6 +68,14 @@ module.exports = {
         use: 'awesome-typescript-loader',
       },
       {
+        test: /\.ya?ml$/,
+        // type: 'json', // Required by Webpack v4
+        use: 'raw-loader',
+        // options: {
+        //   esModule: false,
+        // },
+      },
+      {
         test: /\.css$/,
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader'],

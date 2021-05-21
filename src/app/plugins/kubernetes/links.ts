@@ -23,6 +23,7 @@ export const slackLink = 'https://slack.platform9.io'
 export const forumHelpLink = `${communityBaseUrl}/`
 export const pf9PmkArchitectureDigLink = `${k8sBaseUrl}/multimaster-architecture-platform9-managed-kubernetes/`
 export const pmkDocumentationLink = `${k8sBaseUrl}/introduction/overview`
+export const requestFormLink = `${pf9SupportBaseUrl}/hc/en-us/requests/new?ticket_form_id=360000924873`
 
 // Aws
 export const awsPrerequisitesLink = `${k8sBaseUrl}/aws/`
@@ -42,15 +43,14 @@ export const azureCreateANewApplicationSecretLink = `${microsoftDocBaseUrl}/azur
 export const gettingStartedLink = `${k8sBaseUrl}/quickstart/`
 export const whatIsBareOSLink = `${k8sBaseUrl}/on-premise-kubernetes/what-is-bareos`
 export const bareOSSetupDocumentationLink = `${k8sBaseUrl}/create-multimaster-bareos-cluster/`
-
+export const bareOSSingleMasterSetupDocsLink = `${k8sBaseUrl}/bareos-create-singlemaster-multinode-cluster/`
 // Clusters
 export const remoteMonitoringDocsLink = `${k8sBaseUrl}/enable-remote-monitoring/`
 export const kubectlInstallationDocumentationLink = `${pf9DocOrigin}/kubernetes/kubectl/`
 
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
-export const nodePrerequisitesDocumentationLink =
-  'https://platform9.com/blog/support/managed-container-cloud-requirements-checklist'
+export const nodePrerequisitesDocumentationLink = `${k8sBaseUrl}/on-premise-kubernetes-pre-requisites#setting-up-the-platform9-free-tier-cluster`
 
 // CLI
 export const pmkCliOverviewLink = `${k8sBaseUrl}/PMK-CLI/`
