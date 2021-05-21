@@ -315,17 +315,19 @@ export const typography = {
   },
 }
 
-const relianceLightTheme = generateTheme({
-  palette: { colors, primary: 'blue', secondary: 'pink', type: 'light' },
-  typography: {
-    fontFamily: '"Eina04"',
-    fontSize: 14,
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
-    typography,
-  },
+const relianceLightTheme = {
+  theme: generateTheme({
+    palette: { colors, primary: 'blue', secondary: 'pink', type: 'light' },
+    typography: {
+      fontFamily: '"Eina04"',
+      fontSize: 14,
+      fontWeightLight: 300,
+      fontWeightRegular: 400,
+      fontWeightMedium: 500,
+      typography,
+    },
+  }),
   components,
-})
+}
 // relianceLightTheme.palette.
 export default relianceLightTheme
