@@ -1,8 +1,8 @@
 import ApiClient from 'api-client/ApiClient'
 import { preferencesActions } from 'core/session/preferencesReducers'
 import { themeActions } from 'core/session/themeReducers'
-import { AppPlugins, GlobalPreferences } from 'app/constants'
-import { componentUpdaterObject } from 'account/components/theme/helpers'
+import { GlobalPreferences } from 'app/constants'
+import { generateThemeUpdatePayload } from 'account/components/theme/helpers'
 
 const { preferenceStore } = ApiClient.getInstance()
 
@@ -14,20 +14,16 @@ export const getThemeConfig = async () => {
 }
 
 export const updateThemeConfig = async (config) =>
-  preferenceStore.updateGlobalPreference('theme', config)
+  preferenceStore.updateGlobalPreference(GlobalPreferences.Theme, config)
 
-export const deleteThemeConfig = async () => preferenceStore.deleteGlobalPreference('theme')
+export const deleteThemeConfig = async () =>
+  preferenceStore.deleteGlobalPreference(GlobalPreferences.Theme)
 
-export const updateSessionTheme = (dispatch, settings, theme) => {
-  const themeUpdateBody = {
-    components: [
-      componentUpdaterObject(['header', 'background'], settings.headerHex),
-      componentUpdaterObject(['sidebar', AppPlugins.MyAccount, 'background'], settings.sidenavHex),
-      componentUpdaterObject(['sidebar', AppPlugins.Kubernetes, 'background'], settings.sidenavHex),
-      componentUpdaterObject(['sidebar', AppPlugins.OpenStack, 'background'], settings.sidenavHex),
-      componentUpdaterObject(['sidebar', AppPlugins.BareMetal, 'background'], settings.sidenavHex),
-    ],
-  }
+export const updateSessionTheme = (dispatch, settings) => {
+  const themeUpdateBody = generateThemeUpdatePayload({
+    headerColor: settings.headerHex,
+    sidenavColor: settings.sidenavHex,
+  })
   dispatch(
     preferencesActions.updateLogo({
       logoUrl: settings.logoUrl,

@@ -8,7 +8,6 @@ import {
   clarityDashboardUrl,
   CustomerTiers,
   dashboardUrl,
-  GlobalPreferences,
   helpUrl,
   ironicWizardUrl,
   logoutUrl,
@@ -46,16 +45,12 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
-import { themeActions } from 'core/session/themeReducers'
-import { ThemeConfig } from 'account/components/theme/model'
-import { preferencesActions } from 'core/session/preferencesReducers'
-import { componentUpdaterObject } from 'account/components/theme/helpers'
 
 const toPairs: any = ToPairs
 
 declare let window: CustomWindow
 
-const { keystone, preferenceStore } = ApiClient.getInstance()
+const { keystone } = ApiClient.getInstance()
 
 interface StyleProps {
   path?: string
@@ -306,50 +301,6 @@ const loadRegionFeatures = async (setRegionFeatures, setStacks, dispatch, histor
   }
 }
 
-const loadCustomTheme = async (dispatch) => {
-  try {
-    const response = await preferenceStore.getGlobalPreference(GlobalPreferences.Theme)
-    const customTheme: ThemeConfig = JSON.parse(response.value)
-
-    dispatch(
-      preferencesActions.updateLogo({
-        logoUrl: customTheme.logoUrl,
-      }),
-    )
-    dispatch(
-      themeActions.updateThemeComponent({
-        components: [
-          componentUpdaterObject(['header', 'background'], customTheme.headerColor),
-          componentUpdaterObject(
-            ['sidebar', AppPlugins.MyAccount, 'background'],
-            customTheme.sidenavColor,
-          ),
-          componentUpdaterObject(
-            ['sidebar', AppPlugins.Kubernetes, 'background'],
-            customTheme.sidenavColor,
-          ),
-          componentUpdaterObject(
-            ['sidebar', AppPlugins.OpenStack, 'background'],
-            customTheme.sidenavColor,
-          ),
-          componentUpdaterObject(
-            ['sidebar', AppPlugins.BareMetal, 'background'],
-            customTheme.sidenavColor,
-          ),
-        ],
-      }),
-    )
-  } catch (err) {
-    // Reset the store if it's not available
-    dispatch(
-      preferencesActions.updateLogo({
-        logoUrl: '',
-      }),
-    )
-    console.error(err)
-  }
-}
-
 const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
 const AuthenticatedContainer = () => {
@@ -419,10 +370,6 @@ const AuthenticatedContainer = () => {
       Bugsnag.setUser()
       clearInterval(id)
     }
-  }, [])
-
-  useEffect(() => {
-    loadCustomTheme(dispatch)
   }, [])
 
   // Add Zendesk widget script only for Enterprise users

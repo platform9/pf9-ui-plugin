@@ -24,7 +24,6 @@ import ThemeEnabledDialog from './ThemeEnabledDialog'
 import { ThemeConfig } from './model'
 import { themeActions } from 'core/session/themeReducers'
 import { preferencesActions } from 'core/session/preferencesReducers'
-import { useTheme } from '@material-ui/core/styles'
 import { colorHexValidator } from 'core/utils/fieldValidators'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -130,7 +129,7 @@ interface State {
   sidenavB: string
 }
 
-const updateTheme = (data, setLoading, setSavedDialogOpened, updateParams, dispatch, theme) => {
+const updateTheme = (data, setLoading, setSavedDialogOpened, updateParams, dispatch) => {
   const sendRequest = async () => {
     const body = {
       headerColor: data.headerHex,
@@ -140,7 +139,7 @@ const updateTheme = (data, setLoading, setSavedDialogOpened, updateParams, dispa
     setLoading(true)
     try {
       await updateThemeConfig(body)
-      updateSessionTheme(dispatch, data, theme)
+      updateSessionTheme(dispatch, data)
       updateParams({ themeIsEnabled: true })
       // Show user a dialog saying theme configuration successful
       setSavedDialogOpened(true)
@@ -154,7 +153,6 @@ const updateTheme = (data, setLoading, setSavedDialogOpened, updateParams, dispa
 
 const CustomThemePage = () => {
   const classes = useStyles({})
-  const theme: any = useTheme()
   const { params, updateParams, getParamsUpdater } = useParams<State>({
     enableTheme: false,
     themeIsEnabled: false,
@@ -274,7 +272,7 @@ const CustomThemePage = () => {
           elevated={false}
           formActions={<>{params.enableTheme && <SubmitButton>Save</SubmitButton>}</>}
           onSubmit={() =>
-            updateTheme(params, setLoading, setSavedDialogOpened, updateParams, dispatch, theme)
+            updateTheme(params, setLoading, setSavedDialogOpened, updateParams, dispatch)
           }
         >
           <FormFieldCard title="Custom Theming/Branding">

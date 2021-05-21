@@ -1,6 +1,7 @@
 import config from '../../config'
 import ApiService from 'api-client/ApiService'
 import { PreferenceStoreResponse } from './preference-store.model'
+import { GlobalPreferences } from 'app/constants'
 
 class PreferenceStore extends ApiService {
   public getClassName() {
@@ -15,7 +16,7 @@ class PreferenceStore extends ApiService {
     return `/preference-store`
   }
 
-  getGlobalPreference = async (key) => {
+  getGlobalPreference = async (key: GlobalPreferences) => {
     return this.client.basicGet<PreferenceStoreResponse>({
       url: `${this.baseUrl}/global/${key}`,
       options: {
@@ -25,7 +26,7 @@ class PreferenceStore extends ApiService {
     })
   }
 
-  updateGlobalPreference = async (key, value) => {
+  updateGlobalPreference = async (key: GlobalPreferences, value) => {
     const jsonString = JSON.stringify(value)
     const body = {
       value: jsonString,
@@ -40,7 +41,7 @@ class PreferenceStore extends ApiService {
     })
   }
 
-  deleteGlobalPreference = async (key) => {
+  deleteGlobalPreference = async (key: GlobalPreferences) => {
     return this.client.basicDelete({
       url: `${this.baseUrl}/global/${key}`,
       options: {
