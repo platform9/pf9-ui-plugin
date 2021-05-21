@@ -24,7 +24,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { variantIcon } from 'core/components/Alert'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import { hasClockDrift, meetsHardwareRequirement } from './helper'
 import { clusterActions } from '../clusters/actions'
 import { IClusterSelector } from '../clusters/model'
@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(0, 2, 2, 2),
     marginBottom: theme.spacing(2),
     border: `1px solid ${theme.palette.red[500]}`,
-    backgroundColor: hexToRGBA(theme.palette.red[500], 0.1),
+    backgroundColor: hexToRgbaCss(theme.palette.red[500], 0.1),
     borderRadius: 4,
 
     '& > header': {

@@ -55,6 +55,7 @@ export enum CustomerTiers {
 }
 
 export const ssoEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
+export const themeEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 
 export enum ClusterCloudPlatforms {
   EKS = 'eks',
@@ -135,3 +136,7 @@ export const defaultAxiosConfig = Object.freeze({
 export const publicSlackLink = 'https://kplane.slack.com'
 export const supportEmail = 'support-ft@platform9.com'
 export const pmkftSignupLink = 'https://platform9.com/signup-flow/?sandbox=kubernetes'
+
+export enum GlobalPreferences {
+  Theme = 'theme',
+}

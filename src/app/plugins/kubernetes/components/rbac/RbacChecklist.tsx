@@ -16,7 +16,7 @@ import { IUseDataLoader } from '../infrastructure/nodes/model'
 import PicklistDefault from 'core/components/Picklist'
 import { Chip } from '@material-ui/core'
 import Text from 'core/elements/text'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
@@ -92,7 +92,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginBottom: theme.spacing(),
     display: 'grid',
     gridTemplateColumns: '1fr 40px',
-    background: hexToRGBA(theme.palette.primary.main, 0.1),
+    background: hexToRgbaCss(theme.palette.primary.main, 0.1),
     padding: theme.spacing(1, 2),
     borderRadius: '4px',
     border: '1px solid rgba(74, 163, 223, 0.5)',

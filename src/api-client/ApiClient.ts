@@ -33,6 +33,7 @@ import ApiService from 'api-client/ApiService'
 import Bugsnag from '@bugsnag/js'
 import { someAsync } from 'utils/async'
 import ApiError from 'core/errors/ApiError'
+import PreferenceStore from './PreferenceStore'
 
 interface ApiClientOptions {
   [key: string]: any
@@ -54,6 +55,7 @@ class ApiClient {
   public clemency: Clemency
   public helm: Helm
   public hagrid: Hagrid
+  public preferenceStore: PreferenceStore
   public catalog = {}
   public activeRegion: ID = null
   unscopedToken = null
@@ -104,6 +106,7 @@ class ApiClient {
       instance.clemency.initialize(),
       instance.helm.initialize(),
       instance.hagrid.initialize(),
+      instance.preferenceStore.initialize(),
     ])
   }
 
@@ -149,6 +152,7 @@ class ApiClient {
     this.clemency = this.addApiService(new Clemency(this))
     this.helm = this.addApiService(new Helm(this))
     this.hagrid = this.addApiService(new Hagrid(this))
+    this.preferenceStore = this.addApiService(new PreferenceStore(this))
   }
 
   addApiService = <T extends ApiService>(apiClientInstance: T) => {
