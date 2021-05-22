@@ -374,7 +374,7 @@ const AuthenticatedContainer = () => {
 
   // Add Zendesk widget script only for Enterprise users
   useEffect(() => {
-    if (customerTier === CustomerTiers.Enterprise) {
+    if (customerTier === CustomerTiers.Enterprise && process.env.NODE_ENV === 'production') {
       addZendeskWidgetScriptToDomBody({ userId, displayName, email: name })
     }
     return () => {
