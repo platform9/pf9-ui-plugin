@@ -69,6 +69,11 @@ export const getKubernetesVersion = async (clusterId) => {
     return null
   }
 }
+export const getScopedQbertEndpoint = (qbertEndpoint) =>
+  `${qbertEndpoint}/${qbert.scopedEnpointPath()}`
+export const getScopedClusterProxyEndpoint = (qbertEndpoint, cluster) =>
+  `${getScopedQbertEndpoint(qbertEndpoint)}/clusters/${cluster.uuid}/k8sapi/api/v1`
+
 export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
   const matches = /(?<major>\d+).(?<minor>\d+).(?<patch>\d+)/.exec(version)
   if (!version || !matches) {
@@ -76,9 +81,7 @@ export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) 
   }
   const { major, minor } = matches.groups || {}
   const isNewDashboardUrl = parseInt(major) >= 1 && parseInt(minor) >= 16
-  return `${qbertEndpoint}/${qbert.scopedEnpointPath()}/clusters/${
-    cluster.uuid
-  }/k8sapi/api/v1/namespaces/${
+  return `${getScopedClusterProxyEndpoint(qbertEndpoint, cluster)}/namespaces/${
     isNewDashboardUrl ? 'kubernetes-dashboard' : 'kube-system'
   }/services/https:kubernetes-dashboard:443/proxy/`
 }
