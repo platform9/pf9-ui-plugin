@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Text from 'core/elements/text'
 import { pathStr } from 'utils/fp'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import Theme from 'core/themes/model'
 
 interface StyleProps {
@@ -21,11 +21,11 @@ const useStyles = makeStyles<Theme, Partial<StyleProps>>((theme: Theme) => ({
     border: ({ active, type }) => {
       if (active) {
         if (type === 'fatal') {
-          return `1px solid ${hexToRGBA(theme.palette.red[500], 0.2)}`
+          return `1px solid ${hexToRgbaCss(theme.palette.red[500], 0.2)}`
         } else if (type === 'critical') {
-          return `1px solid ${hexToRGBA(theme.palette.orange[500], 0.2)}`
+          return `1px solid ${hexToRgbaCss(theme.palette.orange[500], 0.2)}`
         } else if (type === 'warning') {
-          return `1px solid ${hexToRGBA(theme.palette.yellow[500], 0.2)}`
+          return `1px solid ${hexToRgbaCss(theme.palette.yellow[500], 0.2)}`
         }
       }
       return 'none'
@@ -40,11 +40,11 @@ const useStyles = makeStyles<Theme, Partial<StyleProps>>((theme: Theme) => ({
         return theme.palette.grey[200]
       }
       if (type === 'fatal') {
-        return hexToRGBA(theme.palette.red[500], 0.2)
+        return hexToRgbaCss(theme.palette.red[500], 0.2)
       } else if (type === 'critical') {
-        return hexToRGBA(theme.palette.orange[500], 0.2)
+        return hexToRgbaCss(theme.palette.orange[500], 0.2)
       } else if (type === 'warning') {
-        return hexToRGBA(theme.palette.yellow[500], 0.2)
+        return hexToRgbaCss(theme.palette.yellow[500], 0.2)
       } else {
         return ''
       }

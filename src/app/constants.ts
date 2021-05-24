@@ -55,6 +55,7 @@ export enum CustomerTiers {
 }
 
 export const ssoEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
+export const themeEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 
 export enum ClusterCloudPlatforms {
   EKS = 'eks',
@@ -145,5 +146,6 @@ export const enum UserPreferenceKeys {
   AwsRoute53DefaultDomain = 'awsRoute53DefaultDomain',
 }
 
-// Global Preferences
-export const enum GlobalPreferenceKeys {}
+export enum GlobalPreferences {
+  Theme = 'theme',
+}

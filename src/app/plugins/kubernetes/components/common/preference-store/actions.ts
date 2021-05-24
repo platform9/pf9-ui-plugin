@@ -22,8 +22,7 @@ export const globalPreferenceStoreActions = createCRUDActions(DataKeys.GlobalPre
     return preferenceStore.getGlobalPreference(key)
   },
   createFn: async ({ key, value }) => {
-    const body = { value: value }
-    return preferenceStore.setGlobalPreference(key, body)
+    return preferenceStore.updateGlobalPreference(key, value)
   },
   deleteFn: async ({ key }) => {
     return preferenceStore.deleteGlobalPreference(key)

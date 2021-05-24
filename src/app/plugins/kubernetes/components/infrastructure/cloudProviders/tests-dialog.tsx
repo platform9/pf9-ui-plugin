@@ -8,7 +8,7 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Text from 'core/elements/text'
 import { Dialog, DialogActions, makeStyles } from '@material-ui/core'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import clsx from 'clsx'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
@@ -57,7 +57,7 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
     padding: theme.spacing(1),
     margin: theme.spacing(2, 2, 1, 2),
     border: `1px solid ${theme.palette.red[500]}`,
-    backgroundColor: hexToRGBA(theme.palette.red[500], 0.1),
+    backgroundColor: hexToRgbaCss(theme.palette.red[500], 0.1),
     borderRadius: 4,
 
     '& > header': {

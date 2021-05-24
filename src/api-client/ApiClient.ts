@@ -13,7 +13,6 @@ import ResMgr from './ResMgr'
 import Clemency from 'api-client/Clemency'
 import Helm from './Helm'
 import Hagrid from './Hagrid'
-import PreferenceStore from './PreferenceStore'
 
 import { ID } from './keystone.model'
 
@@ -34,6 +33,7 @@ import ApiService from 'api-client/ApiService'
 import Bugsnag from '@bugsnag/js'
 import { someAsync } from 'utils/async'
 import ApiError from 'core/errors/ApiError'
+import PreferenceStore from './PreferenceStore'
 
 interface ApiClientOptions {
   [key: string]: any
@@ -56,7 +56,6 @@ class ApiClient {
   public helm: Helm
   public hagrid: Hagrid
   public preferenceStore: PreferenceStore
-
   public catalog = {}
   public activeRegion: ID = null
   unscopedToken = null

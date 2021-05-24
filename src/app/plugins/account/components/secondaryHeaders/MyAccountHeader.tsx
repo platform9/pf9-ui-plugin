@@ -14,7 +14,7 @@ import UpgradeButton from './UpgradeButton'
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   myAccountHeader: {
     height: 96,
-    background: theme.palette.grey[900],
+    background: theme.components.header.background,
     display: 'grid',
     gridTemplateColumns: '180px minmax(max-content, 1150px)',
   },
