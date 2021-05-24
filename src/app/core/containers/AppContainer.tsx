@@ -168,9 +168,10 @@ const AppContainer = () => {
       setCustomerTier(customerTier)
       const sandboxFlag = pathStrOr(false, 'data.experimental.sandbox', initialFeatures)
       const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', initialFeatures)
+      const airgapped = pathStrOr(false, 'data.experimental.airgapped', initialFeatures)
 
       // Segment tracking
-      if (!analyticsOff) {
+      if (!analyticsOff && !airgapped) {
         DocumentMetaCls.addScriptElementToDomBody({
           id: 'segmentCode',
           textContent: segmentScriptContent,

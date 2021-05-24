@@ -30,7 +30,7 @@ import { cloudProviderTypes } from 'k8s/components/infrastructure/cloudProviders
 import { variantIcon } from 'core/components/Alert'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import ClusterDeployedApps from './cluster-deployed-apps'
 import { isDecco } from 'core/utils/helpers'
 import { useSelector } from 'react-redux'
@@ -160,7 +160,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(0, 2, 2, 2),
     marginBottom: theme.spacing(2),
     border: `1px solid ${theme.palette.red[500]}`,
-    backgroundColor: hexToRGBA(theme.palette.red[500], 0.1),
+    backgroundColor: hexToRgbaCss(theme.palette.red[500], 0.1),
     borderRadius: 4,
 
     '& > header': {
@@ -176,14 +176,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ClusterTaskError = ({ taskError }) => {
+const clusterTaskErrorTitle = 'Error Impacting Cluster Availability'
+const etcdBackupTaskErrorTitle = 'ETCD Backup Error'
+
+const ClusterTaskError = ({ title, taskError }) => {
   const classes = useStyles()
   const formattedError = cleanupStacktrace(taskError)
   return (
     <div className={classes.taskErrorAlert}>
       <header>
         <FontAwesomeIcon>{variantIcon.error}</FontAwesomeIcon>
-        <Text variant="caption1">Error Impacting Cluster Availability</Text>
+        <Text variant="caption1">{title}</Text>
         <CopyToClipboard copyText={formattedError} copyIcon="copy" codeBlock={false} />
       </header>
       <CodeBlock className={classes.taskErrorMessage}>{formattedError}</CodeBlock>
@@ -214,7 +217,15 @@ const ClusterDetailsPage = () => {
   const clusterHeader = (
     <>
       <ClusterStatusAndUsage cluster={cluster} loading={loading} />
-      {cluster.taskError && <ClusterTaskError taskError={cluster.taskError} />}
+      {cluster.taskError && (
+        <ClusterTaskError title={clusterTaskErrorTitle} taskError={cluster.taskError} />
+      )}
+      {cluster.etcdBackup?.taskErrorDetail && (
+        <ClusterTaskError
+          title={etcdBackupTaskErrorTitle}
+          taskError={cluster.etcdBackup.taskErrorDetail}
+        />
+      )}
     </>
   )
   return (
@@ -319,7 +330,7 @@ export const HeaderCard = ({
   subtitle,
   icon,
   loading = false,
-  links,
+  links = {},
   children,
   className,
 }) => {

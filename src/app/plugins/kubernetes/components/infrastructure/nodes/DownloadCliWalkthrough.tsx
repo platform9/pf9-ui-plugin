@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     padding: theme.spacing(2, 8),
     margin: theme.spacing(2, 0),
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
+    backgroundColor: hexToRgbaCss(theme.palette.primary.main, 0.1),
   },
   column: {
     margin: theme.spacing(2, 0),
@@ -85,8 +85,8 @@ export const OsRequirements = () => {
         </div>
         <p>
           <Text component="span">
-            You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
-            (7.6/7.7/7.8) installed.
+            You will need a physical or virtual machine with Ubuntu (18.04/20.04) or CentOS (7.X)
+            installed.
           </Text>
         </p>
       </div>
