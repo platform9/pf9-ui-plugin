@@ -8,6 +8,7 @@ export const trackPage = (location) => {
   const route = Route.find(location)
   if (!route) {
     console.info(`No route found for '${location}'. Consider registering it as a Route.`)
+    return
   }
 
   // Tracking for Segment
