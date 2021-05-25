@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import clsx from 'clsx'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 
 interface Props {
   fill?: boolean
@@ -39,7 +39,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       background: 'transparent',
     },
     '&::-webkit-scrollbar-thumb': {
-      background: hexToRGBA(theme.palette.grey[500], 0.2),
+      background: hexToRgbaCss(theme.palette.grey[500], 0.2),
       borderRadius: 2,
     },
   },

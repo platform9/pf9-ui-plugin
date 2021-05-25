@@ -686,6 +686,13 @@ export const routes = {
       name: 'SsoManagement:Group:Edit',
     }),
   },
+  customTheme: Route.register({
+    url: `${pluginRoutePrefix}/theme`,
+    defaultParams: {
+      plugin: AppPlugins.MyAccount,
+    },
+    name: 'CustomTheme',
+  }),
   prometheus: {
     list: Route.register({
       url: `${pluginRoutePrefix}/prometheus`,
