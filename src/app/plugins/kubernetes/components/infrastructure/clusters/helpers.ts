@@ -237,6 +237,7 @@ export const createBareOSCluster = async (data) => {
     'appCatalogEnabled',
     'deployKubevirt',
     'deployLuigiOperator',
+    'useHostname',
   ]
 
   const body = pick(keysToPluck, data)
