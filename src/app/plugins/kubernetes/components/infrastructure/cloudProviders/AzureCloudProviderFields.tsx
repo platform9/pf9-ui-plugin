@@ -9,6 +9,7 @@ import InfoTooltipWrapper from 'core/components/InfoTooltipWrapper'
 const useStyles = makeStyles((theme: Theme) => ({
   inCardSubmit: {
     marginTop: theme.spacing(2.5),
+    width: 'max-content',
   },
 }))
 
@@ -84,12 +85,12 @@ const AzureCloudProviderFields = ({
       />
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {showSubmitInCard && (
-        <InfoTooltipWrapper info={updateButtonTooltipMsg}>
-          <div className={inCardSubmit}>
-            <Button disabled type="submit">
-              Update Cloud Provider
-            </Button>
-          </div>
+        <InfoTooltipWrapper info={updateButtonTooltipMsg} className={inCardSubmit}>
+          {/* <div className={inCardSubmit}> */}
+          <Button disabled type="submit">
+            Update Cloud Provider
+          </Button>
+          {/* </div> */}
         </InfoTooltipWrapper>
       )}
     </>

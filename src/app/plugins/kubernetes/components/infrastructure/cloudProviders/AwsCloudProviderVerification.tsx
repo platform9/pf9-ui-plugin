@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   selectionArea: {
     display: 'grid',
-    gridTemplateColumns: '50% 50%',
+    gridTemplateColumns: '80% 20%',
   },
   setDefaultButton: {
     alignSelf: 'center',
@@ -137,6 +137,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
 
   const handleSetUserDefault = async (key: UserPreferences, value) => {
     setWizardContext({ [key]: value })
+    console.log('set user default', key)
   }
 
   return (

@@ -1,7 +1,7 @@
 import config from '../../config'
 import ApiService from 'api-client/ApiService'
 import { PreferenceStoreResponse } from './preference-store.model'
-import { GlobalPreferences } from 'app/constants'
+import { GlobalPreferences, UserPreferences } from 'app/constants'
 
 class PreferenceStore extends ApiService {
   public getClassName() {
@@ -16,10 +16,9 @@ class PreferenceStore extends ApiService {
     return '/preference-store'
   }
 
-  getUserPreference = async (userId, key) => {
-    const url = `${this.baseUrl}/user/${userId}/${key}`
+  getUserPreference = async (userId, key: UserPreferences) => {
     return this.client.basicGet({
-      url,
+      url: `${this.baseUrl}/user/${userId}/${key}`,
       options: {
         clsName: this.getClassName(),
         mthdName: 'getUserPreference',
@@ -27,40 +26,21 @@ class PreferenceStore extends ApiService {
     })
   }
 
-  // setUserPreference = async (userId, body, key) => {
-  //   const url = `${this.baseUrl}/user/${userId}/${key}`
-  //   return this.client.basicPut({
-  //     url,
-  //     body,
-  //     options: {
-  //       clsName: this.getClassName(),
-  //       mthdName: 'addUserPreference',
-  //     },
-  //   })
-  // }
-
-  setUserPreference = async (userId, body, key) => {
-    const url = `${this.baseUrl}/user/${userId}/${key}`
-    const authHeaders = this.client.getAuthHeaders()['headers']['X-Auth-Token']
-    console.log({ 'X-Auth-Token': authHeaders, 'Content-Type': 'application/json' })
-    return this.client.rawPut({
-      url,
-      data: body,
-      config: {
-        headers: { 'X-Auth-Token': authHeaders, 'Content-Type': 'application/json' },
-        withCredentials: true,
-      },
+  setUserPreference = async (userId, key: UserPreferences, value) => {
+    const body = { value: value }
+    return this.client.basicPut({
+      url: `${this.baseUrl}/user/${userId}/${key}`,
+      body,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'getUserPreference',
+        mthdName: 'addUserPreference',
       },
     })
   }
 
-  deleteUserPreference = async (userId, key) => {
-    const url = `${this.baseUrl}/user/${userId}/${key}`
+  deleteUserPreference = async (userId, key: UserPreferences) => {
     return this.client.basicGet({
-      url,
+      url: `${this.baseUrl}/user/${userId}/${key}`,
       options: {
         clsName: this.getClassName(),
         mthdName: 'deleteUserPreference',

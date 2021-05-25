@@ -28,16 +28,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   selectionArea: {
     display: 'grid',
-    gridTemplateColumns: '50% 50%',
+    gridTemplateColumns: '80% 20%',
   },
   setDefaultButton: {
     alignSelf: 'center',
     justifySelf: 'flex-end',
   },
   sshKey: {
-    backgroundColor: 'white',
-    padding: '0 5px',
-    margin: '0 -5px',
+    width: '70%',
   },
 }))
 
