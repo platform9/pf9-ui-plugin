@@ -131,6 +131,15 @@ class ApiClient {
         const url = error?.response?.config
         const data = error?.response?.data
 
+        // If data contains user password, remove it
+        if (url?.data?.includes('{"methods":["password"]')) {
+          const dataObj = JSON.parse(url.data)
+          if (dataObj?.auth?.identity?.password?.user?.password) {
+            dataObj.auth.identity.password.user.password = 'SENSITIVE_DATA_REMOVED'
+            url.data = JSON.stringify(dataObj)
+          }
+        }
+
         Bugsnag.addMetadata('Api Url', url)
         Bugsnag.addMetadata('Api Response', data)
         Bugsnag.notify(error)
