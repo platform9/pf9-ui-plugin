@@ -20,6 +20,12 @@ import { createSsoConfig, deleteSsoConfig, loadSsoConfig } from './actions'
 import Progress from 'core/components/progress/Progress'
 import SsoEnabledDialog from './SsoEnabledDialog'
 import { SsoProviders } from './model'
+import AccountUpgradeDialog from '../../theme/AccountUpgradeDialog'
+import { CustomerTiers, ssoEnabledTiers } from 'app/constants'
+import { pathOr, prop } from 'ramda'
+import { useSelector } from 'react-redux'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { RootState } from 'app/store'
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -114,6 +120,9 @@ const SsoPage = () => {
   const classes = useStyles({})
   const [loading, setLoading] = useState(true)
   const [dialogOpened, setDialogOpened] = useState(false)
+  const [upgradeDialogOpened, setUpgradeDialogOpened] = useState(false)
+  const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
+  const { features } = session
   const { params, updateParams, getParamsUpdater } = useParams<State>({
     enableSso: false,
     ssoIsEnabled: false,
@@ -155,12 +164,26 @@ const SsoPage = () => {
       updateParams({ enableSso: false, ssoIsEnabled: false })
       return
     }
+    if (
+      !params.enableSso &&
+      !ssoEnabledTiers.includes(pathOr(CustomerTiers.Freedom, ['customer_tier'], features))
+    ) {
+      // If SSO is not available for customer tier
+      setUpgradeDialogOpened(true)
+      return
+    }
     updateParams({ enableSso: !params.enableSso })
   }, [params, updateParams, deleteSsoConfig])
 
   return (
     <div className={classes.ssoPage}>
       <DocumentMeta title="SSO Management" bodyClasses={['form-view']} />
+      {upgradeDialogOpened && (
+        <AccountUpgradeDialog
+          feature="Enterprise SSO"
+          onClose={() => setUpgradeDialogOpened(false)}
+        />
+      )}
       <Progress loading={loading}>
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
