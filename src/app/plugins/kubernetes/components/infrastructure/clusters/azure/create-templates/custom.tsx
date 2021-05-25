@@ -119,9 +119,9 @@ const networkOptions = [
 ]
 
 const templateOptions = [
-  { label: 'Sm - Single Node Master & Worker (Standard_A4_v2)', value: 'small' },
-  { label: 'Md - 1 Master + 3 Workers (Standard_A4_v2)', value: 'medium' },
-  { label: 'Lg - 3 Masters + 5 Workers (Standard_A4_v2)', value: 'large' },
+  { label: 'Sm - Single Node Master & Worker', value: 'small' },
+  { label: 'Md - 1 Master + 3 Workers', value: 'medium' },
+  { label: 'Lg - 3 Masters + 5 Workers', value: 'large' },
   { label: 'custom', value: 'custom' },
 ]
 
@@ -137,15 +137,15 @@ const handleTemplateChoice = ({ setFieldValue }) => (option) => {
       numMasters: 1,
       numWorkers: 0,
       allowWorkloadsOnMaster: true,
-      masterSku: 'Standard_A1_v2',
-      workerSku: 'Standard_A1_v2',
+      masterSku: 'Standard_A4_v2',
+      workerSku: 'Standard_A4_v2',
     },
     medium: {
       numMasters: 1,
       numWorkers: 3,
       allowWorkloadsOnMaster: false,
-      masterSku: 'Standard_A2_v2',
-      workerSku: 'Standard_A2_v2',
+      masterSku: 'Standard_A4_v2',
+      workerSku: 'Standard_A4_v2',
     },
     large: {
       numMasters: 3,
