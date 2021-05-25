@@ -41,7 +41,6 @@ import { updateClarityStore } from 'utils/clarityHelper'
 import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 import Theme from 'core/themes/model'
-import { Route as Routes } from 'core/utils/routes'
 import Bugsnag from '@bugsnag/js'
 
 const { setActiveRegion } = ApiClient.getInstance()
@@ -145,12 +144,7 @@ const AppContainer = () => {
 
   useEffect(() => {
     const unlisten = history.listen((location) => {
-      const url = `${location.pathname}${location.hash}`
-      trackPage(url)
-      const route = Routes.find(url)
-      if (route) {
-        Bugsnag.leaveBreadcrumb(route.name, {}, 'navigation')
-      }
+      trackPage(`${location.pathname}${location.hash}`)
       if (features?.experimental?.sandbox) {
         appCuesSetAnonymous()
       }
