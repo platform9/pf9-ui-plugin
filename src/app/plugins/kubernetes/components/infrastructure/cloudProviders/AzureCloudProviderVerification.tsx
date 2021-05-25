@@ -9,9 +9,10 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
 import { RegionAvailability } from './helpers'
 import { CloudProviders } from './model'
-import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
 import Button from 'core/elements/button'
+import { UserPreferences } from 'app/constants'
 import SshKeyTextfield from '../clusters/form-components/ssh-key-textfield'
+import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
 
 const useStyles = makeStyles((theme: Theme) => ({
   spaceRight: {
@@ -27,11 +28,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   selectionArea: {
     display: 'grid',
-    gridTemplateColumns: '80% 20%',
+    gridTemplateColumns: '50% 50%',
   },
   setDefaultButton: {
     alignSelf: 'center',
     justifySelf: 'flex-end',
+  },
+  sshKey: {
+    backgroundColor: 'white',
+    padding: '0 5px',
+    margin: '0 -5px',
   },
 }))
 
@@ -48,6 +54,7 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
   })
 
   const handleSetUserDefault = async (key, value) => {
+    console.log(key)
     setWizardContext({ [key]: value })
   }
 
@@ -90,7 +97,9 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
             variant="light"
             className={classes.setDefaultButton}
             disabled={!wizardContext.region}
-            onClick={() => handleSetUserDefault('defaultRegion', wizardContext.regionOptionLabel)}
+            onClick={() =>
+              handleSetUserDefault(UserPreferences.AzureRegion, wizardContext.regionOptionLabel)
+            }
           >
             Set As Default
           </Button>
@@ -101,14 +110,17 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
           Add a Public SSH Key to be used as the default key during cluster creation.
         </Text>
         <div className={classes.selectionArea}>
-          <SshKeyTextfield wizardContext={wizardContext} setWizardContext={setWizardContext} />
-
+          <SshKeyTextfield
+            wizardContext={wizardContext}
+            setWizardContext={setWizardContext}
+            required={false}
+          />
           <Button
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
             disabled={!wizardContext.sshKey}
-            onClick={() => handleSetUserDefault('defaultSshKey', wizardContext.sshKey)}
+            onClick={() => handleSetUserDefault(UserPreferences.AzureSshKey, wizardContext.sshKey)}
           >
             Set As Default
           </Button>

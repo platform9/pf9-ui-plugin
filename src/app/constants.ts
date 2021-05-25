@@ -137,13 +137,15 @@ export const publicSlackLink = 'https://kplane.slack.com'
 export const supportEmail = 'support-ft@platform9.com'
 export const pmkftSignupLink = 'https://platform9.com/signup-flow/?sandbox=kubernetes'
 
-// User Preferences
-export const enum UserPreferenceKeys {
-  AwsCloudProviderDefaultRegion = 'awsCloudProviderDefaultRegion',
-  AzureCloudProviderDefaultRegion = 'azureCloudProviderDefaultRegion',
-  AwsDefaultSshKey = 'awsDefaultSshKey',
-  AzureDefaultSshKey = 'azureDefaultSshKey',
-  AwsRoute53DefaultDomain = 'awsRoute53DefaultDomain',
+export const enum UserPreferences {
+  // AWS
+  AwsRegion = 'awsRegion',
+  AwsSshKey = 'awsSshKey',
+  AwsRoute53Domain = 'awsRoute53Domain',
+
+  // Azure
+  AzureRegion = 'azureRegion',
+  AzureSshKey = 'azureSshKey',
 }
 
 export enum GlobalPreferences {

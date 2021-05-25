@@ -22,6 +22,7 @@ import { pick } from 'ramda'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
+import { UserPreferences } from 'app/constants'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -120,31 +121,44 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     })(initialValues.type)
   }, [initialValues.type])
 
-  const getCalloutFields = useCallback((wizardContext) => {
-    return [
-      {
-        label: `Default Region`,
-        value: wizardContext.defaultRegion,
-      },
-      {
-        label: `Default Route53 (Optional)`,
-        value: wizardContext.defaultRoute53Domain,
-        renderCond: wizardContext.type === CloudProviders.Aws,
-      },
-      {
-        label: `Default SSH Key`,
-        value: wizardContext.defaultSshKey,
-      },
-    ]
-  }, [])
+  const getCalloutFields = useCallback(
+    (wizardContext) => {
+      return objSwitchCaseAny({
+        [CloudProviders.Aws]: [
+          {
+            label: `Default Region`,
+            value: wizardContext[UserPreferences.AwsRegion],
+          },
+          {
+            label: `Default Route53 (Optional)`,
+            value: wizardContext[UserPreferences.AwsRoute53Domain],
+          },
+          {
+            label: `Default SSH Key`,
+            value: wizardContext[UserPreferences.AwsSshKey],
+          },
+        ],
+        [CloudProviders.Azure]: [
+          {
+            label: `Default Region`,
+            value: wizardContext[UserPreferences.AzureRegion],
+          },
+          {
+            label: `Default SSH Key`,
+            value: wizardContext[UserPreferences.AzureSshKey],
+          },
+        ],
+      })(initialValues.type)
+    },
+    [initialValues.type],
+  )
 
   const renderCustomCalloutFields = useCallback(
     (wizardContext) => {
       const calloutFields = getCalloutFields(wizardContext)
       return (
         <div>
-          {calloutFields.map(({ label, value, renderCond = true }) => {
-            if (!renderCond) return null
+          {calloutFields.map(({ label, value }) => {
             const icon = value ? 'check-circle' : 'times-circle'
             const iconClass = value ? 'checkIcon' : 'timesIcon'
             return (
@@ -214,6 +228,13 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                           setDefaultValueForTextfields
                         />
                       </FormFieldCard>
+                    </ValidatedForm>
+                    <ValidatedForm
+                      classes={{ root: classes.validatedFormContainer }}
+                      initialValues={wizardContext}
+                      elevated={false}
+                      maxWidth={800}
+                    >
                       <VerificationFields
                         wizardContext={wizardContext}
                         setWizardContext={setWizardContext}

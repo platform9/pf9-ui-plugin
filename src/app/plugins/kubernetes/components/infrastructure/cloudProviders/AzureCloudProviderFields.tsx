@@ -21,6 +21,7 @@ interface Props {
   showSubmitInCard: boolean
   updateWizard: boolean
   errorMessage: string
+  defaultTextfieldValue?: string
 }
 
 const AzureCloudProviderFields = ({
@@ -29,6 +30,7 @@ const AzureCloudProviderFields = ({
   showSubmitInCard = false,
   updateWizard = false,
   errorMessage = '',
+  defaultTextfieldValue = '**********************',
 }: Props) => {
   const { inCardSubmit } = useStyles({})
 
@@ -47,6 +49,7 @@ const AzureCloudProviderFields = ({
         id="tenantId"
         label="Tenant ID"
         onChange={(value) => setWizardContext({ tenantId: value })}
+        value={wizardContext.tenantId || defaultTextfieldValue}
         info="The tenant ID of the service principal"
         disabled={updateWizard}
         required
@@ -55,6 +58,7 @@ const AzureCloudProviderFields = ({
         id="clientId"
         label="Client ID"
         onChange={(value) => setWizardContext({ clientId: value })}
+        value={wizardContext.clientId || defaultTextfieldValue}
         info="The client ID of the service principal"
         disabled={updateWizard}
         required
@@ -64,6 +68,7 @@ const AzureCloudProviderFields = ({
         type="password"
         label="Client Secret"
         onChange={(value) => setWizardContext({ clientSecret: value })}
+        value={wizardContext.clientSecret || defaultTextfieldValue}
         info="The client secret of the service principal"
         disabled={updateWizard}
         required
@@ -72,6 +77,7 @@ const AzureCloudProviderFields = ({
         id="subscriptionId"
         label="Subscription ID"
         onChange={(value) => setWizardContext({ subscriptionId: value })}
+        value={wizardContext.subscriptionId || defaultTextfieldValue}
         info="The ID of the subscription that correlates to the service principal"
         disabled={updateWizard}
         required

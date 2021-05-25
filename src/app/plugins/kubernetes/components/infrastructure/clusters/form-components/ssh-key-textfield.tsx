@@ -7,7 +7,12 @@ const sshKeyValidator = customValidator((value) => {
   return isKeyValid(value)
 }, 'You must enter a valid SSH key')
 
-export default ({ wizardContext, setWizardContext, validations = [sshKeyValidator] }) => (
+export default ({
+  wizardContext,
+  setWizardContext,
+  validations = [sshKeyValidator],
+  required = true,
+}) => (
   <TextField
     id="sshKey"
     value={wizardContext.sshKey}
@@ -15,9 +20,9 @@ export default ({ wizardContext, setWizardContext, validations = [sshKeyValidato
     label="Public SSH key"
     info="Copy/paste your SSH public key"
     size="small"
-    validations={validations}
+    validations={wizardContext.sshKey || required ? validations : []}
     multiline
     rows={3}
-    required
+    required={required}
   />
 )
