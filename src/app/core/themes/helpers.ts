@@ -1,3 +1,4 @@
+import { assocPath, path } from 'ramda'
 import Theme, { Components } from './model'
 
 interface IColor {
@@ -51,6 +52,22 @@ interface IColorPalette {
   primary: IMuiColor
   secondary: IMuiColor
   type: 'light' | 'dark'
+}
+
+// newComponents looks like [{ pathTo: [], value: string }]
+export function generateComponentColors({ components = [] }, defaultComponentStyles: Components) {
+  let newComponentStyles = Object.assign({}, defaultComponentStyles)
+  for (const component of components) {
+    // Is there some easy way to not need to mutate the original object?
+    // @ts-ignore
+    newComponentStyles = assocPath(
+      component.pathTo,
+      // If value is empty value, keep the default
+      component.value || path(component.pathTo, newComponentStyles),
+      newComponentStyles,
+    )
+  }
+  return newComponentStyles
 }
 
 export function generateColorPalette<T extends ThemeColors>({
@@ -121,18 +138,15 @@ export function generateTypography<T>({
 export function generateTheme<P extends ThemeColors, T>({
   palette,
   typography,
-  components,
 }: {
   palette: IPalette<P>
   typography: ITypography<T>
-  components: Components
 }): Theme {
   const MuiTypography = generateTypography<T>(typography)
 
   return {
     palette: generateColorPalette<P>(palette),
     typography: MuiTypography,
-    components,
     breakpoints: {
       keys: ['xs', 'sm', 'md', 'lg', 'xl'],
       values: {
