@@ -27,8 +27,7 @@ export const TopologyManagerAddonFields = (props) => {
 
   useEffect(() => {
     // set default values
-    setWizardContext({ topologyManagerPolicy: 'none' })
-    setWizardContext({ cpuManagerPolicy: 'none' })
+    setWizardContext({ topologyManagerPolicy: 'none', cpuManagerPolicy: 'none' })
   }, [])
 
   if (wizardContext.topologyManagerPolicy !== 'none' && wizardContext.cpuManagerPolicy === 'none') {
