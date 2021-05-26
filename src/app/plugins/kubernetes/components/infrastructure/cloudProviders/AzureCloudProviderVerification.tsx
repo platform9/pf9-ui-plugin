@@ -42,9 +42,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   wizardContext: any
   setWizardContext: any
+  updatePrefs: any
 }
 
-const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Props) => {
+const AzureCloudProviderVerification = ({
+  wizardContext,
+  setWizardContext,
+  updatePrefs,
+}: Props) => {
   const classes = useStyles({})
 
   const [regions, regionsLoading] = useDataLoader(loadCloudProviderDetails, {
@@ -52,8 +57,7 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
   })
 
   const handleSetUserDefault = async (key, value) => {
-    console.log(key)
-    setWizardContext({ [key]: value })
+    updatePrefs({ [key]: value })
   }
 
   return (

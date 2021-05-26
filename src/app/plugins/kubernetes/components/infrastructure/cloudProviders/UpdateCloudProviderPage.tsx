@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
@@ -20,9 +20,12 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { pick } from 'ramda'
 import { routes } from 'core/utils/routes'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import clsx from 'clsx'
-import { UserPreferences } from 'app/constants'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import {
+  awsVerificationCalloutFields,
+  azureVerificationCalloutFields,
+  renderVerificationCalloutFields,
+} from './helpers'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -51,34 +54,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'grid',
     gridGap: theme.spacing(2),
   },
-  spaceRight: {
-    marginRight: theme.spacing(4),
-  },
-  checkIcon: {
-    color: theme.palette.green[500],
-    marginRight: theme.spacing(1),
-    alignSelf: 'center',
-  },
-  timesIcon: {
-    color: theme.palette.red[500],
-    marginRight: theme.spacing(1),
-    alignSelf: 'center',
-  },
-  calloutFields: {
-    display: 'grid',
-    gridGap: theme.spacing(0.5),
-    marginBottom: theme.spacing(1),
-  },
-  label: {
-    display: 'grid',
-    gridTemplateColumns: 'min-content 1fr',
-  },
-  value: {
-    marginLeft: theme.spacing(4),
-  },
-  noneText: {
-    color: theme.palette.grey[300],
-  },
 }))
 
 const formCpBody = (data) => {
@@ -94,6 +69,7 @@ const formCpBody = (data) => {
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
+  const [prefs, updatePrefs] = useScopedPreferences('defaults')
 
   const updatedInitialValues: ICloudProvidersSelector = useMemo(() => {
     return {
@@ -121,70 +97,12 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     })(initialValues.type)
   }, [initialValues.type])
 
-  const getCalloutFields = useCallback(
-    (wizardContext) => {
-      return objSwitchCaseAny({
-        [CloudProviders.Aws]: [
-          {
-            label: `Default Region`,
-            value: wizardContext[UserPreferences.AwsRegion],
-          },
-          {
-            label: `Default Route53 (Optional)`,
-            value: wizardContext[UserPreferences.AwsRoute53Domain],
-          },
-          {
-            label: `Default SSH Key`,
-            value: wizardContext[UserPreferences.AwsSshKey],
-          },
-        ],
-        [CloudProviders.Azure]: [
-          {
-            label: `Default Region`,
-            value: wizardContext[UserPreferences.AzureRegion],
-          },
-          {
-            label: `Default SSH Key`,
-            value: wizardContext[UserPreferences.AzureSshKey],
-          },
-        ],
-      })(initialValues.type)
-    },
-    [initialValues.type],
-  )
-
-  const renderCustomCalloutFields = useCallback(
-    (wizardContext) => {
-      const calloutFields = getCalloutFields(wizardContext)
-      return (
-        <div>
-          {calloutFields.map(({ label, value }) => {
-            const icon = value ? 'check-circle' : 'times-circle'
-            const iconClass = value ? 'checkIcon' : 'timesIcon'
-            return (
-              <div key={label} className={classes.calloutFields}>
-                <div className={classes.label}>
-                  <FontAwesomeIcon className={classes[iconClass]} solid>
-                    {icon}
-                  </FontAwesomeIcon>
-                  <Text variant="body2" className={classes.spaceRight}>
-                    {label}
-                  </Text>
-                </div>
-                <Text
-                  variant="caption1"
-                  className={clsx(classes.value, value ? '' : classes['noneText'])}
-                >
-                  {value || 'none'}
-                </Text>
-              </div>
-            )
-          })}
-        </div>
-      )
-    },
-    [getCalloutFields],
-  )
+  const calloutFields = useMemo(() => {
+    return objSwitchCaseAny({
+      [CloudProviders.Aws]: awsVerificationCalloutFields,
+      [CloudProviders.Azure]: azureVerificationCalloutFields,
+    })(initialValues.type)
+  }, [initialValues.type])
 
   return (
     <>
@@ -202,9 +120,11 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
             return (
               <WizardMeta
                 className={classes.updateCloudProvider}
-                fields={wizardContext}
+                fields={prefs}
+                calloutFields={calloutFields}
+                renderLabels={renderVerificationCalloutFields()}
                 icon={<CloudProviderCard active type={wizardContext.type} />}
-                extraSidebarContent={renderCustomCalloutFields(wizardContext)}
+                showUndefinedFields
               >
                 <WizardStep stepId="step1" label="Update Cloud Provider">
                   <div className={classes.form}>
@@ -238,6 +158,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                       <VerificationFields
                         wizardContext={wizardContext}
                         setWizardContext={setWizardContext}
+                        updatePrefs={updatePrefs}
                       />
                     </ValidatedForm>
                   </div>

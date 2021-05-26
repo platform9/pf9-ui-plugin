@@ -62,6 +62,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   wizardContext: any
   setWizardContext: any
+  updatePrefs: any
 }
 
 const getRoute53String = (classes, loading, regionId, available) =>
@@ -120,7 +121,7 @@ const SshKeyAvailability = ({ keypairs, loading, regionId, setWizardContext }) =
   )
 }
 
-const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props) => {
+const AwsCloudProviderVerification = ({ wizardContext, setWizardContext, updatePrefs }: Props) => {
   const classes = useStyles({})
 
   const [regions, regionsLoading] = useDataLoader(loadCloudProviderDetails, {
@@ -136,8 +137,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
   const handleSetUserDefault = async (key: UserPreferences, value) => {
-    setWizardContext({ [key]: value })
-    console.log('set user default', key)
+    updatePrefs({ [key]: value })
   }
 
   return (

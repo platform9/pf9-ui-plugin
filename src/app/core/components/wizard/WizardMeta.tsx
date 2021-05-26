@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { RenderLabels } from 'k8s/components/pods/renderLabels'
-import { pick, pickBy } from 'ramda'
+import { pick, pickAll, pickBy } from 'ramda'
 import clsx from 'clsx'
 import { WizardContext } from './Wizard'
 import CodeBlock from '../CodeBlock'
@@ -16,7 +16,7 @@ interface Props<T extends {}> {
   showContextPreview?: boolean
   keyOverrides?: { [key: string]: string }
   renderLabels?: (labels) => JSX.Element
-  extraSidebarContent?: JSX.Element
+  showUndefinedFields?: boolean
 }
 
 /*
@@ -32,18 +32,22 @@ export default function WizardMeta<T>({
   fields,
   icon,
   className,
-  extraSidebarContent = null,
   showContextPreview = localStorage.getItem('enableContextPreview') === 'true',
   renderLabels = (labels) => (
     <RenderLabels keyOverrides={keyOverrides} labels={labels} inverse split />
   ),
+  showUndefinedFields = false,
 }: Props<T>) {
   const { setWizardCalloutFields } = useContext(WizardContext as any)
   useEffect(() => {
     setWizardCalloutFields(calloutFields)
   }, [])
   const classes = useStyles({ icon: !!icon })
-  const labels = pickBy(isNotUndefined, pick(calloutFields, fields))
+  const labels = showUndefinedFields
+    ? pickAll(calloutFields as any, fields)
+    : pickBy(isNotUndefined, pick(calloutFields, fields))
+  console.log('labels', labels)
+  console.log(calloutFields)
   return (
     <div className={clsx(classes.wizardMeta, className)}>
       <aside>
@@ -54,7 +58,6 @@ export default function WizardMeta<T>({
           </>
         )}
         {Object.entries(labels).length > 0 && renderLabels(labels)}
-        {extraSidebarContent}
       </aside>
       {children}
       {showContextPreview && (
