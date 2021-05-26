@@ -10,7 +10,6 @@ const renderBoolean = (bool) => (bool ? 'True' : 'False')
 
 const renderStringArray = (array) => array.join(', ')
 
-// Common
 const clusterOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
   { id: 'spec.aks.type', title: 'Type' },
   { id: 'spec.aks.kubernetesVersion', title: 'KubernetesVersion' },

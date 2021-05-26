@@ -39,12 +39,11 @@ const RegionsChecklist = ({ cloudProviderId, onChange, value, className, cluster
   })
 
   const regionCount = useMemo(() => {
-    // Currently only AKS passes this, assume location as prop to index by
     if (clusters) {
       return clusters.reduce((accum, cluster) => {
         return {
           ...accum,
-          [cluster.location]: cluster?.clusters?.length,
+          [cluster.region]: cluster?.clusters?.length,
         }
       }, {})
     }
