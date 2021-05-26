@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -11,6 +12,7 @@ const { qbert } = ApiClient.getInstance()
 
 export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProviders, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get cloud providers')
     const [cloudProviders] = await Promise.all([
       qbert.getCloudProviders(),
       // Make sure the derived data gets loaded as well
@@ -19,6 +21,7 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
     return cloudProviders
   },
   createFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create cloud provider', params)
     const result = await qbert.createCloudProvider(params)
     trackEvent('Create Cloud Provider', {
       cloud_provider_name: params.name,
@@ -32,11 +35,13 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
     return { ...cloudProvider }
   },
   updateFn: async ({ uuid, ...data }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update cloud provider', { clusterId: uuid, ...data })
     const result = await qbert.updateCloudProvider(uuid, data)
     trackEvent('Update Cloud Provider', { uuid })
     return result
   },
   deleteFn: async ({ uuid, name, type }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete cloud provider', { clusterId: uuid, name, type })
     const result = await qbert.deleteCloudProvider(uuid)
     trackEvent('Delete Cloud Provider', {
       uuid,
@@ -47,6 +52,10 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
   },
   customOperations: {
     attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to attach nodes to cluster', {
+        clusterId: clusterUuid,
+        nodes,
+      })
       const nodeUuids = pluck('uuid', nodes)
       await qbert.attach(clusterUuid, nodes)
       trackEvent('Attach node(s) to cluster', { clusterUuid, numNodes: (nodes || []).length })
@@ -57,6 +66,10 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
       )
     },
     detachNodesFromCluster: async ({ clusterUuid, nodeUuids }, currentItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to detach nodes from cluster', {
+        clusterId: clusterUuid,
+        nodeUuids,
+      })
       await qbert.detach(clusterUuid, nodeUuids)
       trackEvent('Detach node(s) from cluster', { clusterUuid, numNodes: (nodeUuids || []).length })
       return currentItems.map((node) =>
@@ -71,6 +84,7 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
 export const loadCloudProviderDetails = createContextLoader(
   ActionDataKeys.CloudProviderDetails,
   async ({ cloudProviderId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load cloud provider details', { cloudProviderId })
     const response = await qbert.getCloudProviderDetails(cloudProviderId)
     return response.Regions
   },
@@ -83,6 +97,10 @@ export const loadCloudProviderDetails = createContextLoader(
 export const loadCloudProviderRegionDetails = createContextLoader(
   ActionDataKeys.CloudProviderRegionDetails,
   async ({ cloudProviderId, cloudProviderRegionId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load cloud provide region details', {
+      cloudProviderId,
+      cloudProviderRegionId,
+    })
     return qbert.getCloudProviderRegionDetails(cloudProviderId, cloudProviderRegionId)
   },
   {

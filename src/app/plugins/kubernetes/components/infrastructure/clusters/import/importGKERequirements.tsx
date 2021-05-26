@@ -8,6 +8,7 @@ import Theme from 'core/themes/model'
 import ComingSoonDialog from './ComingSoonDialog'
 import { trackEvent } from 'utils/tracking'
 import ExternalLink from 'core/components/ExternalLink'
+import Bugsnag from '@bugsnag/js'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
@@ -45,6 +46,7 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
   // const [cloudProviders] = useDataLoader(cloudProviderActions.list)
 
   const triggerDialog = () => {
+    Bugsnag.leaveBreadcrumb('Clicked Import GKE Cluster')
     trackEvent('Clicked Import GKE Cluster')
     setShowComingSoonDialog(true)
   }

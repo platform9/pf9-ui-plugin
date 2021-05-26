@@ -11,12 +11,14 @@ import { appActions } from '../actions'
 import { makeDeployedAppsSelector } from './selectors'
 import namespaceActions from 'k8s/components/namespaces/actions'
 import { trackEvent } from 'utils/tracking'
+import Bugsnag from '@bugsnag/js'
 
 const { helm } = ApiClient.getInstance()
 const { dispatch } = store
 
 export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
   listFn: async ({ clusterId, namespace }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to list deployed apps', { clusterId, namespace })
     // Fetch dependent cache
     await appActions.list()
 
@@ -48,10 +50,14 @@ export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
       Version: version,
       Vals: values,
     }
+    Bugsnag.leaveBreadcrumb('Attempting to update deployed application', {
+      clusterId: clusterId,
+      ...body,
+    })
     const result = helm.updateRelease(clusterId, namespace, body)
     dispatch(cacheActions.clearCache({ cacheKey: DataKeys.DeployedAppDetails }))
 
-    trackEvent('Application Updated ', {
+    trackEvent('Update Application ', {
       cluster: clusterId,
       appName: deploymentName,
     })
@@ -62,9 +68,14 @@ export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
     const data = {
       Name: name,
     }
+    Bugsnag.leaveBreadcrumb('Attempting to delete deployed application', {
+      clusterId,
+      namespace,
+      name,
+    })
     await helm.deleteRelease(clusterId, namespace, data)
 
-    trackEvent('Application Deleted', {
+    trackEvent('Delete Application', {
       cluster: clusterId,
       appName: name,
     })
@@ -90,12 +101,13 @@ export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
         Version: version,
         Vals: values,
       }
+      Bugsnag.leaveBreadcrumb('Attempting to deploy application', { clusterId, namespace, ...body })
       await helm.deployChart(clusterId, namespace, body)
 
       // Refetch the list of deployed apps under this clusterId and namespace
       deployedAppActions.list({ clusterId, namespace }, true)
 
-      trackEvent('Application Deployed', {
+      trackEvent('Deploy Application', {
         cluster: clusterId,
         appName: deploymentName,
       })
@@ -111,6 +123,11 @@ export const deployedAppActions = createCRUDActions(DataKeys.DeployedApps, {
 export const deploymentDetailLoader = createContextLoader(
   DataKeys.DeployedAppDetails,
   async ({ clusterId, namespace, releaseName }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get app deployment details', {
+      clusterId,
+      namespace,
+      releaseName,
+    })
     const details = helm.getReleaseInfo(clusterId, namespace, releaseName)
     return details
   },
