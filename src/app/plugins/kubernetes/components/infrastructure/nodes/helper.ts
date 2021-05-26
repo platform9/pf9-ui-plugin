@@ -1,7 +1,15 @@
-import { partition } from 'ramda'
+import { partition, pathOr } from 'ramda'
 import { ClusterType, HardwareType, nodeHardwareRequirements } from '../clusters/bareos/constants'
+import { ErrorMessageCodes, errorMessageLevel } from './model'
 
-export const hasClockDrift = (node) => node?.message?.warn && node.message.warn[0]
+export const getErrorMessage = (node, msgLevel: errorMessageLevel, code: ErrorMessageCodes) => {
+  const messages = pathOr(null, ['message', msgLevel], node)
+  if (!messages || !Array.isArray(messages)) return null
+
+  return messages.find((msg) => msg.code === code)?.message
+}
+
+export const hasClockDrift = (node) => !!getErrorMessage(node, 'warn', ErrorMessageCodes.timeDrift)
 
 export const isUnauthorizedHost = (host) => !host?.roles?.includes('pf9-kube')
 
