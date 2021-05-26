@@ -1,6 +1,6 @@
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import { WizardContext } from 'core/components/wizard/Wizard'
@@ -11,10 +11,7 @@ const TopologyManagerField = () => (
     info="add Topology Manager support "
   />
 )
-const cpuManagerOptions = [
-  { label: 'none', value: 'none' },
-  { label: 'static', value: 'static' },
-]
+
 const topologyManagerPolicyoptions = [
   { label: 'none', value: 'none' },
   { label: 'best-effort', value: 'best-effort' },
@@ -27,7 +24,20 @@ export const TopologyManagerAddonFields = (props) => {
     wizardContext,
     setWizardContext,
   }: { wizardContext: any; setWizardContext: any } = useContext(WizardContext) as any
-
+  console.log(wizardContext)
+  useEffect(() => {
+    setWizardContext({ topologyManagerPolicy: 'none' })
+    setWizardContext({ cpuManagerPolicy: 'none' })
+  }, [])
+  if (wizardContext.topologyManagerPolicy !== 'none' && wizardContext.cpuManagerPolicy === 'none') {
+    setWizardContext({ cpuManagerPolicy: 'static' })
+  }
+  if (
+    wizardContext.topologyManagerPolicy === 'none' &&
+    wizardContext.cpuManagerPolicy === 'static'
+  ) {
+    setWizardContext({ cpuManagerPolicy: 'none' })
+  }
   return (
     <FormFieldCard title=" Add Topology Manager Policy">
       <PicklistField
@@ -39,18 +49,6 @@ export const TopologyManagerAddonFields = (props) => {
         }}
         required
       />
-      {wizardContext.topologyManagerPolicy !== 'none' &&
-        wizardContext.topologyManagerPolicy !== undefined && (
-          <PicklistField
-            id="CpuManagerPolicy"
-            label="CpuManagerPolicy"
-            options={cpuManagerOptions}
-            onChange={(value) => {
-              setWizardContext({ cpuManagerPolicy: value })
-            }}
-            required
-          />
-        )}
 
       <TextField
         value={wizardContext.reservedCPUsList}
