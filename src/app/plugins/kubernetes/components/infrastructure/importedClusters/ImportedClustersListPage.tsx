@@ -13,8 +13,6 @@ import SimpleLink from 'core/components/SimpleLink'
 import { importedClusterStatusMap } from './model'
 import ClusterStatusSpan from '../clusters/ClusterStatus'
 
-const renderExternal = (_, { external }) => (external ? <div>External</div> : null)
-
 const renderNodeGroups = (_, { nodeGroups }) => <div>{nodeGroups?.length || 0}</div>
 
 const renderClusterDetailLink = (name, cluster) => (
@@ -32,7 +30,7 @@ const renderStatus = (phase) => {
 const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name', render: renderClusterDetailLink },
-  { id: 'external', label: 'Type', render: renderExternal },
+  { id: 'providerType', label: 'Provider' },
   { id: 'status.phase', label: 'Status', render: renderStatus },
   { id: 'region', label: 'Region' },
   { id: 'kubeVersion', label: 'Kubernetes Version' },

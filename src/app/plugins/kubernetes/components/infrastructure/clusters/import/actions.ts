@@ -4,15 +4,7 @@ import { tryCatchAsync } from 'utils/async'
 const { qbert } = ApiClient.getInstance()
 
 const determineVpc = (cluster) => {
-  const choices = ['Public', 'Private']
-  const filteredChoices = choices.filter((choice) => {
-    if (choice === 'Public') {
-      return cluster.pf9Registered
-    } else if (choice === 'Private') {
-      return cluster.isPrivateAPI
-    }
-  })
-  return filteredChoices.length ? filteredChoices.join(' + ') : 'None'
+  return cluster.isPrivateAPI ? 'Private' : 'Public'
 }
 
 export const discoverExternalClusters = async ({

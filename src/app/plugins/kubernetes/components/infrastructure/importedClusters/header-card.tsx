@@ -46,7 +46,9 @@ const HeaderCard: FC<{ title: string; cluster: ImportedClusterSelector }> = ({
 
   const providerType = cluster?.metadata?.labels?.provider
   const privateAccess = cluster?.spec?.[providerType]?.network?.vpc?.privateAccess
-  const publicAccess = cluster?.spec?.[providerType]?.network?.vpc?.publicAccess
+  // Confirming with backend regarding vpc for aks cluster
+  const publicAccess =
+    cluster?.spec?.[providerType]?.network?.vpc?.publicAccess || cluster.providerType === 'aks'
   const isPublicPrivateVpc = privateAccess === true && publicAccess === true
   const isPrivateVpc = privateAccess === true && publicAccess === false
   const vpcText = `${publicAccess === true ? 'Public' : ''}${isPublicPrivateVpc ? ' + ' : ''}${
@@ -70,7 +72,7 @@ const HeaderCard: FC<{ title: string; cluster: ImportedClusterSelector }> = ({
         </Text>
         <Text variant="body2">{vpcText}</Text>
         <Text variant="body2" className={classes.capitalize}>
-          {cluster?.metadata?.labels?.region}
+          {cluster.region}
         </Text>
       </article>
       {isPrivateVpc && (
