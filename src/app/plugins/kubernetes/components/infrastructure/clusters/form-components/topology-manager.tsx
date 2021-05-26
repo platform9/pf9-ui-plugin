@@ -24,11 +24,13 @@ export const TopologyManagerAddonFields = (props) => {
     wizardContext,
     setWizardContext,
   }: { wizardContext: any; setWizardContext: any } = useContext(WizardContext) as any
-  console.log(wizardContext)
+
   useEffect(() => {
+    // set default values
     setWizardContext({ topologyManagerPolicy: 'none' })
     setWizardContext({ cpuManagerPolicy: 'none' })
   }, [])
+
   if (wizardContext.topologyManagerPolicy !== 'none' && wizardContext.cpuManagerPolicy === 'none') {
     setWizardContext({ cpuManagerPolicy: 'static' })
   }
@@ -39,7 +41,7 @@ export const TopologyManagerAddonFields = (props) => {
     setWizardContext({ cpuManagerPolicy: 'none' })
   }
   return (
-    <FormFieldCard title=" Add Topology Manager Policy">
+    <FormFieldCard title="Add Topology Manager Policy">
       <PicklistField
         id="TopologyManagerPolicy"
         label="TopologyManagerPolicy"
