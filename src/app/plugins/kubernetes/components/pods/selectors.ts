@@ -24,7 +24,10 @@ import { clustersSelector } from 'k8s/components/infrastructure/clusters/selecto
 import { IDeploymentSelector, IPodSelector, IServicesSelector } from './model'
 import { IDataKeys } from 'k8s/datakeys.model'
 import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
-import { getK8sDashboardLinkFromVersion } from '../infrastructure/clusters/helpers'
+import {
+  getK8sDashboardLinkFromVersion,
+  getScopedClusterProxyEndpoint,
+} from '../infrastructure/clusters/helpers'
 import { clientStoreKey } from 'core/client/clientReducers'
 import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
 
@@ -60,10 +63,8 @@ export const podsSelector = createSelector(
         const containers = pod?.spec?.containers
         const logUrls = containers.map((container) => {
           const logsEndpoint = pathJoin(
-            qbertEndpoint.match(/(.*?)\/qbert/)[0], // Trim the uri after "/qbert" from the qbert endpoint
-            'v1/clusters',
-            cluster?.uuid,
-            'k8sapi/api/v1/namespaces/', // qbert v3 link fails authorization so we have to use v1 link for logs
+            getScopedClusterProxyEndpoint(qbertEndpoint, cluster),
+            '/namespaces/', // qbert v3 link fails authorization so we have to use v1 link for logs
             namespace,
             'pods',
             name,

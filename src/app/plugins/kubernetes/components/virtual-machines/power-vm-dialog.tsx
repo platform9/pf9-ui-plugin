@@ -6,6 +6,7 @@ import Progress from 'core/components/progress/Progress'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { trackEvent } from 'utils/tracking'
 import { virtualMachineActions } from './actions'
+import Bugsnag from '@bugsnag/js'
 // import { routes } from 'core/utils/routes'
 
 const stopPropagation = (e) => e.stopPropagation()
@@ -23,6 +24,11 @@ const PowerVirtualMachineDialog = ({ rows: [virtualMachine], onClose }) => {
   )
   const title = `Permanently delete VM "${virtualMachine?.name}"?`
   const handleAction = useCallback(async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to power VM', {
+      cluster_uuid: virtualMachine?.clusterId,
+      vm_name: virtualMachine?.name,
+      vm_namespace: virtualMachine?.namespace,
+    })
     await powerVirtualMachine(virtualMachine)
     onClose()
     // history.push(routes.virtualMachines.list.path())

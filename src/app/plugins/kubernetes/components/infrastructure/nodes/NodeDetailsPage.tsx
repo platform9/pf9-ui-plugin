@@ -1,7 +1,6 @@
 // Libs
 import React, { useMemo, FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Card, CardHeader, CardContent, Grid } from '@material-ui/core'
 import Text from 'core/elements/text'
 import useReactRouter from 'use-react-router'
 // Actions
@@ -10,36 +9,54 @@ import { loadNodes } from './actions'
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
 // Models
-import { INodesSelector } from './model'
+import { ErrorMessageCodes, INodesSelector } from './model'
 import SimpleLink from 'core/components/SimpleLink'
 import Progress from 'core/components/progress/Progress'
 import UsageWidget from 'core/components/widgets/UsageWidget'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
-import ExternalLink from 'core/components/ExternalLink'
 import HelpContainer from 'core/components/HelpContainer'
 import { routes } from 'core/utils/routes'
-import partition from 'ramda/es/partition'
-
-const isPrimaryNetwork = (primaryNetwork) => ([name, ip]) => ip === primaryNetwork
-
-export const orderInterfaces = (
-  networkInterfaces: { [key: string]: string },
-  primaryNetwork: string,
-) => {
-  return [].concat(
-    ...partition(isPrimaryNetwork(primaryNetwork), Object.entries(networkInterfaces)),
-  )
-}
+import Theme from 'core/themes/model'
+import NodeInfo from './NodeInfo'
+import { HeaderCard } from '../clusters/ClusterDetailsPage'
+import ClusterStatusSpan from '../clusters/ClusterStatus'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { variantIcon } from 'core/components/Alert'
+import CodeBlock from 'core/components/CodeBlock'
+import CopyToClipboard from 'core/components/CopyToClipboard'
+import { getErrorMessage, hasClockDrift, meetsHardwareRequirement } from './helper'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
+import { clusterActions } from '../clusters/actions'
+import { IClusterSelector } from '../clusters/model'
+import {
+  ClusterType,
+  HardwareType,
+  minAvailableDiskSpace,
+  nodeHardwareRequirements,
+} from '../clusters/bareos/constants'
+import { getAvailableSpace } from '../clusters/bareos/ClusterHostChooser'
 
 // Styles
 const useStyles = makeStyles((theme: Theme) => ({
-  backLink: {
-    marginBottom: theme.spacing(2),
-    marginLeft: 'auto',
+  pageContainer: {
+    position: 'relative',
+    maxWidth: 1234,
   },
-  detailContainer: {
-    display: 'flex',
+  backLink: {
+    position: 'absolute',
+    right: 0,
+    top: 8,
+    zIndex: 100,
+    ...theme.typography.caption2,
+  },
+  nodeInfoContainer: {
     marginTop: theme.spacing(2),
+  },
+  detailsHeader: {
+    display: 'grid',
+    gridTemplateColumns: '434px repeat(3, 250px)',
+    gridGap: theme.spacing(2),
+    paddingBottom: 20,
   },
   rowHelp: {
     width: 24,
@@ -58,143 +75,83 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  card: {
-    marginRight: theme.spacing(2),
+  clockDriftErrorMessage: {
+    maxHeight: 165,
+    fontSize: 14,
+    padding: theme.spacing(0, 2),
+    margin: 0,
+    marginTop: theme.spacing(2),
+    backgroundColor: 'transparent',
+    color: theme.palette.red[500],
+    fontWeight: 300,
+    lineHeight: '15px',
+  },
+  clockDriftErrorAlert: {
+    maxHeight: 224,
+    maxWidth: 'inherit',
+    padding: theme.spacing(0, 2, 2, 2),
+    marginBottom: theme.spacing(2),
+    border: `1px solid ${theme.palette.red[500]}`,
+    backgroundColor: hexToRgbaCss(theme.palette.red[500], 0.1),
+    borderRadius: 4,
+
+    '& > header': {
+      color: theme.palette.red[500],
+      borderBottom: `1px solid ${theme.palette.red[500]}`,
+      display: 'grid',
+      gridGap: theme.spacing(),
+      gridTemplateColumns: '22px 1fr 22px',
+      fontSize: 14,
+      height: 40,
+      alignItems: 'center',
+    },
   },
 }))
 
-const ClusterDetailsPage: FC = () => {
+const NodeDetailsPage: FC = () => {
   const { match } = useReactRouter()
   const classes = useStyles({})
-  const [nodes, loading] = useDataLoader(loadNodes)
+  const [nodes, loadingNodes] = useDataLoader(loadNodes)
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+
   const selectedNode: INodesSelector =
     nodes.find((x: INodesSelector) => x.uuid === match.params.id) || {}
-
-  const totals = useMemo(
-    () => ({
-      compute: calcUsageTotalByPath(
-        [selectedNode],
-        'combined.usage.compute.current',
-        'combined.usage.compute.max',
-      ),
-      memory: calcUsageTotalByPath(
-        [selectedNode],
-        'combined.usage.memory.current',
-        'combined.usage.memory.max',
-      ),
-      disk: calcUsageTotalByPath(
-        [selectedNode],
-        'combined.usage.disk.current',
-        'combined.usage.disk.max',
-      ),
-    }),
-    [selectedNode],
-  )
+  const cluster: IClusterSelector = selectedNode.clusterUuid
+    ? clusters.find((cluster) => cluster.uuid === selectedNode.clusterUuid)
+    : {}
+  const loadingSomething = loadingNodes || loadingClusters
+  const clockDriftErrorMsg = getErrorMessage(selectedNode, 'warn', ErrorMessageCodes.timeDrift)
 
   return (
     <PageContainer
+      className={classes.pageContainer}
       header={
-        <>
-          <Text variant="h5">Node {selectedNode.name}</Text>
-          <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
-            « Back to Node List
-          </SimpleLink>
-        </>
+        <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
+          « Back to Node List
+        </SimpleLink>
       }
     >
-      <Progress loading={loading} message="Loading Nodes..." minHeight={200}>
-        <Grid container spacing={1}>
-          <Grid item xs={4}>
-            <UsageWidget
-              title="Compute"
-              stats={totals.compute}
-              units="GHz"
-              headerImg={'/ui/images/icon-compute.svg'}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <UsageWidget
-              title="Memory"
-              stats={totals.memory}
-              units="GiB"
-              headerImg={'/ui/images/icon-memory.svg'}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <UsageWidget
-              title="Storage"
-              stats={totals.disk}
-              units="GiB"
-              headerImg={'/ui/images/icon-storage.svg'}
-            />
-          </Grid>
-        </Grid>
-        <NodeDetail {...selectedNode} />
+      <Progress loading={loadingSomething} message="Loading Nodes..." minHeight={200}>
+        <div className={classes.nodeInfoContainer}>
+          <NodeStatusAndUsage node={selectedNode} cluster={cluster} loading={loadingSomething} />
+          {!!clockDriftErrorMsg && <NodeClockDriftError errorMessage={clockDriftErrorMsg} />}
+          <NodeInfo />
+        </div>
       </Progress>
     </PageContainer>
   )
 }
 
-const NodeDetail: FC<INodesSelector> = (node) => {
-  const { uuid, combined, logs, clusterName, clusterUuid } = node
-  const { detailContainer, card } = useStyles({})
-  const hostId = uuid
-  const roles = combined?.roles
-  const operatingSystem = combined?.resmgr?.info?.os_info || combined?.osInfo
-  const primaryNetwork = combined?.qbert?.primaryIp
-  const networkInterfaces = combined?.networkInterfaces || {}
-  const CPUArchitecture = combined?.resmgr?.info?.arch
-
-  const orderedInterfaces = orderInterfaces(networkInterfaces, primaryNetwork)
-
+const NodeClockDriftError = ({ errorMessage }) => {
+  const classes = useStyles()
   return (
-    <div className={detailContainer}>
-      <Card className={card}>
-        <CardHeader title="Misc" />
-        <CardContent>
-          <table>
-            <tbody>
-              <DetailRow
-                label="Node UUID"
-                value={hostId}
-                helpMessage="This is the unique ID that PMK as assigned to this node"
-              />
-              <DetailRow label="CPU Architecture" value={CPUArchitecture} />
-              <DetailRow label="Operating System" value={operatingSystem} />
-              {!!clusterName && (
-                <DetailRow
-                  label="Cluster info"
-                  value={
-                    <SimpleLink src={routes.cluster.detail.path({ id: clusterUuid })}>
-                      {clusterName}
-                    </SimpleLink>
-                  }
-                />
-              )}
-              <DetailRow label="Roles" value={roles} />
-              <DetailRow label="Logs" value={<ExternalLink url={logs}>View Logs</ExternalLink>} />
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader title="Network Interfaces" />
-        <CardContent>
-          <table>
-            <tbody>
-              {orderedInterfaces.map(([interfaceName, interfaceIp]) => (
-                <DetailRow
-                  key={interfaceIp}
-                  label={
-                    interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName
-                  }
-                  value={interfaceIp}
-                />
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+    <div className={classes.clockDriftErrorAlert}>
+      <header>
+        <FontAwesomeIcon>{variantIcon.error}</FontAwesomeIcon>
+        <Text variant="caption1">Clock Drift Detected</Text>
+        <CopyToClipboard copyText={errorMessage} copyIcon="copy" codeBlock={false} />
+      </header>
+      <CodeBlock className={classes.clockDriftErrorMessage}>{errorMessage}</CodeBlock>
     </div>
   )
 }
@@ -228,4 +185,88 @@ export const DetailRow: FC<{
   )
 }
 
-export default ClusterDetailsPage
+const NodeStatusAndUsage = ({ node, cluster, loading }) => {
+  const classes = useStyles()
+  const usage = useMemo(
+    () => ({
+      compute: calcUsageTotalByPath(
+        [node],
+        'combined.usage.compute.current',
+        'combined.usage.compute.max',
+      ),
+      memory: calcUsageTotalByPath(
+        [node],
+        'combined.usage.memory.current',
+        'combined.usage.memory.max',
+      ),
+      disk: calcUsageTotalByPath([node], 'combined.usage.disk.current', 'combined.usage.disk.max'),
+    }),
+    [node],
+  )
+  return (
+    <div className={classes.detailsHeader}>
+      <NodeStatus node={node} cluster={cluster} />
+      <UsageWidget title="Compute" stats={usage.compute} units="GHz" />
+
+      <UsageWidget title="Memory" stats={usage.memory} units="GiB" />
+
+      <UsageWidget title="Storage" stats={usage.disk} units="GiB" />
+    </div>
+  )
+}
+
+const NodeStatus = ({ node, cluster }) => {
+  const clusterType =
+    cluster?.nodes?.length === 1 ? ClusterType.SingleNodeCluster : ClusterType.MultiNodeCluster
+  const totalRamCapacity = node?.combined?.usage?.memory?.max
+  const totalDiskSpace = node?.combined?.usage?.disk?.max
+  const availableDiskSpace = getAvailableSpace(node?.combined?.usage?.disk)
+  const nodeHasClockDrift = hasClockDrift(node)
+
+  return (
+    <HeaderCard title={node?.name} icon="cube" subtitle="" className="">
+      <ClusterStatusSpan
+        title={`Recommended Minimum RAM Capacity: ${
+          nodeHardwareRequirements[clusterType][HardwareType.RAM]
+        } GB`}
+        status={
+          meetsHardwareRequirement(totalRamCapacity, clusterType, HardwareType.RAM) ? 'ok' : 'fail'
+        }
+        variant="header"
+        iconStatus
+      >
+        {`RAM Capacity: ${totalRamCapacity?.toFixed(2)} GB`}
+      </ClusterStatusSpan>
+      <ClusterStatusSpan
+        title={`Recommended Minimum Available Disk Space: ${minAvailableDiskSpace} GB`}
+        status={availableDiskSpace >= minAvailableDiskSpace ? 'ok' : 'fail'}
+        variant="header"
+        iconStatus
+      >
+        {`Available Disk Space: ${availableDiskSpace?.toFixed(2)} GB`}
+      </ClusterStatusSpan>
+      <ClusterStatusSpan
+        title={`Recommended Minimum Total Disk Space: ${
+          nodeHardwareRequirements[clusterType][HardwareType.Disk]
+        } GB`}
+        status={
+          meetsHardwareRequirement(totalDiskSpace, clusterType, HardwareType.Disk) ? 'ok' : 'fail'
+        }
+        variant="header"
+        iconStatus
+      >
+        {`Total Disk Space: ${totalDiskSpace?.toFixed(2)} GB`}
+      </ClusterStatusSpan>
+      <ClusterStatusSpan
+        title={`Host clock ${nodeHasClockDrift ? 'is' : 'is not'} out of sync`}
+        status={nodeHasClockDrift ? 'error' : 'ok'}
+        variant="header"
+        iconStatus
+      >
+        {nodeHasClockDrift ? 'Clock Drift Detected' : 'No Clock Drift Detected'}
+      </ClusterStatusSpan>
+    </HeaderCard>
+  )
+}
+
+export default NodeDetailsPage

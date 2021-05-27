@@ -13,7 +13,7 @@ import {
   requestFormLink,
 } from 'k8s/links'
 import ExternalLink from 'core/components/ExternalLink'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import { useSelector } from 'react-redux'
 import { CustomerTiers } from 'app/constants'
 import { pathOr, prop } from 'ramda'
@@ -57,8 +57,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     gridTemplateColumns: '1fr 50px',
     alignItems: 'center',
     padding: theme.spacing(1, 2),
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
-    border: `1px solid ${hexToRGBA(theme.palette.primary.main, 0.5)}`,
+    backgroundColor: hexToRgbaCss(theme.palette.primary.main, 0.1),
+    border: `1px solid ${hexToRgbaCss(theme.palette.primary.main, 0.5)}`,
     borderRadius: theme.spacing(1, 1, 0, 0),
   },
   cardBody: {
