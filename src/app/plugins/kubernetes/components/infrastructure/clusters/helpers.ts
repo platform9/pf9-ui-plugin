@@ -306,6 +306,16 @@ const createGenericCluster = async (body, data) => {
     body.schedulerFlags = data.schedulerFlags?.split(',')
   }
 
+  if (data.cpuManagerPolicy) {
+    body.cpuManagerPolicy = data.cpuManagerPolicy
+  }
+
+  if (data.topologyManagerPolicy) {
+    body.topologyManagerPolicy = data.topologyManagerPolicy
+  }
+  if (data.reservedCPUs) {
+    body.reservedCPUs = data.reservedCPUs
+  }
   // Calico is required when ipv6 is selected
   if (data.networkStack === NetworkStackTypes.IPv6) {
     body.calicoIPv6PoolCidr = body.containersCidr

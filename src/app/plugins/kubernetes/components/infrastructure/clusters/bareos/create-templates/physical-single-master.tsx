@@ -106,6 +106,7 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           withAddonManager
           elevated={false}
         >
+
           {({ setFieldValue, values }) => (
             <>
               {/* Cluster Name */}
@@ -125,6 +126,7 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               {/* Cluster Settings */}
               <FormFieldCard title="Cluster Settings">
                 <KubernetesVersion />
+
 
                 <Divider className={classes.divider} />
                 <Text variant="caption1">Cluster Network Stack</Text>
@@ -256,8 +258,10 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         <ValidatedForm
           initialValues={wizardContext}
           onSubmit={setWizardContext}
-          triggerSubmit={onNext}
           title="Advanced Configuration"
+          triggerSubmit={onNext}
+          elevated={false}
+          withAddonManager
         >
           {({ values }) => (
             <>
@@ -265,6 +269,11 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
 
               <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
               <TagsField />
+              <AddonTogglers
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                addons={['enableTopologyManager']}
+              />
             </>
           )}
         </ValidatedForm>
