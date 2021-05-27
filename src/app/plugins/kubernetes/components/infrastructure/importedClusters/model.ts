@@ -332,6 +332,7 @@ export interface Aks {
   dnsPrefix: string
   tags: AksTags
   fqdn: string
+  enablePrivateCluster?: boolean
 }
 
 export interface AgentPool {
