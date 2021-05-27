@@ -15,10 +15,10 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
 import { getIcon, getIconClass, RegionAvailability } from './helpers'
 import Button from 'core/elements/button'
-import { UserPreferences } from 'app/constants'
-import { CloudProviders } from './model'
+import { CloudProviders, CloudDefaults } from './model'
 import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
 import SshKeyPicklist from '../clusters/form-components/ssh-key-picklist'
+import { UserPreferences } from 'app/constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   wizardContext: any
   setWizardContext: any
-  updatePrefs: any
+  updateUserDefaults: any
 }
 
 const getRoute53String = (classes, loading, regionId, available) =>
@@ -121,7 +121,11 @@ const SshKeyAvailability = ({ keypairs, loading, regionId, setWizardContext }) =
   )
 }
 
-const AwsCloudProviderVerification = ({ wizardContext, setWizardContext, updatePrefs }: Props) => {
+const AwsCloudProviderVerification = ({
+  wizardContext,
+  setWizardContext,
+  updateUserDefaults,
+}: Props) => {
   const classes = useStyles({})
 
   const [regions, regionsLoading] = useDataLoader(loadCloudProviderDetails, {
@@ -136,8 +140,8 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext, updateP
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
-  const handleSetUserDefault = async (key: UserPreferences, value) => {
-    updatePrefs({ [key]: value })
+  const handleSetUserDefault = async (key: CloudDefaults, value) => {
+    updateUserDefaults(UserPreferences.CloudProvider, { [key]: value })
   }
 
   return (
@@ -175,25 +179,12 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext, updateP
             }
             values={wizardContext}
           />
-          {/* <CloudProviderRegionPicklist
-            id="region"
-            label="Region"
-            type={CloudProviders.Aws}
-            cloudProviderId={wizardContext.cloudProviderId}
-            value={wizardContext.region}
-            onChange={(value, label) =>
-              setWizardContext({ region: value, regionOptionLabel: label })
-            }
-            disabled={!wizardContext.cloudProviderId}
-            showNone={false}
-            showAll={false}
-          /> */}
           <Button
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
             disabled={!wizardContext.region}
-            onClick={() => handleSetUserDefault(UserPreferences.AwsRegion, wizardContext.region)}
+            onClick={() => handleSetUserDefault(CloudDefaults.AwsRegion, wizardContext.region)}
           >
             Set As Default
           </Button>
@@ -234,20 +225,6 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext, updateP
               setWizardContext({ awsDomain: value, awsDomainOptionLabel: label })
             }
           />
-          {/* <ClusterDomainPicklist
-            id="awsDomain"
-            label="Route 53 Domain"
-            cloudProviderId={wizardContext.cloudProviderId}
-            cloudProviderRegionId={wizardContext.region}
-            value={wizardContext.awsDomain}
-            onChange={(value, label) =>
-              setWizardContext({ awsDomain: value, awsDomainOptionLabel: label })
-            }
-            disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
-            showNone={false}
-            showAll={false}
-            fullWidth
-          /> */}
           <Button
             color="primary"
             variant="light"
@@ -255,7 +232,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext, updateP
             disabled={!wizardContext.awsDomain}
             onClick={() =>
               handleSetUserDefault(
-                UserPreferences.AwsRoute53Domain,
+                CloudDefaults.AwsRoute53Domain,
                 wizardContext.awsDomainOptionLabel,
               )
             }
@@ -304,25 +281,12 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext, updateP
             onChange={(value) => setWizardContext({ sshKey: value })}
             required={false}
           />
-          {/* <AwsClusterSshKeyPicklist
-            id="sshKey"
-            label="SSH Key"
-            cloudProviderId={wizardContext.cloudProviderId}
-            cloudProviderRegionId={wizardContext.region}
-            info=""
-            value={wizardContext.sshKey}
-            onChange={(value) => setWizardContext({ sshKey: value })}
-            disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
-            showNone={false}
-            showAll={false}
-            fullWidth
-          /> */}
           <Button
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
             disabled={!wizardContext.sshKey}
-            onClick={() => handleSetUserDefault(UserPreferences.AwsSshKey, wizardContext.sshKey)}
+            onClick={() => handleSetUserDefault(CloudDefaults.AwsSshKey, wizardContext.sshKey)}
           >
             Set As Default
           </Button>

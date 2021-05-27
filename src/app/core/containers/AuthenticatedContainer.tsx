@@ -12,6 +12,7 @@ import {
   ironicWizardUrl,
   logoutUrl,
   pmkftSignupLink,
+  UserPreferences,
 } from 'app/constants'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
@@ -45,12 +46,15 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
+import { preferencesActions } from 'core/session/preferencesReducers'
 
 const toPairs: any = ToPairs
 
 declare let window: CustomWindow
 
-const { keystone } = ApiClient.getInstance()
+const { keystone, preferenceStore } = ApiClient.getInstance()
+
+const userPreferenceKeys = [UserPreferences.CloudProvider]
 
 interface StyleProps {
   path?: string
@@ -320,6 +324,7 @@ const AuthenticatedContainer = () => {
   const [stacks, setStacks] = useState([])
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const {
+    username,
     userDetails: { id: userId, name, displayName, role },
     features,
   } = session
@@ -381,6 +386,25 @@ const AuthenticatedContainer = () => {
       hideZendeskWidget()
     }
   }, [userId, displayName, name, customerTier])
+
+  useEffect(() => {
+    const loadUserPrefs = async () => {
+      if (!userId) return
+
+      userPreferenceKeys.map(async (key) => {
+        const response: any = await preferenceStore.getUserPreference(userId, key)
+        const value = { awsSshKey: 'bharris' } || JSON.parse(response.value)
+        dispatch(
+          preferencesActions.updatePrefs({
+            username,
+            key: ['defaults', key],
+            prefs: value,
+          }),
+        )
+      })
+    }
+    loadUserPrefs()
+  }, [userId, username])
 
   const withStackSlider = regionFeatures?.openstack && regionFeatures?.kubernetes
 

@@ -26,6 +26,7 @@ import {
   azureVerificationCalloutFields,
   renderVerificationCalloutFields,
 } from './helpers'
+import { UserPreferences } from 'app/constants'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -69,7 +70,8 @@ const formCpBody = (data) => {
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
-  const [prefs, updatePrefs] = useScopedPreferences('defaults')
+  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const cloudDefaults = prefs[UserPreferences.CloudProvider] || {}
 
   const updatedInitialValues: ICloudProvidersSelector = useMemo(() => {
     return {
@@ -120,7 +122,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
             return (
               <WizardMeta
                 className={classes.updateCloudProvider}
-                fields={prefs}
+                fields={cloudDefaults}
                 calloutFields={calloutFields}
                 renderLabels={renderVerificationCalloutFields()}
                 icon={<CloudProviderCard active type={wizardContext.type} />}
@@ -142,6 +144,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                         <UpdateForm
                           wizardContext={wizardContext}
                           setWizardContext={setWizardContext}
+                          showInfo={wizardContext.type === CloudProviders.Aws}
                           toggleIamPolicy
                           showSubmitInCard
                           updateWizard
@@ -158,7 +161,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                       <VerificationFields
                         wizardContext={wizardContext}
                         setWizardContext={setWizardContext}
-                        updatePrefs={updatePrefs}
+                        updateUserDefaults={updateUserDefaults}
                       />
                     </ValidatedForm>
                   </div>

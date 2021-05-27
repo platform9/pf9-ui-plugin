@@ -59,8 +59,6 @@ enum DataKeys {
   Tenants = 'Tenants',
   Users = 'Users',
   UserTenants = 'UserTenants',
-  UserPreferences = 'UserPreferences',
-  GlobalPreferences = 'GlobalPreferences',
 }
 
 export default DataKeys
@@ -127,6 +125,4 @@ export const ActionDataKeys = {
   Tenants: 'Tenants',
   Users: 'Users',
   UserTenants: 'UserTenants',
-  UserPreferences: 'UserPreferences',
-  GlobalPreferences: 'GlobalPreferences',
 }

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Text from 'core/elements/text'
-import { UserPreferences } from 'app/constants'
+import { CloudDefaults } from './model'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
@@ -31,22 +31,19 @@ export const RegionAvailability = ({ classes, regions, setWizardContext }) => {
 }
 
 export const awsVerificationCalloutFields = [
-  UserPreferences.AwsRegion,
-  UserPreferences.AwsRoute53Domain,
-  UserPreferences.AwsSshKey,
+  CloudDefaults.AwsRegion,
+  CloudDefaults.AwsRoute53Domain,
+  CloudDefaults.AwsSshKey,
 ]
 
-export const azureVerificationCalloutFields = [
-  UserPreferences.AzureRegion,
-  UserPreferences.AzureSshKey,
-]
+export const azureVerificationCalloutFields = [CloudDefaults.AzureRegion, CloudDefaults.AzureSshKey]
 
 export const calloutFieldLabels = {
-  [UserPreferences.AwsRegion]: 'Default Region',
-  [UserPreferences.AwsRoute53Domain]: 'Default Route53 (Optional)',
-  [UserPreferences.AwsSshKey]: 'Default SSH Key',
-  [UserPreferences.AzureRegion]: 'Default Region',
-  [UserPreferences.AzureSshKey]: 'Default SSH Key',
+  [CloudDefaults.AwsRegion]: 'Default Region',
+  [CloudDefaults.AwsRoute53Domain]: 'Default Route53 (Optional)',
+  [CloudDefaults.AwsSshKey]: 'Default SSH Key',
+  [CloudDefaults.AzureRegion]: 'Default Region',
+  [CloudDefaults.AzureSshKey]: 'Default SSH Key',
 }
 
 const useStyles = makeStyles((theme: Theme) => ({

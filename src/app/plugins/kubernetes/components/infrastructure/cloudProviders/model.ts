@@ -20,6 +20,15 @@ export enum CloudProvidersFriendlyName {
   local = 'BareOS',
 }
 
+export enum CloudDefaults {
+  AwsRegion = 'awsRegion',
+  AwsRoute53Domain = 'awsRoute53Domain',
+  AwsSshKey = 'awsSshKey',
+
+  AzureRegion = 'azureRegion',
+  AzureSshKey = 'azureSshKey',
+}
+
 export interface ICloudProvidersSelector extends GetCloudProvider {
   descriptiveType: string
   deployedCapacity: DeployedCapacity

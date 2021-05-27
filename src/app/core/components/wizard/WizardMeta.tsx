@@ -46,8 +46,6 @@ export default function WizardMeta<T>({
   const labels = showUndefinedFields
     ? pickAll(calloutFields as any, fields)
     : pickBy(isNotUndefined, pick(calloutFields, fields))
-  console.log('labels', labels)
-  console.log(calloutFields)
   return (
     <div className={clsx(classes.wizardMeta, className)}>
       <aside>

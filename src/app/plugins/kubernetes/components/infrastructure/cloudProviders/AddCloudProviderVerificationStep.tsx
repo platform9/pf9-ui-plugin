@@ -18,6 +18,7 @@ import {
 } from './helpers'
 import { routes } from 'core/utils/routes'
 import Button from 'core/elements/button'
+import { UserPreferences } from 'app/constants'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -47,7 +48,8 @@ interface Props {
 // This step requires the cloud provider to have been created & have its ID
 const AddCloudProviderVerificationStep = ({ history, wizardContext, setWizardContext }: Props) => {
   const classes = useStyles({})
-  const [prefs, updatePrefs] = useScopedPreferences('defaults')
+  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const cloudDefaults = prefs[UserPreferences.CloudProvider] || {}
 
   const ActiveForm = objSwitchCaseAny({
     [CloudProviders.Aws]: AwsCloudProviderVerification,
@@ -62,7 +64,7 @@ const AddCloudProviderVerificationStep = ({ history, wizardContext, setWizardCon
   return (
     <Progress loading={!wizardContext.cloudProviderId}>
       <WizardMeta
-        fields={prefs}
+        fields={cloudDefaults}
         calloutFields={calloutFields}
         renderLabels={renderVerificationCalloutFields()}
         icon={<CloudProviderCard active type={wizardContext.provider} />}
@@ -81,7 +83,7 @@ const AddCloudProviderVerificationStep = ({ history, wizardContext, setWizardCon
             <ActiveForm
               wizardContext={wizardContext}
               setWizardContext={setWizardContext}
-              updatePrefs={updatePrefs}
+              updateUserDefaults={updateUserDefaults}
             />
           </ValidatedForm>
           <Button

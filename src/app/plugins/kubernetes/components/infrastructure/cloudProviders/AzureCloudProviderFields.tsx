@@ -39,6 +39,7 @@ interface Props {
   showSubmitInCard: boolean
   updateWizard: boolean
   errorMessage: string
+  showInfo?: boolean
   setDefaultValueForTextfields?: boolean
   defaultTextfieldValue?: string
 }
@@ -49,6 +50,7 @@ const AzureCloudProviderFields = ({
   showSubmitInCard = false,
   updateWizard = false,
   errorMessage = '',
+  showInfo = true,
   setDefaultValueForTextfields = false,
   defaultTextfieldValue = '**********************',
 }: Props) => {
@@ -56,37 +58,39 @@ const AzureCloudProviderFields = ({
 
   return (
     <>
-      <Info expanded={false} className={info}>
-        <div>
-          Provide the Tenant, Subscription ID, Client ID, and Client Secret for an Azure Service
-          Principle Account that has been assigned the Azure Contributor Role.
-        </div>
-        <br></br>
-        <div>
-          The Contributor role is required as Platform9 will create new resources in Azure
-          including:
-        </div>
-        <ul className={bullets}>
-          <li className={bullet}>
-            <span className={bulletText}>Virtual Machines</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>Scale Sets</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>Security Groups</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>Load Balancer</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>Resource Groups</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>Virtual Networks</span>
-          </li>
-        </ul>
-      </Info>
+      {showInfo && (
+        <Info expanded={false} className={info}>
+          <div>
+            Provide the Tenant, Subscription ID, Client ID, and Client Secret for an Azure Service
+            Principle Account that has been assigned the Azure Contributor Role.
+          </div>
+          <br></br>
+          <div>
+            The Contributor role is required as Platform9 will create new resources in Azure
+            including:
+          </div>
+          <ul className={bullets}>
+            <li className={bullet}>
+              <span className={bulletText}>Virtual Machines</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>Scale Sets</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>Security Groups</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>Load Balancer</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>Resource Groups</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>Virtual Networks</span>
+            </li>
+          </ul>
+        </Info>
+      )}
       <TextField
         id="name"
         label="Name"

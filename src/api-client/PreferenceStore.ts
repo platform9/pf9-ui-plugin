@@ -27,7 +27,10 @@ class PreferenceStore extends ApiService {
   }
 
   setUserPreference = async (userId, key: UserPreferences, value) => {
-    const body = { value: value }
+    const jsonString = JSON.stringify(value)
+    const body = {
+      value: jsonString,
+    }
     return this.client.basicPut({
       url: `${this.baseUrl}/user/${userId}/${key}`,
       body,
