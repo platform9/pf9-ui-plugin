@@ -1,16 +1,15 @@
 import React from 'react'
-import InfoPanel from 'core/components/InfoPanel'
+import InfoPanel, { getFieldsForCard, IDetailFields } from 'core/components/InfoPanel'
 import { makeStyles } from '@material-ui/styles'
 import { ImportedClusterSelector } from './model'
 import Theme from 'core/themes/model'
-import { getFieldsForCard, IClusterDetailFields } from '../clusters/ClusterInfo'
 import renderLabels from 'k8s/components/pods/renderLabels'
 
 const renderBoolean = (bool) => (bool ? 'True' : 'False')
 
 const renderStringArray = (array) => array.join(', ')
 
-const clusterOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
+const clusterOverviewFields: Array<IDetailFields<ImportedClusterSelector>> = [
   { id: 'spec.aks.type', title: 'Type' },
   { id: 'spec.aks.kubernetesVersion', title: 'KubernetesVersion' },
   { id: 'spec.aks.fqdn', title: 'FQDN' },
@@ -21,7 +20,7 @@ const clusterOverviewFields: Array<IClusterDetailFields<ImportedClusterSelector>
   { id: 'spec.aks.dnsPrefix', title: 'DNS Prefix' },
 ]
 
-const networkingFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
+const networkingFields: Array<IDetailFields<ImportedClusterSelector>> = [
   { id: 'spec.aks.network.plugin', title: 'Plugin' },
   { id: 'spec.aks.network.policy', title: 'Policy' },
   { id: 'spec.aks.network.serviceCIDR', title: 'Service CIDR' },
@@ -39,7 +38,7 @@ const networkingFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
   // },
 ]
 
-const loadBalancerFields: Array<IClusterDetailFields<ImportedClusterSelector>> = [
+const loadBalancerFields: Array<IDetailFields<ImportedClusterSelector>> = [
   {
     id: 'spec.aks.network.loadBalancerSKU',
     title: 'Load Balancer SKU',

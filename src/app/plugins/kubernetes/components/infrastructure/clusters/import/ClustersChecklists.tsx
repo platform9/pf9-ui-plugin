@@ -105,6 +105,9 @@ const ClustersChecklists = ({
         retrieveClusters()
       },
       aks: ({ allRegions, cloudProviderId, stack }) => {
+        if (allClusters.length) {
+          return
+        }
         setLoadingClusters(true)
         const getClusters = async () => {
           try {
@@ -125,7 +128,7 @@ const ClustersChecklists = ({
         }
       },
     }
-  }, [])
+  }, [allClusters])
 
   const allRegions = useMemo(() => {
     return details
