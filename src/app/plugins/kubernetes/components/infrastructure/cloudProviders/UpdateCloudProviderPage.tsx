@@ -21,11 +21,7 @@ import WizardMeta from 'core/components/wizard/WizardMeta'
 import { pick } from 'ramda'
 import { routes } from 'core/utils/routes'
 import useScopedPreferences from 'core/session/useScopedPreferences'
-import {
-  awsVerificationCalloutFields,
-  azureVerificationCalloutFields,
-  renderVerificationCalloutFields,
-} from './helpers'
+import { cloudVerificationCalloutFields, renderVerificationCalloutFields } from './helpers'
 import { UserPreferences } from 'app/constants'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
@@ -71,7 +67,15 @@ const formCpBody = (data) => {
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
   const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
-  const cloudDefaults = prefs[UserPreferences.CloudProvider] || {}
+
+  const cloudDefaults = useMemo(() => {
+    return (
+      objSwitchCaseAny({
+        [CloudProviders.Aws]: prefs[UserPreferences.Aws],
+        [CloudProviders.Azure]: prefs[UserPreferences.Azure],
+      })(initialValues.type) || {}
+    )
+  }, [initialValues.type, prefs])
 
   const updatedInitialValues: ICloudProvidersSelector = useMemo(() => {
     return {
@@ -99,13 +103,6 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     })(initialValues.type)
   }, [initialValues.type])
 
-  const calloutFields = useMemo(() => {
-    return objSwitchCaseAny({
-      [CloudProviders.Aws]: awsVerificationCalloutFields,
-      [CloudProviders.Azure]: azureVerificationCalloutFields,
-    })(initialValues.type)
-  }, [initialValues.type])
-
   return (
     <>
       <DocumentMeta title="Update Cloud Provider" bodyClasses={['form-view']} />
@@ -122,8 +119,8 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
             return (
               <WizardMeta
                 className={classes.updateCloudProvider}
-                fields={cloudDefaults}
-                calloutFields={calloutFields}
+                fields={{ ...wizardContext, ...cloudDefaults }}
+                calloutFields={cloudVerificationCalloutFields(wizardContext.type)}
                 renderLabels={renderVerificationCalloutFields()}
                 icon={<CloudProviderCard active type={wizardContext.type} />}
                 showUndefinedFields

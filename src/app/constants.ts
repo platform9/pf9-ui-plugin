@@ -138,7 +138,8 @@ export const supportEmail = 'support-ft@platform9.com'
 export const pmkftSignupLink = 'https://platform9.com/signup-flow/?sandbox=kubernetes'
 
 export enum UserPreferences {
-  CloudProvider = 'cloudProvider',
+  Aws = 'aws',
+  Azure = 'azure',
 }
 
 export enum GlobalPreferences {

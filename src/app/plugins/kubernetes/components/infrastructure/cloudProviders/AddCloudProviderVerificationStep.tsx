@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
@@ -11,11 +11,7 @@ import Text from 'core/elements/text'
 import { CloudProviders } from './model'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import useScopedPreferences from 'core/session/useScopedPreferences'
-import {
-  awsVerificationCalloutFields,
-  azureVerificationCalloutFields,
-  renderVerificationCalloutFields,
-} from './helpers'
+import { cloudVerificationCalloutFields, renderVerificationCalloutFields } from './helpers'
 import { routes } from 'core/utils/routes'
 import Button from 'core/elements/button'
 import { UserPreferences } from 'app/constants'
@@ -49,23 +45,26 @@ interface Props {
 const AddCloudProviderVerificationStep = ({ history, wizardContext, setWizardContext }: Props) => {
   const classes = useStyles({})
   const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
-  const cloudDefaults = prefs[UserPreferences.CloudProvider] || {}
+
+  const cloudDefaults = useMemo(() => {
+    return (
+      objSwitchCaseAny({
+        [CloudProviders.Aws]: prefs[UserPreferences.Aws],
+        [CloudProviders.Azure]: prefs[UserPreferences.Azure],
+      })(wizardContext.provider) || {}
+    )
+  }, [wizardContext.provider, prefs])
 
   const ActiveForm = objSwitchCaseAny({
     [CloudProviders.Aws]: AwsCloudProviderVerification,
     [CloudProviders.Azure]: AzureCloudProviderVerification,
   })(wizardContext.provider)
 
-  const calloutFields = objSwitchCaseAny({
-    [CloudProviders.Aws]: awsVerificationCalloutFields,
-    [CloudProviders.Azure]: azureVerificationCalloutFields,
-  })(wizardContext.provider)
-
   return (
     <Progress loading={!wizardContext.cloudProviderId}>
       <WizardMeta
-        fields={cloudDefaults}
-        calloutFields={calloutFields}
+        fields={{ ...wizardContext, ...cloudDefaults }}
+        calloutFields={cloudVerificationCalloutFields(wizardContext.provider)}
         renderLabels={renderVerificationCalloutFields()}
         icon={<CloudProviderCard active type={wizardContext.provider} />}
         showUndefinedFields

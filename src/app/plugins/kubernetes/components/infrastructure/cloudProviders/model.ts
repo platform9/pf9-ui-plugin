@@ -21,12 +21,12 @@ export enum CloudProvidersFriendlyName {
 }
 
 export enum CloudDefaults {
-  AwsRegion = 'awsRegion',
-  AwsRoute53Domain = 'awsRoute53Domain',
-  AwsSshKey = 'awsSshKey',
-
-  AzureRegion = 'azureRegion',
-  AzureSshKey = 'azureSshKey',
+  Region = 'region',
+  RegionLabel = 'regionDisplayName',
+  Domain = 'domain', // Route 53 Domain. AWS only
+  DomainLabel = 'domainLabel',
+  SshKey = 'sshKey',
+  SshKeyLabel = 'sshKeyLabel',
 }
 
 export interface ICloudProvidersSelector extends GetCloudProvider {

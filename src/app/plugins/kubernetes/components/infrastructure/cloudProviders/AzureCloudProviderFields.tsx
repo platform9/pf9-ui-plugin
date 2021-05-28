@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import Button from 'core/elements/button'
 import Theme from 'core/themes/model'
@@ -56,6 +56,17 @@ const AzureCloudProviderFields = ({
 }: Props) => {
   const { info, bullets, bullet, bulletText, inCardSubmit } = useStyles({})
 
+  useEffect(() => {
+    if (!setDefaultValueForTextfields) return
+    setWizardContext({
+      tenantId: defaultTextfieldValue,
+      secret: defaultTextfieldValue,
+      clientId: defaultTextfieldValue,
+      clientSecret: defaultTextfieldValue,
+      subscriptionId: defaultTextfieldValue,
+    })
+  }, [])
+
   return (
     <>
       {showInfo && (
@@ -104,11 +115,7 @@ const AzureCloudProviderFields = ({
         id="tenantId"
         label="Tenant ID"
         onChange={(value) => setWizardContext({ tenantId: value })}
-        value={
-          !wizardContext.tenantId && setDefaultValueForTextfields
-            ? defaultTextfieldValue
-            : wizardContext.tenantId
-        }
+        value={wizardContext.tenantId}
         info="The tenant ID of the service principal"
         disabled={updateWizard}
         required
@@ -117,11 +124,7 @@ const AzureCloudProviderFields = ({
         id="clientId"
         label="Client ID"
         onChange={(value) => setWizardContext({ clientId: value })}
-        value={
-          !wizardContext.clientId && setDefaultValueForTextfields
-            ? defaultTextfieldValue
-            : wizardContext.clientId
-        }
+        value={wizardContext.clientId}
         info="The client ID of the service principal"
         disabled={updateWizard}
         required
@@ -131,11 +134,7 @@ const AzureCloudProviderFields = ({
         type="password"
         label="Client Secret"
         onChange={(value) => setWizardContext({ clientSecret: value })}
-        value={
-          !wizardContext.clientSecret && setDefaultValueForTextfields
-            ? defaultTextfieldValue
-            : wizardContext.clientSecret
-        }
+        value={wizardContext.clientSecret}
         info="The client secret of the service principal"
         disabled={updateWizard}
         required
@@ -144,11 +143,7 @@ const AzureCloudProviderFields = ({
         id="subscriptionId"
         label="Subscription ID"
         onChange={(value) => setWizardContext({ subscriptionId: value })}
-        value={
-          !wizardContext.subscriptionId && setDefaultValueForTextfields
-            ? defaultTextfieldValue
-            : wizardContext.subscriptionId
-        }
+        value={wizardContext.subscriptionId}
         info="The ID of the subscription that correlates to the service principal"
         disabled={updateWizard}
         required

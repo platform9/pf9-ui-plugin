@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Text from 'core/elements/text'
-import { CloudDefaults } from './model'
+import { CloudDefaults, CloudProviders } from './model'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
+import { objSwitchCase } from 'utils/fp'
+const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 export const getIcon = (classes, loading, regionId, available) =>
   loading || !regionId ? 'circle' : available ? 'check-circle' : 'times-circle'
@@ -30,20 +32,21 @@ export const RegionAvailability = ({ classes, regions, setWizardContext }) => {
   )
 }
 
-export const awsVerificationCalloutFields = [
-  CloudDefaults.AwsRegion,
-  CloudDefaults.AwsRoute53Domain,
-  CloudDefaults.AwsSshKey,
-]
+export const cloudVerificationCalloutFields = (cloudProvider: CloudProviders) => {
+  if (!cloudProvider) return []
+  return objSwitchCaseAny({
+    [CloudProviders.Aws]: [CloudDefaults.Region, CloudDefaults.DomainLabel, CloudDefaults.SshKey],
+    [CloudProviders.Azure]: [CloudDefaults.RegionLabel, CloudDefaults.SshKey],
+  })(cloudProvider)
+}
 
-export const azureVerificationCalloutFields = [CloudDefaults.AzureRegion, CloudDefaults.AzureSshKey]
-
-export const calloutFieldLabels = {
-  [CloudDefaults.AwsRegion]: 'Default Region',
-  [CloudDefaults.AwsRoute53Domain]: 'Default Route53 (Optional)',
-  [CloudDefaults.AwsSshKey]: 'Default SSH Key',
-  [CloudDefaults.AzureRegion]: 'Default Region',
-  [CloudDefaults.AzureSshKey]: 'Default SSH Key',
+const cloudVerificationCalloutFieldLabels = {
+  [CloudDefaults.Region]: 'Default Region',
+  [CloudDefaults.RegionLabel]: 'Default Region',
+  [CloudDefaults.Domain]: 'Default Route53 (Optional)',
+  [CloudDefaults.DomainLabel]: 'Default Route53 (Optional)',
+  [CloudDefaults.SshKey]: 'Default SSH Key',
+  [CloudDefaults.SshKeyLabel]: 'Default SSH Key',
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -84,7 +87,7 @@ export const renderVerificationCalloutFields = () => (fields) => {
       {Object.entries(fields).map(([key, value]) => {
         const icon = value ? 'check-circle' : 'times-circle'
         const iconClass = value ? 'checkIcon' : 'timesIcon'
-        const label = calloutFieldLabels[key]
+        const label = cloudVerificationCalloutFieldLabels[key]
         return (
           <div key={label} className={classes.calloutFields}>
             <div className={classes.label}>

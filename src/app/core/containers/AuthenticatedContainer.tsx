@@ -54,7 +54,7 @@ declare let window: CustomWindow
 
 const { keystone, preferenceStore } = ApiClient.getInstance()
 
-const userPreferenceKeys = [UserPreferences.CloudProvider]
+const userPreferenceKeys = [UserPreferences.Aws, UserPreferences.Azure]
 
 interface StyleProps {
   path?: string
@@ -392,8 +392,10 @@ const AuthenticatedContainer = () => {
       if (!userId) return
 
       userPreferenceKeys.map(async (key) => {
-        const response: any = await preferenceStore.getUserPreference(userId, key)
-        const value = { awsSshKey: 'bharris' } || JSON.parse(response.value)
+        const response: any =
+          { sshKey: 'bharris' } || (await preferenceStore.getUserPreference(userId, key))
+        if (!response) return
+        const value = { sshKey: 'bharris' } || JSON.parse(response.value)
         dispatch(
           preferencesActions.updatePrefs({
             username,

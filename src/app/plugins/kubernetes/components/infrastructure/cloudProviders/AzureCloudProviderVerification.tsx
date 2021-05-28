@@ -13,6 +13,7 @@ import Button from 'core/elements/button'
 import SshKeyTextfield from '../clusters/form-components/ssh-key-textfield'
 import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
 import { UserPreferences } from 'app/constants'
+import { isKeyValid } from 'ssh-pub-key-validation'
 
 const useStyles = makeStyles((theme: Theme) => ({
   spaceRight: {
@@ -56,8 +57,8 @@ const AzureCloudProviderVerification = ({
     cloudProviderId: wizardContext.cloudProviderId,
   })
 
-  const handleSetUserDefault = async (key: CloudDefaults, value) => {
-    updateUserDefaults(UserPreferences.CloudProvider, { [key]: value })
+  const handleSetUserDefault = async (values) => {
+    updateUserDefaults(UserPreferences.Azure, values)
   }
 
   return (
@@ -89,10 +90,9 @@ const AzureCloudProviderVerification = ({
         <div className={classes.selectionArea}>
           <CloudProviderRegionField
             cloudProviderType={CloudProviders.Azure}
-            onChange={(value, label) =>
-              setWizardContext({ region: value, regionOptionLabel: label })
-            }
+            onChange={(value, label) => setWizardContext({ region: value, regionLabel: label })}
             values={wizardContext}
+            required={false}
           />
           <Button
             color="primary"
@@ -100,7 +100,10 @@ const AzureCloudProviderVerification = ({
             className={classes.setDefaultButton}
             disabled={!wizardContext.region}
             onClick={() =>
-              handleSetUserDefault(CloudDefaults.AzureRegion, wizardContext.regionOptionLabel)
+              handleSetUserDefault({
+                [CloudDefaults.Region]: wizardContext.region,
+                [CloudDefaults.RegionLabel]: wizardContext.regionLabel,
+              })
             }
           >
             Set As Default
@@ -122,7 +125,10 @@ const AzureCloudProviderVerification = ({
             variant="light"
             className={classes.setDefaultButton}
             disabled={!wizardContext.sshKey}
-            onClick={() => handleSetUserDefault(CloudDefaults.AzureSshKey, wizardContext.sshKey)}
+            onClick={() =>
+              isKeyValid(wizardContext.sshKey) &&
+              handleSetUserDefault({ [CloudDefaults.SshKey]: wizardContext.sshKey })
+            }
           >
             Set As Default
           </Button>

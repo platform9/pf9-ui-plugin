@@ -140,8 +140,8 @@ const AwsCloudProviderVerification = ({
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
-  const handleSetUserDefault = async (key: CloudDefaults, value) => {
-    updateUserDefaults(UserPreferences.CloudProvider, { [key]: value })
+  const handleSetUserDefault = async (values) => {
+    updateUserDefaults(UserPreferences.Aws, values)
   }
 
   return (
@@ -174,9 +174,7 @@ const AwsCloudProviderVerification = ({
         <div className={classes.selectionArea}>
           <CloudProviderRegionField
             cloudProviderType={CloudProviders.Aws}
-            onChange={(value, label) =>
-              setWizardContext({ region: value, regionOptionLabel: label })
-            }
+            onChange={(value, label) => setWizardContext({ region: value })}
             values={wizardContext}
           />
           <Button
@@ -184,7 +182,12 @@ const AwsCloudProviderVerification = ({
             variant="light"
             className={classes.setDefaultButton}
             disabled={!wizardContext.region}
-            onClick={() => handleSetUserDefault(CloudDefaults.AwsRegion, wizardContext.region)}
+            onClick={() =>
+              handleSetUserDefault({
+                [CloudDefaults.Region]: wizardContext.region,
+                [CloudDefaults.RegionLabel]: wizardContext.regionLabel,
+              })
+            }
           >
             Set As Default
           </Button>
@@ -222,7 +225,7 @@ const AwsCloudProviderVerification = ({
             cloudProviderRegionId={wizardContext.region}
             disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
             onChange={(value, label) =>
-              setWizardContext({ awsDomain: value, awsDomainOptionLabel: label })
+              setWizardContext({ awsDomain: value, awsDomainLabel: label })
             }
           />
           <Button
@@ -231,10 +234,10 @@ const AwsCloudProviderVerification = ({
             className={classes.setDefaultButton}
             disabled={!wizardContext.awsDomain}
             onClick={() =>
-              handleSetUserDefault(
-                CloudDefaults.AwsRoute53Domain,
-                wizardContext.awsDomainOptionLabel,
-              )
+              handleSetUserDefault({
+                [CloudDefaults.Domain]: wizardContext.awsDomain,
+                [CloudDefaults.DomainLabel]: wizardContext.awsDomainLabel,
+              })
             }
           >
             Set As Default
@@ -286,7 +289,7 @@ const AwsCloudProviderVerification = ({
             variant="light"
             className={classes.setDefaultButton}
             disabled={!wizardContext.sshKey}
-            onClick={() => handleSetUserDefault(CloudDefaults.AwsSshKey, wizardContext.sshKey)}
+            onClick={() => handleSetUserDefault({ [CloudDefaults.SshKey]: wizardContext.sshKey })}
           >
             Set As Default
           </Button>

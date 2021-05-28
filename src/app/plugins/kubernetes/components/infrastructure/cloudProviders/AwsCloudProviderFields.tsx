@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import Info from 'core/components/validatedForm/Info'
 import { makeStyles } from '@material-ui/styles'
@@ -79,6 +79,14 @@ const AwsCloudProviderFields = ({
   const { bullets, bullet, bulletText, downloadIcon, iamInfo, inCardSubmit } = useStyles({})
   const [downloadState, setDownloadState] = useState({ status: '', message: '' })
 
+  useEffect(() => {
+    if (!setDefaultValueForTextfields) return
+    setWizardContext({
+      key: defaultTextfieldValue,
+      secret: defaultTextfieldValue,
+    })
+  }, [])
+
   return (
     <>
       {showInfo && (
@@ -140,11 +148,7 @@ const AwsCloudProviderFields = ({
         id="key"
         label="Access Key ID"
         onChange={(value) => setWizardContext({ key: value })}
-        value={
-          !wizardContext.key && setDefaultValueForTextfields
-            ? defaultTextfieldValue
-            : wizardContext.key
-        }
+        value={wizardContext.key}
         info="AWS IAM Access Key"
         required
       />
@@ -152,11 +156,7 @@ const AwsCloudProviderFields = ({
         id="secret"
         label="Secret Access Key"
         onChange={(value) => setWizardContext({ secret: value })}
-        value={
-          !wizardContext.secret && setDefaultValueForTextfields
-            ? defaultTextfieldValue
-            : wizardContext.secret
-        }
+        value={wizardContext.secret}
         info="IAM User Secret Key"
         type="password"
         required
