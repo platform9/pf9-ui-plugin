@@ -9,7 +9,7 @@ import { loadNodes } from './actions'
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
 // Models
-import { INodesSelector } from './model'
+import { ErrorMessageCodes, INodesSelector } from './model'
 import SimpleLink from 'core/components/SimpleLink'
 import Progress from 'core/components/progress/Progress'
 import UsageWidget from 'core/components/widgets/UsageWidget'
@@ -24,8 +24,8 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { variantIcon } from 'core/components/Alert'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
+import { getErrorMessage, hasClockDrift, meetsHardwareRequirement } from './helper'
 import { hexToRgbaCss } from 'core/utils/colorHelpers'
-import { hasClockDrift, meetsHardwareRequirement } from './helper'
 import { clusterActions } from '../clusters/actions'
 import { IClusterSelector } from '../clusters/model'
 import {
@@ -119,8 +119,8 @@ const NodeDetailsPage: FC = () => {
   const cluster: IClusterSelector = selectedNode.clusterUuid
     ? clusters.find((cluster) => cluster.uuid === selectedNode.clusterUuid)
     : {}
-  const message = selectedNode?.message as any
   const loadingSomething = loadingNodes || loadingClusters
+  const clockDriftErrorMsg = getErrorMessage(selectedNode, 'warn', ErrorMessageCodes.timeDrift)
 
   return (
     <PageContainer
@@ -134,7 +134,7 @@ const NodeDetailsPage: FC = () => {
       <Progress loading={loadingSomething} message="Loading Nodes..." minHeight={200}>
         <div className={classes.nodeInfoContainer}>
           <NodeStatusAndUsage node={selectedNode} cluster={cluster} loading={loadingSomething} />
-          {hasClockDrift(selectedNode) && <NodeClockSkewError errorMessage={message?.warn[0]} />}
+          {!!clockDriftErrorMsg && <NodeClockDriftError errorMessage={clockDriftErrorMsg} />}
           <NodeInfo />
         </div>
       </Progress>
@@ -142,7 +142,7 @@ const NodeDetailsPage: FC = () => {
   )
 }
 
-const NodeClockSkewError = ({ errorMessage }) => {
+const NodeClockDriftError = ({ errorMessage }) => {
   const classes = useStyles()
   return (
     <div className={classes.clockDriftErrorAlert}>
