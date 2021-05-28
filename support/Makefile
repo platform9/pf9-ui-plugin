@@ -15,7 +15,7 @@ RPM_DIR := $(BUILD_DIR)
 SPEC_FILE := $(BUILD_DIR)/rpm.spec
 
 NODEJS_DIR := $(TOP_DIR)/node
-NODEJS_DOWNLOAD_SCRIPT = $(shell pwd)/download-nodejs-latest-v10.x.sh
+NODEJS_DOWNLOAD_SCRIPT = $(shell pwd)/download-nodejs-latest-v12.x.sh
 NODE_BIN := $(NODEJS_DIR)/bin/node
 NPM_BIN := $(NODE_BIN) $(NODEJS_DIR)/bin/npm --scripts-prepend-node-path=true
 
