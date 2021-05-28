@@ -40,6 +40,9 @@ import { attachNodeToCluster } from '../models/qbert/Operations'
 import Token from '../models/openstack/Token'
 import { range } from '../util'
 import { strict as assert } from 'assert'
+import config from '../../../config'
+
+const simConfig = config.simulator
 
 function loadPreset() {
   console.log("Loading 'dev' preset.")
@@ -77,8 +80,8 @@ function loadPreset() {
   // Create an admin user
   const adminUser = new User({
     id: 'id-user-admin',
-    email: 'admin@platform9.com',
-    password: 'secret',
+    email: simConfig.username,
+    password: simConfig.password,
     tenantId: serviceTenant.id,
   })
   adminUser.addRole(serviceTenant, adminRole)
@@ -115,6 +118,7 @@ function loadPreset() {
     })
     tenant.addUsers(users)
   })
+
   Tenant.findById(serviceTenant.id).addUser(adminUser)
 
   // Groups
