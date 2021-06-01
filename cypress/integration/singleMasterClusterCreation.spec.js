@@ -27,5 +27,6 @@ it('logs in successfully', () => {
       cy.get('label').contains('Kubernetes Version *').click()
       cy.get("li[data-value='1.18.10-pmk.1547']")
       cy.xpath("//span[text()='IPv4']/preceding::input[@type='radio']").should('be.checked')
+      
     })  
 })
