@@ -9,6 +9,7 @@ import AzureCloudProviderRequirementDialog from '../azure/AzureCloudProviderRequ
 import ComingSoonDialog from './ComingSoonDialog'
 import { trackEvent } from 'utils/tracking'
 import ExternalLink from 'core/components/ExternalLink'
+import Bugsnag from '@bugsnag/js'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   requirements: {
@@ -46,6 +47,7 @@ const ImportAKSRequirements = ({ onComplete, platform }) => {
   // const [cloudProviders] = useDataLoader(cloudProviderActions.list)
 
   const triggerDialog = () => {
+    Bugsnag.leaveBreadcrumb('Clicked Import AKS Cluster')
     trackEvent('Clicked Import AKS Cluster')
     setShowComingSoonDialog(true)
   }

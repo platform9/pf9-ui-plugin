@@ -7,6 +7,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import { trackEvent } from 'utils/tracking'
 import { virtualMachineActions } from './actions'
 import { routes } from 'core/utils/routes'
+import Bugsnag from '@bugsnag/js'
 
 const stopPropagation = (e) => e.stopPropagation()
 const VirtualMachineDeleteDialog = ({ rows: [virtualMachine], onClose }) => {
@@ -23,6 +24,11 @@ const VirtualMachineDeleteDialog = ({ rows: [virtualMachine], onClose }) => {
   )
   const title = `Permanently delete VM "${virtualMachine?.name}"?`
   const handleDelete = useCallback(async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete VM', {
+      cluster_uuid: virtualMachine?.clusterId,
+      vm_name: virtualMachine?.name,
+      vm_namespace: virtualMachine?.namespace,
+    })
     await deleteVirtualMachine(virtualMachine)
     onClose()
     history.push(routes.virtualMachines.list.path())

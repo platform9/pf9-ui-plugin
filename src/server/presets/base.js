@@ -4,8 +4,9 @@ import Role from '../models/openstack/Role'
 import Tenant from '../models/openstack/Tenant'
 import User from '../models/openstack/User'
 import Flavor from '../models/openstack/Flavor'
+import config from '../../../config'
 
-// import Token from '../models/Token'
+const simConfig = config.simulator
 
 function loadPreset() {
   console.log("Loading 'base' preset.")
@@ -13,8 +14,8 @@ function loadPreset() {
   const adminRole = new Role({ name: 'admin' })
   const memberRole = new Role({ name: '_member_' })
   const adminUser = new User({
-    username: 'admin@platform9.com',
-    password: 'secret',
+    email: simConfig.username,
+    password: simConfig.password,
     tenant: serviceTenant,
   })
   const region = new Region({ id: 'Default Region' })

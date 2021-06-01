@@ -39,6 +39,12 @@ const AutoScalingAddonFields = React.lazy(async () =>
     default: module.AutoScalingAddonFields,
   })),
 )
+const TopologyManagerField = React.lazy(async () => import('./topology-manager'))
+const TopologyManagerAddonFields = React.lazy(async () =>
+  import('./topology-manager').then((module) => ({
+    default: module.TopologyManagerAddonFields,
+  })),
+)
 
 const addonMap = {
   networkPluginOperator: {
@@ -70,6 +76,10 @@ const addonMap = {
     toggler: AutoScalingField,
     details: { component: AutoScalingAddonFields },
   },
+  enableTopologyManager: {
+    toggler: TopologyManagerField,
+    details: { component: TopologyManagerAddonFields },
+  },
 }
 
 interface WizardAddonContext {
@@ -100,7 +110,7 @@ export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
   )
 }
 
-export const AddonDetailCards = ({ values }) => {
+export const AddonDetailCards = ({ wizardContext, setWizardContext, values }) => {
   const { addons } = useContext(AddonContext)
 
   return (

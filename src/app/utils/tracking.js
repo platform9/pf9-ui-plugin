@@ -1,16 +1,22 @@
 import { Route } from 'core/utils/routes'
+import Bugsnag from '@bugsnag/js'
 
 // Data is sent to Segment using window.analytics
 
 // name & body are both optional for both page & event
-export const trackPage = (location, body = {}) => {
+export const trackPage = (location) => {
   const route = Route.find(location)
-  if (window.analytics && route) {
-    return window.analytics.page(route.name)
-  }
   if (!route) {
     console.info(`No route found for '${location}'. Consider registering it as a Route.`)
+    return
   }
+
+  // Tracking for Segment
+  if (window.analytics) {
+    window.analytics.page(route.name)
+  }
+
+  Bugsnag.leaveBreadcrumb(route.name, {}, 'navigation')
 }
 
 export const trackEvent = (name, body = {}) => {
