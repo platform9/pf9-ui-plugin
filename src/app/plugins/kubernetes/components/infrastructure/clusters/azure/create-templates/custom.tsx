@@ -394,6 +394,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
           elevated={false}
+          withAddonManager
         >
           {({ values }) => (
             <>
@@ -411,6 +412,11 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 {/* Tags */}
                 <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
                 <TagsField />
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={['enableTopologyManager']}
+                />
               </FormFieldCard>
             </>
           )}

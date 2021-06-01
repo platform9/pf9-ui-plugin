@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import { trackEvent } from 'utils/tracking'
 import { CloudProviders } from '../cloudProviders/model'
 import { ClusterCreateTypes } from './model'
@@ -21,19 +22,20 @@ const generateTrackEventHandler = ({
   totalSteps,
   name,
   additionalParams = (ctx) => ({}),
-}) => ({ platform, target }) => (context = {}) =>
-  trackEvent(
-    `WZ New ${formattedPlatformNames?.[platform]} Cluster ${formattedTargetNames?.[target]} ${name} ${currentStep}`.replace(
-      / {2}/,
-      ' ',
-    ),
-    {
-      ...defaultParams,
-      wizard_progress: `${currentStep} of ${totalSteps}`,
-      wizard_name: `Add New ${formattedPlatformNames?.[platform]} ${formattedTargetNames?.[target]} Cluster`,
-      ...additionalParams(context),
-    },
+}) => ({ platform, target }) => (context = {}) => {
+  const event = `WZ New ${formattedPlatformNames?.[platform]} Cluster ${formattedTargetNames?.[target]} ${name} ${currentStep}`.replace(
+    / {2}/,
+    ' ',
   )
+  const metadata = {
+    ...defaultParams,
+    wizard_progress: `${currentStep} of ${totalSteps}`,
+    wizard_name: `Add New ${formattedPlatformNames?.[platform]} ${formattedTargetNames?.[target]} Cluster`,
+    ...additionalParams(context),
+  }
+  Bugsnag.leaveBreadcrumb(event, metadata)
+  trackEvent(event, metadata)
+}
 
 export const azureClusterTracking = {
   oneClick: generateTrackEventHandler({

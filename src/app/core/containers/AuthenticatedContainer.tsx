@@ -47,6 +47,7 @@ import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
 import { preferencesActions } from 'core/session/preferencesReducers'
+import { isProductionEnv } from 'core/utils/helpers'
 
 const toPairs: any = ToPairs
 
@@ -379,7 +380,7 @@ const AuthenticatedContainer = () => {
 
   // Add Zendesk widget script only for Enterprise users
   useEffect(() => {
-    if (customerTier === CustomerTiers.Enterprise) {
+    if (customerTier === CustomerTiers.Enterprise && isProductionEnv) {
       addZendeskWidgetScriptToDomBody({ userId, displayName, email: name })
     }
     return () => {

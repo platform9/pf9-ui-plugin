@@ -9,6 +9,7 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import { Resmgr } from './model'
 import { Node } from 'api-client/qbert.model'
 import { isUnauthorizedHost } from './helper'
+import Bugsnag from '@bugsnag/js'
 
 const { qbert, resMgr } = ApiClient.getInstance()
 
@@ -52,6 +53,7 @@ export const loadNodes = createContextLoader(
 export const authNode = createContextUpdater(
   ActionDataKeys.Nodes,
   async (node) => {
+    Bugsnag.leaveBreadcrumb('Attempting to authorize node', { node })
     await resMgr.addRole(node.uuid, 'pf9-kube', {})
     trackEvent('Authorize Node', {
       node_name: node.name,
@@ -66,6 +68,7 @@ export const authNode = createContextUpdater(
 export const deAuthNode = createContextUpdater(
   ActionDataKeys.Nodes,
   async (node) => {
+    Bugsnag.leaveBreadcrumb('Attempting to unauthorize node', { node })
     await resMgr.unauthorizeHost(node.uuid)
     trackEvent('Deauthorize Node', {
       node_name: node.name,

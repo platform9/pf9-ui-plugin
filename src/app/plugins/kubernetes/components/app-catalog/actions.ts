@@ -3,12 +3,14 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { makeAppsSelector } from './selectors'
+import Bugsnag from '@bugsnag/js'
 
 const { helm } = ApiClient.getInstance()
 
 export const appDetailsLoader = createContextLoader(
   ActionDataKeys.AppDetails,
   async ({ repository, name, infoType = 'all', versions = true }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load app details', { name, repository })
     const chart = await helm.getChartInfo(repository, name, {
       info_type: infoType,
       versions,
@@ -31,6 +33,7 @@ const parseRepoName = (name) => name.match(/^(\w||-)+/)[0]
 export const appsAvailableToClusterLoader = createContextLoader(
   ActionDataKeys.AppsAvailableToCluster,
   async ({ clusterId }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get apps available to cluster', { clusterId })
     const charts: any = await helm.getChartsForCluster(clusterId)
     return charts.map((chart) => ({
       ...chart,
@@ -45,6 +48,7 @@ export const appsAvailableToClusterLoader = createContextLoader(
 
 export const appActions = createCRUDActions(ActionDataKeys.Apps, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get all apps')
     const apps = await helm.getCharts()
     return apps.map((app) => {
       return {

@@ -21,6 +21,8 @@ import { loadAlertRules } from '../monitoring/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { prometheusCluster } from 'k8s/components/infrastructure/clusters/helpers'
 import { hasPrometheusEnabled } from '../prometheus/helpers'
+import Bugsnag from '@bugsnag/js'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -30,6 +32,7 @@ export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 export const loadAlerts = createContextLoader(
   ActionDataKeys.Alerts,
   async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load alerts', params)
     const clustersWithTasks = await clusterTagActions.list()
     const [clusterId, clusters] = await parseClusterParams(params)
     const filteredClusters = clusters.filter((cluster) => {
@@ -71,6 +74,7 @@ const selector = allClustersSelector()
 export const loadTimeSeriesAlerts = createContextLoader(
   ActionDataKeys.AlertsTimeSeries,
   async ({ chartTime, ...params }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to load time series alerts', { chartTime, ...params })
     const timeNow = moment().unix()
     const [number, period] = chartTime.split('.')
     const timePast = moment
@@ -105,17 +109,22 @@ export const loadTimeSeriesAlerts = createContextLoader(
 
 export const silenceActions = createCRUDActions(ActionDataKeys.Silences, {
   listFn: async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get alert mananger silences', params)
     const [clusterId, clusters] = await parseClusterParams(params)
     return clusterId === allKey
       ? someAsync(pluck('uuid', clusters).map(qbert.getAlertManagerSilences)).then(flatten)
       : qbert.getAlertManagerSilences(clusterId)
   },
   createFn: async ({ clusterId, body }) => {
-    return qbert.createAlertManagerSilence(clusterId, body)
+    Bugsnag.leaveBreadcrumb('Attempting to create alert manager silence', { clusterId, ...body })
+    const result = await qbert.createAlertManagerSilence(clusterId, body)
+    trackEvent(' Create Alert Manager Silence', { clusterId })
+    return result
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId } = await currentItems.find((x) => x.id === id)
     const result = await qbert.deleteAlertManagerSilence(clusterId, id)
+    trackEvent(' Delete Alert Manager Silence', { id })
     return result
   },
   uniqueIdentifier: 'id',

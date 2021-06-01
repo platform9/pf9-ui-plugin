@@ -25,6 +25,7 @@ import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
+import Bugsnag from '@bugsnag/js'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -65,15 +66,18 @@ const ImportEKSClusterPage = () => {
 
   const handleSubmit = async (data) => {
     setSubmitting(true)
-    trackEvent('Import EKS Clusters', {
+    const metadata = {
       cloud_provider_id: data.cloudProviderId,
       regions: data.regions,
       clusters: data.finalSelectedClusters.map((cluster) => cluster.id),
-    })
+    }
+    Bugsnag.leaveBreadcrumb('Attempting to import EKS clusters', metadata)
+    trackEvent('Import EKS Clusters', metadata)
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,
     })
+
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
     reloadImportedClusters(true)
