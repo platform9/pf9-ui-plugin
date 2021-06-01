@@ -20,10 +20,10 @@ it('logs in successfully', () => {
 
     it('Should be able to click on AddCluster then SingleMasterCluster',()=>{
       cy.get("a[href='/ui/kubernetes/infrastructure/clusters/add']", {timeout: 3000}).click()
-      cy.wait(15000)
-      cy.get("button").contains('Single Master Cluster',{timeout: 3000}).click()
-      cy.wait(20000)
-      cy.type(clusterName)
+      cy.wait(5000)
+      cy.xpath("//span[contains(text(),'Single Master Cluster')]").click()
+      cy.wait(3000)
+      cy.get('#name').type(clusterName)
       cy.get('label').contains('Kubernetes Version *').click()
       cy.get("li[data-value='1.18.10-pmk.1547']")
       cy.xpath("//span[text()='IPv4']/preceding::input[@type='radio']").should('be.checked')
