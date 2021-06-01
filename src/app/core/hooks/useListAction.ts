@@ -1,8 +1,8 @@
-import Action from 'core/actions/Action'
 import { arrayIfNil, ensureFunction, isNilOrEmpty } from 'utils/fp'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { memoizedDep } from 'utils/misc'
 import {
+  Dictionary,
   either,
   equals,
   find,
@@ -25,6 +25,12 @@ import {
 import { useToast } from 'core/providers/ToastProvider'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import moize from 'moize'
+import { ParametricSelector } from 'reselect'
+import { RootState, useAppSelector } from 'app/store'
+import ListAction from 'core/actions/ListAction'
+import getDataSelector from 'core/utils/getDataSelector'
+import { IDataKeys } from 'k8s/datakeys.model'
+import { ValueOf } from 'core/actions/Action'
 
 const onErrorHandler = moize(
   (cacheKey, showToast, registerNotification) => (errorMessage, catchedErr) => {
@@ -34,27 +40,35 @@ const onErrorHandler = moize(
   },
 )
 
-interface Options<T, R> {
-  action: Action<T, R>
-  selector: <TState, TSelected>(state: TState) => TSelected
-  params: T
+interface Options<P, R> {
+  selector?: ParametricSelector<RootState, P, R>
+  params?: P
   loadOnDemand?: boolean
   loadingFeedback?: boolean
 }
+const defaultParams = {}
 
-const useListAction = <T, R>(options: Options<T, R>) => {
-  const { action, selector, params, loadOnDemand = false, loadingFeedback = true } = options
-  const { cacheKey, errorMessage, indexBy, cache } = action.config
+const useListAction = <D extends keyof IDataKeys, R = IDataKeys[D], P extends Dictionary<any> = {}>(
+  action: ListAction<D, R, P>,
+  options: Options<P, R> = {},
+): [boolean, (boolean) => {}] => {
+  const { cacheKey, errorMessage, indexBy = [], cache } = action.config
+  const {
+    selector = getDataSelector(cacheKey, indexBy),
+    params = defaultParams,
+    loadOnDemand = false,
+    loadingFeedback = true,
+  } = options
   const [{ currentTenant, currentRegion }] = useScopedPreferences()
 
-  const selectedData = useSelector(selector)
-
-  // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
+  // Memoize the params dependency as we want to make sure it really changed and not just got a new ref
   const memoizedParams = memoizedDep(params)
   const memoizedIndexedParams = cache
     ? // @ts-ignore
       memoizedDep(pipe(pickAll(indexBy), reject(either(isNil, equals(allKey))))(memoizedParams))
     : memoizedParams
+
+  const selectedData = useAppSelector((state) => selector(state, memoizedParams))
 
   const paramsSelector = useMemo(
     () =>
@@ -67,14 +81,15 @@ const useListAction = <T, R>(options: Options<T, R>) => {
   )
   const cachedParams = useSelector(paramsSelector)
 
-  const loadingSelector = useMemo(() => path([cacheStoreKey, loadingStoreKey, cacheKey]), [
-    cacheKey,
-  ])
-  const loading = useSelector(loadingSelector)
+  const loadingSelector = useMemo<(RootState) => boolean>(
+    () => path([cacheStoreKey, loadingStoreKey, cacheKey]),
+    [cacheKey],
+  )
+  const loading = useSelector<RootState, boolean>(loadingSelector)
 
   const dispatch = useDispatch()
 
-  // We use this ref to flag when the component has been unmounted so we prevent further state updates
+  // We use this ref to flag when the component has been unmounted to prevent further state updates
   const unmounted = useRef(false)
 
   const showToast = useToast()
@@ -103,7 +118,8 @@ const useListAction = <T, R>(options: Options<T, R>) => {
           await action.call(memoizedParams)
         } catch (err) {
           const parsedErrorMesssage = ensureFunction(errorMessage)(err, params)
-          // TODO we should be putting these somewhere in the store to allow more control over the errors handling
+          // TODO we should be putting these somewhere in the store to allow more control
+          // over the errors handling
           onError(parsedErrorMesssage, err)
         }
         if (loadingFeedback) {

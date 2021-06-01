@@ -14,7 +14,7 @@ interface Props<T> {
   pollIntervalMs?: number
   refreshDuration?: number
   textColor?: TypographyProps['color']
-  onReload: (ignoreCache?: boolean) => T[]
+  onReload: (ignoreCache?: boolean) => void
 }
 
 const defaultRefreshDuration = 1000 * 60 * 5

@@ -6,7 +6,7 @@ import WizardMeta from 'core/components/wizard/WizardMeta'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useReactRouter from 'use-react-router'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { createCluster } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import { CloudProviders } from '../../cloudProviders/model'
@@ -46,10 +46,7 @@ const AddAwsClusterPage = () => {
   const onComplete = (_, cluster) =>
     history.push(routes.cluster.nodeHealth.path({ id: cluster?.uuid }))
 
-  const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(
-    clusterActions.create,
-    onComplete,
-  )
+  const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(createCluster, onComplete)
   const handleSubmit = (data) =>
     createAwsClusterAction({ ...data, clusterType: CloudProviders.Aws, segmentTrackingFields })
 

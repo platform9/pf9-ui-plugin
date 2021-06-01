@@ -9,7 +9,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { Tasks, NodeTaskStatus } from '../clusters/TaskStatusDialog'
 import pluck from 'ramda/es/pluck'
 import { emptyArr } from 'utils/fp'
-import { clusterActions } from '../clusters/actions'
+import { listClusters } from '../clusters/actions'
 import { loadNodes } from './actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
@@ -181,7 +181,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
     clusters,
     loadingClusters,
     reloadClusters,
-  ]: IUseDataLoader<IClusterSelector> = useDataLoader(clusterActions.list) as any
+  ]: IUseDataLoader<IClusterSelector> = useDataLoader(listClusters) as any
   const [nodes, loadingNodes, reloadNodes]: IUseDataLoader<INodesSelector> = useDataLoader(
     loadNodes,
   ) as any

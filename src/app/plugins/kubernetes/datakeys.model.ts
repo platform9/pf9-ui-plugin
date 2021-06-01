@@ -12,6 +12,7 @@ import {
   GetClusterRolesItem,
   GetClusterClusterRoleBindingsItem,
   AlertManagerAlert,
+  Role as SubSupportedRoleVersions,
 } from 'api-client/qbert.model'
 import { IClusterAction } from './components/infrastructure/clusters/model'
 import { ClusterTag } from 'api-client/appbert.model'
@@ -67,6 +68,7 @@ export interface IDataKeys {
   KubeRoles: Array<IGenericClusterizedResponse<GetClusterRolesItem>>
   RoleBindings: Array<IGenericClusterizedResponse<GetClusterClusterRoleBindingsItem>>
   ClusterRoleBindings: Array<IGenericClusterizedResponse<GetClusterClusterRoleBindingsItem>>
+  SupportedRoleVersions: SubSupportedRoleVersions[]
   ManagementUsers: User[]
   ManagementTenants: Tenant[]
   ManagementRoles: Role[]

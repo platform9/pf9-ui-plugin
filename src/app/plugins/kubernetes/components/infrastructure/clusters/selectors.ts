@@ -165,38 +165,15 @@ export const allClustersSelector = (
     orderDirection: 'asc',
   },
 ) => {
+  const filteredClustersSelector = makeParamsClustersSelector()
   return createSelector(
-    [clustersSelector, importedClustersSelector, (_, params) => mergeLeft(params, defaultParams)],
-    (clusters, importedClusters, params) => {
-      const {
-        masterNodeClusters,
-        masterlessClusters,
-        hasControlPanel,
-        healthyClusters,
-        appCatalogClusters,
-        prometheusClusters,
-        orderBy,
-        orderDirection,
-      } = params
-      // I want to reuse the makeParamsClusterSelector etc. here instead of code
-      // repetition but I don't know how to do so
-      const filteredClusters = pipe<
-        IClusterSelector[],
-        IClusterSelector[],
-        IClusterSelector[],
-        IClusterSelector[],
-        IClusterSelector[],
-        IClusterSelector[],
-        IClusterSelector[]
-      >(
-        filterIf(masterNodeClusters, hasMasterNode),
-        filterIf(masterlessClusters, masterlessCluster),
-        filterIf(prometheusClusters, prometheusCluster),
-        filterIf(appCatalogClusters, hasAppCatalogEnabled),
-        filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
-        filterIf(healthyClusters, hasHealthyMasterNodes),
-      )(clusters)
-
+    [
+      filteredClustersSelector,
+      importedClustersSelector,
+      (_, params) => mergeLeft(params, defaultParams),
+    ],
+    (filteredClusters, importedClusters, params) => {
+      const { prometheusClusters, orderBy, orderDirection } = params
       const filteredImportedClusters = pipe<any, any>(
         filterIf(prometheusClusters, prometheusCluster),
       )(importedClusters)

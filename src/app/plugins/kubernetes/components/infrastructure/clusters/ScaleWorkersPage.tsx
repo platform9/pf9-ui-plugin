@@ -1,29 +1,37 @@
-import React, { FunctionComponent } from 'react'
-import { k8sPrefix } from 'app/constants'
-import { makeStyles } from '@material-ui/styles'
-import FormWrapper from 'core/components/FormWrapper'
-import { pathJoin } from 'utils/misc'
-import useReactRouter from 'use-react-router'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { Theme } from '@material-ui/core'
-import Text from 'core/elements/text'
+import { makeStyles } from '@material-ui/styles'
+import { k8sPrefix } from 'app/constants'
 import BlockChooser from 'core/components/BlockChooser'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import TextField from 'core/components/validatedForm/TextField'
-import { validators, customValidator } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import useParams from 'core/hooks/useParams'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import FormWrapper from 'core/components/FormWrapper'
+import TextField from 'core/components/validatedForm/TextField'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import Text from 'core/elements/text'
 import useDataUpdater from 'core/hooks/useDataUpdater'
+import useParams from 'core/hooks/useParams'
+import { customValidator, validators } from 'core/utils/fieldValidators'
+import {
+  attachNodes,
+  detachNodes,
+  listClusters,
+  updateCluster,
+} from 'k8s/components/infrastructure/clusters/actions'
+import { allPass } from 'ramda'
+import React, { FunctionComponent } from 'react'
+import useReactRouter from 'use-react-router'
+import { pathJoin } from 'utils/misc'
 import ClusterHostChooser, {
-  isUnassignedNode,
   inCluster,
-  isNotMaster,
   isConnected,
+  isNotMaster,
+  isUnassignedNode,
 } from './bareos/ClusterHostChooser'
 import { IClusterSelector } from './model'
-import { allPass } from 'ramda'
+import { useAppSelector } from 'app/store'
+import useListAction from 'core/hooks/useListAction'
+import { emptyObj } from 'utils/fp'
+import { makeParamsClustersSelector } from './selectors'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
@@ -201,18 +209,21 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
   )
 }
 
+const selector = makeParamsClustersSelector()
+
 const ScaleWorkersPage: FunctionComponent = () => {
   const classes = useStyles({})
   const { match, history } = useReactRouter()
   const { id } = match.params
-  const [clusters, loading] = useDataLoader(clusterActions.list)
+  const [loading] = useListAction(listClusters)
+  const clusters = useAppSelector((state) => selector(state, emptyObj))
 
   const onComplete = () => history.push(listUrl)
-  const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
+  const [update, updating] = useDataUpdater(updateCluster, onComplete)
 
   // TypeScript is not able to infer that the customOperations are actually there so we need to work around it
-  const [attach, isAttaching] = useDataUpdater((clusterActions as any).attachNodes, onComplete)
-  const [detach, isDetaching] = useDataUpdater((clusterActions as any).detachNodes, onComplete)
+  const [attach, isAttaching] = useDataUpdater(attachNodes, onComplete)
+  const [detach, isDetaching] = useDataUpdater(detachNodes, onComplete)
 
   const isUpdating = updating || isAttaching || isDetaching
 

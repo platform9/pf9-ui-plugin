@@ -1,3 +1,4 @@
+import { IDataKeys } from 'k8s/datakeys.model'
 import { Dictionary, either, equals, isNil, pickAll, pipe, reject } from 'ramda'
 import Action from 'core/actions/Action'
 import { emptyArr, ensureArray } from 'utils/fp'
@@ -5,7 +6,11 @@ import { allKey } from 'app/constants'
 import store from 'app/store'
 import { cacheActions } from 'core/caching/cacheReducers'
 
-class UpdateAction<R extends Dictionary<any>, P extends Dictionary<any> = {}> extends Action<R, P> {
+class UpdateAction<
+  D extends keyof IDataKeys,
+  P extends Dictionary<any> = {},
+  R = IDataKeys[D]
+> extends Action<D, P, R> {
   public get name() {
     return 'update'
   }

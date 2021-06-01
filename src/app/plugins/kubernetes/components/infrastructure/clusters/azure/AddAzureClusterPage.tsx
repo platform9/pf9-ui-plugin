@@ -4,7 +4,7 @@ import FormWrapper from 'core/components/FormWrapper'
 import Wizard from 'core/components/wizard/Wizard'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useReactRouter from 'use-react-router'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { createCluster } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import { CloudProviders } from '../../cloudProviders/model'
@@ -44,10 +44,7 @@ const AddAzureClusterPage = () => {
   }, [])
 
   const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
-  const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(
-    clusterActions.create,
-    onComplete,
-  )
+  const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(createCluster, onComplete)
   const handleSubmit = (data) =>
     createAzureClusterAction({ ...data, clusterType: CloudProviders.Azure, segmentTrackingFields })
 

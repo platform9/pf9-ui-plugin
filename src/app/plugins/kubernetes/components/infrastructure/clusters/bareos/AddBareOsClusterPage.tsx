@@ -3,7 +3,7 @@ import FormWrapper from 'core/components/FormWrapper'
 import Wizard from 'core/components/wizard/Wizard'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useReactRouter from 'use-react-router'
-import { clusterActions } from '../actions'
+import { createCluster } from '../actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import { routes } from 'core/utils/routes'
@@ -76,7 +76,7 @@ const AddBareOsClusterPage = () => {
   const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
 
   const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(
-    clusterActions.create,
+    createCluster,
     onComplete,
   )
 

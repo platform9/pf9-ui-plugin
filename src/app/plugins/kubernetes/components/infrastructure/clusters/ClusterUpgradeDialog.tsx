@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { upgradeCluster } from 'k8s/components/infrastructure/clusters/actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ConfirmationDialog from 'core/components/ConfirmationDialog'
 import Text from 'core/elements/text'
@@ -21,8 +21,8 @@ const ClusterUpgradeDialog = ({ rows: [cluster], onClose }) => {
   const defaultState = getUpgradeTarget(cluster)
   const [upgradeType, setUpgradeType] = useState(defaultState)
   // @ts-ignore
-  const [upgradeCluster, upgradingCluster] = useDataUpdater(clusterActions.upgradeCluster, onClose)
-  const handeSubmit = useCallback(() => upgradeCluster({ cluster, upgradeType }), [
+  const [runUpgradeAction, upgradingCluster] = useDataUpdater(upgradeCluster, onClose)
+  const handeSubmit = useCallback(() => runUpgradeAction({ cluster, upgradeType }), [
     upgradeCluster,
     upgradeType,
   ])

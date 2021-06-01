@@ -1,10 +1,15 @@
+import { IDataKeys } from 'k8s/datakeys.model'
 import { Dictionary, isNil } from 'ramda'
 import Action, { ActionConfig } from 'core/actions/Action'
 import { cacheActions } from 'core/caching/cacheReducers'
 import store from 'app/store'
 import { ensureArray } from 'utils/fp'
 
-class CustomAction<R, P extends Dictionary<any> = {}> extends Action<R, P> {
+class CustomAction<
+  D extends keyof IDataKeys,
+  P extends Dictionary<any> = {},
+  R = IDataKeys[D]
+> extends Action<D, P, R> {
   private readonly customName: string
   private readonly customProcessor: (result: R, params: P) => Promise<void> | void
 
@@ -16,7 +21,7 @@ class CustomAction<R, P extends Dictionary<any> = {}> extends Action<R, P> {
     name: string,
     public readonly callback: (params: P) => Promise<R>,
     customProcessor?: (result: R, params: P) => Promise<void> | void,
-    config?: Partial<ActionConfig>,
+    config?: Partial<ActionConfig<D>>,
   ) {
     super(callback, config)
     this.customName = name

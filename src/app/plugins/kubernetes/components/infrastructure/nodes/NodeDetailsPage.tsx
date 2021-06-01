@@ -26,7 +26,9 @@ import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { getErrorMessage, hasClockDrift, meetsHardwareRequirement } from './helper'
 import { hexToRgbaCss } from 'core/utils/colorHelpers'
-import { clusterActions } from '../clusters/actions'
+import { useAppSelector } from 'app/store'
+import useListAction from 'core/hooks/useListAction'
+import { emptyObj } from 'utils/fp'
 import { IClusterSelector } from '../clusters/model'
 import {
   ClusterType,
@@ -35,6 +37,8 @@ import {
   nodeHardwareRequirements,
 } from '../clusters/bareos/constants'
 import { getAvailableSpace } from '../clusters/bareos/ClusterHostChooser'
+import { listClusters } from '../clusters/actions'
+import { makeParamsClustersSelector } from '../clusters/selectors'
 
 // Styles
 const useStyles = makeStyles((theme: Theme) => ({
@@ -108,17 +112,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
+const selector = makeParamsClustersSelector()
+
 const NodeDetailsPage: FC = () => {
   const { match } = useReactRouter()
   const classes = useStyles({})
   const [nodes, loadingNodes] = useDataLoader(loadNodes)
-  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const [loadingClusters] = useListAction(listClusters)
+  const clusters = useAppSelector((state) => selector(state, emptyObj))
 
   const selectedNode: INodesSelector =
     nodes.find((x: INodesSelector) => x.uuid === match.params.id) || {}
   const cluster: IClusterSelector = selectedNode.clusterUuid
     ? clusters.find((cluster) => cluster.uuid === selectedNode.clusterUuid)
-    : {}
+    : null
   const loadingSomething = loadingNodes || loadingClusters
   const clockDriftErrorMsg = getErrorMessage(selectedNode, 'warn', ErrorMessageCodes.timeDrift)
 

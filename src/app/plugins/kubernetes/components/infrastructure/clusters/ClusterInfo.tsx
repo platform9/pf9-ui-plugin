@@ -1,17 +1,21 @@
-import React from 'react'
-import InfoPanel, { getFieldsForCard, IDetailFields } from 'core/components/InfoPanel'
+import React, { useMemo } from 'react'
+import InfoPanel, { IDetailFields, getFieldsForCard } from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
 import Text from 'core/elements/text'
-import { makeStyles, withStyles } from '@material-ui/styles'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import Progress from 'core/components/progress/Progress'
+import { useAppSelector } from 'app/store'
+import { listClusters } from 'k8s/components/infrastructure/clusters/actions'
 import { IClusterSelector } from './model'
 import { CloudProviders, CloudProvidersFriendlyName } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
+import { applicationLoadBalancer } from 'k8s/links'
 import { castBoolToStr, formatDate } from 'utils/misc'
 import ExternalLink from 'core/components/ExternalLink'
-import { applicationLoadBalancer } from 'k8s/links'
+import { withStyles, makeStyles } from '@material-ui/styles'
+import useListAction from 'core/hooks/useListAction'
+import { emptyObj } from 'utils/fp'
+import { makeParamsClustersSelector } from './selectors'
 
 // Common
 const clusterOverviewFields: Array<IDetailFields<IClusterSelector>> = [
@@ -254,33 +258,42 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
+const selector = makeParamsClustersSelector()
+
 const ClusterInfo = () => {
   const { match } = useReactRouter()
+  const { id: clusterId } = match.params
   const classes = useStyles({})
-  const [clusters] = useDataLoader(clusterActions.list)
-  const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
+  const [loading] = useListAction(listClusters)
+  const clusters = useAppSelector((state) => selector(state, emptyObj))
+  const cluster = useMemo<IClusterSelector>(
+    () => clusters.find((cluster) => cluster.uuid === clusterId),
+    [clusters, clusterId],
+  )
 
   const overview = overviewStats(cluster)
   const csiDrivers = cluster?.csiDrivers?.drivers || []
   const etcdBackupFields = etcdBackupProps(cluster)
 
   return (
-    <div className={classes.clusterInfo}>
-      <div className={classes.column}>
-        <InfoPanel className={classes.card} title="Overview" items={overview} />
-        {csiDrivers.length > 0 && (
-          <InfoPanel
-            className={classes.card}
-            title="CSI Driver Details"
-            items={csiDrivers.map(csiDriverProps)}
-          />
-        )}
+    <Progress loading={loading} overlay>
+      <div className={classes.clusterInfo}>
+        <div className={classes.column}>
+          <InfoPanel className={classes.card} title="Overview" items={overview} />
+          {csiDrivers.length > 0 && (
+            <InfoPanel
+              className={classes.card}
+              title="CSI Driver Details"
+              items={csiDrivers.map(csiDriverProps)}
+            />
+          )}
+        </div>
+        <div className={classes.column}>
+          {renderCloudInfo(cluster, classes)}
+          <InfoPanel className={classes.card} title="ETCD Backup" items={etcdBackupFields} />
+        </div>
       </div>
-      <div className={classes.column}>
-        {renderCloudInfo(cluster, classes)}
-        <InfoPanel className={classes.card} title="ETCD Backup" items={etcdBackupFields} />
-      </div>
-    </div>
+    </Progress>
   )
 }
 

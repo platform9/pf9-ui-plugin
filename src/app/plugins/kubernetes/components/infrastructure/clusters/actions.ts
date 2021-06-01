@@ -1,6 +1,14 @@
 import ApiClient from 'api-client/ApiClient'
+import { ClusterElement, INormalizedCluster } from 'api-client/qbert.model'
 import { allKey } from 'app/constants'
+import store from 'app/store'
 import ActionsSet from 'core/actions/ActionsSet'
+import CreateAction from 'core/actions/CreateAction'
+import CustomAction from 'core/actions/CustomAction'
+import DeleteAction from 'core/actions/DeleteAction'
+import ListAction from 'core/actions/ListAction'
+import UpdateAction from 'core/actions/UpdateAction'
+import { cacheActions } from 'core/caching/cacheReducers'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
   createAwsCluster,
@@ -10,20 +18,20 @@ import {
   getKubernetesVersion,
   getProgressPercent,
 } from 'k8s/components/infrastructure/clusters/helpers'
-import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
-import { pathOr, pick } from 'ramda'
-import { mapAsync } from 'utils/async'
-import { ClusterElement, INormalizedCluster } from 'api-client/qbert.model'
-import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import {
+  allClustersSelector,
+  clustersSelector,
+} from 'k8s/components/infrastructure/clusters/selectors'
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
-import ListAction from 'core/actions/ListAction'
-import CreateAction from 'core/actions/CreateAction'
-import UpdateAction from 'core/actions/UpdateAction'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
+import { Dictionary, pathOr, pick } from 'ramda'
+import { mapAsync } from 'utils/async'
+import { emptyObj, isNilOrEmpty } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
-import DeleteAction from 'core/actions/DeleteAction'
-import CustomAction from 'core/actions/CustomAction'
-import store from 'app/store'
-import { cacheActions } from 'core/caching/cacheReducers'
+import { importedClusterActions } from '../importedClusters/actions'
+import { importedClustersSelector } from '../importedClusters/selectors'
+import { IClusterAction } from 'k8s/components/infrastructure/clusters/model'
 
 const { appbert, qbert } = ApiClient.getInstance()
 
@@ -43,7 +51,7 @@ const getCsiDrivers = async (clusterUiid) => {
   }
 }
 
-const clusterActions = new ActionsSet({
+const clusterActions = new ActionsSet<'Clusters'>({
   cacheKey: DataKeys.Clusters,
   uniqueIdentifier: 'uuid',
 })
@@ -60,8 +68,8 @@ export type Cluster = ClusterElement &
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const listClusters = clusterActions.add(
-  new ListAction<Cluster[]>(async () => {
-    const rawClusters = Promise.all([
+  new ListAction<'Clusters'>(async () => {
+    const [rawClusters] = await Promise.all([
       qbert.getClusters(),
       // Fetch dependent entities
       clusterTagActions.list(),
@@ -90,7 +98,7 @@ export const listClusters = clusterActions.add(
 type ClusterType = 'aws' | 'azure' | 'local'
 
 export const createCluster = clusterActions.add(
-  new CreateAction<INormalizedCluster>(async (params: { clusterType: ClusterType }) => {
+  new CreateAction<'Clusters', { clusterType: ClusterType }, INormalizedCluster>(async (params) => {
     if (params.clusterType === 'aws') {
       return createAwsCluster(params)
     }
@@ -105,8 +113,9 @@ export const createCluster = clusterActions.add(
 )
 
 export const updateCluster = clusterActions.add(
-  new UpdateAction(
-    async (params: {
+  new UpdateAction<
+    'Clusters',
+    {
       uuid: string
       name: string
       tags: string
@@ -114,27 +123,28 @@ export const updateCluster = clusterActions.add(
       numMinWorkers: number
       numMaxWorkers: number
       etcdBackup: any
-    }) => {
-      const { uuid } = params
-      const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
-
-      const body = pick(updateableParams, params)
-      body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
-
-      await qbert.updateCluster(uuid, body)
-      trackEvent('Update Cluster', { uuid })
-
-      // Doing this will help update the table, but the cache remains incorrect...
-      // Same issue regarding cache applies to anything else updated this function
-      // body.etcdBackupEnabled = !!body.etcdBackup
-      // clusterActions.invalidateCache()
-      return body
     },
-  ),
+    any
+  >(async (params) => {
+    const { uuid } = params
+    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
+
+    const body = pick(updateableParams, params)
+    body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
+
+    await qbert.updateCluster(uuid, body)
+    trackEvent('Update Cluster', { uuid })
+
+    // Doing this will help update the table, but the cache remains incorrect...
+    // Same issue regarding cache applies to anything else updated this function
+    // body.etcdBackupEnabled = !!body.etcdBackup
+    // clusterActions.invalidateCache()
+    return body
+  }),
 )
 
 export const deleteCluster = clusterActions.add(
-  new DeleteAction(async ({ uuid }: { uuid: string }) => {
+  new DeleteAction<'Clusters', { uuid: string }, any>(async ({ uuid }) => {
     await qbert.deleteCluster(uuid)
     // Delete cluster Segment tracking is done in ClusterDeleteDialog.tsx because that code
     // has more context about the cluster name, etc.
@@ -146,19 +156,20 @@ export const deleteCluster = clusterActions.add(
 )
 
 export const scaleCluster = clusterActions.add(
-  new CustomAction(
-    'scaleCluster',
-    async ({
-      cluster,
-      numSpotWorkers,
-      numWorkers,
-      spotPrice,
-    }: {
+  new CustomAction<
+    'Clusters',
+    {
       cluster: Cluster
       numWorkers: number
       numSpotWorkers: number
       spotPrice: number
-    }) => {
+    },
+    {
+      numWorkers: number
+    }
+  >(
+    'scaleCluster',
+    async ({ cluster, numSpotWorkers, numWorkers, spotPrice }) => {
       const body = {
         numWorkers,
         numSpotWorkers: numSpotWorkers || 0,
@@ -187,10 +198,10 @@ export const scaleCluster = clusterActions.add(
 )
 
 export const upgradeCluster = clusterActions.add(
-  new CustomAction(
+  new CustomAction<'Clusters', { uuid: string; upgradeType: string }, { canUpgrade: boolean }>(
     'upgradeCluster',
-    async ({ uuid }: { uuid: string }) => {
-      await qbert.upgradeCluster(uuid)
+    async ({ uuid, upgradeType }) => {
+      await qbert.upgradeCluster(uuid, upgradeType)
       trackEvent('Upgrade Cluster', { clusterUuid: uuid })
 
       return {
@@ -212,9 +223,15 @@ export const upgradeCluster = clusterActions.add(
 )
 
 export const updateTag = clusterActions.add(
-  new CustomAction(
+  new CustomAction<
+    'Clusters',
+    { cluster: Cluster; key: string; val: string },
+    {
+      tags: Dictionary<any> // TODO fix these typings
+    }
+  >(
     'updateTag',
-    async ({ cluster, key, val }: { cluster: Cluster; key: string; val: string }) => {
+    async ({ cluster, key, val }) => {
       const body = {
         tags: { ...(cluster.tags || {}), [key]: val },
       }
@@ -238,15 +255,14 @@ export const updateTag = clusterActions.add(
 )
 
 export const attachNodes = clusterActions.add(
-  new CustomAction(
+  new CustomAction<'Clusters', { cluster: Cluster; nodes: any[] }, void>(
     'attachNodes',
-    async ({ cluster, nodes }: { cluster: Cluster; nodes: any[] }) => {
+    async ({ cluster, nodes }) => {
       await qbert.attach(cluster.uuid, nodes)
       trackEvent('Cluster Attach Nodes', {
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,
       })
-      return null
     },
     () => {
       // Clear the combined hosts cache
@@ -260,7 +276,7 @@ export const attachNodes = clusterActions.add(
 )
 
 export const detachNodes = clusterActions.add(
-  new CustomAction(
+  new CustomAction<'Clusters', { cluster: Cluster; nodes: any[] }, void>(
     'detachNodes',
     async ({ cluster, nodes }: { cluster: Cluster; nodes: any[] }) => {
       await qbert.detach(cluster.uuid, nodes)
@@ -268,7 +284,6 @@ export const detachNodes = clusterActions.add(
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,
       })
-      return null
     },
     () => {
       // Clear the combined hosts cache
@@ -284,8 +299,39 @@ export const detachNodes = clusterActions.add(
 // If params.clusterId is not assigned it fetches all clusters
 // and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
-export const parseClusterParams = async (params): Promise<[string, Cluster[]]> => {
+export const parseClusterParams = async (params): Promise<[string, IClusterAction[]]> => {
   const clusters = await listClusters.call(params)
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
   return [clusterId, clusters]
+}
+
+export const loadSupportedRoleVersions = new ListAction<'SupportedRoleVersions'>(
+  async () => {
+    return qbert.getK8sSupportedRoleVersions()
+  },
+  {
+    uniqueIdentifier: 'uuid',
+    cache: false,
+  },
+)
+
+const allSelector = allClustersSelector()
+// TODO: this has be improved, we shouldn't even need this function
+export const getAllClusters = async (reload = false) => {
+  if (reload) {
+    await listClusters.call(emptyObj)
+    await importedClusterActions.list()
+  } else {
+    // Match useDataLoader method of checking for nil/empty on cache
+    const normalClusters = clustersSelector(store.getState(), emptyObj)
+    const importedClusters = importedClustersSelector(store.getState(), emptyObj)
+    if (isNilOrEmpty(normalClusters)) {
+      await listClusters.call(emptyObj)
+    }
+    if (isNilOrEmpty(importedClusters)) {
+      await importedClusterActions.list()
+    }
+  }
+  const allClusters = allSelector(store.getState(), emptyObj)
+  return allClusters
 }

@@ -20,40 +20,16 @@ import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 
 const { qbert } = ApiClient.getInstance()
 
-const podsActions = new ActionsSet({
+const podsActions = new ActionsSet<'Pods'>({
   cacheKey: DataKeys.Pods,
-export const podActions = createCRUDActions(ActionDataKeys.Pods, {
-  listFn: async (params) => {
-    Bugsnag.leaveBreadcrumb('Attempting to get pods', params)
-    const [clusterId, clusters] = await parseClusterParams(params)
-    return clusterId === allKey
-      ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
-      : qbert.getClusterPods(clusterId)
-  },
-  createFn: async ({ clusterId, namespace, yaml }) => {
-    Bugsnag.leaveBreadcrumb('Attempting to create new pod', { clusterId, namespace, yaml })
-    const body = jsYaml.safeLoad(yaml)
-    const pod = await qbert.createPod(clusterId, namespace, body)
-    trackEvent('Create New Pod', {
-      clusterId,
-      namespace,
-      name: pathStr('metadata.name', pod),
-    })
-    return pod
-  },
-  deleteFn: async ({ id }, currentItems) => {
-    const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
-    Bugsnag.leaveBreadcrumb('Attempting to delete pod', { id, clusterId, namespace, name })
-    const result = await qbert.deletePod(clusterId, namespace, name)
-    trackEvent('Delete Pod', { clusterId, namespace, name, id })
-    return result
-  },
   uniqueIdentifier: 'metadata.uid',
   indexBy: 'clusterId',
 })
 
 export const listPods = podsActions.add(
-  new ListAction(async (params: { clusterId: string }) => {
+  new ListAction<'Pods', { clusterId: string }>(async (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to get pods', params)
+
     const [clusterId, clusters] = await parseClusterParams(params)
     return clusterId === allKey
       ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
@@ -62,36 +38,39 @@ export const listPods = podsActions.add(
 )
 
 export const createPod = podsActions.add(
-  new CreateAction(
-    async ({
-      clusterId,
-      namespace,
-      yaml,
-    }: {
+  new CreateAction<
+    'Pods',
+    {
       clusterId: string
       namespace: string
       yaml: string
-    }) => {
-      const body = jsYaml.safeLoad(yaml)
-      const pod = await qbert.createPod(clusterId, namespace, body)
-      trackEvent('Create New Pod', {
-        clusterId,
-        namespace,
-        name: pathStr('metadata.name', pod),
-      })
-      return pod
     },
-  ),
+    any
+  >(async ({ clusterId, namespace, yaml }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create new pod', { clusterId, namespace, yaml })
+
+    const body = jsYaml.safeLoad(yaml)
+    const pod = await qbert.createPod(clusterId, namespace, body)
+    trackEvent('Create New Pod', {
+      clusterId,
+      namespace,
+      name: pathStr('metadata.name', pod),
+    })
+    return pod
+  }),
 )
 
 export const deletePod = podsActions.add(
-  new DeleteAction(async (params: { id: string }) => {
+  new DeleteAction<'Pods', { id: string }, any>(async (params) => {
     const { id } = params
+
     const singlePodSelector = pipe(
       pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Pods]),
       find((x) => x.id === id),
     )
     const { clusterId, namespace, name } = useSelector(singlePodSelector)
+    Bugsnag.leaveBreadcrumb('Attempting to delete pod', { id, clusterId, namespace, name })
+
     const result = await qbert.deletePod(clusterId, namespace, name)
     trackEvent('Delete Pod', { clusterId, namespace, name, id })
     return result

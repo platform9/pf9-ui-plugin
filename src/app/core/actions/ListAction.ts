@@ -1,3 +1,4 @@
+import { IDataKeys } from 'k8s/datakeys.model'
 import {
   Dictionary,
   either,
@@ -16,10 +17,11 @@ import { emptyArr, ensureArray } from 'utils/fp'
 import { allKey, defaultUniqueIdentifier } from 'app/constants'
 import { cacheActions } from 'core/caching/cacheReducers'
 
-class ListAction<R extends Array<Dictionary<any>>, P extends Dictionary<any> = {}> extends Action<
-  R,
-  P
-> {
+class ListAction<
+  D extends keyof IDataKeys,
+  P extends Dictionary<any> = {},
+  R extends any[] = IDataKeys[D]
+> extends Action<D, P, R> {
   public get name() {
     return 'list'
   }
@@ -64,8 +66,10 @@ class ListAction<R extends Array<Dictionary<any>>, P extends Dictionary<any> = {
     )(params)
 
     // We can't rely on the server to index the data, as sometimes it simply doesn't return the
-    // params used for the query, so we will add them to the items in order to be able to find them afterwards
-    const itemsWithParams = result.map(mergeLeft(providedIndexedParams))
+    // params used for the query, so we will add them to the items in order to be able to find
+    // them afterwards
+    const itemsWithParams =
+      result instanceof Array ? result.map(mergeLeft(providedIndexedParams)) : result
 
     // Perfom the cache update operations
     if (!cache || refetch) {

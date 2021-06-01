@@ -1,33 +1,51 @@
-import DataKeys from 'k8s/DataKeys'
+import { IDataKeys } from 'k8s/datakeys.model'
 import { Dictionary } from 'ramda'
 import { isNilOrEmpty } from 'utils/fp'
 
-export interface ActionConfig {
+export interface ActionConfig<D extends keyof IDataKeys> {
   uniqueIdentifier: string | string[]
   indexBy?: string | string[]
   entityName?: string
-  cacheKey: DataKeys
+  cacheKey: D
   cache?: boolean
-  successMessage?: (<D, P>(updatedItems: D[], prevItems: D[], params: P) => string) | string
-  errorMessage?: (<P>(err: Error, params: P) => string) | string
+  successMessage?:
+    | (<R = IDataKeys[D], P extends Dictionary<any> = {}>(
+        updatedItems: R,
+        prevItems: R,
+        params: P,
+      ) => string)
+    | string
+  errorMessage?: (<P extends Dictionary<any> = {}>(err: Error, params: P) => string) | string
 }
 
-abstract class Action<R, P extends Dictionary<any> = {}> {
+export type ValueOf<T> = T[keyof T]
+
+export interface IAction<D extends keyof IDataKeys> {
+  name: string
+  config: ActionConfig<D>
+  updateConfig: (config: Partial<ActionConfig<D>>) => void
+}
+
+abstract class Action<D extends keyof IDataKeys, P extends Dictionary<any>, R>
+  implements IAction<D> {
   public abstract get name(): string
 
-  private baseConfig: ActionConfig = {
+  private baseConfig: ActionConfig<D> = {
     cacheKey: null,
     uniqueIdentifier: 'id',
     cache: true,
   }
 
-  constructor(public readonly callback: (params: P) => Promise<R>, config?: Partial<ActionConfig>) {
+  constructor(
+    public readonly callback: (params: P) => Promise<R>,
+    config?: Partial<ActionConfig<D>>,
+  ) {
     if (config) {
       this.updateConfig(config)
     }
   }
 
-  public updateConfig = (config: Partial<ActionConfig>) => {
+  public updateConfig = (config: Partial<ActionConfig<D>>) => {
     this.baseConfig = Object.freeze({
       ...this.baseConfig,
       ...config,

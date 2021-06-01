@@ -1,24 +1,24 @@
-import React, { useEffect, useMemo, useState } from 'react'
 import { makeStyles, Theme } from '@material-ui/core'
-import { IUseDataLoader } from '../infrastructure/nodes/model'
-import { IAlertSelector } from '../alarms/model'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { loadAlerts } from '../alarms/actions'
 import { allKey, LoadingGifs } from 'app/constants'
-import { getAllClusters } from '../infrastructure/clusters/actions'
-import AlarmOverviewOrderPicklist from './AlarmOverviewOrderPicklist'
-import SeverityPicklist from '../alarms/SeverityPicklist'
-import Progress from 'core/components/progress/Progress'
-import ClusterAlarmCard from './ClusterAlarmCard'
-import AlarmOverviewClusters from './AlarmOverviewClusters'
+import { useAppSelector } from 'app/store'
+import { cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
 import RefreshButton from 'core/components/buttons/refresh-button'
 import NoContentMessage from 'core/components/NoContentMessage'
-import { cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
+import Progress from 'core/components/progress/Progress'
+import useDataLoader from 'core/hooks/useDataLoader'
+import useListAction from 'core/hooks/useListAction'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { path } from 'ramda'
-import { allClustersSelector } from '../infrastructure/clusters/selectors'
-import { useSelector } from 'react-redux'
-import { GlobalState } from 'k8s/datakeys.model'
+import React, { useMemo, useState } from 'react'
+import { loadAlerts } from '../alarms/actions'
+import { IAlertSelector } from '../alarms/model'
+import SeverityPicklist from '../alarms/SeverityPicklist'
+import { listClusters } from '../infrastructure/clusters/actions'
+import { makeParamsClustersSelector } from '../infrastructure/clusters/selectors'
+import { IUseDataLoader } from '../infrastructure/nodes/model'
+import AlarmOverviewClusters from './AlarmOverviewClusters'
+import AlarmOverviewOrderPicklist from './AlarmOverviewOrderPicklist'
+import ClusterAlarmCard from './ClusterAlarmCard'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   alarmsContainer: {
@@ -50,6 +50,8 @@ const defaultParams = {
   order: 'highToLow',
 }
 
+const selector = makeParamsClustersSelector()
+
 // Todo: Pagination or a max height container with scroll
 const AlarmOverviewPage = () => {
   const classes = useStyles({})
@@ -59,25 +61,19 @@ const AlarmOverviewPage = () => {
     params,
   ) as any
 
-  const selector = allClustersSelector()
-  const allClusters = useSelector((state: GlobalState) =>
+  const allClusters = useAppSelector((state) =>
     selector(state, {
       prometheusClusters: true,
       orderBy: 'name',
     }),
   )
 
-  const clustersLoading = useSelector(
-    path([cacheStoreKey, loadingStoreKey, ActionDataKeys.Clusters]),
-  )
-  const importedClustersLoading = useSelector(
+  const importedClustersLoading = useAppSelector(
     path([cacheStoreKey, loadingStoreKey, ActionDataKeys.ImportedClusters]),
   )
-  const allClustersLoading = clustersLoading && importedClustersLoading
+  const [clustersLoading, reloadClusters] = useListAction(listClusters)
 
-  useEffect(() => {
-    getAllClusters()
-  }, [])
+  const allClustersLoading = clustersLoading && importedClustersLoading
 
   const clustersWithAlarms = useMemo(() => {
     if (!alarmsLoading && !allClustersLoading) {
@@ -157,7 +153,7 @@ const AlarmOverviewPage = () => {
                 className={classes.refreshButton}
                 onRefresh={() => {
                   reloadAlarms(true)
-                  getAllClusters(true)
+                  reloadClusters(true)
                 }}
               />
             </div>

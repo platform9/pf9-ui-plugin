@@ -1,18 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
-import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
-import useReactRouter from 'use-react-router'
-import { onboardingPodSetup, allKey } from 'app/constants'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { podActions } from '../pods/actions'
-import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
+import { onboardingPodSetup } from 'app/constants'
+import { useAppSelector } from 'app/store'
+import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
+import PollingData from 'core/components/PollingData'
+import Button from 'core/elements/button'
+import Text from 'core/elements/text'
+import useListAction from 'core/hooks/useListAction'
 import Theme from 'core/themes/model'
 import { routes } from 'core/utils/routes'
-import PollingData from 'core/components/PollingData'
-import { IUseDataLoader } from '../infrastructure/nodes/model'
-import { IPod } from '../pods/models'
-import Button from 'core/elements/button'
+import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
+import React, { useCallback, useEffect, useState } from 'react'
+import useReactRouter from 'use-react-router'
+import { emptyObj } from 'utils/fp'
+import { listPods } from '../pods/actions'
+import { makePodsSelector } from '../pods/selectors'
 
 const oneSecond = 1000
 
@@ -34,6 +35,8 @@ enum Panels {
   CreatePod = 0,
 }
 
+const selector = makePodsSelector()
+
 const PodSetup = ({ onComplete, initialPanel }: Props) => {
   const classes = useStyles({})
   const { history } = useReactRouter()
@@ -53,15 +56,10 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
     new Set(initialPanel !== undefined ? [initialPanel] : []),
   )
 
-  const [pods, loadingPods, reloadPods]: IUseDataLoader<IPod> = useDataLoader(
-    podActions.list,
-    {
-      clusterId: allKey,
-    },
-    {
-      loadingFeedback: false,
-    },
-  ) as any
+  const [loadingPods, reloadPods] = useListAction(listPods, {
+    loadingFeedback: false,
+  })
+  const pods = useAppSelector((state) => selector(state, emptyObj))
   const hasPods = podSetupComplete(pods)
 
   useEffect(() => {
@@ -80,7 +78,7 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
     [activePanels],
   )
 
-  const handleReload = (ignoreCache) => {
+  const handleReload = (ignoreCache?: boolean) => {
     if (!loadedOnce) {
       setLoadedOnce(true)
     }

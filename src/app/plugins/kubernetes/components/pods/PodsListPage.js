@@ -1,30 +1,23 @@
 import { makeStyles } from '@material-ui/styles'
 import { allKey, listTablePrefs } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import DateCell from 'core/components/listTable/cells/DateCell'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import useListAction from 'core/hooks/useListAction'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-import { makeStyles } from '@material-ui/styles'
-import { objSwitchCase } from 'utils/fp'
-import { listPods, podActions } from 'k8s/components/pods/actions'
+import { listPods, deletePod } from 'k8s/components/pods/actions'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import { makePodsSelector } from 'k8s/components/pods/selectors'
 import { pick } from 'ramda'
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import { objSwitchCase } from 'utils/fp'
-import { DateAndTime } from 'core/components/listTable/cells/DateCell'
-import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
-import { routes } from 'core/utils/routes'
-import { trackEvent } from 'utils/tracking'
-import SimpleLink from 'core/components/SimpleLink'
-import { makeStyles } from '@material-ui/styles'
-import { pathStrOr } from 'utils/fp'
 import Text from 'core/elements/text'
+import SimpleLink from 'core/components/SimpleLink'
+import { trackEvent } from 'utils/tracking'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import { routes } from 'core/utils/routes'
+import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import Bugsnag from '@bugsnag/js'
 
 const useStyles = makeStyles((theme) => ({
@@ -43,14 +36,14 @@ const defaultParams = {
 }
 const usePrefParams = createUsePrefParamsHook('Pods', listTablePrefs)
 
-const selector = makePodsSelector()
+const selector = makePodsSelector(defaultParams)
 
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
 
+    const [loading, reload] = useListAction(listPods, { selector, params })
     const data = useSelector((store) => selector(store, params))
-    const [loading, reload] = useListAction({ action: listPods, selector, params })
 
     const updateClusterId = useCallback((clusterId) => {
       updateParams({
@@ -139,7 +132,7 @@ const renderStatus = (phase) => {
 }
 
 export const options = {
-  deleteFn: podActions.delete,
+  deleteFn: deletePod,
   addUrl: routes.pods.add.path(),
   addText: 'Create New Pod',
   columns: [

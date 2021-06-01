@@ -4,9 +4,12 @@ import BannerButton from 'core/components/buttons/BannerButton'
 import { makeStyles, Theme } from '@material-ui/core'
 import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { listClusters } from 'k8s/components/infrastructure/clusters/actions'
 import { routes } from 'core/utils/routes'
+import useListAction from 'core/hooks/useListAction'
+import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import { useAppSelector } from 'app/store'
+import { emptyObj } from 'utils/fp'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   root: {
@@ -17,24 +20,27 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
     fontWeight: 'bold',
   },
 }))
+const selector = makeParamsClustersSelector()
 
 const ClusterUpgradeBanner = () => {
   const classes = useStyles({})
   const { history } = useReactRouter()
 
-  const [clusters, clustersLoading] = useDataLoader(clusterActions.list)
-  const upgradableClusters = clusters.filter(cluster => cluster.canUpgrade)
+  const [clustersLoading] = useListAction(listClusters, { selector })
+  const clusters = useAppSelector((state) => selector(state, emptyObj))
+  const upgradableClusters = clusters.filter((cluster) => cluster.canUpgrade)
 
   const redirectToClusters = () => {
     history.push(routes.cluster.list.path())
   }
 
-  return (!clustersLoading && upgradableClusters.length) ? (
+  return !clustersLoading && upgradableClusters.length ? (
     <>
       <BannerContainer />
       <BannerContent>
         <div className={classes.root}>
-          There's a new Platform9 release available. {upgradableClusters.length} clusters to upgrade.
+          There's a new Platform9 release available. {upgradableClusters.length} clusters to
+          upgrade.
           <BannerButton onClick={redirectToClusters}>View Clusters</BannerButton>
         </div>
       </BannerContent>
