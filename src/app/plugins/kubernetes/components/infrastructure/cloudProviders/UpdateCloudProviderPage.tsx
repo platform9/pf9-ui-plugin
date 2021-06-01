@@ -159,6 +159,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                         wizardContext={wizardContext}
                         setWizardContext={setWizardContext}
                         updateUserDefaults={updateUserDefaults}
+                        cloudDefaults={cloudDefaults}
                       />
                     </ValidatedForm>
                   </div>

@@ -44,12 +44,14 @@ interface Props {
   wizardContext: any
   setWizardContext: any
   updateUserDefaults: any
+  cloudDefaults: any
 }
 
 const AzureCloudProviderVerification = ({
   wizardContext,
   setWizardContext,
   updateUserDefaults,
+  cloudDefaults,
 }: Props) => {
   const classes = useStyles({})
 
@@ -98,7 +100,9 @@ const AzureCloudProviderVerification = ({
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
-            disabled={!wizardContext.region}
+            disabled={
+              !wizardContext.region || cloudDefaults[CloudDefaults.Region] === wizardContext.region
+            }
             onClick={() =>
               handleSetUserDefault({
                 [CloudDefaults.Region]: wizardContext.region,
@@ -124,7 +128,9 @@ const AzureCloudProviderVerification = ({
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
-            disabled={!wizardContext.sshKey}
+            disabled={
+              !wizardContext.sshKey || cloudDefaults[CloudDefaults.SshKey] === wizardContext.sshKey
+            }
             onClick={() =>
               isKeyValid(wizardContext.sshKey) &&
               handleSetUserDefault({ [CloudDefaults.SshKey]: wizardContext.sshKey })

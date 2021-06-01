@@ -63,6 +63,7 @@ interface Props {
   wizardContext: any
   setWizardContext: any
   updateUserDefaults: any
+  cloudDefaults: any
 }
 
 const getRoute53String = (classes, loading, regionId, available) =>
@@ -125,6 +126,7 @@ const AwsCloudProviderVerification = ({
   wizardContext,
   setWizardContext,
   updateUserDefaults,
+  cloudDefaults,
 }: Props) => {
   const classes = useStyles({})
 
@@ -181,7 +183,9 @@ const AwsCloudProviderVerification = ({
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
-            disabled={!wizardContext.region}
+            disabled={
+              !wizardContext.region || cloudDefaults[CloudDefaults.Region] === wizardContext.region
+            }
             onClick={() =>
               handleSetUserDefault({
                 [CloudDefaults.Region]: wizardContext.region,
@@ -232,7 +236,10 @@ const AwsCloudProviderVerification = ({
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
-            disabled={!wizardContext.awsDomain}
+            disabled={
+              !wizardContext.awsDomain ||
+              cloudDefaults[CloudDefaults.Domain] === wizardContext.awsDomain
+            }
             onClick={() =>
               handleSetUserDefault({
                 [CloudDefaults.Domain]: wizardContext.awsDomain,
@@ -288,7 +295,9 @@ const AwsCloudProviderVerification = ({
             color="primary"
             variant="light"
             className={classes.setDefaultButton}
-            disabled={!wizardContext.sshKey}
+            disabled={
+              !wizardContext.sshKey || cloudDefaults[CloudDefaults.SshKey] === wizardContext.sshKey
+            }
             onClick={() => handleSetUserDefault({ [CloudDefaults.SshKey]: wizardContext.sshKey })}
           >
             Set As Default
