@@ -5,7 +5,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import { awsPrerequisitesLink } from 'k8s/links'
-import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { CloudDefaults, CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import ClusterNameField from '../../form-components/name'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
@@ -73,6 +73,7 @@ export const initialContext = {
   allowWorkloadsOnMaster: false,
   useRoute53: false,
   domainId: '',
+  azs: [],
 }
 
 const columns = [
@@ -198,7 +199,19 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
   const [prefs] = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Aws] || {}, [prefs])
 
-  const handleCloudProviderChange = (value) => {
+  const updateFqdns = (values) => (value, label) => {
+    setWizardContext({ domainId: value })
+
+    const name = values.name || wizardContext.name
+
+    const api = `${name}-api.${label}`
+    setWizardContext({ externalDnsName: api })
+
+    const service = `${name}-service.${label}`
+    setWizardContext({ serviceFqdn: service })
+  }
+
+  const handleCloudProviderChange = (values) => (value) => {
     setWizardContext({
       cloudProviderId: value,
     })
@@ -206,13 +219,41 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
     // Populate the form with default values from the pref store AFTER the user chooses the
     // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
     // for the rest of the fields
-    setCloudDefaults()
+
+    setCloudDefaults(values)
   }
 
-  const setCloudDefaults = useCallback(() => {
-    if (isEmpty(cloudDefaults)) return
-    setWizardContext({ ...cloudDefaults })
-  }, [cloudDefaults])
+  // const handleCloudProviderChange = (value) => {
+  //   setWizardContext({
+  //     cloudProviderId: value,
+  //   })
+
+  //   // Populate the form with default values from the pref store AFTER the user chooses the
+  //   // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
+  //   // for the rest of the fields
+  //   setCloudDefaults()
+  // }
+
+  const setCloudDefaults = useCallback(
+    (values) => {
+      // if (isEmpty(cloudDefaults)) return
+      // setWizardContext({ ...cloudDefaults })
+      if (isEmpty(cloudDefaults)) return
+      setWizardContext({ ...cloudDefaults, domainId: cloudDefaults[CloudDefaults.DomainLabel] })
+      updateFqdns(values)(
+        cloudDefaults[CloudDefaults.Domain],
+        cloudDefaults[CloudDefaults.DomainLabel],
+      )
+    },
+    [cloudDefaults],
+  )
+
+  const handleStepOneSubmit = (values) => {
+    setWizardContext(values)
+    if (!values.useRoute53) {
+      setWizardContext({ domainId: '', externalDnsName: '', serviceFqdn: '' })
+    }
+  }
 
   return (
     <>
@@ -226,7 +267,8 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
           fullWidth
           classes={{ root: classes.validatedFormContainer }}
           initialValues={wizardContext}
-          onSubmit={setWizardContext}
+          // onSubmit={setWizardContext}
+          onSubmit={handleStepOneSubmit}
           triggerSubmit={onNext}
           withAddonManager
           elevated={false}
@@ -249,7 +291,7 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                   cloudProviderType={CloudProviders.Aws}
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  onChange={handleCloudProviderChange}
+                  onChange={handleCloudProviderChange(values)}
                 />
 
                 {/* AWS Region */}

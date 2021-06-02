@@ -127,6 +127,7 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
     // Populate the form with default values from the pref store AFTER the user chooses the
     // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
     // for the rest of the fields
+
     setCloudDefaults(values)
   }
 

@@ -393,10 +393,9 @@ const AuthenticatedContainer = () => {
       if (!userId) return
 
       userPreferenceKeys.map(async (key) => {
-        const response: any =
-          { sshKey: 'arjun' } || (await preferenceStore.getUserPreference(userId, key))
+        const response: any = await preferenceStore.getUserPreference(userId, key)
         if (!response) return
-        const value = { sshKey: 'arjun' } || JSON.parse(response.value)
+        const value = JSON.parse(response.value)
         dispatch(
           preferencesActions.updatePrefs({
             username,

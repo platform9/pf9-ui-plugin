@@ -6,7 +6,7 @@ import {
   PreferencesState,
 } from 'core/session/preferencesReducers'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
-import { pathOr, Dictionary, prop } from 'ramda'
+import { pathOr, Dictionary, prop, merge } from 'ramda'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -67,6 +67,7 @@ const useScopedPreferences = <T extends Dictionary<any>>(
         console.error('Unable to update user preferences. Session has not been initialized')
         return
       }
+
       dispatch(
         preferencesActions.updatePrefs({
           username,
@@ -74,7 +75,7 @@ const useScopedPreferences = <T extends Dictionary<any>>(
           prefs: value,
         }),
       )
-      preferenceStore.setUserPreference(id, defaultsKey, prefs)
+      preferenceStore.setUserPreference(id, defaultsKey, merge(prefs[defaultsKey] || {}, value))
     },
     [username, id],
   )

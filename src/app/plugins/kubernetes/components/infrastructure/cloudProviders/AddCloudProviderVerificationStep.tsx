@@ -83,6 +83,7 @@ const AddCloudProviderVerificationStep = ({ history, wizardContext, setWizardCon
               wizardContext={wizardContext}
               setWizardContext={setWizardContext}
               updateUserDefaults={updateUserDefaults}
+              cloudDefaults={cloudDefaults}
             />
           </ValidatedForm>
           <Button

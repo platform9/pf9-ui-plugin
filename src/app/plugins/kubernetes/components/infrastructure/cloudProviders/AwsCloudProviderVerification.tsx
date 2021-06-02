@@ -143,6 +143,9 @@ const AwsCloudProviderVerification = ({
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
   const handleSetUserDefault = async (values) => {
+    // In the user pref store, the key UserPreferences.Azure is mapped to a JSON string
+    // If we want to update or add in a new default value, we need to merge the current
+    // values with the new value(s)
     updateUserDefaults(UserPreferences.Aws, values)
   }
 
