@@ -201,7 +201,8 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
   })
   const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
-  const handleRegionChange = (regionName) => setWizardContext({ location: regionName })
+  const handleRegionChange = (regionName) =>
+    setWizardContext({ region: regionName, location: regionName })
 
   const handleCloudProviderChange = (value) => {
     setWizardContext({

@@ -63,7 +63,7 @@ const AddCloudProviderPage = () => {
                     setSubmitting={setSubmittingStep}
                   />
                   <Button className={classes.button} onClick={handleNext} type="submit">
-                    + Add Cloud Provider
+                    + Create Cloud Provider
                   </Button>
                 </WizardStep>
                 <WizardStep

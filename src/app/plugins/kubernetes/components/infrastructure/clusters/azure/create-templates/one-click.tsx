@@ -100,9 +100,8 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
   const [prefs] = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Azure] || {}, [prefs])
 
-  const handleRegionChange = (regionName) => {
-    setWizardContext({ location: regionName })
-  }
+  const handleRegionChange = (regionName) =>
+    setWizardContext({ region: regionName, location: regionName })
 
   const handleCloudProviderChange = (value) => {
     setWizardContext({
