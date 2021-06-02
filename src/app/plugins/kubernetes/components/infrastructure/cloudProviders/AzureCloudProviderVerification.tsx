@@ -93,6 +93,7 @@ const AzureCloudProviderVerification = ({
           <CloudProviderRegionField
             cloudProviderType={CloudProviders.Azure}
             onChange={(value, label) => setWizardContext({ region: value, regionLabel: label })}
+            wizardContext={wizardContext}
             values={wizardContext}
             required={false}
           />

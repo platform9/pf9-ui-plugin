@@ -177,6 +177,7 @@ const AwsCloudProviderVerification = ({
           <CloudProviderRegionField
             cloudProviderType={CloudProviders.Aws}
             onChange={(value, label) => setWizardContext({ region: value })}
+            wizardContext={wizardContext}
             values={wizardContext}
           />
           <Button
@@ -289,6 +290,7 @@ const AwsCloudProviderVerification = ({
             values={wizardContext}
             info=""
             onChange={(value) => setWizardContext({ sshKey: value })}
+            value={wizardContext.sshKey}
             required={false}
           />
           <Button

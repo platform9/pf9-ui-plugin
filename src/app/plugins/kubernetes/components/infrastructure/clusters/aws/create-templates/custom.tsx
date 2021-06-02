@@ -1,5 +1,5 @@
-import React, { FC } from 'react'
-import { defaultEtcBackupPath } from 'app/constants'
+import React, { FC, useCallback, useMemo } from 'react'
+import { defaultEtcBackupPath, UserPreferences } from 'app/constants'
 import WizardStep from 'core/components/wizard/WizardStep'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -43,6 +43,8 @@ import { ClusterCreateTypes } from '../../model'
 import { awsClusterTracking } from '../../tracking'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import CustomApiFlags from '../../form-components/custom-api-flag'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { isEmpty } from 'ramda'
 
 export const initialContext = {
   template: 'small',
@@ -193,6 +195,24 @@ interface Props {
 
 const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
+  const [prefs] = useScopedPreferences('defaults')
+  const cloudDefaults = useMemo(() => prefs[UserPreferences.Aws] || {}, [prefs])
+
+  const handleCloudProviderChange = (value) => {
+    setWizardContext({
+      cloudProviderId: value,
+    })
+
+    // Populate the form with default values from the pref store AFTER the user chooses the
+    // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
+    // for the rest of the fields
+    setCloudDefaults()
+  }
+
+  const setCloudDefaults = useCallback(() => {
+    if (isEmpty(cloudDefaults)) return
+    setWizardContext({ ...cloudDefaults })
+  }, [cloudDefaults])
 
   return (
     <>
@@ -225,13 +245,20 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 <ClusterNameField setWizardContext={setWizardContext} />
 
                 {/* Cloud Provider */}
-                <CloudProviderField cloudProviderType={CloudProviders.Aws} />
+                <CloudProviderField
+                  cloudProviderType={CloudProviders.Aws}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onChange={handleCloudProviderChange}
+                />
 
                 {/* AWS Region */}
                 <CloudProviderRegionField
                   cloudProviderType={CloudProviders.Aws}
                   values={values}
+                  wizardContext={wizardContext}
                   onChange={(region) => setWizardContext({ azs: [] })}
+                  disabled={!values.cloudProviderId && !values.region}
                 />
 
                 {/* AWS Availability Zone */}
@@ -245,7 +272,12 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 )}
 
                 {/* SSH Key */}
-                <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={values} />
+                <SshKeyField
+                  dropdownComponent={AwsClusterSshKeyPicklist}
+                  values={values}
+                  value={wizardContext.sshKey}
+                  onChange={(value) => setWizardContext({ sshKey: value })}
+                />
 
                 {/* Template Chooser */}
                 <ClusterTemplatesField

@@ -7,6 +7,7 @@ const additionalInfo =
 export default ({
   dropdownComponent,
   values,
+  value,
   onChange = undefined,
   info = additionalInfo,
   required = true,
@@ -20,6 +21,7 @@ export default ({
       cloudProviderId={values.cloudProviderId}
       cloudProviderRegionId={values.region}
       info={info}
+      value={value}
       onChange={onChange}
       required={required}
     />

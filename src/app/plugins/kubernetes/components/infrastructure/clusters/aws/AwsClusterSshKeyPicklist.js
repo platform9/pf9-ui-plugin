@@ -17,9 +17,9 @@ const AwsClusterSshKeyPicklist = forwardRef(
       keypairs,
     ])
 
-    useEffect(() => {
-      onChange && onChange('')
-    }, [cloudProviderId, cloudProviderRegionId])
+    // useEffect(() => {
+    //   onChange && onChange('')
+    // }, [cloudProviderId, cloudProviderRegionId])
 
     return <Picklist {...rest} ref={ref} loading={loading} options={options} onChange={onChange} />
   },

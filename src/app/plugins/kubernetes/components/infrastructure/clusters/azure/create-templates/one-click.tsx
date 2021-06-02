@@ -1,7 +1,7 @@
-import React, { FC } from 'react'
+import React, { FC, useCallback, useMemo } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import ClusterNameField from '../../form-components/name'
-import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { CloudDefaults, CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { azurePrerequisitesLink } from 'k8s/links'
 import Text from 'core/elements/text'
@@ -18,6 +18,9 @@ import SshKeyTextField from '../../form-components/ssh-key-textfield'
 import KubernetesVersion from '../../form-components/kubernetes-version'
 import { azureClusterTracking } from '../../tracking'
 import { ClusterCreateTypes } from '../../model'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { UserPreferences } from 'app/constants'
+import { isEmpty } from 'ramda'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -94,8 +97,28 @@ interface Props {
 
 const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
+  const [prefs] = useScopedPreferences('defaults')
+  const cloudDefaults = useMemo(() => prefs[UserPreferences.Azure] || {}, [prefs])
 
-  const handleRegionChange = (regionName) => setWizardContext({ location: regionName })
+  const handleRegionChange = (regionName) => {
+    setWizardContext({ location: regionName })
+  }
+
+  const handleCloudProviderChange = (value) => {
+    setWizardContext({
+      cloudProviderId: value,
+    })
+
+    // Populate the form with default values from the pref store AFTER the user chooses the
+    // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
+    // for the rest of the fields
+    setCloudDefaults()
+  }
+
+  const setCloudDefaults = useCallback(() => {
+    if (isEmpty(cloudDefaults)) return
+    setWizardContext({ ...cloudDefaults, location: cloudDefaults[CloudDefaults.Region] })
+  }, [cloudDefaults])
 
   return (
     <WizardStep stepId="one-click" onNext={azureClusterTracking.oneClick(trackingFields)}>
@@ -121,13 +144,20 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
               <ClusterNameField setWizardContext={setWizardContext} />
 
               {/* Cloud Provider */}
-              <CloudProviderField cloudProviderType={CloudProviders.Azure} />
+              <CloudProviderField
+                cloudProviderType={CloudProviders.Azure}
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                onChange={handleCloudProviderChange}
+              />
 
               {/* Cloud Provider Region */}
               <CloudProviderRegionField
                 cloudProviderType={CloudProviders.Azure}
+                wizardContext={wizardContext}
                 values={values}
                 onChange={handleRegionChange}
+                disabled={!values.cloudProviderId && !values.region}
               />
 
               {/* SSH Key */}

@@ -74,6 +74,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   value: {
     marginLeft: theme.spacing(4),
+    display: 'block',
+    overflow: 'auto',
   },
   noneText: {
     color: theme.palette.grey[300],

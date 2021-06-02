@@ -1,5 +1,5 @@
 import { Divider, makeStyles, Theme } from '@material-ui/core'
-import { defaultEtcBackupPath } from 'app/constants'
+import { defaultEtcBackupPath, UserPreferences } from 'app/constants'
 import Alert from 'core/components/Alert'
 import ExternalLink from 'core/components/ExternalLink'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -8,9 +8,9 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import WizardStep from 'core/components/wizard/WizardStep'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
-import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { CloudDefaults, CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { azurePrerequisitesLink } from 'k8s/links'
-import React, { FC } from 'react'
+import React, { FC, useCallback, useMemo } from 'react'
 import { pathStrOr } from 'utils/fp'
 import { castBoolToStr } from 'utils/misc'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
@@ -46,6 +46,9 @@ import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import { azureClusterTracking } from '../../tracking'
 import { ClusterCreateTypes } from '../../model'
 import CustomApiFlags from '../../form-components/custom-api-flag'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { isEmpty } from 'ramda'
+
 export const initialContext = {
   template: 'small',
   masterSku: 'Standard_A1_v2',
@@ -189,6 +192,8 @@ interface Props {
 
 const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
+  const [prefs] = useScopedPreferences('defaults')
+  const cloudDefaults = useMemo(() => prefs[UserPreferences.Azure] || {}, [prefs])
 
   const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
@@ -197,6 +202,22 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
   const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
   const handleRegionChange = (regionName) => setWizardContext({ location: regionName })
+
+  const handleCloudProviderChange = (value) => {
+    setWizardContext({
+      cloudProviderId: value,
+    })
+
+    // Populate the form with default values from the pref store AFTER the user chooses the
+    // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
+    // for the rest of the fields
+    setCloudDefaults()
+  }
+
+  const setCloudDefaults = useCallback(() => {
+    if (isEmpty(cloudDefaults)) return
+    setWizardContext({ ...cloudDefaults, location: cloudDefaults[CloudDefaults.Region] })
+  }, [cloudDefaults])
 
   return (
     <>
@@ -229,13 +250,20 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <ClusterNameField setWizardContext={setWizardContext} />
 
                 {/* Cloud Provider */}
-                <CloudProviderField cloudProviderType={CloudProviders.Azure} />
+                <CloudProviderField
+                  cloudProviderType={CloudProviders.Azure}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onChange={handleCloudProviderChange}
+                />
 
                 {/* Cloud Provider Region */}
                 <CloudProviderRegionField
                   cloudProviderType={CloudProviders.Azure}
                   values={values}
+                  wizardContext={wizardContext}
                   onChange={handleRegionChange}
+                  disabled={!values.cloudProviderId && !values.region}
                 />
 
                 {/* SSH Key */}
