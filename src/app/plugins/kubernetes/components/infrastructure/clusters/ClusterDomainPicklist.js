@@ -21,10 +21,6 @@ const ClusterDomainPicklist = forwardRef(
       onChange && onChange(value, option && option.label)
     }
 
-    // useEffect(() => {
-    //   onChange && onChange('')
-    // }, [cloudProviderId, cloudProviderRegionId])
-
     return (
       <Picklist {...rest} onChange={handleChange} ref={ref} loading={loading} options={options} />
     )

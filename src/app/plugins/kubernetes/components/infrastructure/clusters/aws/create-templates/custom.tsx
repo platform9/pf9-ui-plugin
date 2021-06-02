@@ -223,17 +223,6 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
     setCloudDefaults(values)
   }
 
-  // const handleCloudProviderChange = (value) => {
-  //   setWizardContext({
-  //     cloudProviderId: value,
-  //   })
-
-  //   // Populate the form with default values from the pref store AFTER the user chooses the
-  //   // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
-  //   // for the rest of the fields
-  //   setCloudDefaults()
-  // }
-
   const setCloudDefaults = useCallback(
     (values) => {
       // if (isEmpty(cloudDefaults)) return

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -80,14 +80,9 @@ const getSshKeyString = (classes, loading, regionId, available) =>
     ? 'SSH Keys Detected'
     : 'No SSH Keys Detected'
 
-const Route53Availability = ({ domains, loading, regionId, setWizardContext }) => {
+const Route53Availability = ({ domains, loading, regionId }) => {
   const classes = useStyles({})
   const available = domains?.length
-  useEffect(() => {
-    if (setWizardContext) {
-      setWizardContext(!loading && regionId && !!available)
-    }
-  }, [loading, regionId, available])
 
   return (
     <div className={classes.info}>
@@ -101,14 +96,9 @@ const Route53Availability = ({ domains, loading, regionId, setWizardContext }) =
   )
 }
 
-const SshKeyAvailability = ({ keypairs, loading, regionId, setWizardContext }) => {
+const SshKeyAvailability = ({ keypairs, loading, regionId }) => {
   const classes = useStyles({})
   const available = keypairs?.length
-  useEffect(() => {
-    if (setWizardContext) {
-      setWizardContext(!loading && regionId && !!available)
-    }
-  }, [loading, regionId, available])
 
   return (
     <div className={classes.info}>
@@ -142,12 +132,7 @@ const AwsCloudProviderVerification = ({
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
-  const handleSetUserDefault = async (values) => {
-    // In the user pref store, the key UserPreferences.Azure is mapped to a JSON string
-    // If we want to update or add in a new default value, we need to merge the current
-    // values with the new value(s)
-    updateUserDefaults(UserPreferences.Aws, values)
-  }
+  const handleSetUserDefault = (values) => updateUserDefaults(UserPreferences.Aws, values)
 
   return (
     <>
@@ -157,13 +142,7 @@ const AwsCloudProviderVerification = ({
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability
-                classes={classes}
-                regions={regions}
-                setWizardContext={(isAvailable) =>
-                  setWizardContext({ regionsAvailable: isAvailable })
-                }
-              />
+              <RegionAvailability classes={classes} regions={regions} />
             )}
           </>
         }
@@ -209,9 +188,6 @@ const AwsCloudProviderVerification = ({
             loading={loading}
             regionId={wizardContext.region}
             domains={domains}
-            setWizardContext={(isAvailable) =>
-              setWizardContext({ route53DomainsAvailable: isAvailable })
-            }
           />
         }
         link={
@@ -274,7 +250,6 @@ const AwsCloudProviderVerification = ({
             loading={loading}
             regionId={wizardContext.region}
             keypairs={keypairs}
-            setWizardContext={(isAvailable) => setWizardContext({ sshKeysAvailable: isAvailable })}
           />
         }
         link={

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Text from 'core/elements/text'
 import { CloudDefaults, CloudProviders } from './model'
@@ -14,13 +14,8 @@ export const getIcon = (classes, loading, regionId, available) =>
 export const getIconClass = (classes, loading, regionId, available) =>
   loading || !regionId ? classes.circleIcon : available ? classes.checkIcon : classes.timesIcon
 
-export const RegionAvailability = ({ classes, regions, setWizardContext }) => {
+export const RegionAvailability = ({ classes, regions }) => {
   const available = regions?.length
-  useEffect(() => {
-    if (setWizardContext) {
-      setWizardContext(!!available)
-    }
-  }, [available])
 
   return (
     <Text variant="body2" className={classes.spaceRight}>

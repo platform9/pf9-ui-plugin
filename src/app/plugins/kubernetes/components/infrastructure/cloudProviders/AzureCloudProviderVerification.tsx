@@ -59,12 +59,7 @@ const AzureCloudProviderVerification = ({
     cloudProviderId: wizardContext.cloudProviderId,
   })
 
-  const handleSetUserDefault = async (values) => {
-    // In the user pref store, the key UserPreferences.Azure is mapped to a JSON string
-    // If we want to update or add in a new default value, we need to merge the current
-    // values with the new value(s)
-    updateUserDefaults(UserPreferences.Azure, values)
-  }
+  const handleSetUserDefault = (values) => updateUserDefaults(UserPreferences.Azure, values)
 
   return (
     <>
@@ -73,13 +68,7 @@ const AzureCloudProviderVerification = ({
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability
-                classes={classes}
-                regions={regions}
-                setWizardContext={(isAvailable) =>
-                  setWizardContext({ regionsAvailable: isAvailable })
-                }
-              ></RegionAvailability>
+              <RegionAvailability classes={classes} regions={regions}></RegionAvailability>
             )}
           </>
         }
