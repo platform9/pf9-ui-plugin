@@ -80,7 +80,6 @@ describe('Single Master Cluster Creation', () => {
     
     cy.get('.jss105',{timeout: 30000}).should('not.be.visible')
     // TODO: Add validations
-    cy.contains('')
     cy.xpath('//h3',{timeout: 20000}).then(()=>{
       cy.each(cy.contains('^Completed all [0-9]+ tasks successfully$'))
       cy.contains('p','^Completed all [0-9]+ tasks successfully$')
