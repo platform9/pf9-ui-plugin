@@ -1,3 +1,5 @@
+const { number } = require("prop-types")
+
 // import config from '../../config'
 const username = 'kingshuk.nandy@afourtech.com'
 const password = 'Test@1234'
@@ -46,39 +48,43 @@ describe('Single Master Cluster Creation', () => {
 
   it('Should be able to setup Master Node',()=>{
     cy.contains('Select a node to add as a Master Node')
-    cy.get('input:nth-child(1)').click()
+    cy.xpath("//tr[@class='MuiTableRow-root']//input[@type='radio']").first().click();
     cy.contains("Next").click()
   })
   it('Should be able to setup Worker Nodes',()=>{
     cy.contains('Select nodes to add as Worker Nodes')
-    cy.get('input:nth-child(1)').click()
-    cy.get('input:nth-child(2)').click()
+    var desiredNodeCount=2
+    cy.xpath("//tr[@class='MuiTableRow-root']//input[@type='checkbox']").each(($el)=>{
+      $el.click()
+      desiredNodeCount--
+      if(desiredNodeCount==0) return false 
+    })
     cy.contains("Next").click()
   })
   it('Should be able to setup Network',()=>{
     cy.contains('Cluster Networking Range & HTTP Proxy')
-    //TODO: Add validations
+    // TODO: Add validations
     cy.contains("Next").click()
   })
   it('Should be able to setup Advanced Configuration',()=>{
     cy.contains('Advanced Configuration')
-    //TODO: Add validations
-    cy.contains("Next").click()
-  })
-  it('Should be able to setup Advanced Configuration',()=>{
-    cy.contains('Advanced Configuration')
-    //TODO: Add validations
+    // TODO: Add validations
     cy.contains("Next").click()
   })
   it('Should be able to review and complete setup of the cluster',()=>{
     cy.contains('Finish and Review')
-    //TODO: Add validations
-    cy.contains("Next").click()
+    // TODO: Add validations
+    cy.contains("Complete").click()
   })
   it('Should be able to verify Cluster Creation Completed Successfully',()=>{
-    cy.contains('Finish and Review')
-    //TODO: Add validations
-    cy.contains("Next").click()
+    
+    cy.get('.jss105',{timeout: 30000}).should('not.be.visible')
+    // TODO: Add validations
+    cy.contains('')
+    cy.xpath('//h3',{timeout: 20000}).then(()=>{
+      cy.each(cy.contains('^Completed all [0-9]+ tasks successfully$'))
+      cy.contains('p','^Completed all [0-9]+ tasks successfully$')
+    })
   })
 
   
