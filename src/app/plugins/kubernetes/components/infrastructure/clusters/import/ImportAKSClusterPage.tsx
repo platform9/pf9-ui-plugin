@@ -24,6 +24,7 @@ import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
 import { ClusterCloudPlatforms } from 'app/constants'
+import Bugsnag from '@bugsnag/js'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -64,6 +65,7 @@ const ImportAKSClusterPage = () => {
 
   const handleSubmit = async (data) => {
     setSubmitting(true)
+    Bugsnag.leaveBreadcrumb('Attempting to import AKS clusters', data)
     trackEvent('Import AKS Clusters', {
       cloud_provider_id: data.cloudProviderId,
       regions: data.regions,

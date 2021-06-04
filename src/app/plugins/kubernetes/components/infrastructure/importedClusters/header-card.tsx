@@ -47,7 +47,7 @@ const HeaderCard: FC<{ title: string; cluster: ImportedClusterSelector }> = ({
   const providerType = cluster?.metadata?.labels?.provider
   const privateAccess =
     cluster?.spec?.[providerType]?.network?.vpc?.privateAccess ||
-    cluster?.spec?.aks?.enablePrivateCluster
+    (providerType === 'aks' && cluster?.spec?.aks?.enablePrivateCluster)
   const publicAccess =
     cluster?.spec?.[providerType]?.network?.vpc?.publicAccess ||
     (providerType === 'aks' && !cluster?.spec?.aks?.enablePrivateCluster)

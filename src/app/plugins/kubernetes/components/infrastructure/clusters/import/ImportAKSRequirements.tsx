@@ -50,7 +50,7 @@ const ImportAKSRequirements = ({ onComplete, platform }) => {
   const [cloudProviders] = useDataLoader(cloudProviderActions.list)
 
   const handleClick = useCallback(() => {
-    const hasAzureProvider = !!cloudProviders.some(
+    const hasAzureProvider = !!cloudProviders.find(
       (provider) => provider.type === CloudProviders.Azure,
     )
     if (!hasAzureProvider) {
