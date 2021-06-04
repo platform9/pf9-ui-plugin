@@ -55,7 +55,7 @@ export enum CustomerTiers {
 }
 
 // Don't forget to revert ssoEnabledTiers back to normal
-export const ssoEnabledTiers = [CustomerTiers.Freedom, CustomerTiers.Enterprise, CustomerTiers.OEM]
+export const ssoEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 export const themeEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 
 export enum ClusterCloudPlatforms {
