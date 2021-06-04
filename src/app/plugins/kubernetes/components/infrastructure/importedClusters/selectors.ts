@@ -31,12 +31,15 @@ export const importedClustersSelector = createSelector(
         name: cluster.spec?.displayName,
         cloudProviderId: cluster.spec?.cloudProviderID,
         external: cluster.metadata?.labels?.external,
-        region: cluster.metadata?.labels?.region,
+        region: cluster.metadata?.labels?.region || cluster.metadata?.labels?.location,
         kubeVersion: cluster.spec?.kubeVersion,
         creationTimestamp: cluster.metadata?.creationTimestamp,
-        containerCidr: cluster.spec?.eks?.network?.containerCidr,
-        servicesCidr: cluster.spec?.eks?.network?.servicesCidr,
-        nodeGroups: cluster.spec?.eks?.nodegroups,
+        // Backend to work on standardizing common fields btwn providers in API responses
+        containerCidr:
+          cluster.spec?.eks?.network?.containerCidr || cluster.spec?.aks?.network?.containerCIDR,
+        servicesCidr:
+          cluster.spec?.eks?.network?.servicesCidr || cluster.spec?.aks?.network?.serviceCIDR,
+        nodeGroups: cluster.spec?.eks?.nodegroups || cluster.spec?.aks?.agentPools,
         providerType: cluster.metadata?.labels?.provider,
         workers: cluster.status?.workers,
         usage,
