@@ -68,6 +68,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   filename: {
     marginLeft: theme.spacing(0.5),
   },
+  error: {
+    color: theme.palette.red[500],
+  },
 }))
 
 interface State {
@@ -87,6 +90,11 @@ const customCodeMirrorOptions = {
 }
 
 const updateSsoSettings = (data, setLoading, setDialogOpened, updateParams) => {
+  // Validate that only metadataUrl or metadata is defined
+  if (data.metadataUrl && data.metadata) {
+    return
+  }
+
   const sendRequests = async () => {
     // If SSO config already exists, delete old one and create a new one
     // Otherwise just create a new one
@@ -237,12 +245,16 @@ const SsoPage = () => {
               <Text variant="caption1" className={classes.wizardLabel}>
                 SAML Metadata (XML) from your SSO Provider
               </Text>
+              <Text variant="body2">
+                You may specify a metadata URL or upload a metadata XML file.
+              </Text>
               <div className={classes.field}>
                 <TextField
                   id="metadataUrl"
                   label="URL"
                   onChange={getParamsUpdater('metadataUrl')}
                   value={params.metadataUrl}
+                  required={!params.metadata}
                 />
                 <Text variant="body2" className={classes.orLabel}>
                   or
@@ -256,15 +268,19 @@ const SsoPage = () => {
                   {params.metadataFileName}
                 </Text>
               </div>
-              {!params.metadataUrl && params.metadata && (
-                <CodeMirror
-                  id="metadata"
-                  label="SAML Metadata (XML)"
-                  options={customCodeMirrorOptions}
-                  onChange={getParamsUpdater('metadata')}
-                  value={params.metadata}
-                  className={classes.fullWidth}
-                />
+              <CodeMirror
+                id="metadata"
+                label="SAML Metadata (XML)"
+                options={customCodeMirrorOptions}
+                onChange={getParamsUpdater('metadata')}
+                value={params.metadata}
+                className={classes.fullWidth}
+                required={!params.metadataUrl}
+              />
+              {params.metadataUrl && params.metadata && (
+                <Text variant="body2" className={classes.error}>
+                  Please specify only the metadata URL or only the metadata XML
+                </Text>
               )}
               <Text variant="caption1" className={classes.wizardLabel}>
                 SSO Provider Attribute MAP in XML
@@ -280,6 +296,7 @@ const SsoPage = () => {
                 onChange={getParamsUpdater('defaultAttributeMap')}
                 value={params.defaultAttributeMap}
                 className={classes.fullWidth}
+                required
               />
               <div className={classes.attributeMapButtons}>
                 <Button
