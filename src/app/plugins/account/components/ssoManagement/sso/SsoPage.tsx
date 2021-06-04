@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   wizardLabel: {
     margin: theme.spacing(1, 0),
   },
-  textArea: {
+  fullWidth: {
     width: '100% !important',
   },
   field: {
@@ -140,12 +140,14 @@ const SsoPage = () => {
           entity_id: entityId,
           provider: ssoProvider,
           metadata_url: metadataUrl,
+          metadata,
         }: any = await loadSsoConfig()
         updateParams({
           defaultAttributeMap,
           entityId,
           ssoProvider,
           metadataUrl,
+          metadata,
           enableSso: true,
           ssoIsEnabled: true,
         })
@@ -254,6 +256,16 @@ const SsoPage = () => {
                   {params.metadataFileName}
                 </Text>
               </div>
+              {!params.metadataUrl && params.metadata && (
+                <CodeMirror
+                  id="metadata"
+                  label="SAML Metadata (XML)"
+                  options={customCodeMirrorOptions}
+                  onChange={getParamsUpdater('metadata')}
+                  value={params.metadata}
+                  className={classes.fullWidth}
+                />
+              )}
               <Text variant="caption1" className={classes.wizardLabel}>
                 SSO Provider Attribute MAP in XML
               </Text>
@@ -267,6 +279,7 @@ const SsoPage = () => {
                 options={customCodeMirrorOptions}
                 onChange={getParamsUpdater('defaultAttributeMap')}
                 value={params.defaultAttributeMap}
+                className={classes.fullWidth}
               />
               <div className={classes.attributeMapButtons}>
                 <Button
