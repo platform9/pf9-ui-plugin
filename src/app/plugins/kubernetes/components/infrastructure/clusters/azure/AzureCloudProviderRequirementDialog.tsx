@@ -57,10 +57,6 @@ const AzureCloudProviderRequirementDialog = ({ showDialog, setShowDialog }) => {
         <Text variant="body1" className={classes.text}>
           Connect your Azure account by creating a Azure Cloud Provider.
         </Text>
-        <Text variant="body1" className={classes.text}>
-          Please note that a Route 53 domain name registration will also be required which can be
-          designated during the creation of the new Azure Cloud Provider.
-        </Text>
       </FormFieldCard>
       <DialogActions className={classes.dialogButtons}>
         <Button variant="light" color="secondary" onClick={() => setShowDialog(false)}>
