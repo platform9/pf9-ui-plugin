@@ -37,8 +37,8 @@ class Wizard extends PureComponent {
     }
   }
 
-  setActiveStep = (stepId) => {
-    this.setState({ activeStepId: stepId })
+  setActiveStep = (stepId, stepNum) => {
+    this.setState({ activeStepId: stepId, activeStep: stepNum })
   }
 
   getActiveStepId = ({ steps }, activeStep) =>
@@ -70,7 +70,6 @@ class Wizard extends PureComponent {
   handleNext = async () => {
     const { onComplete, singleStep } = this.props
     const { steps, activeStep, wizardContext } = this.state
-
     // This is triggerSubmit in the ValidatedForm
     if (this.nextCb[activeStep]) {
       const ok = await this.nextCb[activeStep]()
@@ -175,6 +174,8 @@ class Wizard extends PureComponent {
           setWizardContext,
           onNext: this.onNext,
           handleNext: this.handleNext,
+          handleBack: this.handleBack,
+          setActiveStep: this.setActiveStep,
         })}
         {!hideAllButtons && (
           <WizardButtons hasCalloutFields={this.state.calloutFields}>

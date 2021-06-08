@@ -45,7 +45,7 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
-import { isProductionEnv } from 'core/utils/helpers'
+import { isDecco, isProductionEnv } from 'core/utils/helpers'
 
 const toPairs: any = ToPairs
 
@@ -327,9 +327,19 @@ const AuthenticatedContainer = () => {
   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
   const plugins = pluginManager.getPlugins()
   const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
+
+  const showOnboarding = isDecco(features) && customerTier === CustomerTiers.Freedom
+  console.log(showOnboarding)
   const showNavBar =
     currentStack !== AppPlugins.MyAccount ||
     (currentStack === AppPlugins.MyAccount && role === 'admin')
+  // const showNavBar =
+  //   (!showOnboarding && currentStack !== AppPlugins.MyAccount) ||
+  //   (currentStack === AppPlugins.MyAccount && role === 'admin')
+
+  // const showNavBar =
+  //   currentStack !== AppPlugins.MyAccount ||
+  //   (currentStack === AppPlugins.MyAccount && role === 'admin')
 
   const dispatch = useDispatch()
   const showToast = useToast()

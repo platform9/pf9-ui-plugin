@@ -26,6 +26,7 @@ import {
 } from '../infrastructure/clusters/ClusterStatusUtils'
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import { ImportedClusterSelector } from '../infrastructure/importedClusters/model'
+import OnboardingPage from '../onboarding/onboarding-page'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -328,20 +329,30 @@ const DashboardPage = () => {
   const features = session?.features
   // To avoid missing API errors for ironic region UX-751
   const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
+  const showOnboarding = true
 
   return (
-    <section className={classes.cardColumn} id={`dashboard-page`}>
-      <Text id="dashboard-title" variant="h5">
-        Welcome{displayName ? ` ${displayName}` : ''}!
-      </Text>
-      {kubeRegion && (
-        <div className={classes.dashboardMosaic}>
-          {reportsWithPerms(reports, session.userDetails.role).map((report) => (
-            <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-          ))}
-        </div>
+    <>
+      {showOnboarding && (
+        <section>
+          <OnboardingPage />
+        </section>
       )}
-    </section>
+      {!showOnboarding && (
+        <section className={classes.cardColumn} id={`dashboard-page`}>
+          <Text id="dashboard-title" variant="h5">
+            Welcome{displayName ? ` ${displayName}` : ''}!
+          </Text>
+          {kubeRegion && (
+            <div className={classes.dashboardMosaic}>
+              {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+                <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+    </>
   )
 }
 

@@ -180,7 +180,13 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         }
       >
         <Text variant="body2">SSH Keys are required for access to manage EC2 Instances.</Text>
-        <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={wizardContext} info="" />
+        <SshKeyField
+          dropdownComponent={AwsClusterSshKeyPicklist}
+          values={wizardContext}
+          info=""
+          wizardContext={wizardContext}
+          setWizardContext={setWizardContext}
+        />
       </FormFieldCard>
     </>
   )

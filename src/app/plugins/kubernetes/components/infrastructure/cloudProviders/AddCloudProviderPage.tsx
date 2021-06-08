@@ -11,7 +11,7 @@ import { CloudProviders } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
-const formTitle = ({ provider }) => {
+export const formTitle = ({ provider }) => {
   if (provider === CloudProviders.Aws) {
     return 'Create AWS Cloud Provider'
   } else if (provider === CloudProviders.Azure) {
