@@ -1,10 +1,12 @@
+// @ts-nocheck
+
 // libs
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { pathOr, prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/styles'
 // Constants
-import { allKey } from 'app/constants'
+import { allKey, CustomerTiers, UserPreferences } from 'app/constants'
 // Actions
 import { deploymentActions, podActions, serviceActions } from '../pods/actions'
 import { clusterActions } from '../infrastructure/clusters/actions'
@@ -27,6 +29,9 @@ import {
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import { ImportedClusterSelector } from '../infrastructure/importedClusters/model'
 import OnboardingPage from '../onboarding/onboarding-page'
+import { isDecco } from 'core/utils/helpers'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -71,6 +76,17 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   pod: {
     gridArea: 'pod',
+  },
+  modal: {
+    position: 'fixed',
+    left: 0,
+    top: '55px',
+    width: '100%',
+    height: '100%',
+    overflow: 'auto',
+    zIndex: '5000',
+    backgroundColor: theme.palette.grey['100'],
+    padding: theme.spacing(2, 4),
   },
 }))
 
@@ -323,20 +339,42 @@ const nodeHealthStatus = ({ status }) => {
 
 const DashboardPage = () => {
   const classes = useStyles({})
+  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const displayName = session?.userDetails?.displayName
-  const features = session?.features
+  const {
+    username,
+    userDetails: { displayName },
+    features,
+  } = session
+  // const displayName = session?.userDetails?.displayName
+  // const features = session?.features
   // To avoid missing API errors for ironic region UX-751
   const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
-  const showOnboarding = true
+  const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
+  const [clusters] = useDataLoader(clusterActions.list)
+
+  const showOnboarding = useMemo(
+    () =>
+      isDecco(features) &&
+      customerTier === CustomerTiers.Freedom &&
+      (prefs.showOnboarding || (prefs.showOnboarding === undefined && clusters.length > 0)),
+    [features, customerTier, prefs.showOnboarding, clusters],
+  )
+
+  useEffect(() => {
+    if (prefs.showOnboarding !== undefined) {
+      return
+    }
+    updateUserDefaults(UserPreferences.FeatureFlags, { showOnboarding: !(clusters.length > 0) })
+  }, [username])
 
   return (
     <>
       {showOnboarding && (
-        <section>
+        <div id="myModal" className={classes.modal}>
           <OnboardingPage />
-        </section>
+        </div>
       )}
       {!showOnboarding && (
         <section className={classes.cardColumn} id={`dashboard-page`}>

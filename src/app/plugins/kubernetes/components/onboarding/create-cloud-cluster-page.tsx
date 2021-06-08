@@ -49,18 +49,26 @@ const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext }) => 
       segmentTrackingFields,
       clusterType: wizardContext.provider,
       name: wizardContext.clusterName,
+      location: wizardContext.region, // We need to add this in for Azure. Azure takes in a location field
     }
 
-    console.log('data', data)
-
     await createCluster(data)
-
     return true
   }
 
   useEffect(() => {
     onNext(handleSubmit)
   }, [handleSubmit])
+
+  useEffect(() => {
+    if (wizardContext.provider === CloudProviders.Aws) {
+      awsClusterTracking.createStarted(segmentTrackingFields)()
+      awsClusterTracking.oneClick(segmentTrackingFields)()
+    } else if (wizardContext.provider === CloudProviders.Azure) {
+      azureClusterTracking.createStarted(segmentTrackingFields)()
+      azureClusterTracking.oneClick(segmentTrackingFields)()
+    }
+  }, [])
 
   useEffect(() => {
     if (wizardContext.provider === CloudProviders.Aws) {

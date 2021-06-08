@@ -36,6 +36,8 @@ interface Props {
   handleNext: any
   title: string
   setSubmitting: any
+  cloudProviderOptions: CloudProviders[]
+  header?: string
 }
 
 const links = {
@@ -88,6 +90,8 @@ const AddCloudProviderCredentialStep = ({
   handleNext,
   title,
   setSubmitting,
+  cloudProviderOptions,
+  header = 'Select a Cloud Provider Type:',
 }: Props) => {
   const classes = useStyles({})
   const [errorMessage, setErrorMessage] = useState('')
@@ -175,13 +179,33 @@ const AddCloudProviderCredentialStep = ({
     })(wizardContext.provider)
   }, [wizardContext.provider])
 
+  // This flag is created for the onboarding process. We only let them create an AWS cloud provider for now
+  // because we only support EKS clusters for now.
+  // When we can support importing clusters from Azure and Google cloud, we can remove this
+  const isDisabled = (cloudProvider) =>
+    wizardContext.clusterChoice === 'import'
+      ? cloudProvider === CloudProviders.Aws
+        ? false
+        : true
+      : false
+
   return (
     <>
       <Text className={classes.title} variant="body1">
-        Select a Cloud Provider Type:
+        {header}
       </Text>
       <div className={classes.cloudProviderCards}>
-        <CloudProviderCard
+        {cloudProviderOptions.map((cloudProvider) => (
+          <CloudProviderCard
+            key={cloudProvider}
+            active={wizardContext.provider === cloudProvider}
+            onClick={(value) => setWizardContext({ provider: value })}
+            type={cloudProvider}
+            disabled={isDisabled(cloudProvider)}
+          />
+        ))}
+
+        {/* <CloudProviderCard
           active={wizardContext.provider === CloudProviders.Aws}
           onClick={(value) => setWizardContext({ provider: value })}
           type={CloudProviders.Aws}
@@ -190,7 +214,7 @@ const AddCloudProviderCredentialStep = ({
           active={wizardContext.provider === CloudProviders.Azure}
           onClick={(value) => setWizardContext({ provider: value })}
           type={CloudProviders.Azure}
-        />
+        /> */}
       </div>
       {wizardContext.provider && (
         <ValidatedForm

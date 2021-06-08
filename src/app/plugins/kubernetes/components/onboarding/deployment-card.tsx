@@ -64,7 +64,7 @@ const DeploymentCard: FC<Props> = (props) => {
     <div className={classes.root} onClick={handleClick}>
       <div className={classes.imagesContainer}>
         {imageNames.map((name) => (
-          <img alt={images[name]?.alt} src={images[name]?.src} />
+          <img key={name} alt={images[name]?.alt} src={images[name]?.src} />
         ))}
       </div>
       <Text className={classes.label} variant="caption4">

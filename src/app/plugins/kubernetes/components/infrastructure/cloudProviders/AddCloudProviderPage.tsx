@@ -60,6 +60,7 @@ const AddCloudProviderPage = () => {
                     handleNext={handleNext}
                     title={formTitle(wizardContext)}
                     setSubmitting={setSubmittingStep}
+                    cloudProviderOptions={[CloudProviders.Aws, CloudProviders.Azure]}
                   />
                 </WizardStep>
                 <WizardStep

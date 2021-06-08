@@ -3,7 +3,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Theme from 'core/themes/model'
 import { masterNodeLengthValidator } from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import CloudProviderCard from '../common/CloudProviderCard'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import ClusterHostChooser, {
@@ -45,13 +45,7 @@ const segmentTrackingFields = {
   target: ClusterCreateTypes.OneClick,
 }
 
-const CreateBareOsClusterPage = ({
-  clusterName,
-  kubernetesVersion,
-  onNext,
-  wizardContext,
-  setWizardContext,
-}) => {
+const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext }) => {
   const classes = useStyles()
   const [option, setOption] = useState<Option>('ova')
   const [createCluster, creatingCluster] = useDataUpdater(clusterActions.create)
@@ -66,7 +60,7 @@ const CreateBareOsClusterPage = ({
     bareOSClusterTracking.oneClick(segmentTrackingFields)()
   }, [])
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
@@ -76,13 +70,13 @@ const CreateBareOsClusterPage = ({
       ...initialContext,
       segmentTrackingFields,
       clusterType: 'local',
-      name: clusterName,
-      kubeRoleVersion: kubernetesVersion,
+      name: wizardContext.clusterName,
+      kubeRoleVersion: wizardContext.kubeRoleVersion,
       masterNodes: wizardContext.masterNodes,
     }
     await createCluster(data)
     return true
-  }
+  }, [wizardContext])
 
   useEffect(() => {
     onNext(handleSubmit)

@@ -27,7 +27,7 @@ import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
 import Bugsnag from '@bugsnag/js'
 
-const toggleRegion = (region, wizardContext, setWizardContext) => {
+export const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
     ? setWizardContext({ regions: wizardContext.regions.filter((r) => r !== region) })
     : setWizardContext({ regions: [...wizardContext.regions, region].sort() })

@@ -29,6 +29,7 @@ const CheckListItem = ({ children, checked }) => (
 
 const UserPasswordField = ({
   value,
+  onChange = null,
   id = 'password',
   label = 'Password',
   className = '',
@@ -42,6 +43,7 @@ const UserPasswordField = ({
       type="password"
       validations={passwordValidators}
       className={className}
+      onChange={onChange}
     />
     {showPasswordRequirements && (
       <Text variant="body1" component="div">
@@ -62,6 +64,7 @@ const UserPasswordField = ({
 
 interface Props {
   value: string
+  onChange?: (value) => void
   id?: string
   label?: string
   className?: string

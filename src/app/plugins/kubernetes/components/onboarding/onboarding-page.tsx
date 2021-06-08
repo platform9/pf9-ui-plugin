@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { makeStyles } from '@material-ui/styles'
 import PrevButton from 'core/components/buttons/PrevButton'
 import DocumentMeta from 'core/components/DocumentMeta'
@@ -24,7 +23,9 @@ import CreateCloudClusterPage from './create-cloud-cluster-page'
 import DeploymentCard from './deployment-card'
 import { routes } from 'core/utils/routes'
 import Button from 'core/elements/button'
-import { ClusterCreateTypes } from '../infrastructure/clusters/model'
+import ImportClusterPage from './import-cluster-page'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { UserPreferences } from 'app/constants'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -61,12 +62,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export type ClusterChoice = 'bareOs' | 'cloud' | 'import'
 
-const defaultClusterName = 'PF9-singlenode-cluster'
-
 const OnboardingPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const [clusterChoice, setClusterChoice] = useState<ClusterChoice>(null)
+  const [clusterChoice, setClusterChoice] = useState<ClusterChoice>('bareOs')
+  const [, , , updateUserDefaults] = useScopedPreferences('defaults')
   const [kubernetesVersions] = useDataLoader(loadSupportedRoleVersions)
 
   const defaultKubernetesVersion = useMemo(() => {
@@ -78,36 +78,52 @@ const OnboardingPage = () => {
   const initialContext = {
     clusterName: 'PF9-single-node-cluster',
     kubeRoleVersion: defaultKubernetesVersion,
+    cloudProviderId: '98421be9-f902-4c5b-a7f4-45f55bd530d0',
   }
+
+  const cloudProviderOptions = useMemo(
+    () =>
+      ({
+        cloud: [CloudProviders.Aws, CloudProviders.Azure],
+        import: [CloudProviders.Aws, CloudProviders.Azure, CloudProviders.Google],
+      }[clusterChoice]),
+    [clusterChoice],
+  )
 
   const BuildClusterStep = useMemo(() => {
     return objSwitchCaseAny({
       bareOs: CreateBareOsClusterPage,
       cloud: CreateCloudClusterPage,
+      import: ImportClusterPage,
     })(clusterChoice)
   }, [clusterChoice])
 
-  const submitForm = () => {}
+  const handleFormCompletion = () => {
+    updateUserDefaults(UserPreferences.FeatureFlags, { showOnboarding: false })
+    console.log('user default updated')
+    history.push(routes.cluster.list.path())
+  }
 
   const handleDeploymentCardClick = (setWizardContext, handleNext, setActiveStep) => (
     type: ClusterChoice,
   ) => {
     setClusterChoice(type)
+    setWizardContext({ clusterChoice: type })
     if (type === 'bareOs') {
       setActiveStep('step3', 2) // Step num is 2 because the step count starts at 0
       return
     }
-    if (type === 'cloud') {
-      setWizardContext({ provider: CloudProviders.Aws }) // set AWS as the default one for now
-    }
+
+    setWizardContext({ provider: CloudProviders.Aws }) // set AWS as the default one for now
     handleNext()
   }
 
-  const handleStepThreeBackButtonClick = (handleBack, setActiveStep) => () => {
+  const handleStepThreeBackButtonClick = (handleBack, setActiveStep, onNext) => () => {
     if (clusterChoice === 'bareOs') {
       setActiveStep('step1', 0)
       return
     }
+
     handleBack()
   }
 
@@ -115,11 +131,11 @@ const OnboardingPage = () => {
     <>
       <DocumentMeta title="Onboarding" bodyClasses={['form-view']} />
       <FormWrapper title="">
-        <Wizard context={initialContext} onComplete={submitForm} hideAllButtons={true}>
+        <Wizard context={initialContext} onComplete={handleFormCompletion} hideAllButtons={true}>
           {({ wizardContext, setWizardContext, onNext, handleNext, handleBack, setActiveStep }) => {
             return (
               <>
-                <WizardStep stepId="step1" label="Welcome">
+                <WizardStep stepId="step1" label="Welcome" keepContentMounted={false}>
                   <div className={classes.welcomeContainer}>
                     <img src={'/ui/images/management-plane.svg'} />
                     <div className={classes.welcomeContent}>
@@ -172,33 +188,39 @@ const OnboardingPage = () => {
                   label="Configure Your Infrastructure"
                   keepContentMounted={false}
                 >
-                  <>
-                    <AddCloudProviderCredentialStep
-                      wizardContext={wizardContext}
-                      setWizardContext={setWizardContext}
-                      onNext={onNext}
-                      handleNext={handleNext}
-                      title={formTitle(wizardContext)}
-                      setSubmitting={() => {}}
-                    />
-                    <PrevButton onClick={handleBack} />
-                    <SubmitButton onClick={handleNext}>+ Save Cloud Provider</SubmitButton>
-                  </>
+                  <AddCloudProviderCredentialStep
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
+                    onNext={onNext}
+                    handleNext={handleNext}
+                    title={formTitle(wizardContext)}
+                    setSubmitting={() => {}}
+                    cloudProviderOptions={cloudProviderOptions}
+                    header={
+                      clusterChoice === 'import' ? 'Select the Cloud to Import Clusters From' : null
+                    }
+                  />
+                  <PrevButton onClick={handleBack} />
+                  <SubmitButton onClick={handleNext}>+ Save Cloud Provider</SubmitButton>
                 </WizardStep>
-                <WizardStep stepId="step3" label="Build Your Cluster">
+                <WizardStep stepId="step3" label="Build Your Cluster" keepContentMounted={false}>
                   <BuildClusterStep
-                    clusterName={defaultClusterName}
-                    kubernetesVersion={defaultKubernetesVersion}
                     onNext={onNext}
                     handleNext={handleNext}
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
                   />
-                  <PrevButton onClick={handleStepThreeBackButtonClick(handleBack, setActiveStep)} />
+                  <PrevButton
+                    onClick={handleStepThreeBackButtonClick(handleBack, setActiveStep, onNext)}
+                  />
                   <SubmitButton onClick={handleNext}>+ Create Cluster</SubmitButton>
                 </WizardStep>
-                <WizardStep stepId="step4" label="Invite a Coworker">
-                  <AddCoworkerStep />
+                <WizardStep stepId="step4" label="Invite a Coworker" keepContentMounted={false}>
+                  <AddCoworkerStep
+                    onNext={onNext}
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
+                  />
                   <Button
                     color="secondary"
                     className={classes.button}
@@ -206,7 +228,9 @@ const OnboardingPage = () => {
                   >
                     Skip
                   </Button>
-                  <SubmitButton className={classes.button}>+ Invite and Done</SubmitButton>
+                  <SubmitButton className={classes.button} onClick={handleNext}>
+                    + Invite and Done
+                  </SubmitButton>
                 </WizardStep>
               </>
             )

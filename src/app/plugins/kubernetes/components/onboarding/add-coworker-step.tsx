@@ -1,7 +1,6 @@
-// @ts-nocheck
-import React, { useState, useMemo } from 'react'
-import { makeStyles } from '@material-ui/styles'
-import Theme from 'core/themes/model'
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react'
+// import { makeStyles } from '@material-ui/styles'
+// import Theme from 'core/themes/model'
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@material-ui/core'
 import {
   activationByEmailLabel,
@@ -11,8 +10,8 @@ import UserPasswordField from 'app/plugins/account/components/userManagement/use
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { emailValidator } from 'core/utils/fieldValidators'
-import { routes } from 'core/utils/routes'
-import useReactRouter from 'use-react-router'
+// import { routes } from 'core/utils/routes'
+// import useReactRouter from 'use-react-router'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { useSelector } from 'react-redux'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
@@ -24,13 +23,13 @@ import { mngmUserActions } from 'app/plugins/account/components/userManagement/u
 import Progress from 'core/components/progress/Progress'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 
-const useStyles = makeStyles((theme: Theme) => ({
-  button: {
-    gridColumn: '2',
-    marginTop: theme.spacing(3),
-    width: 'max-content',
-  },
-}))
+// const useStyles = makeStyles((theme: Theme) => ({
+//   button: {
+//     gridColumn: '2',
+//     marginTop: theme.spacing(3),
+//     width: 'max-content',
+//   },
+// }))
 
 const initialValues = {
   username: '',
@@ -40,9 +39,9 @@ const initialValues = {
 
 const defaultRoleName = 'admin'
 
-const AddCoworkerStep = () => {
-  const classes = useStyles()
-  const { history } = useReactRouter()
+const AddCoworkerStep = ({ wizardContext, setWizardContext, onNext }) => {
+  // const classes = useStyles()
+  // const { history } = useReactRouter()
   const [, , getUserPrefs] = useScopedPreferences()
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { username } = session
@@ -54,30 +53,52 @@ const AddCoworkerStep = () => {
   const [activationType, setActivationType] = useState('createPassword')
   const [addUser, addingUser] = useDataUpdater(
     mngmUserActions.create,
-    (success) => success && history.push(routes.cluster.list.path()),
+    // (success) => success && history.push(routes.cluster.list.path()),
   )
+  const validatorRef = useRef(null)
 
-  const handleSubmit = async (values) => {
+  const setupValidator = (validate) => {
+    validatorRef.current = { validate }
+  }
+
+  const handleSubmit = useCallback(async () => {
+    const isValid = validatorRef.current.validate()
+    if (!isValid) {
+      return false
+    }
+
     const data = {
-      ...values,
+      ...wizardContext,
       roleAssignments: { [currentTenant]: defaultRoleId },
     }
+    console.log('addUserData', data)
     await addUser(data)
-  }
+    return true
+  }, [wizardContext])
+
+  useEffect(() => {
+    onNext(handleSubmit)
+  }, [handleSubmit])
 
   return (
     <Progress message={'Adding user...'} loading={addingUser}>
-      <ValidatedForm
-        //   title="Basic Info"
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        elevated={false}
-        // triggerSubmit={onNext}
-      >
+      <ValidatedForm initialValues={initialValues} elevated={false} triggerSubmit={setupValidator}>
         {({ values }) => (
           <>
-            <TextField id="username" label="Email" validations={[emailValidator]} required />
-            <TextField id="displayname" label="Display Name" />
+            <TextField
+              id="username"
+              label="Email"
+              value={wizardContext.username}
+              onChange={(value) => setWizardContext({ username: value })}
+              validations={[emailValidator]}
+              required
+            />
+            <TextField
+              id="displayname"
+              label="Display Name"
+              value={wizardContext.displayname}
+              onChange={(value) => setWizardContext({ displayname: value })}
+            />
             <FormControl component="fieldset">
               <FormLabel component="legend">
                 <p>Activate User Account</p>
@@ -101,8 +122,12 @@ const AddCoworkerStep = () => {
                 />
               </RadioGroup>
             </FormControl>
-            {activationType === 'createPassword' && <UserPasswordField value={values.password} />}
-            {/* <SubmitButton className={classes.button}>+ Invite and Done</SubmitButton> */}
+            {activationType === 'createPassword' && (
+              <UserPasswordField
+                value={values.password}
+                onChange={(value) => setWizardContext({ password: value })}
+              />
+            )}
           </>
         )}
       </ValidatedForm>
