@@ -46,6 +46,7 @@ export const initialContext = {
   networkStack: 'ipv4',
   privileged: true,
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
+  domainId: '',
 }
 
 const columns = [
