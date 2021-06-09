@@ -3,6 +3,7 @@ import useReactRouter from 'use-react-router'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
+import clsx from 'clsx'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -53,7 +54,7 @@ const images = {
 }
 
 const DeploymentCard: FC<Props> = (props) => {
-  const { type, imageNames, label, src, onClick } = props
+  const { type, imageNames, label, src, onClick, className } = props
   const classes = useStyles()
   const { history } = useReactRouter()
   const handleClick = () => {
@@ -61,7 +62,7 @@ const DeploymentCard: FC<Props> = (props) => {
     history.push(src)
   }
   return (
-    <div className={classes.root} onClick={handleClick}>
+    <div className={clsx(classes.root, className)} onClick={handleClick}>
       <div className={classes.imagesContainer}>
         {imageNames.map((name) => (
           <img key={name} alt={images[name]?.alt} src={images[name]?.src} />
@@ -82,6 +83,7 @@ interface Props {
   imageNames: string[]
   label?: string
   disabled?: boolean
+  className?: any
 }
 
 export default DeploymentCard

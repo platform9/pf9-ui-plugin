@@ -10,13 +10,14 @@ import ClusterHostChooser, {
   isConnected,
   isUnassignedNode,
 } from '../infrastructure/clusters/bareos/ClusterHostChooser'
-import DownloadOvaWalkthrough from '../infrastructure/nodes/download-ova-walkthrough'
-import DownloadCliWalkthrough from '../infrastructure/nodes/DownloadCliWalkthrough'
 import { initialContext } from '../infrastructure/clusters/bareos/create-templates/physical-one-click'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { ClusterCreateTypes } from '../infrastructure/clusters/model'
 import { bareOSClusterTracking } from '../infrastructure/clusters/tracking'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import DownloadOvaWalkthrough from './download-ova-walkthrough'
+import DownloadCliWalkthrough from './download-cli-walkthrough'
 
 const useStyles = makeStyles((theme: Theme) => ({
   connectNodesContainer: {
@@ -34,6 +35,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     gridColumn: '2',
     marginTop: theme.spacing(3),
     width: 'max-content',
+  },
+  linkText: {
+    textDecoration: 'underline',
+    color: theme.palette.primary.main,
+  },
+  spaceAbove: {
+    marginTop: theme.spacing(2),
+  },
+  downloadIcon: {
+    marginLeft: theme.spacing(1),
+  },
+  downloadButton: {
+    marginTop: theme.spacing(1),
   },
 }))
 
@@ -99,22 +113,24 @@ const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext, setS
           onClick={(type) => setOption('cli')}
         />
       </div>
-      {option === 'ova' ? <DownloadOvaWalkthrough /> : <DownloadCliWalkthrough />}
-      <ValidatedForm
-        title="Waiting for your Ubuntu/CentOs Node to Attach"
-        elevated={false}
-        triggerSubmit={setupValidator}
-      >
-        <ClusterHostChooser
-          id="masterNodes"
-          selection="single"
-          filterFn={allPass([isConnected, isUnassignedNode])}
-          onChange={(value) => setWizardContext({ masterNodes: value })}
-          validations={[masterNodeLengthValidator]}
-          pollForNodes
-          required
-        />
-      </ValidatedForm>
+      <FormFieldCard title="Attach a master node">
+        {option === 'ova' ? <DownloadOvaWalkthrough /> : <DownloadCliWalkthrough />}
+        <ValidatedForm
+          title="Waiting for your Ubuntu/CentOs Node to Attach"
+          elevated={false}
+          triggerSubmit={setupValidator}
+        >
+          <ClusterHostChooser
+            id="masterNodes"
+            selection="single"
+            filterFn={allPass([isConnected, isUnassignedNode])}
+            onChange={(value) => setWizardContext({ masterNodes: value })}
+            validations={[masterNodeLengthValidator]}
+            pollForNodes
+            required
+          />
+        </ValidatedForm>
+      </FormFieldCard>
     </div>
   )
 }

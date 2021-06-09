@@ -31,6 +31,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   downloadIcon: {
     marginLeft: theme.spacing(1),
   },
+  downloadButton: {
+    marginTop: theme.spacing(1),
+  },
 }))
 
 const downloadLink =
@@ -50,7 +53,7 @@ const DownloadOvaWalkthrough = (): JSX.Element => {
           <div>
             <Text>Download the OVA</Text>
             <SimpleLink src={downloadLink}>
-              <SubmitButton>
+              <SubmitButton className={classes.downloadButton}>
                 Download
                 <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
                   download

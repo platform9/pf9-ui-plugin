@@ -17,6 +17,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { mngmRoleActions } from 'app/plugins/account/components/userManagement/roles/actions'
 import { mngmUserActions } from 'app/plugins/account/components/userManagement/users/actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 
 const initialValues = {
   username: '',
@@ -67,7 +68,7 @@ const AddCoworkerStep = ({ wizardContext, setWizardContext, onNext, setSubmittin
   return (
     <ValidatedForm initialValues={initialValues} elevated={false} triggerSubmit={setupValidator}>
       {({ values }) => (
-        <>
+        <FormFieldCard title="Add a User">
           <TextField
             id="username"
             label="Email"
@@ -108,7 +109,7 @@ const AddCoworkerStep = ({ wizardContext, setWizardContext, onNext, setSubmittin
               onChange={(value) => setWizardContext({ password: value })}
             />
           )}
-        </>
+        </FormFieldCard>
       )}
     </ValidatedForm>
   )

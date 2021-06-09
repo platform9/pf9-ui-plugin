@@ -26,6 +26,7 @@ import Button from 'core/elements/button'
 import ImportClusterPage from './import-cluster-page'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { UserPreferences } from 'app/constants'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   welcomeContent: {
     display: 'grid',
     gridGap: theme.spacing(4),
+    paddingBottom: theme.spacing(2),
   },
   descriptionText: {
     width: '700px',
@@ -50,6 +52,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     gridTemplateColumns: 'max-content max-content',
     gridGap: theme.spacing(4),
   },
+  deploymentCard: {
+    border: `1px solid ${theme.palette.grey['700']}`,
+    '&:hover': {
+      border: `1px solid ${theme.palette.blue['500']}`,
+    },
+  },
   actionRow: {
     display: 'grid',
   },
@@ -61,6 +69,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 export type ClusterChoice = 'bareOs' | 'cloud' | 'import'
+
+const managementPlaneImagePath = '/ui/images/light-management-plane.svg'
 
 const OnboardingPage = () => {
   const classes = useStyles()
@@ -80,15 +90,6 @@ const OnboardingPage = () => {
     clusterName: 'PF9-single-node-cluster',
     kubeRoleVersion: defaultKubernetesVersion,
   }
-
-  const cloudProviderOptions = useMemo(
-    () =>
-      ({
-        cloud: [CloudProviders.Aws, CloudProviders.Azure],
-        import: [CloudProviders.Aws, CloudProviders.Azure, CloudProviders.Google],
-      }[clusterChoice]),
-    [clusterChoice],
-  )
 
   const BuildClusterStep = useMemo(() => {
     return objSwitchCaseAny({
@@ -135,31 +136,45 @@ const OnboardingPage = () => {
               <>
                 <WizardStep stepId="step1" label="Welcome" keepContentMounted={false}>
                   <div className={classes.welcomeContainer}>
-                    <img src={'/ui/images/management-plane.svg'} />
-                    <div className={classes.welcomeContent}>
-                      <Text variant="h5">Welcome to Platform9</Text>
-                      <Text variant="body2" className={classes.descriptionText}>
-                        To get started we are going to build your first cluster. You will be able to
-                        deploy using a Virtual Machine, Physical Server or pubic cloud services on
-                        AWS or Azure. If you have clusters in EKS, AKS or GKE you can select to
-                        import them too.
-                      </Text>
-                      <div className={classes.deploymentChoices}>
-                        <div className={classes.newClusterChoices}>
+                    <img src={managementPlaneImagePath} />
+                    <FormFieldCard title="Welcome to Platform9">
+                      <div className={classes.welcomeContent}>
+                        <Text variant="body2" className={classes.descriptionText}>
+                          To get started we are going to build your first cluster. You will be able
+                          to deploy using a Virtual Machine, Physical Server or pubic cloud services
+                          on AWS or Azure. If you have clusters in EKS, AKS or GKE you can select to
+                          import them too.
+                        </Text>
+                        <div className={classes.deploymentChoices}>
+                          <div className={classes.newClusterChoices}>
+                            <DeploymentCard
+                              className={classes.deploymentCard}
+                              type="bareOs"
+                              imageNames={['virtualMachine', 'physicalMachine']}
+                              label="My Infrastucture"
+                              onClick={handleDeploymentCardClick(
+                                setWizardContext,
+                                handleNext,
+                                setActiveStep,
+                              )}
+                            />
+                            <DeploymentCard
+                              className={classes.deploymentCard}
+                              type="cloud"
+                              imageNames={['azure', 'aws']}
+                              label="Build on Public Cloud"
+                              onClick={handleDeploymentCardClick(
+                                setWizardContext,
+                                handleNext,
+                                setActiveStep,
+                              )}
+                            />
+                          </div>
                           <DeploymentCard
-                            type="bareOs"
-                            imageNames={['virtualMachine', 'physicalMachine']}
-                            label="My Infrastucture"
-                            onClick={handleDeploymentCardClick(
-                              setWizardContext,
-                              handleNext,
-                              setActiveStep,
-                            )}
-                          />
-                          <DeploymentCard
-                            type="cloud"
-                            imageNames={['azure', 'aws']}
-                            label="Build on Public Cloud"
+                            className={classes.deploymentCard}
+                            type="import"
+                            imageNames={['gke', 'aks', 'eks']}
+                            label="Import GKE, AKS, or EKS"
                             onClick={handleDeploymentCardClick(
                               setWizardContext,
                               handleNext,
@@ -167,18 +182,8 @@ const OnboardingPage = () => {
                             )}
                           />
                         </div>
-                        <DeploymentCard
-                          type="import"
-                          imageNames={['gke', 'aks', 'eks']}
-                          label="Import GKE, AKS, or EKS"
-                          onClick={handleDeploymentCardClick(
-                            setWizardContext,
-                            handleNext,
-                            setActiveStep,
-                          )}
-                        />
                       </div>
-                    </div>
+                    </FormFieldCard>
                   </div>
                 </WizardStep>
                 <WizardStep
@@ -193,7 +198,6 @@ const OnboardingPage = () => {
                     handleNext={handleNext}
                     title={formTitle(wizardContext)}
                     setSubmitting={setSubmitting}
-                    cloudProviderOptions={cloudProviderOptions}
                     header={
                       clusterChoice === 'import' ? 'Select the Cloud to Import Clusters From' : null
                     }

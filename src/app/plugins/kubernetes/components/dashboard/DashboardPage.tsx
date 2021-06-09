@@ -355,15 +355,15 @@ const DashboardPage = () => {
     () =>
       isDecco(features) &&
       customerTier === CustomerTiers.Freedom &&
-      (prefs.showOnboarding || (prefs.showOnboarding === undefined && clusters.length > 0)),
-    [features, customerTier, prefs.showOnboarding, clusters],
+      ((prefs.isOnboarded === undefined && clusters?.length === 0) || !prefs.isOnboarded),
+    [features, customerTier, prefs.isOnboarded, clusters],
   )
 
   useEffect(() => {
-    if (prefs.showOnboarding !== undefined) {
+    if (prefs.isOnboarded !== undefined) {
       return
     }
-    updateUserDefaults(UserPreferences.FeatureFlags, { showOnboarding: !(clusters.length > 0) })
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: clusters.length > 0 })
   }, [username])
 
   return (
