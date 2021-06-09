@@ -44,6 +44,8 @@ const rootPath = '/ui/images/icon-cloudproviders'
 const icons = {
   [CloudProviders.Aws]: `${rootPath}/cloudaws-default${iconSize}.png`,
   [CloudProviders.Azure]: `${rootPath}/cloudazure-default${iconSize}.png`,
+  [CloudProviders.Google]: `${rootPath}/cloudgoogle-default${iconSize}.png`,
+  [CloudProviders.GKE]: `${rootPath}/cloudgoogle-default${iconSize}.png`,
   [CloudProviders.VirtualMachine]: `${rootPath}/vm-default${iconSize}.png`,
   [CloudProviders.PhysicalMachine]: `${rootPath}/physical-default${iconSize}.png`,
 }
@@ -51,6 +53,8 @@ const icons = {
 const labels = {
   [CloudProviders.Aws]: 'Amazon Web Services',
   [CloudProviders.Azure]: 'Microsoft Azure',
+  [CloudProviders.Google]: 'Google Cloud',
+  [CloudProviders.GKE]: 'Google Cloud',
   [CloudProviders.VirtualMachine]: 'BareOS Virtual Machines',
   [CloudProviders.PhysicalMachine]: 'BareOS Physical Servers',
 }

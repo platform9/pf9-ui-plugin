@@ -36,10 +36,17 @@ export const importedClustersSelector = createSelector(
         creationTimestamp: cluster.metadata?.creationTimestamp,
         // Backend to work on standardizing common fields btwn providers in API responses
         containerCidr:
-          cluster.spec?.eks?.network?.containerCidr || cluster.spec?.aks?.network?.containerCIDR,
+          cluster.spec?.eks?.network?.containerCidr ||
+          cluster.spec?.aks?.network?.containerCIDR ||
+          cluster.spec?.gke?.network?.podIpv4CIDR,
         servicesCidr:
-          cluster.spec?.eks?.network?.servicesCidr || cluster.spec?.aks?.network?.serviceCIDR,
-        nodeGroups: cluster.spec?.eks?.nodegroups || cluster.spec?.aks?.agentPools,
+          cluster.spec?.eks?.network?.servicesCidr ||
+          cluster.spec?.aks?.network?.serviceCIDR ||
+          cluster.spec?.gke?.network?.servicesIpv4CIDR,
+        nodeGroups:
+          cluster.spec?.eks?.nodegroups ||
+          cluster.spec?.aks?.agentPools ||
+          cluster.spec?.gke?.nodePools,
         providerType: cluster.metadata?.labels?.provider,
         workers: cluster.status?.workers,
         usage,

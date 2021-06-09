@@ -10,6 +10,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Text from 'core/elements/text'
 import { CloudProviders } from './model'
 import WizardMeta from 'core/components/wizard/WizardMeta'
+import GoogleCloudProviderVerification from './GoogleCloudProviderVerification'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -39,6 +40,7 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
   const ActiveForm = objSwitchCaseAny({
     [CloudProviders.Aws]: AwsCloudProviderVerification,
     [CloudProviders.Azure]: AzureCloudProviderVerification,
+    [CloudProviders.GKE]: GoogleCloudProviderVerification,
   })(wizardContext.provider)
 
   return (
