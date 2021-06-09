@@ -10,7 +10,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import Theme from 'core/themes/model'
 import { sort } from 'ramda'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { objSwitchCase } from 'utils/fp'
 import { compareVersions } from '../app-catalog/helpers'
 import AddCloudProviderCredentialStep from '../infrastructure/cloudProviders/AddCloudProviderCredentialStep'
@@ -68,6 +68,7 @@ const OnboardingPage = () => {
   const [clusterChoice, setClusterChoice] = useState<ClusterChoice>('bareOs')
   const [, , , updateUserDefaults] = useScopedPreferences('defaults')
   const [kubernetesVersions] = useDataLoader(loadSupportedRoleVersions)
+  const [submitting, setSubmitting] = useState(false)
 
   const defaultKubernetesVersion = useMemo(() => {
     const versionsList = kubernetesVersions?.map((obj) => obj.roleVersion) || []
@@ -78,7 +79,6 @@ const OnboardingPage = () => {
   const initialContext = {
     clusterName: 'PF9-single-node-cluster',
     kubeRoleVersion: defaultKubernetesVersion,
-    cloudProviderId: '98421be9-f902-4c5b-a7f4-45f55bd530d0',
   }
 
   const cloudProviderOptions = useMemo(
@@ -98,11 +98,10 @@ const OnboardingPage = () => {
     })(clusterChoice)
   }, [clusterChoice])
 
-  const handleFormCompletion = () => {
+  const handleFormCompletion = useCallback(() => {
     updateUserDefaults(UserPreferences.FeatureFlags, { showOnboarding: false })
-    console.log('user default updated')
     history.push(routes.cluster.list.path())
-  }
+  }, [history])
 
   const handleDeploymentCardClick = (setWizardContext, handleNext, setActiveStep) => (
     type: ClusterChoice,
@@ -118,19 +117,18 @@ const OnboardingPage = () => {
     handleNext()
   }
 
-  const handleStepThreeBackButtonClick = (handleBack, setActiveStep, onNext) => () => {
+  const handleStepThreeBackButtonClick = (handleBack, setActiveStep) => () => {
     if (clusterChoice === 'bareOs') {
       setActiveStep('step1', 0)
       return
     }
-
     handleBack()
   }
 
   return (
     <>
       <DocumentMeta title="Onboarding" bodyClasses={['form-view']} />
-      <FormWrapper title="">
+      <FormWrapper title="" loading={submitting}>
         <Wizard context={initialContext} onComplete={handleFormCompletion} hideAllButtons={true}>
           {({ wizardContext, setWizardContext, onNext, handleNext, handleBack, setActiveStep }) => {
             return (
@@ -194,7 +192,7 @@ const OnboardingPage = () => {
                     onNext={onNext}
                     handleNext={handleNext}
                     title={formTitle(wizardContext)}
-                    setSubmitting={() => {}}
+                    setSubmitting={setSubmitting}
                     cloudProviderOptions={cloudProviderOptions}
                     header={
                       clusterChoice === 'import' ? 'Select the Cloud to Import Clusters From' : null
@@ -209,10 +207,9 @@ const OnboardingPage = () => {
                     handleNext={handleNext}
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
+                    setSubmitting={setSubmitting}
                   />
-                  <PrevButton
-                    onClick={handleStepThreeBackButtonClick(handleBack, setActiveStep, onNext)}
-                  />
+                  <PrevButton onClick={handleStepThreeBackButtonClick(handleBack, setActiveStep)} />
                   <SubmitButton onClick={handleNext}>+ Create Cluster</SubmitButton>
                 </WizardStep>
                 <WizardStep stepId="step4" label="Invite a Coworker" keepContentMounted={false}>
@@ -220,11 +217,12 @@ const OnboardingPage = () => {
                     onNext={onNext}
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
+                    setSubmitting={setSubmitting}
                   />
                   <Button
                     color="secondary"
                     className={classes.button}
-                    onClick={() => history.push(routes.cluster.list.path())}
+                    onClick={handleFormCompletion}
                   >
                     Skip
                   </Button>

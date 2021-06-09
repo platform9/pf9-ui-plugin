@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 // libs
 import React, { useEffect, useMemo } from 'react'
 import { pathOr, prop } from 'ramda'
@@ -29,9 +27,9 @@ import {
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import { ImportedClusterSelector } from '../infrastructure/importedClusters/model'
 import OnboardingPage from '../onboarding/onboarding-page'
-import { isDecco } from 'core/utils/helpers'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import useDataLoader from 'core/hooks/useDataLoader'
+import { isDecco } from 'core/utils/helpers'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -81,12 +79,13 @@ const useStyles = makeStyles<Theme>((theme) => ({
     position: 'fixed',
     left: 0,
     top: '55px',
-    width: '100%',
-    height: '100%',
+    width: '100vw',
+    height: 'calc(100vh - 55px)', // 55px is the toolbar height
     overflow: 'auto',
-    zIndex: '5000',
+    zIndex: 5000,
     backgroundColor: theme.palette.grey['100'],
     padding: theme.spacing(2, 4),
+    boxSizing: 'border-box',
   },
 }))
 
@@ -347,8 +346,6 @@ const DashboardPage = () => {
     userDetails: { displayName },
     features,
   } = session
-  // const displayName = session?.userDetails?.displayName
-  // const features = session?.features
   // To avoid missing API errors for ironic region UX-751
   const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)

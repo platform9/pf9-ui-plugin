@@ -1,5 +1,4 @@
 import ExternalLink from 'core/components/ExternalLink'
-import Progress from 'core/components/progress/Progress'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import React, { useEffect, useRef, useMemo } from 'react'
 import Text from 'core/elements/text'
@@ -17,8 +16,8 @@ import { awsClusterTracking, azureClusterTracking } from '../infrastructure/clus
 import { ClusterCreateTypes } from '../infrastructure/clusters/model'
 import AwsAvailabilityZoneField from '../infrastructure/clusters/aws/aws-availability-zone'
 
-const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext }) => {
-  const [createCluster, creatingCluster] = useDataUpdater(clusterActions.create)
+const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitting }) => {
+  const [createCluster] = useDataUpdater(clusterActions.create)
   const validatorRef = useRef(null)
   const defaultValues = useMemo(
     () => (wizardContext.provider === CloudProviders.Aws ? awsInitialContext : azureInitialContext),
@@ -38,6 +37,7 @@ const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext }) => 
   )
 
   const handleSubmit = async () => {
+    setSubmitting(true)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
@@ -53,6 +53,7 @@ const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext }) => 
     }
 
     await createCluster(data)
+    setSubmitting(false)
     return true
   }
 
@@ -81,48 +82,46 @@ const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext }) => 
   }, [wizardContext.provider])
 
   return (
-    <Progress loading={creatingCluster} message={'Creating cluster...'}>
-      <ValidatedForm
-        title="Cluster Configuration"
-        link={
-          <ExternalLink url={gettingStartedHelpLink}>
-            <Text variant="caption2">
-              {CloudProvidersFriendlyName[wizardContext.provider]} Cluster Help
-            </Text>
-          </ExternalLink>
-        }
-        triggerSubmit={setupValidator}
-      >
-        <CloudProviderRegionField
-          cloudProviderType={wizardContext.provider}
-          values={wizardContext}
-          onChange={(value) => setWizardContext({ region: value, azs: [] })}
-        />
+    <ValidatedForm
+      title="Cluster Configuration"
+      link={
+        <ExternalLink url={gettingStartedHelpLink}>
+          <Text variant="caption2">
+            {CloudProvidersFriendlyName[wizardContext.provider]} Cluster Help
+          </Text>
+        </ExternalLink>
+      }
+      triggerSubmit={setupValidator}
+    >
+      <CloudProviderRegionField
+        cloudProviderType={wizardContext.provider}
+        values={wizardContext}
+        onChange={(value) => setWizardContext({ region: value, azs: [] })}
+      />
 
-        {wizardContext.provider === CloudProviders.Aws && (
-          <>
-            {wizardContext.region && (
-              <AwsAvailabilityZoneField
-                values={wizardContext}
-                wizardContext={wizardContext}
-                setWizardContext={setWizardContext}
-                allowMultiSelect={false}
-              />
-            )}
-            <SshKeyField
-              dropdownComponent={AwsClusterSshKeyPicklist}
+      {wizardContext.provider === CloudProviders.Aws && (
+        <>
+          {wizardContext.region && (
+            <AwsAvailabilityZoneField
               values={wizardContext}
               wizardContext={wizardContext}
               setWizardContext={setWizardContext}
+              allowMultiSelect={false}
             />
-          </>
-        )}
+          )}
+          <SshKeyField
+            dropdownComponent={AwsClusterSshKeyPicklist}
+            values={wizardContext}
+            wizardContext={wizardContext}
+            setWizardContext={setWizardContext}
+          />
+        </>
+      )}
 
-        {wizardContext.provider === CloudProviders.Azure && (
-          <SshKeyTextField wizardContext={wizardContext} setWizardContext={setWizardContext} />
-        )}
-      </ValidatedForm>
-    </Progress>
+      {wizardContext.provider === CloudProviders.Azure && (
+        <SshKeyTextField wizardContext={wizardContext} setWizardContext={setWizardContext} />
+      )}
+    </ValidatedForm>
   )
 }
 

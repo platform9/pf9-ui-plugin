@@ -1,11 +1,10 @@
 import Bugsnag from '@bugsnag/js'
 import { makeStyles } from '@material-ui/styles'
-import Progress from 'core/components/progress/Progress'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Theme from 'core/themes/model'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { trackEvent } from 'utils/tracking'
 import { registerExternalClusters } from '../infrastructure/clusters/import/actions'
 import ClustersChecklists from '../infrastructure/clusters/import/ClustersChecklists'
@@ -30,11 +29,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const ImportClusterPage = ({ wizardContext, setWizardContext, onNext }) => {
+const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitting }) => {
   const classes = useStyles()
   const validatorRef = useRef(null)
   const [, , reloadImportedClusters] = useDataLoader(importedClusterActions.list)
-  const [submitting, setSubmitting] = useState(false)
 
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
@@ -92,36 +90,34 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext }) => {
   }, [handleSubmit])
 
   return (
-    <Progress message={'Creating cluster...'} loading={submitting}>
-      <ValidatedForm
-        classes={{ root: classes.validatedFormContainer }}
-        initialValues={wizardContext}
-        triggerSubmit={setupValidator}
-        elevated={false}
-      >
-        <FormFieldCard title="Select Regions & Clusters">
-          <div className={classes.regionsAndClusters}>
-            <RegionsChecklist
-              cloudProviderId={wizardContext.cloudProviderId}
-              onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
-              value={wizardContext.regions || []}
-              className={classes.regions}
-            />
-            <ClustersChecklists
-              cloudProviderId={wizardContext.cloudProviderId}
-              onChange={(value, region) =>
-                setWizardContext({
-                  selectedClusters: { ...wizardContext.selectedClusters, [region]: value },
-                })
-              }
-              value={wizardContext.selectedClusters}
-              selectedRegions={wizardContext.regions}
-              className={classes.clusters}
-            />
-          </div>
-        </FormFieldCard>
-      </ValidatedForm>
-    </Progress>
+    <ValidatedForm
+      classes={{ root: classes.validatedFormContainer }}
+      initialValues={wizardContext}
+      triggerSubmit={setupValidator}
+      elevated={false}
+    >
+      <FormFieldCard title="Select Regions & Clusters">
+        <div className={classes.regionsAndClusters}>
+          <RegionsChecklist
+            cloudProviderId={wizardContext.cloudProviderId}
+            onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
+            value={wizardContext.regions || []}
+            className={classes.regions}
+          />
+          <ClustersChecklists
+            cloudProviderId={wizardContext.cloudProviderId}
+            onChange={(value, region) =>
+              setWizardContext({
+                selectedClusters: { ...wizardContext.selectedClusters, [region]: value },
+              })
+            }
+            value={wizardContext.selectedClusters}
+            selectedRegions={wizardContext.regions}
+            className={classes.clusters}
+          />
+        </div>
+      </FormFieldCard>
+    </ValidatedForm>
   )
 }
 

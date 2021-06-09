@@ -71,12 +71,6 @@ class Wizard extends PureComponent {
     const { onComplete, singleStep } = this.props
     const { steps, activeStep, wizardContext } = this.state
 
-    console.log({
-      activeStep: activeStep,
-      activeStepId: this.state.activeStepId,
-      cb: this.nextCb[activeStep],
-    })
-
     // This is triggerSubmit in the ValidatedForm
     if (this.nextCb[activeStep]) {
       const ok = await this.nextCb[activeStep]()

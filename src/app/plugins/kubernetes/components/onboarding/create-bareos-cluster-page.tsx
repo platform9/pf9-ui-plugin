@@ -15,7 +15,6 @@ import DownloadCliWalkthrough from '../infrastructure/nodes/DownloadCliWalkthrou
 import { initialContext } from '../infrastructure/clusters/bareos/create-templates/physical-one-click'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterActions } from '../infrastructure/clusters/actions'
-import Progress from 'core/components/progress/Progress'
 import { ClusterCreateTypes } from '../infrastructure/clusters/model'
 import { bareOSClusterTracking } from '../infrastructure/clusters/tracking'
 
@@ -45,10 +44,10 @@ const segmentTrackingFields = {
   target: ClusterCreateTypes.OneClick,
 }
 
-const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext }) => {
+const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext, setSubmitting }) => {
   const classes = useStyles()
   const [option, setOption] = useState<Option>('ova')
-  const [createCluster, creatingCluster] = useDataUpdater(clusterActions.create)
+  const [createCluster] = useDataUpdater(clusterActions.create)
   const validatorRef = useRef(null)
 
   const setupValidator = (validate) => {
@@ -61,6 +60,7 @@ const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext }) =>
   }, [])
 
   const handleSubmit = useCallback(async () => {
+    setSubmitting(true)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
@@ -75,6 +75,7 @@ const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext }) =>
       masterNodes: wizardContext.masterNodes,
     }
     await createCluster(data)
+    setSubmitting(false)
     return true
   }, [wizardContext])
 
@@ -83,40 +84,38 @@ const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext }) =>
   }, [handleSubmit])
 
   return (
-    <Progress message={'Creating cluster...'} loading={creatingCluster}>
-      <div className={classes.connectNodesContainer}>
-        <div className={classes.connectionChoices}>
-          <CloudProviderCard
-            type={CloudProviders.VirtualMachine}
-            label="VM Template/OVA"
-            active={option === 'ova'}
-            onClick={(type) => setOption('ova')}
-          />
-          <CloudProviderCard
-            type={CloudProviders.PhysicalMachine}
-            label="Existing Virtual or Physical Infrastructure"
-            active={option === 'cli'}
-            onClick={(type) => setOption('cli')}
-          />
-        </div>
-        {option === 'ova' ? <DownloadOvaWalkthrough /> : <DownloadCliWalkthrough />}
-        <ValidatedForm
-          title="Waiting for your Ubuntu/CentOs Node to Attach"
-          elevated={false}
-          triggerSubmit={setupValidator}
-        >
-          <ClusterHostChooser
-            id="masterNodes"
-            selection="single"
-            filterFn={allPass([isConnected, isUnassignedNode])}
-            onChange={(value) => setWizardContext({ masterNodes: value })}
-            validations={[masterNodeLengthValidator]}
-            pollForNodes
-            required
-          />
-        </ValidatedForm>
+    <div className={classes.connectNodesContainer}>
+      <div className={classes.connectionChoices}>
+        <CloudProviderCard
+          type={CloudProviders.VirtualMachine}
+          label="VM Template/OVA"
+          active={option === 'ova'}
+          onClick={(type) => setOption('ova')}
+        />
+        <CloudProviderCard
+          type={CloudProviders.PhysicalMachine}
+          label="Existing Virtual or Physical Infrastructure"
+          active={option === 'cli'}
+          onClick={(type) => setOption('cli')}
+        />
       </div>
-    </Progress>
+      {option === 'ova' ? <DownloadOvaWalkthrough /> : <DownloadCliWalkthrough />}
+      <ValidatedForm
+        title="Waiting for your Ubuntu/CentOs Node to Attach"
+        elevated={false}
+        triggerSubmit={setupValidator}
+      >
+        <ClusterHostChooser
+          id="masterNodes"
+          selection="single"
+          filterFn={allPass([isConnected, isUnassignedNode])}
+          onChange={(value) => setWizardContext({ masterNodes: value })}
+          validations={[masterNodeLengthValidator]}
+          pollForNodes
+          required
+        />
+      </ValidatedForm>
+    </div>
   )
 }
 
