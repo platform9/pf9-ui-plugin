@@ -4,23 +4,19 @@ import { tryCatchAsync } from 'utils/async'
 const { qbert } = ApiClient.getInstance()
 
 const determineVpc = (cluster) => {
-  const choices = ['Public', 'Private']
-  const filteredChoices = choices.filter((choice) => {
-    if (choice === 'Public') {
-      return cluster.pf9Registered
-    } else if (choice === 'Private') {
-      return cluster.isPrivateAPI
-    }
-  })
-  return filteredChoices.length ? filteredChoices.join(' + ') : 'None'
+  return cluster.isPrivateAPI ? 'Private' : 'Public'
 }
 
-export const discoverExternalClusters = async ({ provider, cloudProviderId, regions }) => {
+export const discoverExternalClusters = async ({
+  provider,
+  cloudProviderId,
+  regions = undefined,
+}) => {
   const body = {
     provider,
     cloudProviderID: cloudProviderId,
     providerDetails: {
-      regions: regions,
+      regions,
     },
   }
 
@@ -40,14 +36,19 @@ export const discoverExternalClusters = async ({ provider, cloudProviderId, regi
   return mappedData
 }
 
-export const registerExternalClusters = async ({ cloudProviderId, clusters }) => {
+export const registerExternalClusters = async ({
+  cloudProviderId,
+  clusters,
+  stack,
+  detailsKey,
+}) => {
   const registerExternalClusterPromises = clusters.map((cluster) => {
     const body = {
       id: cluster.id,
-      provider: 'eks',
+      provider: stack,
       cloudProviderID: cloudProviderId,
       providerDetails: {
-        region: cluster.region,
+        [detailsKey]: cluster[detailsKey],
       },
     }
     return qbert.registerExternalCluster(body)
