@@ -10,6 +10,7 @@ import { GetCloudProvider } from 'api-client/qbert.model'
 
 import { ICloudProvidersSelector } from './model'
 import { calculateNodeUsages } from '../common/helpers'
+import { importedClustersSelector } from '../importedClusters/selectors'
 
 export const cloudProviderTypes = {
   aws: 'AWS',
@@ -22,17 +23,21 @@ export const cloudProvidersSelector = createSelector(
   [
     getDataSelector<DataKeys.CloudProviders>(DataKeys.CloudProviders),
     clustersSelector,
+    importedClustersSelector,
     combinedHostsSelector,
   ],
-  (cloudProviders, clusters, combinedHosts) => {
+  (cloudProviders, clusters, importedClusters, combinedHosts) => {
+    console.log(importedClusters, 'importedClusters')
     return pipe<GetCloudProvider[], GetCloudProvider[], ICloudProvidersSelector[]>(
       filter<GetCloudProvider>(({ type }) => type !== 'local'),
       map((cloudProvider) => {
         const descriptiveType =
           cloudProviderTypes[cloudProvider.type] || capitalizeString(cloudProvider.type)
         const filterCpClusters = propEq('nodePoolUuid', cloudProvider.nodePoolUuid)
+        const filterCpImportedClusters = propEq('cloudProviderId', cloudProvider.uuid)
         const cpClusters = clusters.filter(filterCpClusters)
         const cpNodes = pluck('nodes', cpClusters).flat()
+        const cpImportedClusters = importedClusters.filter(filterCpImportedClusters)
         const usage = calculateNodeUsages(cpNodes)
         return {
           ...cloudProvider,
@@ -40,6 +45,7 @@ export const cloudProvidersSelector = createSelector(
           deployedCapacity: usage,
           clusters: cpClusters,
           nodes: cpNodes,
+          importedClusters: cpImportedClusters,
         }
       }),
     )(cloudProviders)
