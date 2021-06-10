@@ -15,9 +15,24 @@ import { initialContext as azureInitialContext } from '../infrastructure/cluster
 import { awsClusterTracking, azureClusterTracking } from '../infrastructure/clusters/tracking'
 import { ClusterCreateTypes } from '../infrastructure/clusters/model'
 import AwsAvailabilityZoneField from '../infrastructure/clusters/aws/aws-availability-zone'
+import { UserPreferences } from 'app/constants'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 
-const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitting }) => {
-  const [createCluster] = useDataUpdater(clusterActions.create)
+const CreateCloudClusterPage = ({
+  wizardContext,
+  setWizardContext,
+  onNext,
+  setSubmitting,
+  setClusterId,
+}) => {
+  const [, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const onComplete = (success, cluster) => {
+    if (!success) return
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true }) // Should we only update the user default if it's a success? What if it's not a success?
+    setClusterId(cluster.uuid)
+    console.log('user pref updated and cluster uuid', cluster.uuid)
+  }
+  const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)
   const defaultValues = useMemo(
     () => (wizardContext.provider === CloudProviders.Aws ? awsInitialContext : azureInitialContext),
@@ -51,7 +66,7 @@ const CreateCloudClusterPage = ({ wizardContext, setWizardContext, onNext, setSu
       name: wizardContext.clusterName,
       location: wizardContext.region, // We need to add this in for Azure. Azure takes in a location field
     }
-
+    console.log('data', data)
     await createCluster(data)
     setSubmitting(false)
     return true

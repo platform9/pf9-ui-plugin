@@ -4,14 +4,18 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Theme from 'core/themes/model'
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { trackEvent } from 'utils/tracking'
 import { registerExternalClusters } from '../infrastructure/clusters/import/actions'
 import ClustersChecklists from '../infrastructure/clusters/import/ClustersChecklists'
-import { toggleRegion } from '../infrastructure/clusters/import/ImportEKSClusterPage'
 import RegionsChecklist from '../infrastructure/clusters/import/RegionsChecklist'
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import { map, keys, flatten } from 'ramda'
+import { ClusterCloudPlatforms } from 'app/constants'
+import { CloudProviders } from '../infrastructure/cloudProviders/model'
+import { objSwitchCase } from 'utils/fp'
+import { toggleRegion } from '../infrastructure/clusters/import/ImportEKSClusterPage'
+const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -29,17 +33,35 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
+const cloudClusterMap = {
+  [CloudProviders.Aws]: ClusterCloudPlatforms.EKS,
+  [CloudProviders.Azure]: ClusterCloudPlatforms.AKS,
+  [CloudProviders.Google]: ClusterCloudPlatforms.GKE,
+}
+
+const detailsKeyMap = {
+  [CloudProviders.Aws]: 'region',
+  [CloudProviders.Azure]: 'resourceGroup',
+  [CloudProviders.Google]: 'zone',
+}
+
 const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitting }) => {
   const classes = useStyles()
   const validatorRef = useRef(null)
   const [, , reloadImportedClusters] = useDataLoader(importedClusterActions.list)
+  const clusterType = cloudClusterMap[wizardContext.provider]
+  const detailsKey = detailsKeyMap[wizardContext.provider]
 
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
   }
 
   useEffect(() => {
-    setWizardContext({ regions: [] })
+    setWizardContext({
+      regions: [],
+      selectedClusters: {},
+      finalSelectedClusters: [],
+    })
   }, [])
 
   const getAllSelectedClusters = (selectedClusters) => {
@@ -70,14 +92,16 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
       finalSelectedClusters: finalSelectedClusters.map((cluster) => cluster.id),
     }
 
-    console.log('metadata', metadata)
+    console.log('imported clusters metadata', metadata)
 
-    Bugsnag.leaveBreadcrumb('Attempting to import EKS clusters', metadata)
-    trackEvent('Import EKS Clusters', metadata)
+    Bugsnag.leaveBreadcrumb(`Attempting to import ${clusterType} clusters`, metadata)
+    trackEvent(`Import ${clusterType} Clusters`, metadata)
 
     await registerExternalClusters({
       cloudProviderId: wizardContext.cloudProviderId,
       clusters: finalSelectedClusters,
+      stack: clusterType,
+      detailsKey: detailsKey,
     })
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
@@ -89,6 +113,101 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
     onNext(handleSubmit)
   }, [handleSubmit])
 
+  const eksClusterAndRegionsField = useMemo(
+    () => (
+      <>
+        <RegionsChecklist
+          cloudProviderId={wizardContext.cloudProviderId}
+          onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
+          value={wizardContext.regions || []}
+          className={classes.regions}
+        />
+        <ClustersChecklists
+          cloudProviderId={wizardContext.cloudProviderId}
+          onChange={(value, region) =>
+            setWizardContext({
+              selectedClusters: { ...wizardContext.selectedClusters, [region]: value },
+            })
+          }
+          value={wizardContext.selectedClusters || {}}
+          selectedRegions={wizardContext.regions || []}
+          className={classes.clusters}
+          stack={ClusterCloudPlatforms.EKS}
+        />
+      </>
+    ),
+    [wizardContext, setWizardContext],
+  )
+
+  const aksClusterAndRegionsField = useMemo(
+    () => (
+      <>
+        <RegionsChecklist
+          cloudProviderId={wizardContext.cloudProviderId}
+          onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
+          value={wizardContext.regions || []}
+          className={classes.regions}
+          clusters={wizardContext.clusterList}
+        />
+        <ClustersChecklists
+          cloudProviderId={wizardContext.cloudProviderId}
+          onChange={(value, region) =>
+            setWizardContext({
+              selectedClusters: { ...wizardContext.selectedClusters, [region]: value },
+            })
+          }
+          value={wizardContext.selectedClusters || {}}
+          selectedRegions={wizardContext.regions || []}
+          className={classes.clusters}
+          stack={ClusterCloudPlatforms.AKS}
+          onClustersLoad={(clusters) => setWizardContext({ clusterList: clusters })}
+        />
+      </>
+    ),
+    [wizardContext, setWizardContext],
+  )
+
+  const gkeClusterAndRegionsField = useMemo(
+    () => (
+      <>
+        <RegionsChecklist
+          cloudProviderId={wizardContext.cloudProviderId}
+          onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
+          value={wizardContext.regions || []}
+          className={classes.regions}
+          clusters={wizardContext.clusterList}
+        />
+        <ClustersChecklists
+          cloudProviderId={wizardContext.cloudProviderId}
+          onChange={(value, region) =>
+            setWizardContext({
+              selectedClusters: { ...wizardContext.selectedClusters, [region]: value },
+            })
+          }
+          value={wizardContext.selectedClusters || {}}
+          selectedRegions={wizardContext.regions || []}
+          className={classes.clusters}
+          stack={ClusterCloudPlatforms.GKE}
+          onClustersLoad={(clusters) => setWizardContext({ clusterList: clusters })}
+        />
+      </>
+    ),
+    [wizardContext, setWizardContext],
+  )
+
+  const clustersAndRegionsField = useMemo(() => {
+    return objSwitchCaseAny({
+      [CloudProviders.Aws]: eksClusterAndRegionsField,
+      [CloudProviders.Azure]: aksClusterAndRegionsField,
+      [CloudProviders.Google]: gkeClusterAndRegionsField,
+    })(wizardContext.provider)
+  }, [
+    wizardContext.provider,
+    eksClusterAndRegionsField,
+    aksClusterAndRegionsField,
+    gkeClusterAndRegionsField,
+  ])
+
   return (
     <ValidatedForm
       classes={{ root: classes.validatedFormContainer }}
@@ -97,25 +216,7 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
       elevated={false}
     >
       <FormFieldCard title="Select Regions & Clusters">
-        <div className={classes.regionsAndClusters}>
-          <RegionsChecklist
-            cloudProviderId={wizardContext.cloudProviderId}
-            onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
-            value={wizardContext.regions || []}
-            className={classes.regions}
-          />
-          <ClustersChecklists
-            cloudProviderId={wizardContext.cloudProviderId}
-            onChange={(value, region) =>
-              setWizardContext({
-                selectedClusters: { ...wizardContext.selectedClusters, [region]: value },
-              })
-            }
-            value={wizardContext.selectedClusters}
-            selectedRegions={wizardContext.regions}
-            className={classes.clusters}
-          />
-        </div>
+        <div className={classes.regionsAndClusters}>{clustersAndRegionsField}</div>
       </FormFieldCard>
     </ValidatedForm>
   )

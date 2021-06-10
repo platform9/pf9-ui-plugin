@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { makeStyles } from '@material-ui/styles'
 import PrevButton from 'core/components/buttons/PrevButton'
 import DocumentMeta from 'core/components/DocumentMeta'
@@ -24,8 +26,6 @@ import DeploymentCard from './deployment-card'
 import { routes } from 'core/utils/routes'
 import Button from 'core/elements/button'
 import ImportClusterPage from './import-cluster-page'
-import useScopedPreferences from 'core/session/useScopedPreferences'
-import { UserPreferences } from 'app/constants'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
@@ -76,7 +76,7 @@ const OnboardingPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const [clusterChoice, setClusterChoice] = useState<ClusterChoice>('bareOs')
-  const [, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const [clusterId, setClusterId] = useState(null)
   const [kubernetesVersions] = useDataLoader(loadSupportedRoleVersions)
   const [submitting, setSubmitting] = useState(false)
 
@@ -100,9 +100,12 @@ const OnboardingPage = () => {
   }, [clusterChoice])
 
   const handleFormCompletion = useCallback(() => {
-    updateUserDefaults(UserPreferences.FeatureFlags, { showOnboarding: false })
-    history.push(routes.cluster.list.path())
-  }, [history])
+    if (clusterChoice === 'import') {
+      history.push(routes.cluster.imported.list.path())
+    } else {
+      history.push(routes.cluster.nodeHealth.path({ id: clusterId }))
+    }
+  }, [history, clusterId, clusterChoice])
 
   const handleDeploymentCardClick = (setWizardContext, handleNext, setActiveStep) => (
     type: ClusterChoice,
@@ -212,6 +215,7 @@ const OnboardingPage = () => {
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
                     setSubmitting={setSubmitting}
+                    setClusterId={setClusterId}
                   />
                   <PrevButton onClick={handleStepThreeBackButtonClick(handleBack, setActiveStep)} />
                   <SubmitButton onClick={handleNext}>+ Create Cluster</SubmitButton>

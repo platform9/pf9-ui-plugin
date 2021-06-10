@@ -18,6 +18,8 @@ import { bareOSClusterTracking } from '../infrastructure/clusters/tracking'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import DownloadOvaWalkthrough from './download-ova-walkthrough'
 import DownloadCliWalkthrough from './download-cli-walkthrough'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { UserPreferences } from 'app/constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   connectNodesContainer: {
@@ -58,10 +60,23 @@ const segmentTrackingFields = {
   target: ClusterCreateTypes.OneClick,
 }
 
-const CreateBareOsClusterPage = ({ onNext, wizardContext, setWizardContext, setSubmitting }) => {
+const CreateBareOsClusterPage = ({
+  onNext,
+  wizardContext,
+  setWizardContext,
+  setSubmitting,
+  setClusterId,
+}) => {
   const classes = useStyles()
   const [option, setOption] = useState<Option>('ova')
-  const [createCluster] = useDataUpdater(clusterActions.create)
+  const [, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const onComplete = (success, cluster) => {
+    if (!success) return
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true }) // Should we only update the user default if it's a success? What if it's not a success?
+    setClusterId(cluster.uuid)
+    console.log('user pref updated and cluster uuid', cluster.uuid)
+  }
+  const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)
 
   const setupValidator = (validate) => {
