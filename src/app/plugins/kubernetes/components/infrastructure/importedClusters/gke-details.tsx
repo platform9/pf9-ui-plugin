@@ -34,6 +34,7 @@ const GkeDetails = ({ cluster, loading, reload }: Props) => {
   const classes = useStyles({})
   const overview = getFieldsForCard(clusterOverviewFields, cluster)
   const networking = getFieldsForCard(networkingFields, cluster)
+  // Todo: Add tags card after backend adds it to the response
 
   return (
     <div className={classes.clusterInfo}>

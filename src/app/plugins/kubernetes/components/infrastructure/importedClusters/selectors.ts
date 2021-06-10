@@ -31,7 +31,7 @@ export const importedClustersSelector = createSelector(
         name: cluster.spec?.displayName,
         cloudProviderId: cluster.spec?.cloudProviderID,
         external: cluster.metadata?.labels?.external,
-        region: cluster.metadata?.labels?.region || cluster.metadata?.labels?.location,
+        region: cluster.metadata?.labels?.location,
         kubeVersion: cluster.spec?.kubeVersion,
         creationTimestamp: cluster.metadata?.creationTimestamp,
         // Backend to work on standardizing common fields btwn providers in API responses
