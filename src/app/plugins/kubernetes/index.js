@@ -56,8 +56,8 @@ import VirtualMachineDetailPage from './components/virtual-machines/details'
 import AddVirtualMachinePage from './components/virtual-machines/add'
 import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
 
+import UpgradeClusterPage from './components/infrastructure/clusters/UpgradeClusterPage'
 import { isDecco } from 'core/utils/helpers'
-
 class Kubernetes extends React.PureComponent {
   render() {
     return <h1>Kubernetes Plugin</h1>
@@ -150,6 +150,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/clusters/scaleWorkers/:id', exact: true },
       requiredRoles: 'admin',
       component: ScaleWorkersPage,
+    },
+    {
+      name: 'Upgrade Cluster',
+      link: { path: '/infrastructure/clusters/:id/upgrade', exact: true },
+      requiredRoles: 'admin',
+      component: UpgradeClusterPage,
     },
     {
       name: 'Cluster Details',

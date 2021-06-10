@@ -97,7 +97,7 @@ const AlarmOverviewClusters = () => {
 
   const filteredClusters = useMemo(() => {
     return allClusters.filter((cluster) => {
-      return cluster.name.includes(params.search)
+      return cluster?.name.includes(params.search)
     })
   }, [allClusters, params.search])
 
@@ -127,14 +127,14 @@ const AlarmOverviewClusters = () => {
           </Text>
         )}
         {filteredClusters.map((cluster) => (
-          <div className={classes.clustersList} key={cluster.uuid}>
-            <div key={cluster.uuid} className={classes.clusterRow}>
-              <Text variant="body2">{cluster.name}</Text>
+          <div className={classes.clustersList} key={cluster?.uuid}>
+            <div key={cluster?.uuid} className={classes.clusterRow}>
+              <Text variant="body2">{cluster?.name}</Text>
               <div className={classes.clusterLinks}>
-                <ExternalLink url={cluster.usage.grafanaLink}>
+                <ExternalLink url={cluster?.usage?.grafanaLink}>
                   <FontAwesomeIcon size="sm">chart-line</FontAwesomeIcon>
                 </ExternalLink>
-                <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>
+                <SimpleLink src={routes.cluster.nodes.path({ id: cluster?.uuid })}>
                   <FontAwesomeIcon size="sm">search-plus</FontAwesomeIcon>
                 </SimpleLink>
               </div>

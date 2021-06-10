@@ -29,8 +29,32 @@ const MetalLbAddonLayer2Field = React.lazy(async () =>
 )
 
 const EtcdBackupFields = React.lazy(async () => import('./etcd-backup'))
+
 const EdcdBackupAddonFields = React.lazy(async () =>
   import('./etcd-backup').then((module) => ({ default: module.EdcdBackupAddonFields })),
+)
+
+const AdvancedBatchUpgradeField = React.lazy(async () => import('./advanced-batch-upgrade'))
+
+const AdvancedBatchUpgradeAddonField = React.lazy(async () =>
+  import('./advanced-batch-upgrade').then((module) => ({
+    default: module.AdvancedBatchUpgradeAddonField,
+  })),
+)
+
+const SequentialClusterUpgradeField = React.lazy(async () => import('./sequential-cluster-upgrade'))
+
+const SequentialClusterUpgradeAddonField = React.lazy(async () =>
+  import('./sequential-cluster-upgrade').then((module) => ({
+    default: module.SequentialClusterUpgradeAddonField,
+  })),
+)
+
+const PercentageClusterUpgradeField = React.lazy(async () => import('./percentage-cluster-upgrade'))
+const PercentageClusterUpgradeAddonField = React.lazy(async () =>
+  import('./percentage-cluster-upgrade').then((module) => ({
+    default: module.PercentageClusterUpgradeAddonField,
+  })),
 )
 
 const AutoScalingField = React.lazy(async () => import('./auto-scaling'))
@@ -58,6 +82,18 @@ const addonMap = {
   etcdBackup: {
     toggler: EtcdBackupFields,
     details: { component: EdcdBackupAddonFields },
+  },
+  sequentialClusterUpgrade: {
+    toggler: SequentialClusterUpgradeField,
+    details: { component: SequentialClusterUpgradeAddonField },
+  },
+  percentageClusterUpgrade: {
+    toggler: PercentageClusterUpgradeField,
+    details: { component: PercentageClusterUpgradeAddonField },
+  },
+  advancedBatchUpgrade: {
+    toggler: AdvancedBatchUpgradeField,
+    details: { component: AdvancedBatchUpgradeAddonField },
   },
   prometheusMonitoringEnabled: {
     toggler: PrometheusMonitoringField,
@@ -112,7 +148,6 @@ export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
 
 export const AddonDetailCards = ({ wizardContext, setWizardContext, values }) => {
   const { addons } = useContext(AddonContext)
-
   return (
     <Suspense fallback="loading...">
       {addons.map((addon) => {

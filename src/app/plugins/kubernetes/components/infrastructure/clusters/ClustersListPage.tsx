@@ -313,6 +313,16 @@ export const options = {
           : 'Cannot scale workers: cluster is busy',
     },
     {
+      cond: both(isAdmin, canScaleWorkers),
+      icon: 'level-up',
+      label: 'Upgrade Clusters',
+      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}/upgrade`,
+      disabledInfo: ([cluster]) =>
+        !!cluster && isAzureAutoscalingCluster(cluster)
+          ? 'Scaling Azure autoscaling clusters is not yet supported'
+          : 'Cannot scale workers: cluster is busy',
+    },
+    {
       cond: both(isAdmin, canUpgradeCluster),
       icon: 'level-up',
       label: 'Upgrade Cluster',

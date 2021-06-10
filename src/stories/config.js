@@ -1,66 +1,47 @@
-import StoryRouter from 'storybook-react-router'
-import { addDecorator, addParameters, configure } from '@storybook/react'
-import { appDecorators } from './helpers'
-import { create } from '@storybook/theming'
-import { withInfo } from '@storybook/addon-info'
-import { withKnobs } from '@storybook/addon-knobs'
-import '../app/bootstrap'
-
-addDecorator(withInfo({ header: false, inline: true, source: true }))
-addDecorator(withKnobs)
-addDecorator(StoryRouter())
-addDecorator(appDecorators)
-
-const storybookTheme = create({
-  base: 'light',
-
-  brandTitle: 'Platform9 Storybook',
-  brandUrl: 'https://platform9.com',
-  brandImage: 'https://hostadvice.com/wp-content/uploads/2017/07/Platform9-LogoStacked-777x352.png',
-
-  // Typography
-  fontBase: 'Roboto, sans-serif',
-  fontCode: 'monospace',
-
-  appBg: '#fafafa',
-  appContentBg: '#fff',
-
-  // Below are the default values for the light theme
-  /*
-  colorPrimary: '#ff4785',
-  colorSecondary: '#1ea7df',
-
-  // UI
-  appBorderColor: 'rgba(0,0,0,.1)',
-  appBorderRadius: 4,
-
-  // Text colors
-  textColor: '#333',
-  textInverseColor: 'rgba(255,255,255,0.9)',
-
-  // Toolbar default and active colors
-  barTextColor: '#999999',
-  barSelectedColor: '#1ea7fd',
-  barBg: '#fff',
-
-  // Form colors
-  inputBg: '#fff',
-  inputBorder: 'rgba(0, 0, 0, 0.1)',
-  inputTextColor: '#333',
-  inputBorderRadius: 4,
-  */
-})
-
-addParameters({
-  options: {
-    theme: storybookTheme,
-  },
-})
-
-const req = require.context('.', true, /\.stories\.js$/)
-
-function loadStories() {
-  req.keys().forEach((filename) => req(filename))
+const {
+  OS_HOST,
+  OS_API_HOST,
+  OS_USERNAME,
+  OS_PASSWORD,
+  // controls which region the GraphQL server uses
+  OS_REGION,
+} = (process && process.env) || {}
+/* eslint-disable */
+const envs = {
+  stage: { region: 'k8s1', apiHost: 'https://ui-staging.platform9.horse' },
+  dev: { region: 'k8s1', apiHost: 'https://ui-dev.platform9.horse' },
 }
-
-configure(loadStories, module)
+/* eslint-enable */
+const config = {
+  production: {
+    host: '',
+    apiHost: '',
+  },
+  development: {
+    host: 'http://localhost:3000',
+    simulator: {
+      preset: 'dev',
+      username: 'admin@platform9.com',
+      password: 'Platform9!@ui-dev',
+    },
+    developer: true,
+  },
+  test: {
+    host: OS_HOST || 'http://localhost:3000',
+    apiHost: OS_API_HOST || 'http://localhost:4444',
+    region: OS_REGION || 'KVM-Neutron',
+    simulator: {
+      preset: 'base',
+      username: OS_USERNAME || 'brennan@platform9.com',
+      password: OS_PASSWORD || 'OWQ0npYmst9ekiJP',
+    },
+    // Use the following for testing against a real DU
+    username: OS_USERNAME || 'brennan@platform9.com',
+    password: OS_PASSWORD || 'OWQ0npYmst9ekiJP',
+  },
+}
+/* CHANGE ME */
+const getServer = (target) => envs[target]
+config.development = Object.assign(config.development, getServer('dev'))
+const env = process.env.NODE_ENV || 'development'
+module.exports = config[env]
