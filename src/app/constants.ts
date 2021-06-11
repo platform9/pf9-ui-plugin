@@ -54,7 +54,6 @@ export enum CustomerTiers {
   OEM = 'oem',
 }
 
-// Don't forget to revert ssoEnabledTiers back to normal
 export const ssoEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 export const themeEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 
