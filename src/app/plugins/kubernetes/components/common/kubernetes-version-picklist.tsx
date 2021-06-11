@@ -1,8 +1,9 @@
 import React, { forwardRef, useMemo } from 'react'
 import PicklistDefault from 'core/components/Picklist'
-import { loadSupportedRoleVersions } from '../infrastructure/clusters/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
+import { loadSupportedRoleVersions } from 'k8s/components/infrastructure/clusters/actions'
+
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 const KubernetesVersionPicklist = forwardRef(({ ...rest }, ref) => {

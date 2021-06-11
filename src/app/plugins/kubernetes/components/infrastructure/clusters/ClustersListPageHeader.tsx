@@ -2,7 +2,7 @@
 import React, { useCallback } from 'react'
 
 // Actions
-import { clusterActions } from './actions'
+import { listClusters } from './actions'
 
 // Components
 import ListPageHeader from 'k8s/components/common/ListPageHeader'
@@ -14,6 +14,7 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 import { clusterStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
 import { IClusterSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
+import { makeParamsClustersSelector } from './selectors'
 
 const maxUsagePaths = {
   computeMaxPath: 'usage.compute.max',
@@ -27,6 +28,8 @@ const curUsagePaths = {
   diskCurrPath: 'usage.disk.current',
 }
 
+const selector = makeParamsClustersSelector()
+
 export const ClusterListHeader = () => {
   const handleGetUsage = useCallback((clusters: IClusterSelector[]) => {
     const items = clusters.filter((cluster) => (cluster.nodes || []).length > 0)
@@ -36,7 +39,8 @@ export const ClusterListHeader = () => {
     <>
       <ListPageHeader<IClusterSelector>
         report={clusterStatusCardProps}
-        loaderFn={clusterActions.list}
+        listAction={listClusters}
+        dataSelector={selector}
         totalUsageFn={handleGetUsage}
         documentMeta={<DocumentMeta title="Clusters" />}
       />

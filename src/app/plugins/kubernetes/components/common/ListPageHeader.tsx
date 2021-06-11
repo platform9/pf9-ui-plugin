@@ -12,6 +12,10 @@ import { IStatusCardWithFilterProps } from '../dashboard/DashboardPage'
 import Theme from 'core/themes/model'
 import PollingData from 'core/components/PollingData'
 import { IUseDataLoader } from '../infrastructure/nodes/model'
+import ListAction from 'core/actions/ListAction'
+import { Dictionary } from 'ramda'
+import { RootState } from 'app/store'
+import { ParametricSelector } from 'reselect'
 
 interface IUsageTotal {
   current: number
@@ -24,15 +28,21 @@ interface IUsageTotals {
   disk: IUsageTotal
 }
 
+type AnyDictionary = Dictionary<any>
 interface IListPageHeaderProps<T> {
   report: IStatusCardWithFilterProps
   totalUsageFn?: (items: T[]) => IUsageTotals
-  loaderFn: Function
+  loaderFn?: Function
+  dataLoader?: [Function, {}] // todo figure out typings here.
+  listAction?: ListAction<AnyDictionary[], AnyDictionary> // todo fix typings here
+  dataSelector?: ParametricSelector<RootState, AnyDictionary, AnyDictionary[]> // todo fix typings here
   documentMeta?: JSX.Element
   hideUsage?: Boolean
 }
 function ListPageHeader<T>({
   loaderFn,
+  listAction,
+  dataSelector,
   report,
   totalUsageFn,
   documentMeta,

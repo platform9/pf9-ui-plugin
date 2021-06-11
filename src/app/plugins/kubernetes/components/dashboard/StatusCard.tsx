@@ -14,6 +14,12 @@ import PieUsageWidget from 'core/components/widgets/PieUsageWidget'
 import DonutWidget from 'core/components/widgets/DonutWidget'
 import { PieDataEntry } from 'core/components/graphs/PieGraph'
 import Theme from 'core/themes/model'
+import ListAction from 'core/actions/ListAction'
+import { Dictionary } from 'ramda'
+import { ParametricSelector } from 'reselect'
+import { RootState, useAppSelector } from 'app/store'
+import useListAction from 'core/hooks/useListAction'
+import { IDataKeys } from 'k8s/datakeys.model'
 
 const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((theme) => ({
   headerIcon: {
@@ -104,13 +110,20 @@ export interface IStatusCardQuantity {
   piePrimary?: string
   graphType?: 'usage' | 'donut'
 }
+
+type AnyDictionary = Dictionary<any>
+type KeyOf<T> = keyof T
+
 export interface StatusCardProps {
   entity: string
   route: string
   addRoute: string
   title: string
   icon: string | PropertyFunction<JSX.Element>
-  dataLoader: [Function, {}] // todo figure out typings here.
+  dataLoader?: [Function, {}] // todo figure out typings here.
+  listAction?: ListAction<KeyOf<IDataKeys>> // todo fix typings here
+  dataSelector?: ParametricSelector<RootState, AnyDictionary, AnyDictionary[]> // todo fix typings here
+  params?: AnyDictionary
   quantityFn(data: any[]): IStatusCardQuantity
   actionRow?: boolean
   className?: string
@@ -123,11 +136,24 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
   title,
   icon,
   dataLoader,
+  listAction,
+  dataSelector: selector,
+  params = {},
   quantityFn,
   actionRow = true,
   className,
 }) => {
-  const [data, loading] = useDataLoader(...dataLoader)
+  const loadData = () => {
+    if (dataLoader) {
+      return useDataLoader(...dataLoader)
+    }
+    const loading = useListAction(listAction, { selector, params })
+    const data = useAppSelector((state) => selector(state, params))
+    return [data, loading]
+  }
+
+  const [data, loading] = loadData()
+
   const { quantity, pieData, piePrimary, graphType = 'usage' } = quantityFn(data)
   const {
     contentContainer,

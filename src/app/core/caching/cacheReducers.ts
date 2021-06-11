@@ -1,48 +1,48 @@
+import { IDataKeys } from 'k8s/datakeys.model'
 import {
   __,
-  assocPath,
-  pathEq,
-  over,
-  append,
-  lensPath,
-  pipe,
-  mergeLeft,
   allPass,
-  map,
-  path,
-  split,
-  of,
-  identity,
+  append,
+  assocPath,
   Dictionary,
   find,
-  when,
+  identity,
   isNil,
+  lensPath,
+  map,
+  mergeLeft,
+  of,
+  over,
+  path,
+  pathEq,
+  pipe,
+  split,
+  when,
   dissocPath,
 } from 'ramda'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
+  adjustWith,
   arrayIfNil,
-  upsertAllBy,
+  emptyArr,
   ensureArray,
   pathStr,
-  emptyArr,
-  adjustWith,
   removeWith,
+  upsertAllBy,
 } from 'utils/fp'
 import { defaultUniqueIdentifier } from 'app/constants'
-import DataKeys from 'k8s/DataKeys'
 import { isEqual } from 'lodash'
 
 export const paramsStoreKey = 'cachedParams'
 export const dataStoreKey = 'cachedData'
 export const loadingStoreKey = 'loadingData'
 
-type ParamsType = Array<{ [key: string]: number | string }>
+type ParamsType = Dictionary<any>
 type Optional<T> = T extends null ? void : T
 
 export interface CacheState {
   [dataStoreKey]: any[]
-  [paramsStoreKey]: ParamsType
+  [paramsStoreKey]: ParamsType[]
   [loadingStoreKey]: Dictionary<boolean>
 }
 
@@ -61,22 +61,21 @@ const getIdentifiersMatcher = (uniqueIdentifier: string | string[], params: Para
 }
 
 const reducers = {
-  setLoading: (
+  setLoading: <D extends keyof IDataKeys>(
     state,
     {
       payload: { cacheKey, loading },
     }: PayloadAction<{
-      cacheKey: DataKeys
+      cacheKey: D
       loading: boolean
     }>,
   ) => assocPath([loadingStoreKey, cacheKey], loading, state),
-  addItem: <T extends Dictionary<any>>(
+  addItem: <D extends keyof IDataKeys, T extends Dictionary<any>>(
     state,
     {
       payload: { cacheKey, params, item },
     }: PayloadAction<{
-      uniqueIdentifier: string | string[]
-      cacheKey: DataKeys
+      cacheKey: D
       params: ParamsType
       item: T
     }>,
@@ -85,14 +84,14 @@ const reducers = {
 
     return over(dataLens, append(mergeLeft(params, item)))(state)
   },
-  updateItem: <T extends Dictionary<any>>(
+  updateItem: <D extends keyof IDataKeys, T extends Dictionary<any>>(
     state,
     {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, item },
     }: PayloadAction<{
-      uniqueIdentifier: string | string[]
+      uniqueIdentifier?: string | string[]
       params: ParamsType
-      cacheKey: DataKeys
+      cacheKey: D
       item: T
     }>,
   ) => {
@@ -106,11 +105,11 @@ const reducers = {
       adjustWith(matchIdentifiers, mergeLeft(item)),
     )(state)
   },
-  removeItem: (
+  removeItem: <D extends keyof IDataKeys>(
     state,
     {
       payload: { uniqueIdentifier, cacheKey, params },
-    }: PayloadAction<{ uniqueIdentifier: string | string[]; params: ParamsType; cacheKey: string }>,
+    }: PayloadAction<{ uniqueIdentifier: string | string[]; params: ParamsType; cacheKey: D }>,
   ) => {
     const dataLens = lensPath([dataStoreKey, cacheKey])
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
@@ -122,13 +121,13 @@ const reducers = {
       removeWith(matchIdentifiers),
     )(state)
   },
-  upsertAll: <T extends Dictionary<any>>(
+  upsertAll: <D extends keyof IDataKeys, T extends Dictionary<any>>(
     state,
     {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, items },
     }: PayloadAction<{
-      uniqueIdentifier: string | string[]
-      cacheKey: DataKeys
+      uniqueIdentifier?: string | string[]
+      cacheKey: D
       params?: ParamsType
       items: T[]
     }>,
@@ -164,11 +163,11 @@ const reducers = {
       ),
     )(state)
   },
-  replaceAll: <T extends Dictionary<any>>(
+  replaceAll: <D extends keyof IDataKeys, T extends Dictionary<any>>(
     state,
     {
       payload: { cacheKey, params, items },
-    }: PayloadAction<{ cacheKey: string; params?: ParamsType; items: T[] }>,
+    }: PayloadAction<{ cacheKey: D; params?: ParamsType; items: T[] }>,
   ) => {
     const dataPath = [dataStoreKey, cacheKey]
     const paramsPath = [paramsStoreKey, cacheKey]
@@ -179,7 +178,10 @@ const reducers = {
       params ? assocPath(paramsPath, of(params)) : identity,
     )(state)
   },
-  clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKeys }>>) => {
+  clearCache: <D extends keyof IDataKeys>(
+    state,
+    action?: PayloadAction<Optional<{ cacheKey: D }>>,
+  ) => {
     const cacheKey = action?.payload?.cacheKey
     return cacheKey
       ? pipe<CacheState, CacheState, CacheState, CacheState>(

@@ -7,7 +7,12 @@ import FormWrapper from 'core/components/FormWrapper'
 import { pathJoin } from 'utils/misc'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import {
+  attachNodes,
+  detachNodes,
+  listClusters,
+  updateCluster,
+} from 'k8s/components/infrastructure/clusters/actions'
 import BlockChooser from 'core/components/BlockChooser'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -236,15 +241,13 @@ const ScaleMastersPage: FunctionComponent = () => {
   const classes = useStyles({})
   const { match, history } = useReactRouter()
   const { id } = match.params
-  const [clusters, loading] = useDataLoader(clusterActions.list)
+  const [clusters, loading] = useDataLoader(listClusters)
 
   const onComplete = () => history.push(listUrl)
-  const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
+  const [update, updating] = useDataUpdater(updateCluster, onComplete)
 
-  // TypeScript is not able to infer that the customOperations are actually there so we need to work around it
-  const anyClusterActions = clusterActions as any
-  const [attach, isAttaching] = useDataUpdater(anyClusterActions.attachNodes, onComplete)
-  const [detach, isDetaching] = useDataUpdater(anyClusterActions.detachNodes, onComplete)
+  const [attach, isAttaching] = useDataUpdater(attachNodes, onComplete)
+  const [detach, isDetaching] = useDataUpdater(detachNodes, onComplete)
 
   const isUpdating = updating || isAttaching || isDetaching
 

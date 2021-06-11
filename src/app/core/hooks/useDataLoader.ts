@@ -17,7 +17,8 @@ import { memoizedDep } from 'utils/misc'
  * Hook to load data using the specified loader function
  * @param {contextLoaderFn} loaderFn
  * @param {object} [params] Any set of params passed to the loader function
- * @returns {[array, boolean, function]} Returns an array with the loaded data, a loading boolean and a function to reload the data
+ * @returns {[array, boolean, function]} Returns an array with the loaded data, a loading
+ * boolean and a function to reload the data
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // @ts-ignore

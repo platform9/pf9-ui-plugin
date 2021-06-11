@@ -35,6 +35,12 @@ export type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading'
 
 export type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
+export interface CsiDriver {
+  id: string
+  title: string
+  required: boolean
+}
+
 // progressPercent,
 //         version,
 //         baseUrl
@@ -69,6 +75,9 @@ export interface IClusterSelector extends IClusterAction {
       host: string
       cluster: IClusterAction
     } | null
+  }
+  csiDrivers?: {
+    drivers?: CsiDriver[]
   }
 }
 // export interface IClusterSelector {

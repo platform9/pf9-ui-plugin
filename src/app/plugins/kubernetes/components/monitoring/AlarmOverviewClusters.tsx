@@ -5,7 +5,7 @@ import AlphabeticalPicklist from './AlphabeticalPicklist'
 import Text from 'core/elements/text'
 import Progress from 'core/components/progress/Progress'
 import { LoadingGifs } from 'app/constants'
-import { getAllClusters } from '../infrastructure/clusters/actions'
+import { listClusters } from '../infrastructure/clusters/actions'
 import { routes } from 'core/utils/routes'
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
@@ -16,7 +16,8 @@ import { useSelector } from 'react-redux'
 import { path } from 'ramda'
 import { cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { GlobalState } from 'k8s/datakeys.model'
+import { RootState } from 'app/store'
+import { emptyObj } from 'utils/fp'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   header: {
@@ -75,7 +76,7 @@ const AlarmOverviewClusters = () => {
   const [params, updateParams] = useState(defaultParams)
 
   const selector = allClustersSelector()
-  const allClusters = useSelector((state: GlobalState) =>
+  const allClusters = useSelector((state: RootState) =>
     selector(state, {
       prometheusClusters: true,
       orderBy: 'name',
@@ -92,7 +93,7 @@ const AlarmOverviewClusters = () => {
   const allClustersLoading = clustersLoading && importedClustersLoading
 
   useEffect(() => {
-    getAllClusters()
+    listClusters.call(emptyObj)
   }, [params.orderDirection])
 
   const filteredClusters = useMemo(() => {

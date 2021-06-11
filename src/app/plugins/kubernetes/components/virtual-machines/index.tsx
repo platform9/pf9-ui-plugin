@@ -1,17 +1,24 @@
-import React from 'react'
-import Tabs from 'core/components/tabs/Tabs'
-import Tab from 'core/components/tabs/Tab'
-import PageContainer from 'core/components/pageContainer/PageContainer'
-import VirtualMachinesListPage from './list-page'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from '../infrastructure/clusters/actions'
-import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import { useAppSelector } from 'app/store'
 import DocumentMeta from 'core/components/DocumentMeta'
+import PageContainer from 'core/components/pageContainer/PageContainer'
 import Progress from 'core/components/progress/Progress'
+import Tab from 'core/components/tabs/Tab'
+import Tabs from 'core/components/tabs/Tabs'
+import useDataLoader from 'core/hooks/useDataLoader'
+import useListAction from 'core/hooks/useListAction'
+import React from 'react'
+import { emptyObj } from 'utils/fp'
+import { listClusters } from '../infrastructure/clusters/actions'
+import { makeParamsClustersSelector } from '../infrastructure/clusters/selectors'
+import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import KubevirtLandingPage from './kubevirt-landing-page'
+import VirtualMachinesListPage from './list-page'
+
+const selector = makeParamsClustersSelector()
 
 const VirtualMachinesPage = () => {
-  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const [loadingClusters] = useListAction(listClusters)
+  const clusters = useAppSelector((state) => selector(state, emptyObj))
   const [importedClusters, loadingImportedClusters] = useDataLoader(importedClusterActions.list)
   const hasKubevirtClusters = [...clusters, ...importedClusters].find(
     (cluster) => !!cluster.deployKubevirt,

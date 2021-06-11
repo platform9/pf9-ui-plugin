@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from 'react'
 import PushEventManager from 'core/PushEventManager'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { listClusters } from 'k8s/components/infrastructure/clusters/actions'
+import useListAction from 'core/hooks/useListAction'
 
 interface IMessage {
   source: string
@@ -19,7 +19,7 @@ const PushEventsProvider: FC<Props> = ({ children }) => {
   // so that the event handlers have access to the data store and to
   // display toast notifications.
 
-  const [, , reloadClusters] = useDataLoader(clusterActions.list, {}, { loadOnDemand: true })
+  const [, reloadClusters] = useListAction(listClusters, { loadOnDemand: true })
 
   const handleClusterNode = (payload) => {
     // console.log('qbert::cluster_node', payload)

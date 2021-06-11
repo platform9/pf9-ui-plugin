@@ -1,29 +1,54 @@
 import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
+import ActionsSet from 'core/actions/ActionsSet'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import jsYaml from 'js-yaml'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
-import { makeDeploymentsSelector, makePodsSelector } from 'k8s/components/pods/selectors'
-import { ActionDataKeys } from 'k8s/DataKeys'
-import { flatten, pluck } from 'ramda'
+import { makeDeploymentsSelector } from 'k8s/components/pods/selectors'
+import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
+import { find, flatten, pathOr, pipe, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
-import { pathStr } from 'utils/fp'
+import { emptyArr, pathStr } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 import { makeServiceSelector } from './selectors'
+import ListAction from 'core/actions/ListAction'
+import CreateAction from 'core/actions/CreateAction'
+import DeleteAction from 'core/actions/DeleteAction'
+import { useSelector } from 'react-redux'
+import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 
 const { qbert } = ApiClient.getInstance()
 
-export const podActions = createCRUDActions(ActionDataKeys.Pods, {
-  listFn: async (params) => {
+const podsActions = new ActionsSet<'Pods'>({
+  cacheKey: DataKeys.Pods,
+  uniqueIdentifier: 'metadata.uid',
+  indexBy: 'clusterId',
+})
+
+export const listPods = podsActions.add(
+  new ListAction<'Pods', { clusterId: string }>(async (params) => {
     Bugsnag.leaveBreadcrumb('Attempting to get pods', params)
+
     const [clusterId, clusters] = await parseClusterParams(params)
     return clusterId === allKey
       ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
       : qbert.getClusterPods(clusterId)
-  },
-  createFn: async ({ clusterId, namespace, yaml }) => {
+  }),
+)
+
+export const createPod = podsActions.add(
+  new CreateAction<
+    'Pods',
+    {
+      clusterId: string
+      namespace: string
+      yaml: string
+    },
+    any
+  >(async ({ clusterId, namespace, yaml }) => {
     Bugsnag.leaveBreadcrumb('Attempting to create new pod', { clusterId, namespace, yaml })
+
     const body = jsYaml.safeLoad(yaml)
     const pod = await qbert.createPod(clusterId, namespace, body)
     trackEvent('Create New Pod', {
@@ -32,18 +57,25 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
       name: pathStr('metadata.name', pod),
     })
     return pod
-  },
-  deleteFn: async ({ id }, currentItems) => {
-    const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
+  }),
+)
+
+export const deletePod = podsActions.add(
+  new DeleteAction<'Pods', { id: string }, any>(async (params) => {
+    const { id } = params
+
+    const singlePodSelector = pipe(
+      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Pods]),
+      find((x) => x.id === id),
+    )
+    const { clusterId, namespace, name } = useSelector(singlePodSelector)
     Bugsnag.leaveBreadcrumb('Attempting to delete pod', { id, clusterId, namespace, name })
+
     const result = await qbert.deletePod(clusterId, namespace, name)
     trackEvent('Delete Pod', { clusterId, namespace, name, id })
     return result
-  },
-  uniqueIdentifier: 'metadata.uid',
-  indexBy: 'clusterId',
-  selectorCreator: makePodsSelector,
-})
+  }),
+)
 
 export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
   listFn: async (params) => {
@@ -62,7 +94,7 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
     })
     const body = jsYaml.safeLoad(yaml)
     // Also need to refresh the list of pods
-    podActions.invalidateCache()
+    // podsActions.invalidateCache()
     const created = await qbert.createDeployment(clusterId, namespace, body)
     trackEvent('Create New Deployment', {
       clusterId,
@@ -112,6 +144,7 @@ export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
       id: pathStr('metadata.uid', created),
     })
     return {
+      // @ts-ignore
       ...created,
       clusterId,
       name: pathStr('metadata.name', created),

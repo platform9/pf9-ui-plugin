@@ -1,14 +1,17 @@
 import React, { forwardRef, useEffect, useMemo } from 'react'
-import { compose, projectAs } from 'utils/fp'
+import { compose, emptyObj, projectAs } from 'utils/fp'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
-import { clusterActions } from '../../infrastructure/clusters/actions'
+import { listClusters } from '../../infrastructure/clusters/actions'
 import { ValidatedFormProps } from 'core/components/validatedForm/model'
 import { importedClusterActions } from '../../infrastructure/importedClusters/actions'
 import Progress from 'core/components/progress/Progress'
+import useListAction from 'core/hooks/useListAction'
+import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import { useAppSelector } from 'app/store'
 
 const useStyles = makeStyles((theme: Theme) => ({
   clustersMultiSelect: {
@@ -23,10 +26,13 @@ interface Props extends ValidatedFormProps {
   setNumClusterOptions?: (num: number) => void
 }
 
+const selector = makeParamsClustersSelector()
+
 const ClustersMultiSelect: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
   ({ wizardContext, onChange, setNumClusterOptions, ...rest }, ref) => {
     const classes = useStyles()
-    const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+    const [loadingClusters] = useListAction(listClusters)
+    const clusters = useAppSelector((state) => selector(state, emptyObj))
     const [importedClusters, loadingImportedClusters] = useDataLoader(importedClusterActions.list)
 
     const options = useMemo(() => {
@@ -52,9 +58,9 @@ const ClustersMultiSelect: React.ComponentType<Props> = forwardRef<HTMLElement, 
           values={wizardContext.clusters}
           onChange={onChange}
           maxHeight={500}
-          showSelectDeselectAllOption={true}
+          showSelectDeselectAllOption
           {...rest}
-        ></MultiSelect>
+        />
       </Progress>
     )
   },

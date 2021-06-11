@@ -1,21 +1,24 @@
-import React, { useCallback, useState } from 'react'
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
-import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
-import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
-import Theme from 'core/themes/model'
-import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
-import Button from 'core/elements/button'
-import useReactRouter from 'use-react-router'
-import CodeBlock from 'core/components/CodeBlock'
 import { onboardingAccessSetup, onboardingMonitoringSetup } from 'app/constants'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from '../infrastructure/clusters/actions'
-import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
-import { IClusterSelector } from '../infrastructure/clusters/model'
-import { routes } from 'core/utils/routes'
-import { kubectlInstallationDocumentationLink } from 'k8s/links'
+import { useAppSelector } from 'app/store'
+import CodeBlock from 'core/components/CodeBlock'
+import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import ExternalLink from 'core/components/ExternalLink'
+import Button from 'core/elements/button'
+import Text from 'core/elements/text'
+import useListAction from 'core/hooks/useListAction'
+import Theme from 'core/themes/model'
+import { routes } from 'core/utils/routes'
+import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
+import { kubectlInstallationDocumentationLink } from 'k8s/links'
+import React, { useCallback, useState } from 'react'
+import useReactRouter from 'use-react-router'
+import { emptyObj } from 'utils/fp'
+import { listClusters } from '../infrastructure/clusters/actions'
+import { IClusterSelector } from '../infrastructure/clusters/model'
+import { makeParamsClustersSelector } from '../infrastructure/clusters/selectors'
+import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -56,11 +59,15 @@ enum Panels {
   Monitoring = 2,
 }
 
+const selector = makeParamsClustersSelector()
+
 const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   const { history } = useReactRouter()
   const classes = useStyles({})
 
-  const [clusters, loading] = useDataLoader(clusterActions.list)
+  const [loading] = useListAction(listClusters)
+  const clusters = useAppSelector((state) => selector(state, emptyObj))
+
   const hasMonitoring = clustersHaveMonitoring(clusters)
   const hasAccess = clustersHaveAccess()
   const [activePanels, setActivePanels] = useState(new Set([initialPanel]))

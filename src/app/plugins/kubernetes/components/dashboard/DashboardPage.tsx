@@ -6,8 +6,8 @@ import { makeStyles } from '@material-ui/styles'
 // Constants
 import { allKey } from 'app/constants'
 // Actions
-import { deploymentActions, podActions, serviceActions } from '../pods/actions'
-import { clusterActions } from '../infrastructure/clusters/actions'
+import { deploymentActions, serviceActions, listPods } from '../pods/actions'
+import { listClusters } from '../infrastructure/clusters/actions'
 import { loadNodes } from '../infrastructure/nodes/actions'
 import { mngmUserActions } from 'account/components/userManagement/users/actions'
 import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
@@ -26,6 +26,7 @@ import {
 } from '../infrastructure/clusters/ClusterStatusUtils'
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import { ImportedClusterSelector } from '../infrastructure/importedClusters/model'
+import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -80,7 +81,8 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
   addRoute: routes.cluster.add.path(),
   title: 'Clusters Total',
   icon: 'project-diagram',
-  dataLoader: [clusterActions.list, {}],
+  listAction: listClusters,
+  dataSelector: makeParamsClustersSelector(),
   quantityFn: (clusters) => ({
     quantity: clusters.length,
     pieData: [
@@ -263,7 +265,7 @@ const reports = [
     addRoute: routes.pods.add.path(),
     title: 'Pods',
     icon: 'cubes',
-    dataLoader: [podActions.list, { clusterId: allKey }],
+    dataLoader: [listPods, { clusterId: allKey }],
     quantityFn: (pods) => ({
       quantity: pods.length,
       pieData: [

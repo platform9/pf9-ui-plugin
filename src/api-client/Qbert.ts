@@ -310,9 +310,9 @@ class Qbert extends ApiService {
     })
   }
 
-  getK8sSupportedRoleVersions = async (body) => {
+  getK8sSupportedRoleVersions = async () => {
     const url = '/clusters/supportedRoleVersions'
-    const supportedRoleVersions = await this.client.basicGet<SupportedRoleVersions>({
+    const { roles: supportedRoleVersions } = await this.client.basicGet<SupportedRoleVersions>({
       url,
       version: 'v4',
       options: {

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import Text from 'core/elements/text'
 import { Dialog, DialogContent, DialogActions, Button, DialogTitle } from '@material-ui/core'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { deleteCluster } from 'k8s/components/infrastructure/clusters/actions'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -20,7 +20,7 @@ interface IClusterDeleteDialog {
 const stopPropagation = (e) => e.stopPropagation()
 const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], onClose }) => {
   const [showDeauthNodeDialog, setShowDeauthNodeDialog] = useState(false)
-  const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, (success) => {
+  const [runDeleteAction, deletingCluster] = useDataUpdater(deleteCluster, (success) => {
     trackEvent('Delete Cluster', {
       cluster_uuid: cluster.uuid,
       cluster_name: cluster.name,
@@ -33,7 +33,7 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
   })
   const title = `Permanently delete cluster "${cluster?.name}"?`
   const handleDelete = useCallback(async () => {
-    await deleteCluster(cluster)
+    await runDeleteAction(cluster)
   }, [cluster])
 
   if (showDeauthNodeDialog) return <DeauthNodeDialog nodeList={cluster.nodes} onClose={onClose} />

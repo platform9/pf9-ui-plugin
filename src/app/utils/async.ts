@@ -1,8 +1,9 @@
-import { curry, flatten, mapObjIndexed, fromPairs, head } from 'ramda'
+import { curry, flatten, fromPairs, mapObjIndexed } from 'ramda'
 import { ensureArray } from 'utils/fp'
 
 export const pluckAsync = curry((key, promise) => promise.then((obj) => obj[key]))
 
+// eslint-disable-next-line @typescript-eslint/require-await
 export const pipeAsync = (...fns) => async (params) =>
   fns.reduce(async (prevPromise, nextCb) => nextCb(await prevPromise), params)
 
@@ -40,11 +41,13 @@ export const tryCatchAsync = curry(async (tryer, catcher, input) => {
  * })
  */
 export const propsAsync = async (objPromises) => {
+  // TODO: Fix Typings
   const promises = Object.values(
     mapObjIndexed(async (promise, key) => [key, await promise], objPromises),
   )
   const results = await Promise.all(promises)
 
+  // @ts-ignore
   return fromPairs(results)
 }
 
@@ -56,7 +59,10 @@ export const propsAsync = async (objPromises) => {
  * @param [errorHandler] Function that can be used to handle the rejected promises
  * @returns {Promise<[*,...]>}
  */
-export const someAsync = async (promises, errorHandler = (err) => console.warn(err)) => {
+export const someAsync = async <T>(
+  promises: Array<Promise<T>>,
+  errorHandler = (err) => console.warn(err),
+): Promise<T[]> => {
   const results = await Promise.all(
     promises.map(async (promise) => {
       try {
@@ -67,8 +73,10 @@ export const someAsync = async (promises, errorHandler = (err) => console.warn(e
       }
     }),
   )
-  // Just return the successful results
-  return results.filter(Array.isArray).map(head)
+  // Return only the successful results
+  return results.filter(Array.isArray).map(([firstItem]) => firstItem)
 }
 
-export const sleep = async (ms) => await new Promise((resolve) => setTimeout(resolve, ms))
+export const sleep = async (ms) => {
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}

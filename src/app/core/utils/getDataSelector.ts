@@ -14,15 +14,16 @@ import {
 import { arrayIfEmpty, arrayIfNil, emptyArr, ensureArray, isNilOrEmpty } from 'app/utils/fp'
 import { allKey } from 'app/constants'
 import { cacheStoreKey, dataStoreKey, paramsStoreKey } from 'core/caching/cacheReducers'
-import { GlobalState, IDataKeys } from 'k8s/datakeys.model'
+import { IDataKeys } from 'k8s/datakeys.model'
 import { createSelector } from 'reselect'
+import { RootState } from 'app/store'
 
 const getDataSelector = <T extends keyof IDataKeys>(
   dataKey: T,
   indexBy: string[] | string = [],
 ) => {
   return createSelector<
-    GlobalState,
+    RootState,
     Dictionary<any>,
     IDataKeys[T],
     Readonly<any[]>,

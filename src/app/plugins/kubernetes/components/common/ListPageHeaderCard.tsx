@@ -9,6 +9,10 @@ import DonutWidget from 'core/components/widgets/DonutWidget'
 import { PieDataEntry } from 'core/components/graphs/PieGraph'
 import Theme from 'core/themes/model'
 import { CircularProgress } from '@material-ui/core'
+import { RootState } from 'app/store'
+import ListAction from 'core/actions/ListAction'
+import { ParametricSelector } from 'reselect'
+import { Dictionary } from 'ramda'
 
 type PropertyFunction<T> = (p: any) => T
 export interface IStatusCardQuantity {
@@ -17,13 +21,17 @@ export interface IStatusCardQuantity {
   piePrimary?: string
   graphType?: 'usage' | 'donut'
 }
+
+type AnyDictionary = Dictionary<any>
 export interface StatusCardProps {
   entity: string
   route: string
   addRoute: string
   title: string
   icon: string | PropertyFunction<JSX.Element>
-  dataLoader: [Function, {}] // todo figure out typings here.
+  dataLoader?: [Function, {}] // todo figure out typings here.
+  listAction?: ListAction<AnyDictionary[], AnyDictionary> // todo fix typings here
+  dataSelector?: ParametricSelector<RootState, AnyDictionary, AnyDictionary[]> // todo fix typings here
   quantityFn(data: any[]): IStatusCardQuantity
   className?: string
 }

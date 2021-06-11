@@ -1,20 +1,23 @@
-import React, { useState } from 'react'
 import { Dialog, DialogActions } from '@material-ui/core'
-import Text from 'core/elements/text'
-import SubmitButton from 'core/components/buttons/SubmitButton'
-import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import Progress from 'core/components/progress/Progress'
-import TextField from 'core/components/validatedForm/TextField'
-import Button from 'core/elements/button'
 import { makeStyles } from '@material-ui/styles'
-import Theme from 'core/themes/model'
-import namespaceActions from '../namespaces/actions'
-import useDataUpdater from 'core/hooks/useDataUpdater'
-import { namespaceValidator } from 'core/utils/fieldValidators'
+import { useAppSelector } from 'app/store'
+import SubmitButton from 'core/components/buttons/SubmitButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from '../infrastructure/clusters/actions'
+import Progress from 'core/components/progress/Progress'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import TextField from 'core/components/validatedForm/TextField'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import Button from 'core/elements/button'
+import Text from 'core/elements/text'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import useListAction from 'core/hooks/useListAction'
+import Theme from 'core/themes/model'
+import { namespaceValidator } from 'core/utils/fieldValidators'
+import React, { useMemo, useState } from 'react'
+import { emptyObj } from 'utils/fp'
+import { listClusters } from '../infrastructure/clusters/actions'
+import { makeParamsClustersSelector } from '../infrastructure/clusters/selectors'
+import namespaceActions from '../namespaces/actions'
 
 const useStyles = makeStyles((theme: Theme) => ({
   dialogButtons: {
@@ -60,10 +63,16 @@ enum Status {
   Fail = 'fail',
 }
 
+const selector = makeParamsClustersSelector()
+
 const AddNewNamespaceDialog = ({ clusterId, onClose }) => {
   const classes = useStyles()
-  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  const cluster = clusters.find((cluster) => cluster.uuid === clusterId)
+  const [loadingClusters] = useListAction(listClusters)
+  const clusters = useAppSelector((state) => selector(state, emptyObj))
+  const cluster = useMemo(() => clusters.find((cluster) => cluster.uuid === clusterId), [
+    clusters,
+    clusterId,
+  ])
   const [createNamespace, creatingNamespace] = useDataUpdater(namespaceActions.create)
   const [showResult, setShowResult] = useState(false)
   const [status, setStatus] = useState<Status>(Status.Fail)

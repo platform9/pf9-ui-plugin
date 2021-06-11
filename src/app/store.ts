@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage' // defaults to localStorage for 
 import { createStore } from '@reduxjs/toolkit'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { cacheStoreKey } from 'core/caching/cacheReducers'
+import { TypedUseSelectorHook, useSelector } from 'react-redux'
 
 const persistConfig = {
   key: 'root',
@@ -18,5 +19,7 @@ const store = createStore(persistedReducer, composeWithDevTools())
 export const persistor = persistStore(store)
 
 export type RootState = ReturnType<typeof rootReducer>
+
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
 export default store
