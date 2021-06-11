@@ -12,7 +12,7 @@ const renderDeployedCapacity = (_, { deployedCapacity }) => (
 )
 const renderClusterLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={routes.cluster.detail.path({ id: uuid })}>{name}</SimpleLink>
   </div>
 )
 const ClustersCell = ({ clusters }) => {
@@ -38,7 +38,7 @@ const ClustersCell = ({ clusters }) => {
 }
 const renderNodeLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={routes.nodes.detail.path({ id: uuid })}>{name}</SimpleLink>
   </div>
 )
 const NodesCell = ({ nodes }) => {
@@ -64,7 +64,7 @@ const NodesCell = ({ nodes }) => {
 }
 const renderImportedClusterLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/imported/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={routes.cluster.imported.details.path({ id: uuid })}>{name}</SimpleLink>
   </div>
 )
 const ImportedClustersCell = ({ importedClusters }) => {

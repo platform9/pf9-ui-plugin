@@ -27,7 +27,6 @@ export const cloudProvidersSelector = createSelector(
     combinedHostsSelector,
   ],
   (cloudProviders, clusters, importedClusters, combinedHosts) => {
-    console.log(importedClusters, 'importedClusters')
     return pipe<GetCloudProvider[], GetCloudProvider[], ICloudProvidersSelector[]>(
       filter<GetCloudProvider>(({ type }) => type !== 'local'),
       map((cloudProvider) => {
