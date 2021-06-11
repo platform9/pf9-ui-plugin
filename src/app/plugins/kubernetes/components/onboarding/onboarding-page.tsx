@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { makeStyles } from '@material-ui/styles'
 import PrevButton from 'core/components/buttons/PrevButton'
 import DocumentMeta from 'core/components/DocumentMeta'
@@ -15,8 +13,6 @@ import { sort } from 'ramda'
 import React, { useCallback, useMemo, useState } from 'react'
 import { objSwitchCase } from 'utils/fp'
 import { compareVersions } from '../app-catalog/helpers'
-import AddCloudProviderCredentialStep from '../infrastructure/cloudProviders/AddCloudProviderCredentialStep'
-import { formTitle } from '../infrastructure/cloudProviders/AddCloudProviderPage'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import { loadSupportedRoleVersions } from '../infrastructure/clusters/actions'
 import AddCoworkerStep from './add-coworker-step'
@@ -27,6 +23,8 @@ import { routes } from 'core/utils/routes'
 import Button from 'core/elements/button'
 import ImportClusterPage from './import-cluster-page'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import AddCloudProviderPage from './add-cloud-provider-page'
+import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -75,6 +73,7 @@ const managementPlaneImagePath = '/ui/images/light-management-plane.svg'
 const OnboardingPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
+  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
   const [clusterChoice, setClusterChoice] = useState<ClusterChoice>('bareOs')
   const [clusterId, setClusterId] = useState(null)
   const [kubernetesVersions] = useDataLoader(loadSupportedRoleVersions)
@@ -194,16 +193,15 @@ const OnboardingPage = () => {
                   label="Configure Your Infrastructure"
                   keepContentMounted={false}
                 >
-                  <AddCloudProviderCredentialStep
+                  <AddCloudProviderPage
+                    cloudProviders={cloudProviders}
+                    loadingCloudProviders={loading}
                     wizardContext={wizardContext}
                     setWizardContext={setWizardContext}
                     onNext={onNext}
                     handleNext={handleNext}
-                    title={formTitle(wizardContext)}
                     setSubmitting={setSubmitting}
-                    header={
-                      clusterChoice === 'import' ? 'Select the Cloud to Import Clusters From' : null
-                    }
+                    clusterChoice={clusterChoice}
                   />
                   <PrevButton onClick={handleBack} />
                   <SubmitButton onClick={handleNext}>+ Save Cloud Provider</SubmitButton>

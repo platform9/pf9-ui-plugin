@@ -177,10 +177,6 @@ const AddCloudProviderCredentialStep = ({
     })(wizardContext.provider)
   }, [wizardContext.provider])
 
-  // This flag is created for the onboarding process. We only let them create an AWS cloud provider for now
-  // because we only support EKS clusters for now.
-  // When we can support importing clusters from Azure and Google cloud, we can remove this
-
   return (
     <>
       <Text className={classes.title} variant="body1">
