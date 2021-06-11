@@ -1,6 +1,7 @@
 import { INodesSelector } from '../nodes/model'
 import { IClusterSelector } from '../clusters/model'
 import { GetCloudProvider } from 'api-client/qbert.model'
+import { ImportedClusterSelector } from '../importedClusters/model'
 
 export enum CloudProviders {
   Aws = 'aws',
@@ -25,6 +26,7 @@ export interface ICloudProvidersSelector extends GetCloudProvider {
   deployedCapacity: DeployedCapacity
   clusters: IClusterSelector[]
   nodes: INodesSelector[]
+  importedClusters: ImportedClusterSelector[]
 }
 
 // export interface ICloudProvider {

@@ -12,7 +12,7 @@ const renderDeployedCapacity = (_, { deployedCapacity }) => (
 )
 const renderClusterLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={routes.cluster.detail.path({ id: uuid })}>{name}</SimpleLink>
   </div>
 )
 const ClustersCell = ({ clusters }) => {
@@ -38,7 +38,7 @@ const ClustersCell = ({ clusters }) => {
 }
 const renderNodeLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={routes.nodes.detail.path({ id: uuid })}>{name}</SimpleLink>
   </div>
 )
 const NodesCell = ({ nodes }) => {
@@ -62,7 +62,32 @@ const NodesCell = ({ nodes }) => {
     </div>
   )
 }
-
+const renderImportedClusterLink = ({ uuid, name }) => (
+  <div key={uuid}>
+    <SimpleLink src={routes.cluster.imported.details.path({ id: uuid })}>{name}</SimpleLink>
+  </div>
+)
+const ImportedClustersCell = ({ importedClusters }) => {
+  if (!importedClusters || !importedClusters.length) {
+    return <div>0</div>
+  }
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <div>
+      {expanded ? (
+        <div>
+          {importedClusters.map(renderImportedClusterLink)}
+          <SimpleLink onClick={() => setExpanded(!expanded)}>(less details)</SimpleLink>
+        </div>
+      ) : (
+        <div>
+          {importedClusters.length}&nbsp;
+          <SimpleLink onClick={() => setExpanded(!expanded)}>(more details)</SimpleLink>
+        </div>
+      )}
+    </div>
+  )
+}
 export const options = {
   addUrl: routes.cloudProviders.add.path(),
   addText: 'Add Cloud Provider',
@@ -76,6 +101,11 @@ export const options = {
       render: (clusters) => <ClustersCell clusters={clusters} />,
     },
     { id: 'nodes', label: 'Nodes', render: (nodes) => <NodesCell nodes={nodes} /> },
+    {
+      id: 'importedClusters',
+      label: 'Imported Clusters',
+      render: (importedClusters) => <ImportedClustersCell importedClusters={importedClusters} />,
+    },
     { id: 'uuid', label: 'Unique ID' },
   ],
   cacheKey: ActionDataKeys.CloudProviders,
