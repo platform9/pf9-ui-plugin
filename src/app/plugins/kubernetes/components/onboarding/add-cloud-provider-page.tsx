@@ -22,6 +22,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  header: {
+    marginTop: '0px',
+  },
 }))
 
 const AddCloudProviderPage = ({
@@ -97,6 +100,7 @@ const AddCloudProviderPage = ({
           header={
             clusterChoice === 'import' ? 'Select the Cloud to Import Clusters From' : undefined
           }
+          headerClass={classes.header}
         />
       )}
       {!loadingCloudProviders && showExistingCloudProviders && (

@@ -25,6 +25,7 @@ import ImportClusterPage from './import-cluster-page'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import AddCloudProviderPage from './add-cloud-provider-page'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
+import Progress from 'core/components/progress/Progress'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -193,18 +194,20 @@ const OnboardingPage = () => {
                   label="Configure Your Infrastructure"
                   keepContentMounted={false}
                 >
-                  <AddCloudProviderPage
-                    cloudProviders={cloudProviders}
-                    loadingCloudProviders={loading}
-                    wizardContext={wizardContext}
-                    setWizardContext={setWizardContext}
-                    onNext={onNext}
-                    handleNext={handleNext}
-                    setSubmitting={setSubmitting}
-                    clusterChoice={clusterChoice}
-                  />
-                  <PrevButton onClick={handleBack} />
-                  <SubmitButton onClick={handleNext}>+ Save Cloud Provider</SubmitButton>
+                  <Progress loading={loading}>
+                    <AddCloudProviderPage
+                      cloudProviders={cloudProviders}
+                      loadingCloudProviders={loading}
+                      wizardContext={wizardContext}
+                      setWizardContext={setWizardContext}
+                      onNext={onNext}
+                      handleNext={handleNext}
+                      setSubmitting={setSubmitting}
+                      clusterChoice={clusterChoice}
+                    />
+                    <PrevButton onClick={handleBack} />
+                    <SubmitButton onClick={handleNext}>+ Save Cloud Provider</SubmitButton>
+                  </Progress>
                 </WizardStep>
                 <WizardStep stepId="step3" label="Build Your Cluster" keepContentMounted={false}>
                   <BuildClusterStep

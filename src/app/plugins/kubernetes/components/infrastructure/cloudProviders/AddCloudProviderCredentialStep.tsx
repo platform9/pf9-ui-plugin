@@ -13,6 +13,7 @@ import Text from 'core/elements/text'
 import { CloudProviders, CloudProvidersFriendlyName } from './model'
 import TestsDialog, { TestStatus } from './tests-dialog'
 import { clone } from 'ramda'
+import clsx from 'clsx'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -37,6 +38,7 @@ interface Props {
   title: string
   setSubmitting: any
   header?: string
+  headerClass?: any
 }
 
 const links = {
@@ -90,6 +92,7 @@ const AddCloudProviderCredentialStep = ({
   title,
   setSubmitting,
   header = 'Select a Cloud Provider Type:',
+  headerClass = {},
 }: Props) => {
   const classes = useStyles({})
   const [errorMessage, setErrorMessage] = useState('')
@@ -179,7 +182,7 @@ const AddCloudProviderCredentialStep = ({
 
   return (
     <>
-      <Text className={classes.title} variant="body1">
+      <Text className={clsx(classes.title, headerClass)} variant="body1">
         {header}
       </Text>
       <div className={classes.cloudProviderCards}>
