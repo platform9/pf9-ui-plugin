@@ -30,7 +30,6 @@ const CreateCloudClusterPage = ({
     if (!success) return
     updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true }) // Should we only update the user default if it's a success? What if it's not a success?
     setClusterId(cluster.uuid)
-    console.log('user pref updated and cluster uuid', cluster.uuid)
   }
   const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)
@@ -66,7 +65,7 @@ const CreateCloudClusterPage = ({
       name: wizardContext.clusterName,
       location: wizardContext.region, // We need to add this in for Azure. Azure takes in a location field
     }
-    console.log('data', data)
+
     await createCluster(data)
     setSubmitting(false)
     return true

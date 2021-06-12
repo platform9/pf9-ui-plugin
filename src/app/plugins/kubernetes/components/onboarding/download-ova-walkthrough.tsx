@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Text from 'core/elements/text'
 import SimpleLink from 'core/components/SimpleLink'
 import SubmitButton from 'core/components/SubmitButton'
@@ -38,40 +38,43 @@ const useStyles = makeStyles((theme: Theme) => ({
 const downloadLink =
   'https://pmkft-assets.s3-us-west-1.amazonaws.com/OVA_Images/Platform9_Ubuntu_20.04.ova'
 
+const StepTwo = (
+  <Text>Import and then start the OVA using VirtualBox, VMware Workstation or vSphere</Text>
+)
+
+const StepThree = (
+  <>
+    <Text>Login using admin/admin and run</Text>
+
+    <CopyToClipboard copyText={runPf9CliCommand}>
+      <CodeBlock>{<Text variant="body2">{runPf9CliCommand}</Text>}</CodeBlock>
+    </CopyToClipboard>
+  </>
+)
+
+const StepFour = <Text>Return to Create Cluster to use the new node</Text>
+
 const DownloadOvaWalkthrough = () => {
   const classes = useStyles()
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
 
-  const StepOne = (
-    <>
-      <Text>Download the OVA</Text>
-      <SimpleLink src={downloadLink}>
-        <SubmitButton className={classes.downloadButton}>
-          Download
-          <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
-            download
-          </FontAwesomeIcon>
-        </SubmitButton>
-      </SimpleLink>
-    </>
+  const StepOne = useMemo(
+    () => (
+      <>
+        <Text>Download the OVA</Text>
+        <SimpleLink src={downloadLink}>
+          <SubmitButton className={classes.downloadButton}>
+            Download
+            <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
+              download
+            </FontAwesomeIcon>
+          </SubmitButton>
+        </SimpleLink>
+      </>
+    ),
+    [],
   )
-
-  const StepTwo = (
-    <Text>Import and then start the OVA using VirtualBox, VMware Workstation or vSphere</Text>
-  )
-
-  const StepThree = (
-    <>
-      <Text>Login using admin/admin and run</Text>
-
-      <CopyToClipboard copyText={runPf9CliCommand}>
-        <CodeBlock>{<Text variant="body2">{runPf9CliCommand}</Text>}</CodeBlock>
-      </CopyToClipboard>
-    </>
-  )
-
-  const StepFour = <Text>Return to Create Cluster to use the new node</Text>
 
   const downloadSteps = [StepOne, StepTwo, StepThree, StepFour]
 

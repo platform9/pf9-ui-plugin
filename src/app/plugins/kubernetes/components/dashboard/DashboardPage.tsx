@@ -355,7 +355,8 @@ const DashboardPage = () => {
     () =>
       isDecco(features) &&
       customerTier === CustomerTiers.Freedom &&
-      ((prefs.isOnboarded === undefined && clusters?.length === 0) || !prefs.isOnboarded),
+      ((prefs.isOnboarded === undefined && clusters?.length === 0) ||
+        (prefs.isOnboarded !== undefined && prefs.isOnboarded === false)),
     [features, customerTier, prefs.isOnboarded, clusters],
   )
 
@@ -363,8 +364,8 @@ const DashboardPage = () => {
     if (prefs.isOnboarded !== undefined) {
       return
     }
-    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: clusters.length > 0 })
-  }, [username])
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: !showOnboarding })
+  }, [username, showOnboarding])
 
   return (
     <>

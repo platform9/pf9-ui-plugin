@@ -79,7 +79,6 @@ const AddCloudProviderPage = ({
   }, [wizardContext])
 
   useEffect(() => {
-    console.log('showExisting', showExistingCloudProviders)
     if (showExistingCloudProviders) {
       onNext(submitStep)
     }

@@ -74,7 +74,6 @@ const CreateBareOsClusterPage = ({
     if (!success) return
     updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true }) // Should we only update the user default if it's a success? What if it's not a success?
     setClusterId(cluster.uuid)
-    console.log('user pref updated and cluster uuid', cluster.uuid)
   }
   const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)

@@ -23,10 +23,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    // border: `2px solid ${theme.palette.text.primary}`,
     backgroundColor: theme.palette.primary.main,
     borderRadius: '100%',
-    // color: theme.palette.text.primary,
   },
 }))
 

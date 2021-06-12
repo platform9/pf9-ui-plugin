@@ -90,15 +90,6 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
       finalSelectedClusters: finalSelectedClusters.map((cluster) => cluster.id),
     }
 
-    console.log('wizardContext', wizardContext)
-    console.log('imported clusters metadata', metadata)
-    console.log('body', {
-      cloudProviderId: wizardContext.cloudProviderId,
-      clusters: finalSelectedClusters,
-      stack: clusterType,
-      detailsKey: detailsKey,
-    })
-
     Bugsnag.leaveBreadcrumb(`Attempting to import ${clusterType} clusters`, metadata)
     trackEvent(`Import ${clusterType} Clusters`, metadata)
 
