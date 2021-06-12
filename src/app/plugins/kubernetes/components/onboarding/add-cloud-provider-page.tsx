@@ -86,7 +86,7 @@ const AddCloudProviderPage = ({
 
   return (
     <>
-      {!showExistingCloudProviders && (
+      {!loadingCloudProviders && !showExistingCloudProviders && (
         <AddCloudProviderCredentialStep
           wizardContext={wizardContext}
           setWizardContext={setWizardContext}
@@ -99,7 +99,7 @@ const AddCloudProviderPage = ({
           }
         />
       )}
-      {showExistingCloudProviders && (
+      {!loadingCloudProviders && showExistingCloudProviders && (
         <>
           <FormFieldCard
             className={classes.form}
