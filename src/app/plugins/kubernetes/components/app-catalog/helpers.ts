@@ -44,7 +44,7 @@ export const compareVersions = (versionA: string, versionB: string) => {
   const a = versionA.split('.')
   const b = versionB.split('.')
 
-  for (var i = 0; i < Math.max(a.length, b.length); i++) {
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
     if (a[i] === undefined) {
       a[i] = '0'
     }
@@ -52,7 +52,7 @@ export const compareVersions = (versionA: string, versionB: string) => {
       b[i] = '0'
     }
 
-    for (var i = 0; i < a.length; i++) {
+    for (let i = 0; i < a.length; i++) {
       const intA = parseInt(a[i])
       const intB = parseInt(b[i])
 
