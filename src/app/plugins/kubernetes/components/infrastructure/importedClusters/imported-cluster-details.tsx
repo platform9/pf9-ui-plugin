@@ -2,30 +2,61 @@ import React, { useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { importedClusterActions } from './actions'
-
+import PageContainer from 'core/components/pageContainer/PageContainer'
+import { routes } from 'core/utils/routes'
+import { IUseDataLoader } from '../nodes/model'
+import { ImportedClusterSelector } from './model'
 import { makeStyles } from '@material-ui/styles'
 
-import PageContainer from 'core/components/pageContainer/PageContainer'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import SimpleLink from 'core/components/SimpleLink'
 
-import { routes } from 'core/utils/routes'
-
-import ClusterNodeGroups from './node-groups'
-import ClusterNodes from './nodes'
-import ClusterDetails from './details'
+import EksClusterNodeGroups from './node-groups'
+import AgentPools from './agent-pools'
+import AksClusterNodes from './aks-nodes'
+import EksClusterNodes from './nodes'
+import AksClusterDetails from './aks-details'
+import EksClusterDetails from './details'
 import HeaderCard from './header-card'
 
 import Theme from 'core/themes/model'
-import { IUseDataLoader } from '../nodes/model'
-import { ImportedClusterSelector } from './model'
 import ClusterDeployedApps from '../clusters/cluster-deployed-apps'
 import ClusterAlarms from '../clusters/cluster-alarms'
+import { ClusterCloudPlatforms } from 'app/constants'
+
+const useStyles = makeStyles<Theme>((theme) => ({
+  backLink: {
+    position: 'absolute',
+    right: 0,
+    top: 8,
+    zIndex: 100,
+    ...theme.typography.caption2,
+  },
+  deployedAppsContainer: {
+    paddingTop: theme.spacing(2),
+    maxWidth: 1234, // same maxWidth as tabContainer in ClusterDetails page
+  },
+}))
+
+const clusterNodeGroupsComponents = {
+  [ClusterCloudPlatforms.AKS]: AgentPools,
+  [ClusterCloudPlatforms.EKS]: EksClusterNodeGroups,
+}
+
+const clusterNodesComponents = {
+  [ClusterCloudPlatforms.AKS]: AksClusterNodes,
+  [ClusterCloudPlatforms.EKS]: EksClusterNodes,
+}
+
+const clusterDetailsComponents = {
+  [ClusterCloudPlatforms.AKS]: AksClusterDetails,
+  [ClusterCloudPlatforms.EKS]: EksClusterDetails,
+}
 
 function ImportedClusterDetails() {
-  const { match, history } = useReactRouter()
   const classes = useStyles()
+  const { match, history } = useReactRouter()
   const [clusters, loading, reload]: IUseDataLoader<ImportedClusterSelector> = useDataLoader(
     importedClusterActions.list,
   ) as any
@@ -41,6 +72,11 @@ function ImportedClusterDetails() {
   }
 
   const clusterHeader = <HeaderCard title={cluster?.name} cluster={cluster} />
+
+  const ClusterNodeGroups = clusterNodeGroupsComponents[cluster.providerType]
+  const ClusterNodes = clusterNodesComponents[cluster.providerType]
+  const ClusterDetails = clusterDetailsComponents[cluster.providerType]
+
   return (
     <PageContainer>
       {/* <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 30} /> */}
@@ -79,17 +115,3 @@ function ImportedClusterDetails() {
 }
 
 export default ImportedClusterDetails
-
-const useStyles = makeStyles<Theme>((theme) => ({
-  backLink: {
-    position: 'absolute',
-    right: 0,
-    top: 8,
-    zIndex: 100,
-    ...theme.typography.caption2,
-  },
-  deployedAppsContainer: {
-    paddingTop: theme.spacing(2),
-    maxWidth: 1234, // same maxWidth as tabContainer in ClusterDetails page
-  },
-}))

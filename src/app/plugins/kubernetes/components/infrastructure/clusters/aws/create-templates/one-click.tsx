@@ -49,6 +49,7 @@ export const initialContext = {
   privileged: true,
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
   azs: [],
+  domainId: '',
 }
 
 const columns = [
