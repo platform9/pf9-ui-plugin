@@ -34,13 +34,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 const cloudClusterMap = {
   [CloudProviders.Aws]: ClusterCloudPlatforms.EKS,
   [CloudProviders.Azure]: ClusterCloudPlatforms.AKS,
-  [CloudProviders.Google]: ClusterCloudPlatforms.GKE,
+  [CloudProviders.Gcp]: ClusterCloudPlatforms.GKE,
 }
 
 const detailsKeyMap = {
   [CloudProviders.Aws]: 'region',
   [CloudProviders.Azure]: 'resourceGroup',
-  [CloudProviders.Google]: 'zone',
+  [CloudProviders.Gcp]: 'zone',
 }
 
 const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitting }) => {

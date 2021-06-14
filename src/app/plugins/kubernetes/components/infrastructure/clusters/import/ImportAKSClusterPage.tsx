@@ -183,6 +183,7 @@ const ImportAKSClusterPage = () => {
                     selectedClusters={wizardContext.selectedClusters}
                     onChange={(value) => setWizardContext({ finalSelectedClusters: value })}
                     value={wizardContext.finalSelectedClusters}
+                    stack={ClusterCloudPlatforms.AKS}
                     required
                   />
                 </FormFieldCard>

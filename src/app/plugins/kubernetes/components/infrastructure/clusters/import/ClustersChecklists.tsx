@@ -13,12 +13,27 @@ import { ClusterCloudPlatforms } from 'app/constants'
 const renderImported = (_, { pf9Registered }) =>
   pf9Registered ? <Text variant="caption2">Imported</Text> : null
 
-const columns = [
-  { id: 'name', label: 'Name' },
-  { id: 'id', label: 'ID' },
-  { id: 'vpc', label: 'VPC' },
-  { id: 'imported', label: '', render: renderImported },
-]
+const columns = {
+  [ClusterCloudPlatforms.EKS]: [
+    { id: 'name', label: 'Name' },
+    { id: 'id', label: 'ID' },
+    { id: 'vpc', label: 'VPC' },
+    { id: 'imported', label: '', render: renderImported },
+  ],
+  [ClusterCloudPlatforms.AKS]: [
+    { id: 'name', label: 'Name' },
+    { id: 'id', label: 'ID' },
+    { id: 'vpc', label: 'VPC' },
+    { id: 'imported', label: '', render: renderImported },
+  ],
+  [ClusterCloudPlatforms.GKE]: [
+    { id: 'name', label: 'Name' },
+    { id: 'zone', label: 'Zone' },
+    { id: 'id', label: 'ID' },
+    { id: 'vpc', label: 'VPC' },
+    { id: 'imported', label: '', render: renderImported },
+  ],
+}
 
 const useStyles = makeStyles<Theme>((theme) => ({
   listContainer: {
@@ -49,7 +64,7 @@ const clusterIsNotImported = (cluster) => !cluster.pf9Registered
 interface Props {
   cloudProviderId: string
   selectedRegions: string[]
-  stack: string
+  stack: ClusterCloudPlatforms
   onChange: any
   value: any
   className: string
@@ -127,6 +142,27 @@ const ClustersChecklists = ({
           getClusters()
         }
       },
+      gke: ({ allRegions, cloudProviderId, stack }) => {
+        if (allClusters.length) {
+          return
+        }
+        setLoadingClusters(true)
+        const getClusters = async () => {
+          try {
+            const externalClusters = await discoverExternalClusters({
+              provider: stack,
+              cloudProviderId: cloudProviderId,
+            })
+            setAllClusters(externalClusters)
+            if (onClustersLoad) {
+              onClustersLoad(externalClusters)
+            }
+          } finally {
+            setLoadingClusters(false)
+          }
+        }
+        getClusters()
+      },
     }
   }, [allClusters])
 
@@ -144,7 +180,7 @@ const ClustersChecklists = ({
     }
     if (stack === ClusterCloudPlatforms.EKS) {
       return indexBy(prop('region'), allClusters)
-    } else if (stack === ClusterCloudPlatforms.AKS) {
+    } else if ([ClusterCloudPlatforms.AKS, ClusterCloudPlatforms.GKE].includes(stack)) {
       return indexBy(prop('location'), allClusters)
     }
     return {}
@@ -196,7 +232,7 @@ const ClustersChecklists = ({
                 id={region}
                 data={regionClusters}
                 loading={false}
-                columns={columns}
+                columns={columns[stack]}
                 onChange={(value) => onChange(value, region)}
                 value={value[region]}
                 checkboxCond={clusterIsNotImported}

@@ -55,6 +55,7 @@ import VirtualMachinesPage from './components/virtual-machines'
 import VirtualMachineDetailPage from './components/virtual-machines/details'
 import AddVirtualMachinePage from './components/virtual-machines/add'
 import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
+import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
 
 import { isDecco } from 'core/utils/helpers'
 
@@ -127,6 +128,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/clusters/import/aks', exact: true },
       requiredRoles: 'admin',
       component: ImportAKSClusterPage,
+    },
+    {
+      name: 'Import GKE Cluster',
+      link: { path: '/infrastructure/clusters/import/gke', exact: true },
+      requiredRoles: 'admin',
+      component: ImportGKEClusterPage,
     },
     {
       name: 'Imported Cluster Details',

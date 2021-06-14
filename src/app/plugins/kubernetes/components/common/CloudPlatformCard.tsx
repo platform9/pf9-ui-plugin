@@ -45,7 +45,7 @@ const icons = {
   [ClusterCloudPlatforms.EKS]: `${rootPath}/cloudaws-default${iconSize}.png`,
   [ClusterCloudPlatforms.AKS]: `${rootPath}/cloudazure-default${iconSize}.png`,
   // Google icons different size than the others
-  [ClusterCloudPlatforms.GKE]: `${rootPath}/cloudgoogle-default${iconSizes.medium}.png`,
+  [ClusterCloudPlatforms.GKE]: `${rootPath}/cloudgoogle-default${iconSize}.png`,
 }
 
 const labels = {
