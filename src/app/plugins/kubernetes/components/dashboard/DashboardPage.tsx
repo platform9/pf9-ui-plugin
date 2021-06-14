@@ -202,6 +202,11 @@ export const cloudStatusCardProps: IStatusCardWithFilterProps = {
         value: clouds.filter((cloud) => cloud.type === CloudProviders.Azure).length,
         color: 'azure.main',
       },
+      {
+        name: 'Google',
+        value: clouds.filter((cloud) => cloud.type === CloudProviders.Gcp).length,
+        color: 'googleYellow.main',
+      },
     ],
     graphType: 'donut',
   }),

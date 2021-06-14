@@ -15,6 +15,7 @@ import { cloudVerificationCalloutFields, renderVerificationCalloutFields } from 
 import { routes } from 'core/utils/routes'
 import Button from 'core/elements/button'
 import { UserPreferences } from 'app/constants'
+import GoogleCloudProviderVerification from './GoogleCloudProviderVerification'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -58,6 +59,7 @@ const AddCloudProviderVerificationStep = ({ history, wizardContext, setWizardCon
   const ActiveForm = objSwitchCaseAny({
     [CloudProviders.Aws]: AwsCloudProviderVerification,
     [CloudProviders.Azure]: AzureCloudProviderVerification,
+    [CloudProviders.Gcp]: GoogleCloudProviderVerification,
   })(wizardContext.provider)
 
   return (

@@ -25,6 +25,8 @@ const formTitle = ({ provider }) => {
     return 'Create AWS Cloud Provider'
   } else if (provider === CloudProviders.Azure) {
     return 'Create Azure Cloud Provider'
+  } else if (provider === CloudProviders.Gcp) {
+    return 'Create Google Cloud Provider'
   }
   return 'Create Cloud Provider'
 }

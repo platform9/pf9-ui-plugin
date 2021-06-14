@@ -26,7 +26,7 @@ export const pmkDocumentationLink = `${k8sBaseUrl}/introduction/overview`
 export const requestFormLink = `${pf9SupportBaseUrl}/hc/en-us/requests/new?ticket_form_id=360000924873`
 
 // Aws
-export const awsPrerequisitesLink = `${k8sBaseUrl}/aws/`
+export const awsPrerequisitesLink = `${k8sBaseUrl}/aws-prerequisites`
 export const awsNetworkingConfigurationsLink = `${k8sBaseUrl}/networking/configurations-supported-aws-cloud-provider/`
 export const awsAccessHelpLink = `${amazonDocBaseUrl}/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys`
 export const iamPolicyLink = `${pf9GitHubRepoUrl}/support-locker/master/pmk/aws-policy.json`
@@ -34,10 +34,13 @@ export const awsRoute53HelpLink = `${amazonDocBaseUrl}/Route53/latest/DeveloperG
 export const eksHelpLink = `${k8sBaseUrl}/eks-cluster-management`
 
 // Azure
-export const azurePrerequisitesLink = `${k8sBaseUrl}/public-cloud/azure-prerequisites`
+export const azurePrerequisitesLink = `${k8sBaseUrl}/azure-prerequisites`
 export const azureServicePrincipalPortalLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal`
 export const azureGetValuesForSigninginLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in`
 export const azureCreateANewApplicationSecretLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret`
+
+// Google
+export const googlePrerequisitesLink = `${k8sBaseUrl}/google-cloud-prerequisites`
 
 // BareOS
 export const gettingStartedLink = `${k8sBaseUrl}/quickstart/`

@@ -47,10 +47,12 @@ const HeaderCard: FC<{ title: string; cluster: ImportedClusterSelector }> = ({
   const providerType = cluster?.metadata?.labels?.provider
   const privateAccess =
     cluster?.spec?.[providerType]?.network?.vpc?.privateAccess ||
-    (providerType === 'aks' && cluster?.spec?.aks?.enablePrivateCluster)
+    (providerType === 'aks' && cluster?.spec?.aks?.enablePrivateCluster) ||
+    (providerType === 'gke' && cluster?.spec?.gke?.privateCluster)
   const publicAccess =
     cluster?.spec?.[providerType]?.network?.vpc?.publicAccess ||
-    (providerType === 'aks' && !cluster?.spec?.aks?.enablePrivateCluster)
+    (providerType === 'aks' && !cluster?.spec?.aks?.enablePrivateCluster) ||
+    (providerType === 'gke' && !cluster?.spec?.gke?.privateCluster)
   const isPublicPrivateVpc = privateAccess === true && publicAccess === true
   const isPrivateVpc = privateAccess === true && publicAccess === false
   const vpcText = `${publicAccess === true ? 'Public' : ''}${isPublicPrivateVpc ? ' + ' : ''}${

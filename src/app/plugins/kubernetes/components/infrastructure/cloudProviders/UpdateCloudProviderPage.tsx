@@ -23,6 +23,8 @@ import { routes } from 'core/utils/routes'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { cloudVerificationCalloutFields, renderVerificationCalloutFields } from './helpers'
 import { UserPreferences } from 'app/constants'
+import GoogleCloudProviderVerification from './GoogleCloudProviderVerification'
+import GoogleCloudProviderFields from './GoogleCloudProviderFields'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -93,6 +95,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderVerification,
       [CloudProviders.Azure]: AzureCloudProviderVerification,
+      [CloudProviders.Gcp]: GoogleCloudProviderVerification,
     })(initialValues.type)
   }, [initialValues.type])
 
@@ -100,6 +103,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderFields,
       [CloudProviders.Azure]: AzureCloudProviderFields,
+      [CloudProviders.Gcp]: GoogleCloudProviderFields,
     })(initialValues.type)
   }, [initialValues.type])
 

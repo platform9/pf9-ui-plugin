@@ -6,13 +6,10 @@ import { ImportedClusterSelector } from '../importedClusters/model'
 export enum CloudProviders {
   Aws = 'aws',
   Azure = 'azure',
-  Google = 'google',
+  Gcp = 'gke',
   BareOS = 'local',
   PhysicalMachine = 'physical',
   VirtualMachine = 'virtual',
-  EKS = 'eks',
-  AKS = 'aks',
-  GKE = 'gke',
 }
 
 export enum CloudProvidersFriendlyName {

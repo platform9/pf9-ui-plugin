@@ -6,13 +6,16 @@ import ExternalLink from 'core/components/ExternalLink'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import AwsCloudProviderFields from './AwsCloudProviderFields'
 import AzureCloudProviderFields from './AzureCloudProviderFields'
-import { awsPrerequisitesLink, azurePrerequisitesLink } from 'k8s/links'
+import GoogleCloudProviderFields from './GoogleCloudProviderFields'
+import { awsPrerequisitesLink, azurePrerequisitesLink, googlePrerequisitesLink } from 'k8s/links'
 import { objSwitchCase } from 'utils/fp'
 import { cloudProviderActions } from './actions'
 import Text from 'core/elements/text'
 import { CloudProviders, CloudProvidersFriendlyName } from './model'
 import TestsDialog, { TestStatus } from './tests-dialog'
 import { clone } from 'ramda'
+import useReactRouter from 'use-react-router'
+import { routes } from 'core/utils/routes'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -39,14 +42,19 @@ interface Props {
 }
 
 const links = {
-  aws: (
+  [CloudProviders.Aws]: (
     <ExternalLink url={awsPrerequisitesLink}>
       <Text variant="caption2">Need help setting up an AWS provider?</Text>
     </ExternalLink>
   ),
-  azure: (
+  [CloudProviders.Azure]: (
     <ExternalLink url={azurePrerequisitesLink}>
       <Text variant="caption2">Need help setting up an Azure provider?</Text>
+    </ExternalLink>
+  ),
+  [CloudProviders.Gcp]: (
+    <ExternalLink url={googlePrerequisitesLink}>
+      <Text variant="caption2">Need help setting up a Google provider?</Text>
     </ExternalLink>
   ),
 }
@@ -55,9 +63,12 @@ const testsForAws = [{ name: 'AWS account access', status: null }]
 
 const testsForAzure = [{ name: 'Azure account access', status: null }]
 
+const testsForGoogle = [{ name: 'Google account access', status: null }]
+
 const requiredTests = {
   [CloudProviders.Aws]: testsForAws,
   [CloudProviders.Azure]: testsForAzure,
+  [CloudProviders.Gcp]: testsForGoogle,
 }
 
 const formCpBody = (wizardContext) => {
@@ -77,6 +88,20 @@ const formCpBody = (wizardContext) => {
       tenantId: wizardContext.tenantId,
       subscriptionId: wizardContext.subscriptionId,
     }
+  } else if (wizardContext.provider === CloudProviders.Gcp) {
+    try {
+      const parseableString = wizardContext.json.replace(/[^\S\r\n]/g, ' ')
+      const json = JSON.parse(parseableString)
+      return {
+        ...json,
+        type: CloudProviders.Gcp,
+        name: wizardContext.name,
+        account_type: json.type,
+      }
+    } catch (err) {
+      console.error(err)
+      return {}
+    }
   }
   return {}
 }
@@ -95,6 +120,7 @@ const AddCloudProviderCredentialStep = ({
   const [showDialog, setShowDialog] = useState(false)
   const [verified, setVerified] = useState(false)
   const validatorRef = useRef(null)
+  const { history } = useReactRouter()
 
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
@@ -157,6 +183,10 @@ const AddCloudProviderCredentialStep = ({
 
   const handleClose = () => {
     if (verified) {
+      // GKE has nothing to verify, just return to cloud providers page
+      if (wizardContext.provider === CloudProviders.Gcp) {
+        history.push(routes.cloudProviders.list.path())
+      }
       // Move on to the next step
       onNext()
       handleNext()
@@ -172,6 +202,7 @@ const AddCloudProviderCredentialStep = ({
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderFields,
       [CloudProviders.Azure]: AzureCloudProviderFields,
+      [CloudProviders.Gcp]: GoogleCloudProviderFields,
     })(wizardContext.provider)
   }, [wizardContext.provider])
 
@@ -190,6 +221,11 @@ const AddCloudProviderCredentialStep = ({
           active={wizardContext.provider === CloudProviders.Azure}
           onClick={(value) => setWizardContext({ provider: value })}
           type={CloudProviders.Azure}
+        />
+        <CloudProviderCard
+          active={wizardContext.provider === CloudProviders.Gcp}
+          onClick={(value) => setWizardContext({ provider: value })}
+          type={CloudProviders.Gcp}
         />
       </div>
       {wizardContext.provider && (
