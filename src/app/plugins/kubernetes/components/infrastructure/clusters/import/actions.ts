@@ -21,7 +21,6 @@ export const discoverExternalClusters = async ({
   }
 
   const data = await qbert.discoverExternalClusters(body)
-  console.log(data, 'cluster data')
 
   const mappedData = data.map((region) => {
     const mappedClusters = region.clusters.map((cluster) => ({

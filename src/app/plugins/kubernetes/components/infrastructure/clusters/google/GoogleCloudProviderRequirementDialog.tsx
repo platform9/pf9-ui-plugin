@@ -36,7 +36,7 @@ const GoogleCloudProviderRequirementDialog = ({ showDialog, setShowDialog }) => 
   const { history } = useReactRouter()
 
   const handleCloudProviderNavigation = () =>
-    history.push(routes.cloudProviders.add.path({ type: CloudProviders.GKE }))
+    history.push(routes.cloudProviders.add.path({ type: CloudProviders.Gcp }))
 
   return (
     <Dialog maxWidth="md" open={showDialog}>

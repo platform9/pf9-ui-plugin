@@ -204,7 +204,7 @@ export const cloudStatusCardProps: IStatusCardWithFilterProps = {
       },
       {
         name: 'Google',
-        value: clouds.filter((cloud) => cloud.type === CloudProviders.GKE).length,
+        value: clouds.filter((cloud) => cloud.type === CloudProviders.Gcp).length,
         color: 'googleYellow.main',
       },
     ],

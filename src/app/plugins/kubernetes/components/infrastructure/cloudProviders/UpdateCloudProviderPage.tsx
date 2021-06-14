@@ -64,7 +64,6 @@ const formCpBody = (data) => {
 }
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
-  console.log(initialValues, 'initialValues')
   const classes = useStyles({})
 
   const updatedInitialValues: ICloudProvidersSelector = useMemo(() => {
@@ -83,7 +82,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderVerification,
       [CloudProviders.Azure]: AzureCloudProviderVerification,
-      [CloudProviders.GKE]: GoogleCloudProviderVerification,
+      [CloudProviders.Gcp]: GoogleCloudProviderVerification,
     })(initialValues.type)
   }, [initialValues.type])
 
@@ -91,7 +90,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderFields,
       [CloudProviders.Azure]: AzureCloudProviderFields,
-      [CloudProviders.GKE]: GoogleCloudProviderFields,
+      [CloudProviders.Gcp]: GoogleCloudProviderFields,
     })(initialValues.type)
   }, [initialValues.type])
 

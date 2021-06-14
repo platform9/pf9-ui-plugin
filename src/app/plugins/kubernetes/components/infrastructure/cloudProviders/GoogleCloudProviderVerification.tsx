@@ -37,7 +37,6 @@ const GoogleCloudProviderVerification = ({ wizardContext, setWizardContext }: Pr
     cloudProviderId: wizardContext.cloudProviderId,
   })
 
-  console.log(regions, 'regions')
   // Regions expected to return empty, not sure if it may change in the future
   if (!regions.length) {
     return null
@@ -64,7 +63,7 @@ const GoogleCloudProviderVerification = ({ wizardContext, setWizardContext }: Pr
           Platform9 deploys Kubernetes clusters into specified Google Regions.
         </Text>
         <CloudProviderRegionField
-          cloudProviderType={CloudProviders.GKE}
+          cloudProviderType={CloudProviders.Gcp}
           onChange={(value) => setWizardContext({ region: value })}
           values={wizardContext}
         />

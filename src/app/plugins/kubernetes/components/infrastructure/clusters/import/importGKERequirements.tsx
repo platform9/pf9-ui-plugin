@@ -55,7 +55,7 @@ const ImportGKERequirements = ({ onComplete, platform }) => {
 
   const handleClick = useCallback(() => {
     const hasGoogleProvider = !!cloudProviders.some(
-      (provider) => provider.type === CloudProviders.GKE,
+      (provider) => provider.type === CloudProviders.Gcp,
     )
     if (!hasGoogleProvider) {
       setShowDialog(true)

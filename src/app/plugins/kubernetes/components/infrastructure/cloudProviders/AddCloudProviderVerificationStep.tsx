@@ -40,7 +40,7 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
   const ActiveForm = objSwitchCaseAny({
     [CloudProviders.Aws]: AwsCloudProviderVerification,
     [CloudProviders.Azure]: AzureCloudProviderVerification,
-    [CloudProviders.GKE]: GoogleCloudProviderVerification,
+    [CloudProviders.Gcp]: GoogleCloudProviderVerification,
   })(wizardContext.provider)
 
   return (

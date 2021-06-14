@@ -52,7 +52,7 @@ const links = {
       <Text variant="caption2">Need help setting up an Azure provider?</Text>
     </ExternalLink>
   ),
-  [CloudProviders.GKE]: (
+  [CloudProviders.Gcp]: (
     <ExternalLink url={googlePrerequisitesLink}>
       <Text variant="caption2">Need help setting up a Google provider?</Text>
     </ExternalLink>
@@ -68,7 +68,7 @@ const testsForGoogle = [{ name: 'Google account access', status: null }]
 const requiredTests = {
   [CloudProviders.Aws]: testsForAws,
   [CloudProviders.Azure]: testsForAzure,
-  [CloudProviders.GKE]: testsForGoogle,
+  [CloudProviders.Gcp]: testsForGoogle,
 }
 
 const formCpBody = (wizardContext) => {
@@ -88,13 +88,13 @@ const formCpBody = (wizardContext) => {
       tenantId: wizardContext.tenantId,
       subscriptionId: wizardContext.subscriptionId,
     }
-  } else if (wizardContext.provider === CloudProviders.GKE) {
+  } else if (wizardContext.provider === CloudProviders.Gcp) {
     try {
       const parseableString = wizardContext.json.replace(/[^\S\r\n]/g, ' ')
       const json = JSON.parse(parseableString)
       return {
         ...json,
-        type: CloudProviders.GKE,
+        type: CloudProviders.Gcp,
         name: wizardContext.name,
         account_type: json.type,
       }
@@ -184,7 +184,7 @@ const AddCloudProviderCredentialStep = ({
   const handleClose = () => {
     if (verified) {
       // GKE has nothing to verify, just return to cloud providers page
-      if (wizardContext.provider === CloudProviders.GKE) {
+      if (wizardContext.provider === CloudProviders.Gcp) {
         history.push(routes.cloudProviders.list.path())
       }
       // Move on to the next step
@@ -202,7 +202,7 @@ const AddCloudProviderCredentialStep = ({
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderFields,
       [CloudProviders.Azure]: AzureCloudProviderFields,
-      [CloudProviders.GKE]: GoogleCloudProviderFields,
+      [CloudProviders.Gcp]: GoogleCloudProviderFields,
     })(wizardContext.provider)
   }, [wizardContext.provider])
 
@@ -223,9 +223,9 @@ const AddCloudProviderCredentialStep = ({
           type={CloudProviders.Azure}
         />
         <CloudProviderCard
-          active={wizardContext.provider === CloudProviders.GKE}
+          active={wizardContext.provider === CloudProviders.Gcp}
           onClick={(value) => setWizardContext({ provider: value })}
-          type={CloudProviders.GKE}
+          type={CloudProviders.Gcp}
         />
       </div>
       {wizardContext.provider && (

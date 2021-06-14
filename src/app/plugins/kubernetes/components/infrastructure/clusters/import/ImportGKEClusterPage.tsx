@@ -60,7 +60,7 @@ const ImportGKEClusterPage = () => {
   const { history } = useReactRouter()
   const [cloudProviders] = useDataLoader(cloudProviderActions.list)
   const [, , reloadImportedClusters] = useDataLoader(importedClusterActions.list)
-  const providerType = CloudProviders.GKE
+  const providerType = CloudProviders.Gcp
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (data) => {
@@ -118,7 +118,7 @@ const ImportGKEClusterPage = () => {
                     id="cloudProviderId"
                     label="GKE Provider"
                     info="Find GKE clusters to import from the selected cloud provider."
-                    type={CloudProviders.GKE}
+                    type={CloudProviders.Gcp}
                     onChange={(value) => setWizardContext({ cloudProviderId: value })}
                     value={wizardContext.cloudProviderId}
                     required
