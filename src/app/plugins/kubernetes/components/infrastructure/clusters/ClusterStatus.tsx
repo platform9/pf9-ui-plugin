@@ -8,6 +8,7 @@ import {
   isTransientStatus,
   getClusterHealthStatus,
   getClusterConnectionStatus,
+  getClusterApiServerHealthStatus,
 } from './ClusterStatusUtils'
 import { IClusterSelector, IClusterStatus } from './model'
 import { capitalizeString } from 'utils/misc'
@@ -82,7 +83,7 @@ interface Props {
   label?: string
   title: string | JSX.Element
   status?: IClusterStatus
-  variant: StatusVariant
+  variant?: StatusVariant
   iconStatus?: boolean
   className?: any
   inverseStatus?: boolean
@@ -144,12 +145,14 @@ interface IClusterStatusProps {
   variant?: StatusVariant
   message?: string
   iconStatus?: boolean
+  label?: string
 }
 
 export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   cluster,
   variant = 'table',
   message = undefined,
+  label = undefined,
   ...rest
 }) => {
   if (isTransientStatus(cluster.taskStatus)) {
@@ -168,7 +171,7 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
           {...rest}
         >
           {variant === 'header' ? (
-            fields.label
+            label || fields.label
           ) : (
             <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
           )}
@@ -214,6 +217,31 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
     >
       {variant === 'header' ? (
         fields.label
+      ) : (
+        <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
+      )}
+    </ClusterStatusSpan>
+  )
+}
+
+export const ClusterApiServerHealthStatus: FC<IClusterStatusProps> = ({
+  cluster,
+  variant = 'table',
+  message = undefined,
+  label = undefined,
+  ...rest
+}) => {
+  const fields = getClusterApiServerHealthStatus(cluster)
+
+  return (
+    <ClusterStatusSpan
+      title={fields.message}
+      status={fields.clusterStatus}
+      variant={variant}
+      {...rest}
+    >
+      {variant === 'header' ? (
+        label || fields.label
       ) : (
         <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
       )}

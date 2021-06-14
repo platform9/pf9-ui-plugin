@@ -1,4 +1,5 @@
 import {
+  ApiServerStatus,
   ConnectionStatus,
   HealthStatus,
   IClusterSelector,
@@ -357,6 +358,49 @@ export const getClusterConnectionStatus = (cluster: IClusterSelector) => {
   }
   const fields: ConnectionStatusFields & { nodesDetailsUrl: string } =
     connectionStatusFieldsTable[cluster.connectionStatus]
+  fields.nodesDetailsUrl = routes.cluster.nodeHealth.path({ id: cluster.uuid })
+  return fields
+}
+
+export const apiServerHealthStatusFields: {
+  [status in ApiServerStatus]: ConnectionStatusFields
+} = {
+  online: {
+    message: 'API server is responding for all nodes',
+    clusterStatus: 'ok',
+    label: 'Online',
+  },
+  degraded: {
+    message: 'API server is not responding for 1 or more nodes',
+    clusterStatus: 'unknown',
+    label: 'Degraded',
+  },
+  offline: {
+    message: 'API is not responding for any nodes',
+    clusterStatus: 'fail',
+    label: 'Offline',
+  },
+}
+
+export const getClusterApiServerHealthStatus = (cluster: IClusterSelector) => {
+  const nodes = cluster.nodes || []
+  let nodes_responding = 0
+  nodes.map((node) => {
+    if (node.api_responding) {
+      nodes_responding += 1
+    }
+  })
+
+  let fields = null
+
+  if (nodes_responding === 0) {
+    fields = apiServerHealthStatusFields.offline
+  } else if (nodes_responding === nodes.length) {
+    fields = apiServerHealthStatusFields.online
+  } else {
+    fields = apiServerHealthStatusFields.degraded
+  }
+
   fields.nodesDetailsUrl = routes.cluster.nodeHealth.path({ id: cluster.uuid })
   return fields
 }

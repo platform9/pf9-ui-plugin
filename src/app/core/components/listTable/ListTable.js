@@ -676,9 +676,7 @@ class ListTable extends PureComponent {
                   listTableParams={listTableParams}
                 />
               )}
-              {alternativeTableContent ? (
-                alternativeTableContent
-              ) : (
+              {alternativeTableContent || (
                 <div className={classes.tableWrapper}>{tableContent}</div>
               )}
               {!alternativeTableContent &&
