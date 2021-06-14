@@ -20,6 +20,8 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { pick } from 'ramda'
 import { routes } from 'core/utils/routes'
+import GoogleCloudProviderVerification from './GoogleCloudProviderVerification'
+import GoogleCloudProviderFields from './GoogleCloudProviderFields'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -80,6 +82,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderVerification,
       [CloudProviders.Azure]: AzureCloudProviderVerification,
+      [CloudProviders.Gcp]: GoogleCloudProviderVerification,
     })(initialValues.type)
   }, [initialValues.type])
 
@@ -87,6 +90,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderFields,
       [CloudProviders.Azure]: AzureCloudProviderFields,
+      [CloudProviders.Gcp]: GoogleCloudProviderFields,
     })(initialValues.type)
   }, [initialValues.type])
 

@@ -1,9 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import Wizard from 'core/components/wizard/Wizard'
-// import useDataUpdater from 'core/hooks/useDataUpdater'
 import useReactRouter from 'use-react-router'
-// import { clusterActions } from '../actions'
 import { routes } from 'core/utils/routes'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
@@ -25,8 +23,8 @@ import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
-import Bugsnag from '@bugsnag/js'
 import { ClusterCloudPlatforms } from 'app/constants'
+import Bugsnag from '@bugsnag/js'
 
 const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
@@ -50,37 +48,35 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const title = 'Import EKS Clusters'
+const title = 'Import GKE Clusters'
 const initialContext = {
   cloudProviderId: '',
   regions: [],
   selectedClusters: {},
   finalSelectedClusters: [],
 }
-const ImportEKSClusterPage = () => {
+const ImportGKEClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const [cloudProviders] = useDataLoader(cloudProviderActions.list)
   const [, , reloadImportedClusters] = useDataLoader(importedClusterActions.list)
-  const providerType = CloudProviders.Aws
+  const providerType = CloudProviders.Gcp
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (data) => {
     setSubmitting(true)
-    const metadata = {
+    Bugsnag.leaveBreadcrumb('Attempting to import GKE clusters', data)
+    trackEvent('Import GKE Clusters', {
       cloud_provider_id: data.cloudProviderId,
       regions: data.regions,
       clusters: data.finalSelectedClusters.map((cluster) => cluster.id),
-    }
-    Bugsnag.leaveBreadcrumb('Attempting to import EKS clusters', metadata)
-    trackEvent('Import EKS Clusters', metadata)
+    })
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,
-      stack: ClusterCloudPlatforms.EKS,
-      detailsKey: 'region',
+      stack: ClusterCloudPlatforms.GKE,
+      detailsKey: 'zone',
     })
-
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
     reloadImportedClusters(true)
@@ -108,7 +104,7 @@ const ImportEKSClusterPage = () => {
             fields={wizardContext}
             icon={<CloudProviderCard active type={providerType} />}
           >
-            <WizardStep stepId="selectProvider" label="Select AWS Provider">
+            <WizardStep stepId="selectProvider" label="Select GKE Provider">
               <ValidatedForm
                 classes={{ root: classes.validatedFormContainer }}
                 initialValues={wizardContext}
@@ -116,13 +112,13 @@ const ImportEKSClusterPage = () => {
                 triggerSubmit={onNext}
                 elevated={false}
               >
-                <FormFieldCard title="Select AWS Provider">
+                <FormFieldCard title="Select GKE Provider">
                   <PicklistField
                     DropdownComponent={CloudProviderPicklist}
                     id="cloudProviderId"
-                    label="AWS Provider"
-                    info="Find EKS clusters to import from the selected cloud provider."
-                    type={CloudProviders.Aws}
+                    label="GKE Provider"
+                    info="Find GKE clusters to import from the selected cloud provider."
+                    type={CloudProviders.Gcp}
                     onChange={(value) => setWizardContext({ cloudProviderId: value })}
                     value={wizardContext.cloudProviderId}
                     required
@@ -140,7 +136,7 @@ const ImportEKSClusterPage = () => {
               >
                 <FormFieldCard title="Select Regions">
                   <PresetField
-                    label="AWS Provider:"
+                    label="GKE Provider:"
                     value={getCloudProviderName(wizardContext.cloudProviderId)}
                   />
                 </FormFieldCard>
@@ -151,6 +147,7 @@ const ImportEKSClusterPage = () => {
                       onChange={(value) => toggleRegion(value, wizardContext, setWizardContext)}
                       value={wizardContext.regions}
                       className={classes.regions}
+                      clusters={wizardContext.clusterList}
                     />
                     <ClustersChecklists
                       cloudProviderId={wizardContext.cloudProviderId}
@@ -162,7 +159,8 @@ const ImportEKSClusterPage = () => {
                       value={wizardContext.selectedClusters}
                       selectedRegions={wizardContext.regions}
                       className={classes.clusters}
-                      stack={ClusterCloudPlatforms.EKS}
+                      stack={ClusterCloudPlatforms.GKE}
+                      onClustersLoad={(clusters) => setWizardContext({ clusterList: clusters })}
                     />
                   </div>
                 </FormFieldCard>
@@ -176,16 +174,16 @@ const ImportEKSClusterPage = () => {
                 triggerSubmit={onNext}
                 elevated={false}
               >
-                <FormFieldCard title="Review & Confirm EKS Clusters to Import">
+                <FormFieldCard title="Review & Confirm GKE Clusters to Import">
                   <PresetField
-                    label="AWS Provider:"
+                    label="GKE Provider:"
                     value={getCloudProviderName(wizardContext.cloudProviderId)}
                   />
                   <ReviewClustersTable
                     selectedClusters={wizardContext.selectedClusters}
                     onChange={(value) => setWizardContext({ finalSelectedClusters: value })}
                     value={wizardContext.finalSelectedClusters}
-                    stack={ClusterCloudPlatforms.EKS}
+                    stack={ClusterCloudPlatforms.GKE}
                     required
                   />
                 </FormFieldCard>
@@ -198,4 +196,4 @@ const ImportEKSClusterPage = () => {
   )
 }
 
-export default ImportEKSClusterPage
+export default ImportGKEClusterPage
