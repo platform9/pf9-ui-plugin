@@ -87,7 +87,7 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
     const metadata = {
       cloud_provider_id: wizardContext.cloudProviderId,
       regions: wizardContext.regions,
-      finalSelectedClusters: finalSelectedClusters.map((cluster) => cluster.id),
+      clusters: finalSelectedClusters.map((cluster) => cluster.id),
     }
 
     Bugsnag.leaveBreadcrumb(`Attempting to import ${clusterType} clusters`, metadata)
@@ -137,9 +137,9 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
             className={classes.clusters}
             stack={clusterType}
             onClustersLoad={
-              clusterType === ClusterCloudPlatforms.GKE
-                ? (clusters) => setWizardContext({ clusterList: clusters })
-                : null
+              clusterType === ClusterCloudPlatforms.EKS
+                ? null
+                : (clusters) => setWizardContext({ clusterList: clusters })
             }
           />
         </div>

@@ -48,7 +48,7 @@ const images = {
     alt: 'AWS',
     src: `${rootPath}/cloudaws-default.png`,
   },
-  gke: { alt: 'GKE', src: `${rootPath}/cloudgoogle-default@2x.png` },
+  gke: { alt: 'GKE', src: `${rootPath}/cloudgoogle-default.png` },
   aks: { alt: 'AKS', src: `${rootPath}/cloudazure-default.png` },
   eks: { alt: 'EKS', src: `${rootPath}/cloudaws-default.png` },
 }

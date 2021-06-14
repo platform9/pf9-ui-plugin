@@ -113,7 +113,7 @@ const OnboardingPage = () => {
     setClusterChoice(type)
     setWizardContext({ clusterChoice: type })
     if (type === 'bareOs') {
-      setActiveStep('step3', 2) // Step num is 2 because the step count starts at 0
+      setActiveStep('buildClusterStep', 2) // Step num is 2 because the step count starts at 0
       return
     }
 
@@ -123,7 +123,7 @@ const OnboardingPage = () => {
 
   const handleStepThreeBackButtonClick = (handleBack, setActiveStep) => () => {
     if (clusterChoice === 'bareOs') {
-      setActiveStep('step1', 0)
+      setActiveStep('welcomeStep', 0)
       return
     }
     handleBack()
@@ -133,11 +133,11 @@ const OnboardingPage = () => {
     <>
       <DocumentMeta title="Onboarding" bodyClasses={['form-view']} />
       <FormWrapper title="" loading={submitting}>
-        <Wizard context={initialContext} onComplete={handleFormCompletion} hideAllButtons={true}>
+        <Wizard context={initialContext} onComplete={handleFormCompletion} hideAllButtons>
           {({ wizardContext, setWizardContext, onNext, handleNext, handleBack, setActiveStep }) => {
             return (
               <>
-                <WizardStep stepId="step1" label="Welcome" keepContentMounted={false}>
+                <WizardStep stepId="welcomeStep" label="Welcome" keepContentMounted={false}>
                   <div className={classes.welcomeContainer}>
                     <img src={managementPlaneImagePath} />
                     <FormFieldCard title="Welcome to Platform9">
@@ -190,7 +190,7 @@ const OnboardingPage = () => {
                   </div>
                 </WizardStep>
                 <WizardStep
-                  stepId="step2"
+                  stepId="configureInfrastuctureStep"
                   label="Configure Your Infrastructure"
                   keepContentMounted={false}
                 >
@@ -204,12 +204,16 @@ const OnboardingPage = () => {
                       handleNext={handleNext}
                       setSubmitting={setSubmitting}
                       clusterChoice={clusterChoice}
+                      handleBack={handleBack}
                     />
-                    <PrevButton onClick={handleBack} />
-                    <SubmitButton onClick={handleNext}>+ Save Cloud Provider</SubmitButton>
+     
                   </Progress>
                 </WizardStep>
-                <WizardStep stepId="step3" label="Build Your Cluster" keepContentMounted={false}>
+                <WizardStep
+                  stepId="buildClusterStep"
+                  label="Build Your Cluster"
+                  keepContentMounted={false}
+                >
                   <BuildClusterStep
                     onNext={onNext}
                     handleNext={handleNext}
@@ -221,7 +225,11 @@ const OnboardingPage = () => {
                   <PrevButton onClick={handleStepThreeBackButtonClick(handleBack, setActiveStep)} />
                   <SubmitButton onClick={handleNext}>+ Create Cluster</SubmitButton>
                 </WizardStep>
-                <WizardStep stepId="step4" label="Invite a Coworker" keepContentMounted={false}>
+                <WizardStep
+                  stepId="inviteCoworkerStep"
+                  label="Invite a Coworker"
+                  keepContentMounted={false}
+                >
                   <AddCoworkerStep
                     onNext={onNext}
                     wizardContext={wizardContext}

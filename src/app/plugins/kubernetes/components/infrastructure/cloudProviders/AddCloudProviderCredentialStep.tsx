@@ -159,7 +159,7 @@ const AddCloudProviderCredentialStep = ({
       if (!success) {
         // TODO: surface the real API response error to get exact failure reason
         // Hopefully will be doable with Xan's error message changes
-        throw `The provided credentials are not able to access your ${provider} account`
+        throw new Error(`The provided credentials are not able to access your ${provider} account`)
       }
       setWizardContext({ cloudProviderId: newCp.uuid })
     } catch (err) {

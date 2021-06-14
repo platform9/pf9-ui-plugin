@@ -8,6 +8,8 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import AddCloudProviderCredentialStep from '../infrastructure/cloudProviders/AddCloudProviderCredentialStep'
 import { formTitle } from '../infrastructure/cloudProviders/AddCloudProviderPage'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
+import PrevButton from 'core/components/buttons/PrevButton'
+import SubmitButton from 'core/components/buttons/SubmitButton'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   cloudProviders: {
@@ -36,6 +38,7 @@ const AddCloudProviderPage = ({
   handleNext,
   setSubmitting,
   clusterChoice,
+  handleBack,
 }) => {
   const classes = useStyles()
   const [activeCloudProvider, setActiveCloudProvider] = useState(null)
@@ -133,6 +136,10 @@ const AddCloudProviderPage = ({
           )}
         </>
       )}
+      <PrevButton onClick={handleBack} />
+      <SubmitButton onClick={handleNext}>
+        {showExistingCloudProviders ? '+ Select Cloud Provider' : `+ Save Cloud Provider`}
+      </SubmitButton>
     </>
   )
 }
