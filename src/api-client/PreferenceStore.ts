@@ -1,7 +1,7 @@
 import config from '../../config'
 import ApiService from 'api-client/ApiService'
 import { PreferenceStoreResponse } from './preference-store.model'
-import { UserPreferences, GlobalPreferences } from 'app/constants'
+import { GlobalPreferences, UserPreferences } from 'app/constants'
 
 class PreferenceStore extends ApiService {
   public getClassName() {
@@ -13,7 +13,7 @@ class PreferenceStore extends ApiService {
   }
 
   get baseUrl(): string {
-    return `/preference-store`
+    return '/preference-store'
   }
 
   getUserPreference = async (userId, key: UserPreferences) => {

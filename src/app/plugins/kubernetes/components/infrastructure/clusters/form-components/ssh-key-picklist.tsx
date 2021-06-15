@@ -7,6 +7,7 @@ const additionalInfo =
 export default ({
   dropdownComponent,
   values,
+  required = true,
   wizardContext,
   setWizardContext,
   info = additionalInfo,
@@ -22,7 +23,7 @@ export default ({
       info={info}
       value={wizardContext.sshKey}
       onChange={(value) => setWizardContext({ sshKey: value })}
-      required
+      required={required}
     />
   )
 }

@@ -111,6 +111,7 @@ const CreateCloudClusterPage = ({
         cloudProviderType={wizardContext.provider}
         values={wizardContext}
         onChange={(value) => setWizardContext({ region: value, azs: [] })}
+        wizardContext={wizardContext}
       />
 
       {wizardContext.provider === CloudProviders.Aws && (

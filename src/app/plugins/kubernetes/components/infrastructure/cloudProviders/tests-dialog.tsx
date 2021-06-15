@@ -160,7 +160,11 @@ const TestsDialog = ({
           </div>
         )}
         <DialogActions className={classes.dialogActions}>
-          {showCloseButton && <SubmitButton onClick={onClose}>Close</SubmitButton>}
+          {showCloseButton && (
+            <SubmitButton onClick={onClose}>
+              {errorMessage ? 'Close' : '+ Create Cloud Provider'}
+            </SubmitButton>
+          )}
         </DialogActions>
       </FormFieldCard>
     </Dialog>

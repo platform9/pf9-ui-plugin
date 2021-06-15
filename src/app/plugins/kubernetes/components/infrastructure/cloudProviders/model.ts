@@ -18,6 +18,15 @@ export enum CloudProvidersFriendlyName {
   local = 'BareOS',
 }
 
+export enum CloudDefaults {
+  Region = 'region',
+  RegionLabel = 'regionDisplayName',
+  Domain = 'domain', // Route 53 Domain. AWS only
+  DomainLabel = 'domainLabel',
+  SshKey = 'sshKey',
+  SshKeyLabel = 'sshKeyLabel',
+}
+
 export interface ICloudProvidersSelector extends GetCloudProvider {
   descriptiveType: string
   deployedCapacity: DeployedCapacity
