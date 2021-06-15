@@ -30,6 +30,7 @@ describe('Single Master Cluster Creation', () => {
     // cy.wait('@pods', { requestTimeout: 30000, responseTimeout: 30000 })
     cy.wait('@nodes', { requestTimeout: 30000, responseTimeout: 30000 })
     // cy.wait('@deployments', { requestTimeout: 30000, responseTimeout: 30000 })
+    
     cy.contains(completeName)
   })
 
