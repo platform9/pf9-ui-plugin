@@ -149,7 +149,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                           toggleIamPolicy
                           showSubmitInCard
                           updateWizard
-                          setDefaultValueForTextfields
+                          setInitialValue
                         />
                       </FormFieldCard>
                     </ValidatedForm>

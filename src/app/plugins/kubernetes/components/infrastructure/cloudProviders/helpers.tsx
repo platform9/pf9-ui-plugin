@@ -95,10 +95,7 @@ export const renderVerificationCalloutFields = () => (fields) => {
                 {label}
               </Text>
             </div>
-            <Text
-              variant="caption1"
-              className={clsx(classes.value, value ? '' : classes['noneText'])}
-            >
+            <Text variant="caption1" className={clsx(classes.value, value ? '' : classes.noneText)}>
               {value || 'none'}
             </Text>
           </div>
