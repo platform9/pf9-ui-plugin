@@ -131,7 +131,7 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
               />
 
               {/* SSH Key */}
-              <SshKeyTextField />
+              <SshKeyTextField wizardContext={wizardContext} setWizardContext={setWizardContext} />
 
               <KubernetesVersion />
             </FormFieldCard>

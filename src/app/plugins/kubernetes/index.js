@@ -14,7 +14,7 @@ import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDeta
 import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
-import OnboardingPage from './components/onboarding/OnboardingPage'
+import OnboardingPage from './components/onboarding/onboarding-page'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'

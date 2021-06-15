@@ -14,6 +14,7 @@ import Text from 'core/elements/text'
 import { CloudProviders, CloudProvidersFriendlyName } from './model'
 import TestsDialog, { TestStatus } from './tests-dialog'
 import { clone } from 'ramda'
+import clsx from 'clsx'
 import useReactRouter from 'use-react-router'
 import { routes } from 'core/utils/routes'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
@@ -39,6 +40,8 @@ interface Props {
   handleNext: any
   title: string
   setSubmitting: any
+  header?: string
+  headerClass?: any
 }
 
 const links = {
@@ -113,6 +116,8 @@ const AddCloudProviderCredentialStep = ({
   handleNext,
   title,
   setSubmitting,
+  header = 'Select a Cloud Provider Type:',
+  headerClass = {},
 }: Props) => {
   const classes = useStyles({})
   const [errorMessage, setErrorMessage] = useState('')
@@ -154,7 +159,7 @@ const AddCloudProviderCredentialStep = ({
       if (!success) {
         // TODO: surface the real API response error to get exact failure reason
         // Hopefully will be doable with Xan's error message changes
-        throw `The provided credentials are not able to access your ${provider} account`
+        throw new Error(`The provided credentials are not able to access your ${provider} account`)
       }
       setWizardContext({ cloudProviderId: newCp.uuid })
     } catch (err) {
@@ -208,8 +213,8 @@ const AddCloudProviderCredentialStep = ({
 
   return (
     <>
-      <Text className={classes.title} variant="body1">
-        Select a Cloud Provider Type:
+      <Text className={clsx(classes.title, headerClass)} variant="body1">
+        {header}
       </Text>
       <div className={classes.cloudProviderCards}>
         <CloudProviderCard

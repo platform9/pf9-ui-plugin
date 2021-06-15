@@ -1,21 +1,33 @@
+import ApiClient from 'api-client/ApiClient'
+import { UserPreferences } from 'app/constants'
 import {
   preferencesActions,
   preferencesStoreKey,
   PreferencesState,
 } from 'core/session/preferencesReducers'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
-import { pathOr, Dictionary, prop } from 'ramda'
+import { pathOr, Dictionary, prop, merge } from 'ramda'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
+const { preferenceStore } = ApiClient.getInstance()
 
 const useScopedPreferences = <T extends Dictionary<any>>(
   key: string = 'root',
   defaultPrefs?: T,
-): [Partial<T>, (prefs: Partial<T>) => void, (username: string) => Partial<T>] => {
+): [
+  Partial<T>,
+  (prefs: Partial<T>) => void,
+  (username: string) => Partial<T>,
+  (defaultsKey: string, defaults: any) => void,
+] => {
   const selectPrefsState = prop<string, PreferencesState>(preferencesStoreKey)
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const allPrefs = useSelector(selectPrefsState)
-  const { username } = useSelector(selectSessionState)
+  const {
+    username,
+    userDetails: { id },
+  } = useSelector(selectSessionState)
   const prefs = useMemo<Partial<T>>(
     () => ({
       ...(defaultPrefs || {}),
@@ -49,7 +61,26 @@ const useScopedPreferences = <T extends Dictionary<any>>(
     [defaultPrefs, allPrefs, key],
   )
 
-  return [prefs, updatePrefs, getUserPrefs]
+  const updateUserDefaults = useCallback<(defaultsKey: UserPreferences, value: Partial<T>) => void>(
+    (defaultsKey, value) => {
+      if (!username) {
+        console.error('Unable to update user preferences. Session has not been initialized')
+        return
+      }
+
+      dispatch(
+        preferencesActions.updatePrefs({
+          username,
+          key: ['defaults', defaultsKey],
+          prefs: value,
+        }),
+      )
+      preferenceStore.setUserPreference(id, defaultsKey, merge(prefs[defaultsKey] || {}, value))
+    },
+    [username, id],
+  )
+
+  return [prefs, updatePrefs, getUserPrefs, updateUserDefaults]
 }
 
 export default useScopedPreferences

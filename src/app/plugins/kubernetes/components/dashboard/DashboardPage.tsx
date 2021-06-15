@@ -1,10 +1,10 @@
 // libs
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { pathOr, prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/styles'
 // Constants
-import { allKey } from 'app/constants'
+import { allKey, CustomerTiers, UserPreferences } from 'app/constants'
 // Actions
 import { deploymentActions, podActions, serviceActions } from '../pods/actions'
 import { clusterActions } from '../infrastructure/clusters/actions'
@@ -26,6 +26,10 @@ import {
 } from '../infrastructure/clusters/ClusterStatusUtils'
 import { importedClusterActions } from '../infrastructure/importedClusters/actions'
 import { ImportedClusterSelector } from '../infrastructure/importedClusters/model'
+import OnboardingPage from '../onboarding/onboarding-page'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { isDecco } from 'core/utils/helpers'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -70,6 +74,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   pod: {
     gridArea: 'pod',
+  },
+  modal: {
+    position: 'fixed',
+    left: 0,
+    top: '55px',
+    width: '100vw',
+    height: 'calc(100vh - 55px)', // 55px is the toolbar height
+    overflow: 'auto',
+    zIndex: 5000,
+    backgroundColor: theme.palette.grey['100'],
+    padding: theme.spacing(2, 4),
+    boxSizing: 'border-box',
   },
 }))
 
@@ -327,26 +343,57 @@ const nodeHealthStatus = ({ status }) => {
 
 const DashboardPage = () => {
   const classes = useStyles({})
+  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const displayName = session?.userDetails?.displayName
-  const features = session?.features
+  const {
+    username,
+    userDetails: { displayName },
+    features,
+  } = session
   // To avoid missing API errors for ironic region UX-751
   const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
+  const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
+  const [clusters] = useDataLoader(clusterActions.list)
+
+  const showOnboarding = useMemo(
+    () =>
+      isDecco(features) &&
+      customerTier === CustomerTiers.Freedom &&
+      ((prefs.isOnboarded === undefined && clusters?.length === 0) ||
+        (prefs.isOnboarded !== undefined && prefs.isOnboarded === false)),
+    [features, customerTier, prefs.isOnboarded, clusters],
+  )
+
+  useEffect(() => {
+    if (prefs.isOnboarded !== undefined) {
+      return
+    }
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: !showOnboarding })
+  }, [username, showOnboarding])
 
   return (
-    <section className={classes.cardColumn} id={`dashboard-page`}>
-      <Text id="dashboard-title" variant="h5">
-        Welcome{displayName ? ` ${displayName}` : ''}!
-      </Text>
-      {kubeRegion && (
-        <div className={classes.dashboardMosaic}>
-          {reportsWithPerms(reports, session.userDetails.role).map((report) => (
-            <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-          ))}
+    <>
+      {showOnboarding && (
+        <div id="myModal" className={classes.modal}>
+          <OnboardingPage />
         </div>
       )}
-    </section>
+      {!showOnboarding && (
+        <section className={classes.cardColumn} id={`dashboard-page`}>
+          <Text id="dashboard-title" variant="h5">
+            Welcome{displayName ? ` ${displayName}` : ''}!
+          </Text>
+          {kubeRegion && (
+            <div className={classes.dashboardMosaic}>
+              {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+                <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+    </>
   )
 }
 
