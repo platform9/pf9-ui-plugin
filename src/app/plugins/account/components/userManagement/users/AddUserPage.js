@@ -31,6 +31,24 @@ const initialContext = {
 }
 const tenantRolesValidations = [requiredValidator.withMessage('Must select at least one tenant')]
 
+export const activationByEmailLabel = (
+  <>
+    <div>Send activation email to the user.</div>
+    <Text variant="body2" component="p" color="textSecondary">
+      Instructions to create a new password and to activate account will be sent to the email
+      provided.
+    </Text>
+  </>
+)
+export const createUserPasswordLabel = (
+  <>
+    <div>Set password for new user now.</div>
+    <Text variant="body2" component="p" color="textSecondary">
+      Create password for the new user now and activate the account immediately.
+    </Text>
+  </>
+)
+
 const AddUserPage = () => {
   const { history } = useReactRouter()
   const onComplete = useCallback((success) => success && history.push(listUrl), [history])
@@ -38,23 +56,6 @@ const AddUserPage = () => {
   const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
   const [activationType, setActivationType] = useState('createPassword')
 
-  const activationByEmailLabel = (
-    <>
-      <div>Send activation email to the user.</div>
-      <Text variant="body2" component="p" color="textSecondary">
-        Instructions to create a new password and to activate account will be sent to the email
-        provided.
-      </Text>
-    </>
-  )
-  const createUserPasswordLabel = (
-    <>
-      <div>Set password for new user now.</div>
-      <Text variant="body2" component="p" color="textSecondary">
-        Create password for the new user now and activate the account immediately.
-      </Text>
-    </>
-  )
   return (
     <FormWrapper title="New User" loading={submitting} backUrl={listUrl}>
       <Wizard onComplete={handleAdd} context={initialContext}>
