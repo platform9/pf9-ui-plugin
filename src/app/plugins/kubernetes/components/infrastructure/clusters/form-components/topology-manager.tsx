@@ -8,7 +8,7 @@ const TopologyManagerField = () => (
   <CheckboxField
     id="enableTopologyManager"
     label="Add Topology Manager support"
-    info="add Topology Manager support "
+    info="Add Topology Manager support "
   />
 )
 
