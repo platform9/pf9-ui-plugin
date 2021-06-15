@@ -1,23 +1,19 @@
 import config from '../../config'
 
-const signInText = 'Sign In'
-const username = 'admin@platform9.com'
-const password = 'secret'
+const username = config.username
+const password = config.password
 
 describe('login', () => {
   it('reports failed logins', () => {
     cy.visit('/')
 
-    cy.get('#email')
-      .type(username)
+    cy.get('#email').type(username)
 
-    cy.get('#password')
-      .type('badpassword')
+    cy.get('#password').type('badpassword')
 
-    cy.contains(signInText)
-      .click()
+    cy.get('#login-submit').click()
 
-    cy.contains('Login failed')
+    cy.contains('#login-failed')
   })
 
   it('logs in successfully', () => {
@@ -29,8 +25,7 @@ describe('login', () => {
       .clear()
       .type(password)
 
-    cy.contains(signInText)
-      .click()
+    cy.get('#login-submit').click()
 
     cy.contains(config.region)
   })

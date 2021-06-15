@@ -6,6 +6,7 @@ import preferencesReducers, { preferencesStoreKey } from 'core/session/preferenc
 import clientReducers, { clientStoreKey } from 'core/client/clientReducers'
 import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
 import { persistReducer } from 'redux-persist'
+import themeReducers, { customThemeKey } from 'core/session/themeReducers'
 
 const persistCacheConfig = {
   key: cacheStoreKey,
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   [cacheStoreKey]: persistReducer(persistCacheConfig, cacheReducers),
   [notificationStoreKey]: notificationReducers,
   [preferencesStoreKey]: preferencesReducers,
+  [customThemeKey]: themeReducers,
   [clientStoreKey]: clientReducers,
 })
 

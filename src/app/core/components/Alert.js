@@ -5,7 +5,7 @@ import { Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import Text from 'core/elements/text'
 import FontAwesomeIcon from './FontAwesomeIcon'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 
 export const variantIcon = {
   success: 'check-circle',
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
       type === 'card'
         ? theme.palette.grey['000']
         : type === 'error'
-        ? hexToRGBA(theme.palette.red[500], 0.1)
+        ? hexToRgbaCss(theme.palette.red[500], 0.1)
         : theme.palette.blue[100],
   },
   success: { color: theme.palette.green.main },
@@ -71,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const Alert = ({
+  id = undefined,
   className = undefined,
   children,
   message,
@@ -86,7 +87,7 @@ const Alert = ({
   }
 
   return (
-    <Paper className={clsx(classes.root, className)} elevation={0}>
+    <Paper id={id} className={clsx(classes.root, className)} elevation={0}>
       <FontAwesomeIcon className={clsx(classes.icon, classes.iconVariant, classes[variant])}>
         {variantIcon[variant]}
       </FontAwesomeIcon>

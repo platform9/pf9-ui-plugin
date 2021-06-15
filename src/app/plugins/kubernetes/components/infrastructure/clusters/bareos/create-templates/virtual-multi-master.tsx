@@ -246,12 +246,19 @@ const VirtualMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
           title="Advanced Configuration"
+          elevated={false}
+          withAddonManager
         >
           {({ values }) => (
             <>
               <AdvancedApiConfigFields values={values} />
               <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
               <TagsField />
+              <AddonTogglers
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                addons={['enableTopologyManager']}
+              />
             </>
           )}
         </ValidatedForm>

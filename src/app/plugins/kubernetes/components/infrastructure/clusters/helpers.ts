@@ -69,6 +69,11 @@ export const getKubernetesVersion = async (clusterId) => {
     return null
   }
 }
+export const getScopedQbertEndpoint = (qbertEndpoint) =>
+  `${qbertEndpoint}/${qbert.scopedEnpointPath()}`
+export const getScopedClusterProxyEndpoint = (qbertEndpoint, cluster) =>
+  `${getScopedQbertEndpoint(qbertEndpoint)}/clusters/${cluster.uuid}/k8sapi/api/v1`
+
 export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
   const matches = /(?<major>\d+).(?<minor>\d+).(?<patch>\d+)/.exec(version)
   if (!version || !matches) {
@@ -76,9 +81,7 @@ export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) 
   }
   const { major, minor } = matches.groups || {}
   const isNewDashboardUrl = parseInt(major) >= 1 && parseInt(minor) >= 16
-  return `${qbertEndpoint}/${qbert.scopedEnpointPath()}/clusters/${
-    cluster.uuid
-  }/k8sapi/api/v1/namespaces/${
+  return `${getScopedClusterProxyEndpoint(qbertEndpoint, cluster)}/namespaces/${
     isNewDashboardUrl ? 'kubernetes-dashboard' : 'kube-system'
   }/services/https:kubernetes-dashboard:443/proxy/`
 }
@@ -112,7 +115,11 @@ export const hasHealthyMasterNodes = propSatisfies(
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
-export const hasPrometheusTag = pathEq(['hasPrometheus', 'pf9-system:monitoring'], 'true')
+export const hasPrometheusTag = pathEq(['tags', 'pf9-system:monitoring'], 'true')
+export const importedHasPrometheusTag = pathEq(
+  ['metadata', 'labels', 'pf9-system_monitoring'],
+  'true',
+)
 export const prometheusCluster = propSatisfies(isTruthy, 'hasPrometheus')
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
@@ -299,6 +306,16 @@ const createGenericCluster = async (body, data) => {
     body.schedulerFlags = data.schedulerFlags?.split(',')
   }
 
+  if (data.cpuManagerPolicy) {
+    body.cpuManagerPolicy = data.cpuManagerPolicy
+  }
+
+  if (data.topologyManagerPolicy) {
+    body.topologyManagerPolicy = data.topologyManagerPolicy
+  }
+  if (data.reservedCPUs) {
+    body.reservedCPUs = data.reservedCPUs
+  }
   // Calico is required when ipv6 is selected
   if (data.networkStack === NetworkStackTypes.IPv6) {
     body.calicoIPv6PoolCidr = body.containersCidr

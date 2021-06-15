@@ -269,7 +269,10 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
           <PollingData loading={loading} onReload={loadMore} pause={!pollForNodes} />
         )}
         {selectableNodes.length === 0 && (
-          <NoContentMessage message="Waiting... Connect Nodes Using the PF9 CLI" variant="light" />
+          <NoContentMessage
+            message="Waiting... Connect Nodes Using the VM Template/OVA or PF9 CLI"
+            variant="light"
+          />
         )}
         {selectableNodes.length > 0 && (
           <Table className={table}>

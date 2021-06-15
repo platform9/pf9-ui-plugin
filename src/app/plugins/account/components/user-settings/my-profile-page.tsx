@@ -201,6 +201,7 @@ const MyProfilePage = () => {
                   label="Current Password"
                   value={values.currentPassword}
                   showPasswordRequirements={false}
+                  restrictPassword={false}
                 />
                 <UserPasswordField
                   id="newPassword"

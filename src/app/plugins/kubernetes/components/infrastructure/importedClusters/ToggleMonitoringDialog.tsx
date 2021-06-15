@@ -1,53 +1,33 @@
+import Bugsnag from '@bugsnag/js'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
-import { ClusterTag } from 'api-client/appbert.model'
 import Alert from 'core/components/Alert'
 import Progress from 'core/components/progress/Progress'
-import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
 import { clusterTagActions } from '../clusters/actions'
-import { IUseDataLoader } from '../nodes/model'
+import { importedHasPrometheusTag } from 'k8s/components/infrastructure/clusters/helpers'
 
 const { appbert } = ApiClient.getInstance()
 
 const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
   const dispatch = useDispatch()
-  const [
-    appbertData,
-    loadingAppbertData,
-    reloadAppbert,
-  ]: IUseDataLoader<ClusterTag> = useDataLoader(clusterTagActions.list) as any
   const [tagUpdater, updatingTag] = useDataUpdater(clusterTagActions.update, (success) => {
     if (success) {
       onClose()
     }
   })
 
-  const enabled = useMemo(() => {
-    if (appbertData?.length) {
-      const clusterPackages = appbertData.find((item) => {
-        return item.uuid === cluster.uuid
-      })
-      if (!clusterPackages) {
-        return false
-      }
-      const monitoringPackage = clusterPackages.pkgs.find((pkg) => {
-        return pkg.name === 'pf9-mon'
-      })
-      return monitoringPackage?.installed
-    }
-    return false
-  }, [appbertData])
-
-  useEffect(() => {
-    reloadAppbert(true)
-  }, [])
+  const enabled = importedHasPrometheusTag(cluster)
 
   const toggleMonitoring = useCallback(async () => {
+    Bugsnag.leaveBreadcrumb(
+      `Attempting to toggle monitoring ${enabled ? 'off' : 'on'} for imported cluster`,
+      { clusterId: cluster.uuid },
+    )
     try {
       const pkgs: any = await appbert.getPackages()
       const monPkg = pkgs.find((pkg) => pkg.name === 'pf9-mon')
@@ -92,7 +72,7 @@ const ToggleMonitoringDialog = ({ rows: [cluster], onClose }) => {
   return (
     <Dialog open onClose={onClose}>
       <DialogTitle>Monitoring Add-On (Beta)</DialogTitle>
-      <Progress loading={updatingTag || loadingAppbertData} minHeight={100} maxHeight={200}>
+      <Progress loading={updatingTag} minHeight={100} maxHeight={200}>
         <DialogContent>
           <p>
             After enabling the monitoring add-on, you will be able to access Prometheus metrics and

@@ -12,6 +12,7 @@ import UserSettingsIndexPage from './components/user-settings/user-settings-inde
 import AddGroupPage from './components/ssoManagement/groups/AddGroupPage'
 import EditGroupPage from './components/ssoManagement/groups/EditGroupPage'
 import { pathOr } from 'ramda'
+import CustomThemePage from './components/theme/CustomThemePage'
 
 class MyAccount extends React.PureComponent {
   render() {
@@ -91,6 +92,12 @@ MyAccount.registerPlugin = (pluginManager) => {
       link: { path: routes.sso.editGroup.toString(userAccountPrefix), exact: true },
       component: EditGroupPage,
     },
+    {
+      name: 'Custom Theme',
+      requiredRoles: 'admin',
+      link: { path: routes.customTheme.toString(userAccountPrefix), exact: true },
+      component: CustomThemePage,
+    },
   ])
 
   // These nav items are in active development but not shown in production.
@@ -132,6 +139,18 @@ MyAccount.registerPlugin = (pluginManager) => {
           return ssoEnabledTiers.includes(pathOr('', ['customer_tier'], features))
         }
         return features.experimental.sso
+      },
+    },
+    {
+      name: 'Custom Theme',
+      link: { path: routes.customTheme.toString(userAccountPrefix) },
+      icon: 'palette',
+      requiredRoles: 'admin',
+      requiredFeatures: (features) => {
+        if (!features || !features.experimental) {
+          return false
+        }
+        return features.experimental.kplane
       },
     },
   ]
