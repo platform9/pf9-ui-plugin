@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const formTitle = ({ provider }) => {
+export const formTitle = ({ provider }) => {
   if (provider === CloudProviders.Aws) {
     return 'Create AWS Cloud Provider'
   } else if (provider === CloudProviders.Azure) {

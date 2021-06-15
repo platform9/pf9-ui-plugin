@@ -49,7 +49,7 @@ const GoogleCloudProviderVerification = ({ wizardContext, setWizardContext }: Pr
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability classes={classes} regions={regions}></RegionAvailability>
+              <RegionAvailability classes={classes} regions={regions} />
             )}
           </>
         }
@@ -66,6 +66,7 @@ const GoogleCloudProviderVerification = ({ wizardContext, setWizardContext }: Pr
           cloudProviderType={CloudProviders.Gcp}
           onChange={(value) => setWizardContext({ region: value })}
           values={wizardContext}
+          wizardContext={wizardContext}
         />
       </FormFieldCard>
     </>

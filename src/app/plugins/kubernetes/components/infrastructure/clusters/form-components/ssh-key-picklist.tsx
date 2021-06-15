@@ -7,10 +7,10 @@ const additionalInfo =
 export default ({
   dropdownComponent,
   values,
-  value,
-  onChange = undefined,
-  info = additionalInfo,
   required = true,
+  wizardContext,
+  setWizardContext,
+  info = additionalInfo,
 }) => {
   return (
     <PicklistField
@@ -21,8 +21,8 @@ export default ({
       cloudProviderId={values.cloudProviderId}
       cloudProviderRegionId={values.region}
       info={info}
-      value={value}
-      onChange={onChange}
+      value={wizardContext.sshKey}
+      onChange={(value) => setWizardContext({ sshKey: value })}
       required={required}
     />
   )

@@ -267,8 +267,8 @@ const AwsCloudProviderVerification = ({
             dropdownComponent={AwsClusterSshKeyPicklist}
             values={wizardContext}
             info=""
-            onChange={(value) => setWizardContext({ sshKey: value })}
-            value={wizardContext.sshKey}
+            wizardContext={wizardContext}
+            setWizardContext={setWizardContext}
             required={false}
           />
           <Button

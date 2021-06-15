@@ -306,8 +306,10 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 <SshKeyField
                   dropdownComponent={AwsClusterSshKeyPicklist}
                   values={values}
-                  value={wizardContext.sshKey}
-                  onChange={(value) => setWizardContext({ sshKey: value })}
+                  // value={wizardContext.sshKey}
+                  // onChange={(value) => setWizardContext({ sshKey: value })}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
                 />
 
                 {/* Template Chooser */}

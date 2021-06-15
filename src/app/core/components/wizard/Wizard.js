@@ -37,8 +37,8 @@ class Wizard extends PureComponent {
     }
   }
 
-  setActiveStep = (stepId) => {
-    this.setState({ activeStepId: stepId })
+  setActiveStep = (stepId, stepNum) => {
+    this.setState({ activeStepId: stepId, activeStep: stepNum })
   }
 
   getActiveStepId = ({ steps }, activeStep) =>
@@ -175,6 +175,8 @@ class Wizard extends PureComponent {
           setWizardContext,
           onNext: this.onNext,
           handleNext: this.handleNext,
+          handleBack: this.handleBack,
+          setActiveStep: this.setActiveStep,
         })}
         {!hideAllButtons && (
           <WizardButtons hasCalloutFields={this.state.calloutFields}>

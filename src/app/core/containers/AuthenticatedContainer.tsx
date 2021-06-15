@@ -55,7 +55,11 @@ declare let window: CustomWindow
 
 const { keystone, preferenceStore } = ApiClient.getInstance()
 
-const userPreferenceKeys = [UserPreferences.Aws, UserPreferences.Azure]
+const userPreferenceKeys = [
+  UserPreferences.FeatureFlags,
+  UserPreferences.Aws,
+  UserPreferences.Azure,
+]
 
 interface StyleProps {
   path?: string
@@ -332,6 +336,7 @@ const AuthenticatedContainer = () => {
   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
   const plugins = pluginManager.getPlugins()
   const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
+
   const showNavBar =
     currentStack !== AppPlugins.MyAccount ||
     (currentStack === AppPlugins.MyAccount && role === 'admin')
@@ -396,6 +401,7 @@ const AuthenticatedContainer = () => {
         const response: any = await preferenceStore.getUserPreference(userId, key)
         if (!response) return
         const value = JSON.parse(response.value)
+
         dispatch(
           preferencesActions.updatePrefs({
             username,

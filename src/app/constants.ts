@@ -140,6 +140,7 @@ export const pmkftSignupLink = 'https://platform9.com/signup-flow/?sandbox=kuber
 export enum UserPreferences {
   Aws = 'aws',
   Azure = 'azure',
+  FeatureFlags = 'featureFlags',
 }
 
 export enum GlobalPreferences {
