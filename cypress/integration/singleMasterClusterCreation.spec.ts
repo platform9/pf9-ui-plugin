@@ -1,37 +1,14 @@
-const { number } = require("prop-types")
+import 'cypress-wait-until'
 
-// import config from '../../config'
-const username = 'kingshuk.nandy@afourtech.com'
-const password = 'Test@1234'
-const completeName = 'Kingshuk Nandy'
-const region = 'RegionOne'
+const user:userDetails={
+  username: 'kingshuk.nandy@afourtech.com',
+  password: 'Test@1234',
+  completeName: 'Kingshuk Nandy'
+}
 const clusterName = 'SingleMasterCluster-Test-1'
 describe('Single Master Cluster Creation', () => {
-  it('logs in successfully', () => {
-    cy.intercept(/\/qbert\/.*\/services$/).as('services')
-    cy.intercept(/\/qbert\/.*\/clusters$/).as('clusters')
-    cy.intercept(/\/qbert\/.*\/pods$/).as('pods')
-    cy.intercept(/\/qbert\/.*\/nodes$/).as('nodes')
-    cy.intercept(/\/qbert\/.*\/deployments$/).as('deployments')
-
-    cy.visit('/')
-    cy.get('#email')
-      .clear()
-      .type(username)
-
-    cy.get('#password')
-      .clear()
-      .type(password)
-    cy.get('span').contains('Sign In').click()
-
-    cy.wait(60000)
-    // cy.wait('@services', { requestTimeout: 30000, responseTimeout: 30000 })
-    cy.wait('@clusters', { requestTimeout: 30000, responseTimeout: 30000 })
-    // cy.wait('@pods', { requestTimeout: 30000, responseTimeout: 30000 })
-    cy.wait('@nodes', { requestTimeout: 30000, responseTimeout: 30000 })
-    // cy.wait('@deployments', { requestTimeout: 30000, responseTimeout: 30000 })
-    
-    cy.contains(completeName)
+  before(() => {
+    cy.login(user)
   })
 
   it('Should be able add cluster of type "SingleMaster"', () => {
@@ -49,7 +26,7 @@ describe('Single Master Cluster Creation', () => {
 
   it('Should be able to setup Master Node',()=>{
     cy.contains('Select a node to add as a Master Node')
-    cy.xpath("//tr[@class='MuiTableRow-root']//input[@type='radio']").first().click();
+    cy.xpath("//tr[@class='MuiTableRow-root']//input[@type='radio']").first().click()
     cy.contains("Next").click()
   })
   it('Should be able to setup Worker Nodes',()=>{
@@ -58,7 +35,7 @@ describe('Single Master Cluster Creation', () => {
     cy.xpath("//tr[@class='MuiTableRow-root']//input[@type='checkbox']").each(($el)=>{
       $el.click()
       desiredNodeCount--
-      if(desiredNodeCount==0) return false 
+      if(desiredNodeCount===0) return false 
     })
     cy.contains("Next").click()
   })
@@ -79,13 +56,19 @@ describe('Single Master Cluster Creation', () => {
   })
   it('Should be able to verify Cluster Creation Completed Successfully',()=>{
     
-    cy.get('.jss105',{timeout: 30000}).should('not.be.visible')
-    // TODO: Add validations
-    cy.xpath('//h3',{timeout: 20000}).then(()=>{
-      cy.each(cy.contains('^Completed all [0-9]+ tasks successfully$'))
-      cy.contains('p','^Completed all [0-9]+ tasks successfully$')
+    // cy.waitUntil(()=>{
+    //     cy.xpath("//article//following-sibling::div/p",{timeout: 60000}).each(($el)=>{
+    //         cy.get($el).contains(/^Completed all [0-9]+ tasks successfully$/)
+    //     })
+    //   })
+    cy.wait(240000).then(()=>{
+          cy.xpath("//article//following-sibling::div/p",{timeout: 60000}).each(($el)=>{
+          const ele1= $el as unknown as string
+          cy.get(ele1).contains(/^Completed all [0-9]+ tasks successfully$/)
+      })
     })
-  })
 
+      
+    })
   
 })

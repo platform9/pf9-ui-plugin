@@ -1,0 +1,152 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 3,
+    "passes": 1,
+    "pending": 0,
+    "failures": 2,
+    "start": "2021-06-15T16:15:42.840Z",
+    "end": "2021-06-15T16:16:05.922Z",
+    "duration": 23082,
+    "testsRegistered": 3,
+    "passPercent": 33.33333333333333,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "bfc52494-8aa5-4c7c-8326-0e39527b2d08",
+      "title": "",
+      "fullFile": "cypress/integration/login.spec.js",
+      "file": "cypress/integration/login.spec.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "1d5fe961-191f-4525-9379-e31d0ef5f4ea",
+          "title": "login",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "reports failed logins",
+              "fullTitle": "login reports failed logins",
+              "timedOut": null,
+              "duration": 9859,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('/');\ncy.get('#email').type('username');\ncy.get('#password').type('badpassword'); // cy.get('#login-submit').click()\ncy.get('span').contains('Sign In').click();\ncy.waitFor('#login-failed', 2000).then(function () {\n  cy.contains('#login-failed');\n})[\"catch\"](function (error) {\n  console.log(error);\n});",
+              "err": {},
+              "uuid": "f9bfccd7-8123-4713-9ac7-3c4cafebe8c1",
+              "parentUUID": "1d5fe961-191f-4525-9379-e31d0ef5f4ea",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "logs in successfully",
+              "fullTitle": "login logs in successfully",
+              "timedOut": null,
+              "duration": 11283,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"Failed screenshot\",\n  \"value\": \"screenshots\\\\login.spec.js\\\\login -- logs in successfully (failed).png\"\n}",
+              "code": "cy.get('#email').clear().type(username);\ncy.get('#password').clear().type(password); // cy.get('#login-submit').click()\ncy.get('span').contains('Sign In').click();\ncy.wait(5000);\ncy.contains(region);",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 4000ms: Expected to find content: 'Default Region' but never did.",
+                "estack": "AssertionError: Timed out retrying after 4000ms: Expected to find content: 'Default Region' but never did.\n    at Context.eval (https://pmkft-1620747884-26914.platform9.io/__cypress/tests?p=cypress\\integration\\login.spec.js:231:16)",
+                "diff": null
+              },
+              "uuid": "0f4bb8e8-7e9f-4af2-b37e-258d10081a49",
+              "parentUUID": "1d5fe961-191f-4525-9379-e31d0ef5f4ea",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "remembers the login state on refresh",
+              "fullTitle": "login remembers the login state on refresh",
+              "timedOut": null,
+              "duration": 1436,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"Failed screenshot\",\n  \"value\": \"screenshots\\\\login.spec.js\\\\login -- remembers the login state on refresh (failed).png\"\n}",
+              "code": "cy.login();\ncy.visit('/');\ncy.contains(region);",
+              "err": {
+                "message": "TypeError: Cannot read property 'username' of undefined",
+                "estack": "TypeError: Cannot read property 'username' of undefined\n    at Context.eval (https://pmkft-1620747884-26914.platform9.io/__cypress/tests?p=cypress\\support\\index.ts:229:40)",
+                "diff": null
+              },
+              "uuid": "6723381f-5719-40b5-98b9-e1cb34ee450a",
+              "parentUUID": "1d5fe961-191f-4525-9379-e31d0ef5f4ea",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "f9bfccd7-8123-4713-9ac7-3c4cafebe8c1"
+          ],
+          "failures": [
+            "0f4bb8e8-7e9f-4af2-b37e-258d10081a49",
+            "6723381f-5719-40b5-98b9-e1cb34ee450a"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 22578,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "6.2.2"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "cypress/reports/mocha",
+        "overwrite": false,
+        "html": true,
+        "json": true
+      },
+      "version": "5.2.0"
+    }
+  }
+}

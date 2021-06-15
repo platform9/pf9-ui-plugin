@@ -1,0 +1,162 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 4,
+    "passes": 4,
+    "pending": 0,
+    "failures": 0,
+    "start": "2021-06-15T16:00:51.944Z",
+    "end": "2021-06-15T16:05:21.252Z",
+    "duration": 269308,
+    "testsRegistered": 4,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "68d15e90-e2b0-4cc0-9dbe-f912c6a14caa",
+      "title": "",
+      "fullFile": "cypress/integration/oneClickClusterCreation.ts",
+      "file": "cypress/integration/oneClickClusterCreation.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "3881a90f-9f19-41f8-805c-0694cab61713",
+          "title": "Single Master Cluster Creation",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Should be able add cluster of type \"One-Click Cluster\"",
+              "fullTitle": "Single Master Cluster Creation Should be able add cluster of type \"One-Click Cluster\"",
+              "timedOut": null,
+              "duration": 28450,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.intercept('GET', /\\/.*clusters\\/supportedRoleVersions$/).as('supportedRoleVersions');\ncy.get(\"a[href='/ui/kubernetes/infrastructure/clusters/add']\", { timeout: 3000 }).click();\ncy.contains('BareOS Virtual Cluster');\ncy.xpath(\"//span[contains(text(),'One-Click Cluster')]\").click();\ncy.wait('@supportedRoleVersions');\ncy.get('#name').type(clusterName);\ncy.get('#kubeRoleVersion').click();\ncy.get(\"li[data-value='1.18.10-pmk.1547']\").click();",
+              "err": {},
+              "uuid": "f9b15366-fc59-4245-a919-b4fd58f7679b",
+              "parentUUID": "3881a90f-9f19-41f8-805c-0694cab61713",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Should be able to select a node",
+              "fullTitle": "Single Master Cluster Creation Should be able to select a node",
+              "timedOut": null,
+              "duration": 153,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "var desiredNodeCount = 1;\ncy.xpath(\"//tr[@class='MuiTableRow-root']//input[@type='radio']\").each(($el) => {\n    $el.click();\n    desiredNodeCount--;\n    if (desiredNodeCount === 0)\n        return false;\n});",
+              "err": {},
+              "uuid": "9d255424-c1c4-436d-bef5-029b4d07788f",
+              "parentUUID": "3881a90f-9f19-41f8-805c-0694cab61713",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Should be able to review and complete setup of the cluster",
+              "fullTitle": "Single Master Cluster Creation Should be able to review and complete setup of the cluster",
+              "timedOut": null,
+              "duration": 324,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains(\"Complete\").click();",
+              "err": {},
+              "uuid": "8947e189-cb15-492f-9c2f-84a32e534e1f",
+              "parentUUID": "3881a90f-9f19-41f8-805c-0694cab61713",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Should be able to verify Cluster Creation Completed Successfully",
+              "fullTitle": "Single Master Cluster Creation Should be able to verify Cluster Creation Completed Successfully",
+              "timedOut": null,
+              "duration": 240158,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.wait(240000).then(() => {\n    cy.xpath(\"//article//following-sibling::div/p\", { timeout: 60000 }).each(($el) => {\n        cy.get($el).contains(/^Completed all [0-9]+ tasks successfully$/);\n    });\n});",
+              "err": {},
+              "uuid": "b765e0f5-1d55-45dd-862f-b6e01e726711",
+              "parentUUID": "3881a90f-9f19-41f8-805c-0694cab61713",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "f9b15366-fc59-4245-a919-b4fd58f7679b",
+            "9d255424-c1c4-436d-bef5-029b4d07788f",
+            "8947e189-cb15-492f-9c2f-84a32e534e1f",
+            "b765e0f5-1d55-45dd-862f-b6e01e726711"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 269085,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "6.2.2"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "cypress/reports/mocha",
+        "overwrite": false,
+        "html": true,
+        "json": true
+      },
+      "version": "5.2.0"
+    }
+  }
+}

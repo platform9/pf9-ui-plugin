@@ -1,5 +1,5 @@
-const config = require('../../config')
-const sessionJson = require('../fixtures/session')
+import config from '../../config'
+// import sessionJson from '../fixtures/session.json'
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -11,6 +11,23 @@ const sessionJson = require('../fixtures/session')
 // https://on.cypress.io/custom-commands
 // ***********************************************
 //
+// export {}
+declare global{
+  export interface userDetails {
+    username:string
+    password:string 
+    completeName:string
+}
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Cypress {
+     export interface Chainable {
+        login(user:userDetails):Chainable<Element>
+        getById(testId:string):Chainable<Element>
+        getByTestId(testId:string):Chainable<Element>
+    }
+  }
+}
+
 //
 // -- This is a parent command --
 // Cypress.Commands.add("login", () => { ... })
@@ -29,10 +46,32 @@ const sessionJson = require('../fixtures/session')
 
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
-Cypress.Commands.add('login', () => {
-  // FIXME we should be using cy.fixture instead of importing the fixture manually
-  window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
+
+Cypress.Commands.add('getByTestId', (testId) => cy.get(`[data-testid='${testId}']`))
+
+Cypress.Commands.add('getById', (testId) => cy.get(`[id='${testId}']`))
+
+
+// ---------------- Commands reprsenting small flows ----------------------
+Cypress.Commands.add('login', (user:userDetails) => {
+    cy.intercept(/\/qbert\/.*\/v1alpha2\/clusters$/).as('clusters')
+    cy.intercept(/\/qbert\/.*\/nodes$/).as('nodes')
+
+    cy.visit('/')
+    cy.get('#email').clear().type(user.username)
+    cy.get('#password').clear().type(user.password)
+    cy.get('span').contains('Sign In').click()
+
+    cy.wait('@clusters', { requestTimeout: 30000, responseTimeout: 30000 })
+    cy.wait('@nodes', { requestTimeout: 30000, responseTimeout: 30000 })
+    // Validate user Name displayedis as expected
+    cy.contains(user.completeName)
 })
+
+// Cypress.Commands.add('login', () => {
+//   // FIXME we should be using cy.fixture instead of importing the fixture manually
+//   window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
+// })
 
 // For use with <ListTable>.  This will select the row containing the given text.
 Cypress.Commands.add('row', text => cy.contains('tr', text))
@@ -95,3 +134,5 @@ Cypress.Commands.add(
     cy.wait(200)
   },
 )
+
+
