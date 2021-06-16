@@ -399,7 +399,7 @@ export const getClusterApiServerHealthStatus = (cluster: IClusterSelector) => {
   })
 
   let fields = null
-  if (numRespondingNodes === numMasterNodes) {
+  if (nodes.length > 0 && numRespondingNodes === numMasterNodes) {
     fields = clusterApiServerHealthStatusFields.online
   } else if (numRespondingNodes === 0) {
     fields = clusterApiServerHealthStatusFields.offline
