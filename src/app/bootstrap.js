@@ -11,6 +11,7 @@ import { GlobalPreferences } from 'app/constants'
 import { preferencesActions } from 'core/session/preferencesReducers'
 import { generateThemeUpdatePayload } from 'account/components/theme/helpers'
 import { themeActions } from 'core/session/themeReducers'
+import Watchdog from 'core/watchdog'
 
 Bugsnag.start({
   releaseStage: process.env.NODE_ENV,
@@ -32,6 +33,9 @@ if (config.apiHost === undefined) {
 // so that ApiClient singletong will be available to use in the plugin actions
 ApiClient.init({ keystoneEndpoint: `${config.apiHost}/keystone` })
 const { preferenceStore } = ApiClient.getInstance()
+
+const watchdog = new Watchdog(1000, store.dispatch)
+window.addEventListener('beforeunload', () => watchdog.destroy())
 
 const loadTheme = async () => {
   try {

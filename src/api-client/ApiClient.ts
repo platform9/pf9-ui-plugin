@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 import { defaultAxiosConfig } from 'app/constants'
-
+import config from '../../config'
 import Appbert from './Appbert'
 import Cinder from './Cinder'
 import Glance from './Glance'
@@ -23,6 +23,7 @@ import { isPlainObject, pathJoin } from 'utils/misc'
 // import { IApiClient } from './model'
 // import ApiCache from './cache-client'
 import {
+  DDUHealth,
   IRawRequestGetParams,
   IRawRequestPostParams,
   IBasicRequestGetParams,
@@ -183,6 +184,18 @@ class ApiClient {
     this.activeRegion = regionId
   }
 
+  getSystemHealth = async () => {
+    const data = await this.basicGet<DDUHealth>({
+      url: '/regionstatus',
+      endpoint: config.apiHost,
+      options: {
+        clsName: 'ApiClient',
+        mthdName: 'getClusterTags',
+      },
+    })
+    return data
+  }
+
   getAuthHeaders = (scoped = true) => {
     const token = scoped ? this.scopedToken : this.unscopedToken
     if (!token) {
@@ -207,7 +220,7 @@ class ApiClient {
       endpoint = endpoint.replace(/\/v3$/, `/${version}`).replace(/\/v3\//, `/${version}/`)
     }
     // eslint-disable-next-line no-extra-boolean-cast
-    if (!!this.apiServices[clsName].scopedEnpointPath) {
+    if (!!this.apiServices[clsName]?.scopedEnpointPath) {
       return `${endpoint}/${this.apiServices[clsName].scopedEnpointPath()}`
     }
     return endpoint

@@ -29,9 +29,7 @@ import useReactRouter from 'use-react-router'
 import { emptyObj, ensureArray, isNilOrEmpty, pathStrOr } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import PushEventsProvider from 'core/providers/PushEventsProvider'
-import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
-import { MessageTypes } from 'core/components/notifications/model'
 import { RootState } from 'app/store'
 import { apply, Dictionary, keys, mergeAll, pathOr, prop, toPairs as ToPairs } from 'ramda'
 import pluginManager from 'core/utils/pluginManager'
@@ -46,6 +44,8 @@ import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
 import { isProductionEnv } from 'core/utils/helpers'
+import Watchdog from 'core/watchdog'
+import sessionTimeoutCheck from 'core/watchdog/session-timeout'
 
 const toPairs: any = ToPairs
 
@@ -356,20 +356,14 @@ const AuthenticatedContainer = () => {
   useEffect(() => {
     Bugsnag.setUser(userId, name, displayName)
 
-    const id = setInterval(() => {
-      // Check if session has expired
-      const { expiresAt } = session
-      const sessionExpired = moment().isAfter(expiresAt)
-      if (sessionExpired) {
-        dispatch(sessionActions.destroySession())
-        showToast('The session has expired, please log in again', MessageTypes.warning)
-        clearInterval(id)
-      }
-    }, 1000)
+    const cleanupCb = Watchdog.register({
+      handler: sessionTimeoutCheck(session, showToast),
+      frequency: 1000,
+    })
     // Reset the interval if the session changes
     return () => {
       Bugsnag.setUser()
-      clearInterval(id)
+      cleanupCb()
     }
   }, [])
 

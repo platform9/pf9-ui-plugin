@@ -42,6 +42,8 @@ import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 import Theme from 'core/themes/model'
 import Bugsnag from '@bugsnag/js'
+import Watchdog from 'core/watchdog'
+import systemHealthCheck from 'core/watchdog/system-health'
 
 const { setActiveRegion } = ApiClient.getInstance()
 
@@ -236,6 +238,7 @@ const AppContainer = () => {
     }
 
     const initialize = async () => {
+      Watchdog.register({ handler: systemHealthCheck, frequency: 1000 * 60 * 10 })
       await loadLoginFeaturesAndTracking()
       validateSession()
     }
