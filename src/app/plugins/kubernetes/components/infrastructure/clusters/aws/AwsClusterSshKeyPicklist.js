@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { pathStrOr } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
@@ -7,15 +7,17 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const AwsClusterSshKeyPicklist = forwardRef(
-  ({ cloudProviderId, cloudProviderRegionId, ...rest }, ref) => {
+  ({ cloudProviderId, cloudProviderRegionId, onChange, ...rest }, ref) => {
     const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,
     })
-    const keypairs = pathStrOr([], '0.keyPairs', details)
-    const options = keypairs.map((x) => ({ label: x.KeyName, value: x.KeyName }))
+    const keypairs = useMemo(() => pathStrOr([], '0.keyPairs', details), [details])
+    const options = useMemo(() => keypairs.map((x) => ({ label: x.KeyName, value: x.KeyName })), [
+      keypairs,
+    ])
 
-    return <Picklist {...rest} ref={ref} loading={loading} options={options} />
+    return <Picklist {...rest} ref={ref} loading={loading} options={options} onChange={onChange} />
   },
 )
 

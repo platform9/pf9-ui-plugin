@@ -13,11 +13,14 @@ import Tab from 'core/components/tabs/Tab'
 import SimpleLink from 'core/components/SimpleLink'
 
 import EksClusterNodeGroups from './node-groups'
+import GkeClusterNodeGroups from './gke-node-groups'
 import AgentPools from './agent-pools'
 import AksClusterNodes from './aks-nodes'
 import EksClusterNodes from './nodes'
+import GkeClusterNodes from './gke-nodes'
 import AksClusterDetails from './aks-details'
 import EksClusterDetails from './details'
+import GkeClusterDetails from './gke-details'
 import HeaderCard from './header-card'
 
 import Theme from 'core/themes/model'
@@ -42,16 +45,19 @@ const useStyles = makeStyles<Theme>((theme) => ({
 const clusterNodeGroupsComponents = {
   [ClusterCloudPlatforms.AKS]: AgentPools,
   [ClusterCloudPlatforms.EKS]: EksClusterNodeGroups,
+  [ClusterCloudPlatforms.GKE]: GkeClusterNodeGroups,
 }
 
 const clusterNodesComponents = {
   [ClusterCloudPlatforms.AKS]: AksClusterNodes,
   [ClusterCloudPlatforms.EKS]: EksClusterNodes,
+  [ClusterCloudPlatforms.GKE]: GkeClusterNodes,
 }
 
 const clusterDetailsComponents = {
   [ClusterCloudPlatforms.AKS]: AksClusterDetails,
   [ClusterCloudPlatforms.EKS]: EksClusterDetails,
+  [ClusterCloudPlatforms.GKE]: GkeClusterDetails,
 }
 
 function ImportedClusterDetails() {
@@ -61,6 +67,7 @@ function ImportedClusterDetails() {
     importedClusterActions.list,
   ) as any
   const cluster = clusters.find((x) => x.uuid === match.params.id)
+
   useEffect(() => {
     if (!cluster) {
       history.push(routes.cluster.imported.list.path())

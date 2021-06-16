@@ -6,19 +6,25 @@ import { ImportedClusterSelector } from '../importedClusters/model'
 export enum CloudProviders {
   Aws = 'aws',
   Azure = 'azure',
-  Google = 'google',
+  Gcp = 'gke',
   BareOS = 'local',
   PhysicalMachine = 'physical',
   VirtualMachine = 'virtual',
-  EKS = 'eks',
-  AKS = 'aks',
-  GKE = 'gke',
 }
 
 export enum CloudProvidersFriendlyName {
   aws = 'AWS',
   azure = 'Azure',
   local = 'BareOS',
+}
+
+export enum CloudDefaults {
+  Region = 'region',
+  RegionLabel = 'regionDisplayName',
+  Domain = 'domain', // Route 53 Domain. AWS only
+  DomainLabel = 'domainLabel',
+  SshKey = 'sshKey',
+  SshKeyLabel = 'sshKeyLabel',
 }
 
 export interface ICloudProvidersSelector extends GetCloudProvider {

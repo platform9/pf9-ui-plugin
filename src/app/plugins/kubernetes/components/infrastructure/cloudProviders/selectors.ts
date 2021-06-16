@@ -15,6 +15,7 @@ import { importedClustersSelector } from '../importedClusters/selectors'
 export const cloudProviderTypes = {
   aws: 'AWS',
   azure: 'Azure',
+  gke: 'Google',
   openstack: 'OpenStack',
   local: 'BareOS',
 }

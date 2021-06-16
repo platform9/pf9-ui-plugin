@@ -1,14 +1,14 @@
-import React, { FC } from 'react'
+import React, { FC, useCallback, useMemo } from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { CloudDefaults, CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { awsPrerequisitesLink } from 'k8s/links'
 import ClusterNameField from '../../form-components/name'
 import AwsClusterSshKeyPickList from '../AwsClusterSshKeyPicklist'
 import WizardStep from 'core/components/wizard/WizardStep'
 import FormReviewTable from 'core/components/validatedForm/review-table'
-import { defaultEtcBackupPath } from 'app/constants'
+import { defaultEtcBackupPath, UserPreferences } from 'app/constants'
 import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
@@ -21,6 +21,8 @@ import KubernetesVersion from '../../form-components/kubernetes-version'
 import { awsClusterTracking } from '../../tracking'
 import { ClusterCreateTypes } from '../../model'
 import { CalicoDetectionTypes } from '../../form-components/calico-network-fields'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { isEmpty } from 'ramda'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -46,6 +48,7 @@ export const initialContext = {
   networkStack: 'ipv4',
   privileged: true,
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
+  azs: [],
   domainId: '',
 }
 
@@ -100,8 +103,12 @@ interface Props {
 
 const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles({})
+  const [prefs] = useScopedPreferences('defaults')
+  const cloudDefaults = useMemo(() => prefs[UserPreferences.Aws] || {}, [prefs])
 
   const updateFqdns = (values) => (value, label) => {
+    setWizardContext({ domainId: value })
+
     const name = values.name || wizardContext.name
 
     const api = `${name}-api.${label}`
@@ -112,6 +119,30 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
   }
 
   const handleClusterDomainUpdate = (values) => updateFqdns(values)
+
+  const handleCloudProviderChange = (values) => (value) => {
+    setWizardContext({
+      cloudProviderId: value,
+    })
+
+    // Populate the form with default values from the pref store AFTER the user chooses the
+    // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
+    // for the rest of the fields
+
+    setCloudDefaults(values)
+  }
+
+  const setCloudDefaults = useCallback(
+    (values) => {
+      if (isEmpty(cloudDefaults)) return
+      setWizardContext({ ...cloudDefaults, domainId: cloudDefaults[CloudDefaults.DomainLabel] })
+      updateFqdns(values)(
+        cloudDefaults[CloudDefaults.Domain],
+        cloudDefaults[CloudDefaults.DomainLabel],
+      )
+    },
+    [cloudDefaults],
+  )
 
   return (
     <WizardStep stepId="one-click" onNext={awsClusterTracking.oneClick(trackingFields)}>
@@ -137,13 +168,20 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
               <ClusterNameField setWizardContext={setWizardContext} />
 
               {/* Cloud Provider */}
-              <CloudProviderField cloudProviderType={CloudProviders.Aws} />
+              <CloudProviderField
+                cloudProviderType={CloudProviders.Aws}
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                onChange={handleCloudProviderChange(values)}
+              />
 
               {/* Cloud Provider Region */}
               <CloudProviderRegionField
                 cloudProviderType={CloudProviders.Aws}
                 values={values}
+                wizardContext={wizardContext}
                 onChange={(region) => setWizardContext({ azs: [] })}
+                disabled={!values.cloudProviderId && !values.region}
               />
 
               {/* AWS Availability Zone */}
@@ -157,11 +195,17 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
               )}
 
               {/* SSH Key */}
-              <SshKeyField dropdownComponent={AwsClusterSshKeyPickList} values={values} />
+              <SshKeyField
+                dropdownComponent={AwsClusterSshKeyPickList}
+                values={values}
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+              />
 
               {/* Cluster Domain */}
               <ClusterDomainField
                 values={values}
+                value={wizardContext.domainId}
                 onChange={handleClusterDomainUpdate(values)}
                 required={false}
                 disabled={wizardContext.usePf9Domain}

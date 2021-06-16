@@ -2,7 +2,6 @@ import React from 'react'
 import InfoPanel, { getFieldsForCard, IDetailFields } from 'core/components/InfoPanel'
 import { makeStyles } from '@material-ui/styles'
 import { ImportedClusterSelector } from './model'
-import { CloudProviders } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
 import { formatDate } from 'utils/misc'
 import renderLabels from 'k8s/components/pods/renderLabels'
@@ -34,13 +33,10 @@ const renderLoggingFields = (target) => (data) => {
   return Array.from(tags).map((tag) => <div>{tag}</div>)
 }
 
-const eksOverviewFields: Array<IDetailFields<ImportedClusterSelector>> = [
-  { id: 'spec.eks.eksVersion', title: 'EKS Version', required: true },
-  { id: 'spec.eks.network.vpc.clusterSecurityGroupId', title: 'Cluster Security Group ID' },
-]
-
 // Common
 const clusterOverviewFields: Array<IDetailFields<ImportedClusterSelector>> = [
+  { id: 'spec.eks.eksVersion', title: 'EKS Version', required: true },
+  { id: 'spec.eks.network.vpc.clusterSecurityGroupId', title: 'Cluster Security Group ID' },
   { id: 'status.controlPlaneEndpoint', title: 'Api Server Endpoint' },
   {
     id: 'created_at',
@@ -74,10 +70,6 @@ const loggingFields: Array<IDetailFields<ImportedClusterSelector>> = [
   },
 ]
 
-const providerSpecificFields = {
-  [CloudProviders.EKS]: eksOverviewFields,
-}
-
 interface Props {
   cluster: ImportedClusterSelector
   loading: boolean
@@ -85,9 +77,7 @@ interface Props {
 }
 const ClusterInfo = ({ cluster, loading, reload }: Props) => {
   const classes = useStyles({})
-  const provider = cluster?.metadata?.labels?.provider
-  const overviewFields = [...providerSpecificFields[provider], ...clusterOverviewFields]
-  const overview = getFieldsForCard(overviewFields, cluster)
+  const overview = getFieldsForCard(clusterOverviewFields, cluster)
   const networking = getFieldsForCard(networkingFields, cluster)
   const logging = getFieldsForCard(loggingFields, cluster)
 

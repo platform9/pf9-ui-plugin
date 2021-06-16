@@ -1,7 +1,7 @@
 import config from '../../config'
 import ApiService from 'api-client/ApiService'
 import { PreferenceStoreResponse } from './preference-store.model'
-import { GlobalPreferences } from 'app/constants'
+import { GlobalPreferences, UserPreferences } from 'app/constants'
 
 class PreferenceStore extends ApiService {
   public getClassName() {
@@ -13,7 +13,42 @@ class PreferenceStore extends ApiService {
   }
 
   get baseUrl(): string {
-    return `/preference-store`
+    return '/preference-store'
+  }
+
+  getUserPreference = async (userId, key: UserPreferences) => {
+    return this.client.basicGet({
+      url: `${this.baseUrl}/user/${userId}/${key}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getUserPreference',
+      },
+    })
+  }
+
+  setUserPreference = async (userId, key: UserPreferences, value) => {
+    const jsonString = JSON.stringify(value)
+    const body = {
+      value: jsonString,
+    }
+    return this.client.basicPut({
+      url: `${this.baseUrl}/user/${userId}/${key}`,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addUserPreference',
+      },
+    })
+  }
+
+  deleteUserPreference = async (userId, key: UserPreferences) => {
+    return this.client.basicGet({
+      url: `${this.baseUrl}/user/${userId}/${key}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteUserPreference',
+      },
+    })
   }
 
   getGlobalPreference = async (key: GlobalPreferences) => {
