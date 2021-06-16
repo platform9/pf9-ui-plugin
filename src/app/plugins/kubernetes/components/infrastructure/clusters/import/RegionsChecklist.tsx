@@ -41,6 +41,7 @@ const RegionsChecklist = ({ cloudProviderId, onChange, value, className, cluster
   const regionCount = useMemo(() => {
     // For now only AKS needs this, uses cluster.location
     if (clusters) {
+      console.log(clusters, 'clusters in regions checklist')
       return clusters.reduce((accum, cluster) => {
         return {
           ...accum,
@@ -58,6 +59,11 @@ const RegionsChecklist = ({ cloudProviderId, onChange, value, className, cluster
       })
       .sort()
     if (regionCount) {
+      // There is no region list for GKE... determine from clusters
+      if (!regionList.length) {
+        return Object.keys(regionCount).sort()
+      }
+      // Want to trim down region list for AKS
       return regionList.filter((region) => regionCount[region])
     }
     return regionList

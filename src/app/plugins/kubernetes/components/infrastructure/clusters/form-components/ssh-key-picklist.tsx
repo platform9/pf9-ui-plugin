@@ -4,7 +4,14 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 const additionalInfo =
   'Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes.'
 
-export default ({ dropdownComponent, values, info = additionalInfo }) => {
+export default ({
+  dropdownComponent,
+  values,
+  required = true,
+  wizardContext,
+  setWizardContext,
+  info = additionalInfo,
+}) => {
   return (
     <PicklistField
       DropdownComponent={dropdownComponent}
@@ -14,7 +21,9 @@ export default ({ dropdownComponent, values, info = additionalInfo }) => {
       cloudProviderId={values.cloudProviderId}
       cloudProviderRegionId={values.region}
       info={info}
-      required
+      value={wizardContext.sshKey}
+      onChange={(value) => setWizardContext({ sshKey: value })}
+      required={required}
     />
   )
 }

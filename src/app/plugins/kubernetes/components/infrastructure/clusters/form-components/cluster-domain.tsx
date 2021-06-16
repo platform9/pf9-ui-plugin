@@ -2,11 +2,12 @@ import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import ClusterDomainPicklist from '../ClusterDomainPicklist'
 
-const ClusterDomainField = ({ values, onChange, required = true, disabled = false }) => (
+const ClusterDomainField = ({ values, value, onChange, required = true, disabled = false }) => (
   <PicklistField
     DropdownComponent={ClusterDomainPicklist}
     id="domainId"
     label="Domain"
+    value={value}
     onChange={onChange}
     cloudProviderId={values.cloudProviderId}
     cloudProviderRegionId={values.cloudProviderRegionId}

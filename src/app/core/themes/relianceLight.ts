@@ -63,6 +63,9 @@ export const colors = {
     500: '#4AA3DF',
     700: '#1E699C',
   },
+  googleYellow: {
+    500: '#F4B400',
+  },
 }
 const components = {
   header: {

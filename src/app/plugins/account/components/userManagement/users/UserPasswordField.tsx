@@ -32,6 +32,7 @@ const UserPasswordField = ({
   className = '',
   showPasswordRequirements = true,
   restrictPassword = true,
+  onChange = null,
 }: Props) => {
   const passwordValidators = restrictPassword
     ? [requiredValidator, passwordValidator]
@@ -45,6 +46,7 @@ const UserPasswordField = ({
         type="password"
         validations={passwordValidators}
         className={className}
+        onChange={onChange}
       />
       {showPasswordRequirements && (
         <Text variant="body1" component="div">
@@ -73,6 +75,7 @@ interface Props {
   className?: string
   showPasswordRequirements?: boolean
   restrictPassword?: boolean
+  onChange?: (value) => void
 }
 
 export default UserPasswordField

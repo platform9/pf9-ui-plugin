@@ -17,6 +17,7 @@ const useStyles = makeStyles<any, Partial<Props>>((theme: Theme) => ({
     paddingLeft: theme.spacing(2),
     marginLeft: theme.spacing(2),
     listStyleType: ({ type }) => (type === 'dash' ? '"-  "' : type),
+    fontSize: '16px',
   },
 }))
 
