@@ -9,17 +9,6 @@ export enum TaskStates {
   SuspendError = 'suspend_error',
 }
 
-// ;(status: IClusterStatus, theme: Theme) =>
-//   ({
-//     ok: theme.palette.green.main,
-//     pause: theme.palette.yellow.main,
-//     fail: theme.palette.red.main,
-//     error: theme.palette.red.main,
-//     loading: theme.palette.blue.main,
-//     unknown: theme.palette.grey.main,
-//     upgrade: theme.palette.orange.main,
-//   }[status] || theme.palette.red.main)
-
 export const convertTaskStateToStatus = (taskState) =>
   ({
     [TaskStates.Ready]: 'ok',
@@ -61,8 +50,8 @@ export const getServiceMessage = (desired, ready) => {
 export const summaryMessages = {
   [TaskStates.Ready]: 'Your Management Plane Is Operational',
   [TaskStates.Error]: 'Your Management Plane Is In A Failed State',
-  [TaskStates.Suspended]: 'Your Management Plane Has Been Suspended',
-  [TaskStates.Resuming]: 'Your Management Plane Is Resuming',
+  [TaskStates.Suspended]: 'Your Management Plane Has Been Hybernated',
+  [TaskStates.Resuming]: 'Your Management Plane Has Been Hybernated',
   [TaskStates.ResumeError]: 'Your Management Plane Is In A Failed State',
   [TaskStates.SuspendError]: 'Your Management Plane Is In A Failed State',
 }
@@ -71,9 +60,9 @@ export const detailMessages = {
   [TaskStates.Error]:
     'A fatal error has occured, please contract your Platform9 administrator for help',
   [TaskStates.Suspended]:
-    'The Platform9 SaaS Managment Plane was suspended and is in the process of resuming',
+    'The Platform9 SaaS Managment Plane was hybernated and is in the process of resuming. Please wait a few minutes for the process to complete',
   [TaskStates.Resuming]:
-    'The Platform9 SaaS Managment Plane was suspended and is in the process of resuming',
+    'The Platform9 SaaS Managment Plane was hybernated and is in the process of resuming. Please wait a few minutes for the process to complete',
   [TaskStates.ResumeError]:
     'A fatal error has occured while resuming the Platform9 SaaS Managment Plane, please contract your Platform9 administrator for help',
   [TaskStates.SuspendError]:
