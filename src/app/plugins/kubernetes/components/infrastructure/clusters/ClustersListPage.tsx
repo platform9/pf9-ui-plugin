@@ -72,9 +72,10 @@ const renderConnectionStatus = (_, cluster) => (
     cluster={cluster}
   />
 )
-const renderPlatform9ComponentsStatus = (_, cluster) => (
-  <ClusterHealthStatus iconStatus={cluster.connectionStatus === 'converging'} cluster={cluster} />
-)
+const renderPlatform9ComponentsStatus = (_, cluster) => {
+  const showIconStatus = cluster.connectionStatus === 'converging' || cluster.status === 'pending'
+  return <ClusterHealthStatus iconStatus={showIconStatus} cluster={cluster} />
+}
 
 const renderApiServerHealth = (_, cluster) => <ClusterApiServerHealthStatus cluster={cluster} />
 

@@ -159,6 +159,10 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
     return renderTransientStatus(cluster, variant)
   }
 
+  if (cluster.status === 'pending') {
+    return renderTransientStatus({ uuid: cluster.uuid, connectionStatus: 'converging' }, variant)
+  }
+
   const fields = getClusterHealthStatus(cluster)
 
   return (

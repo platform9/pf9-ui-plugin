@@ -384,19 +384,22 @@ export const apiServerHealthStatusFields: {
 
 export const getClusterApiServerHealthStatus = (cluster: IClusterSelector) => {
   const nodes = cluster.nodes || []
-  let nodes_responding = 0
-  nodes.map((node) => {
-    if (node.api_responding) {
-      nodes_responding += 1
+  let numRespondingNodes = 0
+  let numMasterNodes = 0
+  nodes.forEach((node) => {
+    if (node.isMaster) {
+      if (node.api_responding) {
+        numRespondingNodes += 1
+      }
+      numMasterNodes += 1
     }
   })
 
   let fields = null
-
-  if (nodes_responding === 0) {
-    fields = apiServerHealthStatusFields.offline
-  } else if (nodes_responding === nodes.length) {
+  if (numRespondingNodes === numMasterNodes) {
     fields = apiServerHealthStatusFields.online
+  } else if (numRespondingNodes === 0) {
+    fields = apiServerHealthStatusFields.offline
   } else {
     fields = apiServerHealthStatusFields.degraded
   }

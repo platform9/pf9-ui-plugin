@@ -241,7 +241,7 @@ export const renderNodeHealthStatus = (_, node, onClick = undefined) => {
 const renderRole = (_, { isMaster }) => (isMaster ? 'Master' : 'Worker')
 
 const renderApiServerHealth = (_, node) => {
-  if (!node.isMaster) return 'N/A'
+  if (!node.isMaster) return
   const status = node.api_responding ? 'online' : 'offline'
   const fields = apiServerHealthStatusFields[status]
 

@@ -6,6 +6,7 @@ import Text from 'core/elements/text'
 import { pathStr } from 'utils/fp'
 import { formattedName } from 'core/utils/formatters'
 import Theme from 'core/themes/model'
+import InfoTooltip from '../InfoTooltip'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -67,9 +68,17 @@ export const PieLegend = ({ data }) => {
             >
               {entry.value}
             </Text>
-            <Text component="span" variant="body2" className={legendName}>
-              {formattedName(entry.name)}
-            </Text>
+            {entry.info ? (
+              <InfoTooltip info={entry.info}>
+                <Text component="span" variant="body2" className={legendName}>
+                  {formattedName(entry.name)}
+                </Text>
+              </InfoTooltip>
+            ) : (
+              <Text component="span" variant="body2" className={legendName}>
+                {formattedName(entry.name)}
+              </Text>
+            )}
           </div>
         ))}
     </legend>
