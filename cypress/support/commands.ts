@@ -46,13 +46,17 @@ declare global{
 
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
+// Cypress.Commands.add('login', () => {
+//   // FIXME we should be using cy.fixture instead of importing the fixture manually
+//   window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
+// })
 
 Cypress.Commands.add('getByTestId', (testId) => cy.get(`[data-testid='${testId}']`))
 
 Cypress.Commands.add('getById', (testId) => cy.get(`[id='${testId}']`))
 
 
-// ---------------- Commands reprsenting small flows ----------------------
+// ---------------- Commands representing small flows ----------------------
 Cypress.Commands.add('login', (user:userDetails) => {
     cy.intercept(/\/qbert\/.*\/v1alpha2\/clusters$/).as('clusters')
     cy.intercept(/\/qbert\/.*\/nodes$/).as('nodes')
@@ -67,11 +71,6 @@ Cypress.Commands.add('login', (user:userDetails) => {
     // Validate user Name displayedis as expected
     cy.contains(user.completeName)
 })
-
-// Cypress.Commands.add('login', () => {
-//   // FIXME we should be using cy.fixture instead of importing the fixture manually
-//   window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
-// })
 
 // For use with <ListTable>.  This will select the row containing the given text.
 Cypress.Commands.add('row', text => cy.contains('tr', text))
