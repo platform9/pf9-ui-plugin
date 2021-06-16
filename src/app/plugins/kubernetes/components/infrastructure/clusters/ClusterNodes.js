@@ -52,8 +52,6 @@ const ClusterNodes = () => {
     return filterByNodeRole(node)
   })
 
-  console.log('params', params)
-
   const NodesTable = useMemo(
     () =>
       createListTableComponent({

@@ -4,7 +4,7 @@ import { NodeState } from './model'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 const options = [
-  { label: 'Authorized', value: 'master' },
+  { label: 'Authorized', value: NodeState.Authorized },
   { label: 'Unauthorized', value: NodeState.Unauthorized },
 ]
 const NodesStatePicklist = ({ onChange, ...rest }) => {
