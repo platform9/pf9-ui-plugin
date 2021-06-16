@@ -180,6 +180,7 @@
     "test:integration": "cross-env NODE_ENV=test cypress run",
     "cypress:open": "cross-env NODE_ENV=test ./node_modules/.bin/cypress open",
     "cypress:run": "cross-env NODE_ENV=test ./node_modules/.bin/cypress run",
+    "cypress:report": "cross-env NODE_ENV=test ./node_modules/.bin/mochawesome-merge cypress/reports/mocha/*.json > cypress/reports/output.json && ./node_modules/.bin/marge ./cypress/reports/output.json  --reportDir cypress/reports --inline",
     "test:ci": "cross-env NODE_ENV=test ./node_modules/.bin/cypress run",
     "test:ci:record": "cross-env NODE_ENV=test ./node_modules/.bin/cypress run --record --key $CYPRESS_RECORD_KEY --parallel",
     "test:ci:windows": "cross-env NODE_ENV=test bin-up cypress run",
