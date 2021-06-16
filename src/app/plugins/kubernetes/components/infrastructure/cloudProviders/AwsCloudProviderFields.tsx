@@ -46,6 +46,8 @@ interface Props {
   showSubmitInCard: boolean
   updateWizard: boolean
   errorMessage: string
+  showInfo?: boolean
+  setInitialValue?: boolean
 }
 
 const downloadIAMPolicy = async (setState) => {
@@ -69,56 +71,60 @@ const AwsCloudProviderFields = ({
   showSubmitInCard = false,
   updateWizard = false,
   errorMessage = '',
+  showInfo = true,
+  setInitialValue = false,
 }: Props) => {
   const { bullets, bullet, bulletText, downloadIcon, iamInfo, inCardSubmit } = useStyles({})
   const [downloadState, setDownloadState] = useState({ status: '', message: '' })
 
   return (
     <>
-      <Info
-        error={downloadState.status === 'error'}
-        title={toggleIamPolicy ? 'IAM Policy' : ''}
-        expanded={false}
-        className={iamInfo}
-      >
-        <div>
-          The following permissions are required on your AWS account in order to deploy fully
-          automated Managed Kubernetes clusters:
-        </div>
-        <ul className={bullets}>
-          <li className={bullet}>
-            <span className={bulletText}>ELB Management</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>EC2 Instance Management</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>Route 53 DNS Configuration</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>EBS Volume Management</span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>
-              Access to 2 or more Availability Zones within the region
-            </span>
-          </li>
-          <li className={bullet}>
-            <span className={bulletText}>VPC Management</span>
-          </li>
-        </ul>
-        <MuiButton variant="outlined" onClick={() => downloadIAMPolicy(setDownloadState)}>
-          <FontAwesomeIcon size="md" className={downloadIcon}>
-            download
-          </FontAwesomeIcon>
-          <Text className="no-text-transform" variant="buttonSecondary">
-            Download IAM Policy
-          </Text>
-        </MuiButton>
-        {downloadState.status === 'error' && (
-          <Alert small variant="error" message={downloadState.message} />
-        )}
-      </Info>
+      {showInfo && (
+        <Info
+          error={downloadState.status === 'error'}
+          title={toggleIamPolicy ? 'IAM Policy' : ''}
+          expanded={false}
+          className={iamInfo}
+        >
+          <div>
+            The following permissions are required on your AWS account in order to deploy fully
+            automated Managed Kubernetes clusters:
+          </div>
+          <ul className={bullets}>
+            <li className={bullet}>
+              <span className={bulletText}>ELB Management</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>EC2 Instance Management</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>Route 53 DNS Configuration</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>EBS Volume Management</span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>
+                Access to 2 or more Availability Zones within the region
+              </span>
+            </li>
+            <li className={bullet}>
+              <span className={bulletText}>VPC Management</span>
+            </li>
+          </ul>
+          <MuiButton variant="outlined" onClick={() => downloadIAMPolicy(setDownloadState)}>
+            <FontAwesomeIcon size="md" className={downloadIcon}>
+              download
+            </FontAwesomeIcon>
+            <Text className="no-text-transform" variant="buttonSecondary">
+              Download IAM Policy
+            </Text>
+          </MuiButton>
+          {downloadState.status === 'error' && (
+            <Alert small variant="error" message={downloadState.message} />
+          )}
+        </Info>
+      )}
       <TextField
         id="name"
         label="Cloud Provider Name"
@@ -133,6 +139,7 @@ const AwsCloudProviderFields = ({
         label="Access Key ID"
         onChange={(value) => setWizardContext({ key: value })}
         value={wizardContext.key}
+        initialValue={setInitialValue ? '**********************' : ''}
         info="AWS IAM Access Key"
         required
       />
@@ -141,6 +148,7 @@ const AwsCloudProviderFields = ({
         label="Secret Access Key"
         onChange={(value) => setWizardContext({ secret: value })}
         value={wizardContext.secret}
+        initialValue={setInitialValue ? '**********************' : ''}
         info="IAM User Secret Key"
         type="password"
         required

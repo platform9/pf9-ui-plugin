@@ -156,6 +156,7 @@ export interface Spec {
   external: boolean
   eks?: Eks
   aks?: Aks
+  gke?: Gke
 }
 
 export interface Addons {
@@ -327,7 +328,7 @@ export interface Aks {
   nodeResourceGroup: string
   network: Network
   agentPools: AgentPool[]
-  instances: Instance[]
+  instances: AksInstance[]
   servicePrincipalClientID: string
   dnsPrefix: string
   tags: AksTags
@@ -353,7 +354,7 @@ export interface AgentPool {
   vnetSubnetID: string
 }
 
-export interface Instance {
+export interface AksInstance {
   name: string
   location: string
   instanceId: string
@@ -416,4 +417,48 @@ export interface LoadBalancerProfile {
 
 export interface AksTags {
   [key: string]: string
+}
+
+export interface Gke {
+  locations: string[]
+  id: string
+  clusterCaCertificate: string
+  initialClusterVersion: string
+  releaseChannel: string
+  databaseEncryption: string
+  network: GkeNetwork
+  nodePools: NodePool[]
+  privateCluster: boolean
+}
+
+export interface GkeNetwork {
+  useIpAliases: boolean
+  network: string
+  subnetwork: string
+  podIpv4CIDR: string
+  servicesIpv4CIDR: string
+  networkPolicyConfig: boolean
+}
+
+export interface NodePool {
+  name: string
+  diskSizeGb: number
+  machineType: string
+  imageType: string
+  diskType: string
+  nodeCount: number
+  maxPodsPerNode: string
+  status: string
+  k8sVersion: string
+  locations: string[]
+  instances: GkeInstance[]
+}
+
+export interface GkeInstance {
+  name: string
+  status: string
+  id: string
+  location: string
+  instanceTemplate: string
+  instanceGroupName: string
 }

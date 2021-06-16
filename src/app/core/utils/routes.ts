@@ -266,6 +266,13 @@ export const routes = {
         },
         name: 'Infrastructure:Clusters:Import:AKS',
       }),
+      gke: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/import/gke`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:Clusters:Import:GKE',
+      }),
     },
     imported: {
       list: Route.register({

@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { pathStrOr } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
@@ -13,8 +13,8 @@ const ClusterDomainPicklist = forwardRef(
       cloudProviderRegionId,
     })
 
-    const domains = pathStrOr([], '0.domains', details)
-    const options = domains.map((x) => ({ label: x.Name, value: x.Id }))
+    const domains = useMemo(() => pathStrOr([], '0.domains', details), [details])
+    const options = useMemo(() => domains.map((x) => ({ label: x.Name, value: x.Id })), [domains])
 
     const handleChange = (value) => {
       const option = options.find((x) => x.value === value)
