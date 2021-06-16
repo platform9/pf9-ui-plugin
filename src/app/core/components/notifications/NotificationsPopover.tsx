@@ -155,8 +155,8 @@ const NotificationsPopover = ({ className }) => {
       setDropdownTarget('popover')
       clearTimeout(lastTimeout)
       lastTimeout = setTimeout(() => {
-        // setAnchorEl(null)
-        // setDropdownTarget(null)
+        setAnchorEl(null)
+        setDropdownTarget(null)
       }, errorTimeout)
     }
   }, [lastNotification])
