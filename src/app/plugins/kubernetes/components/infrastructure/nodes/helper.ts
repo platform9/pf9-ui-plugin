@@ -1,6 +1,11 @@
 import { partition, pathOr } from 'ramda'
 import { ClusterType, HardwareType, nodeHardwareRequirements } from '../clusters/bareos/constants'
-import { ErrorMessageCodes, errorMessageLevel } from './model'
+import {
+  ApiServerHealthStatus,
+  ApiServerHealthStatusFields,
+  ErrorMessageCodes,
+  errorMessageLevel,
+} from './model'
 
 export const getErrorMessage = (node, msgLevel: errorMessageLevel, code: ErrorMessageCodes) => {
   const messages = pathOr(null, ['message', msgLevel], node)
@@ -40,4 +45,19 @@ export const meetsHardwareRequirement = (
  */
 export const clockDriftDetectedInNodes = (nodes) => {
   return nodes && !!nodes.find((node) => hasClockDrift(node))
+}
+
+export const nodeApiServerHealthStatusFields: {
+  [status in ApiServerHealthStatus]: ApiServerHealthStatusFields
+} = {
+  online: {
+    label: 'Online',
+    message: 'API server is responding on this node',
+    status: 'online',
+  },
+  offline: {
+    label: 'Offline',
+    message: 'API server is not responding on this node',
+    status: 'offline',
+  },
 }

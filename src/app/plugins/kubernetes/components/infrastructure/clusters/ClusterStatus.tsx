@@ -17,6 +17,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
 import { routes } from 'core/utils/routes'
 import { clockDriftDetectedInNodes } from '../nodes/helper'
+import { ApiServerHealthStatus } from '../nodes/model'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
   ({
@@ -27,6 +28,9 @@ const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
     loading: theme.palette.blue.main,
     unknown: theme.palette.grey.main,
     upgrade: theme.palette.orange.main,
+    online: theme.palette.green.main,
+    degraded: theme.palette.orange.main,
+    offline: theme.palette.red.main,
   }[status] || theme.palette.red.main)
 
 const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
@@ -69,7 +73,10 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
 
 type StatusVariant = 'table' | 'header'
 
-const iconMap = new Map<IClusterStatus, { icon: string; classes: string }>([
+const iconMap = new Map<
+  IClusterStatus | ApiServerHealthStatus | 'degraded',
+  { icon: string; classes: string }
+>([
   ['fail', { icon: 'times', classes: '' }],
   ['ok', { icon: 'check', classes: '' }],
   ['pause', { icon: 'pause-circle', classes: '' }],
@@ -77,6 +84,9 @@ const iconMap = new Map<IClusterStatus, { icon: string; classes: string }>([
   ['error', { icon: 'exclamation-triangle', classes: '' }],
   ['loading', { icon: 'sync', classes: 'fa-spin' }],
   ['upgrade', { icon: 'arrow-circle-up', classes: '' }],
+  ['online', { icon: 'check', classes: '' }],
+  ['offline', { icon: 'times', classes: '' }],
+  ['degraded', { icon: 'check', classes: '' }],
 ])
 
 interface Props {
@@ -238,12 +248,7 @@ export const ClusterApiServerHealthStatus: FC<IClusterStatusProps> = ({
   const fields = getClusterApiServerHealthStatus(cluster)
 
   return (
-    <ClusterStatusSpan
-      title={fields.message}
-      status={fields.clusterStatus}
-      variant={variant}
-      {...rest}
-    >
+    <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant} {...rest}>
       {variant === 'header' ? (
         label || fields.label
       ) : (

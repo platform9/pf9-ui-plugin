@@ -12,7 +12,6 @@ import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterSta
 import {
   connectionStatusFieldsTable,
   clusterHealthStatusFields,
-  apiServerHealthStatusFields,
 } from '../clusters/ClusterStatusUtils'
 import NodeDeAuthDialog from './NodeDeAuthDialog'
 import RemoteSupportDialog from './RemoteSupportDialog'
@@ -23,7 +22,6 @@ import { listTablePrefs, allKey } from 'app/constants'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
-import { orderInterfaces } from './helper'
 import { makeStyles } from '@material-ui/styles'
 import { routes } from 'core/utils/routes'
 import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
@@ -32,7 +30,12 @@ import ResourceUsageTables from '../common/ResourceUsageTables'
 import NodesStatePicklist from './nodes-state-picklist'
 import NodeAuthDialog from './NodeAuthDialog'
 import { NodeState } from './model'
-import { clockDriftDetectedInNodes, hasClockDrift } from './helper'
+import {
+  orderInterfaces,
+  clockDriftDetectedInNodes,
+  hasClockDrift,
+  nodeApiServerHealthStatusFields,
+} from './helper'
 import { renderErrorStatus } from '../clusters/ClusterStatus'
 import NodeRolesPicklist from './node-roles-picklist'
 
@@ -243,11 +246,11 @@ const renderRole = (_, { isMaster }) => (isMaster ? 'Master' : 'Worker')
 const renderApiServerHealth = (_, node) => {
   if (!node.isMaster) return
   const status = node.api_responding ? 'online' : 'offline'
-  const fields = apiServerHealthStatusFields[status]
+  const fields = nodeApiServerHealthStatusFields[status]
 
   return (
     <>
-      <ClusterStatusSpan title={fields.label} status={fields.clusterStatus}>
+      <ClusterStatusSpan title={fields.message} status={fields.status}>
         {fields.label}
       </ClusterStatusSpan>
     </>
