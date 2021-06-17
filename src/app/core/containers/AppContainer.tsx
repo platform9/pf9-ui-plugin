@@ -5,6 +5,7 @@ import {
   activateUserUrl,
   CustomerTiers,
   forgotPasswordUrl,
+  GlobalPreferences,
   loginUrl,
   loginWithCookieUrl,
   loginWithSsoUrl,
@@ -42,8 +43,9 @@ import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 import Theme from 'core/themes/model'
 import Bugsnag from '@bugsnag/js'
+import { isDecco } from 'core/utils/helpers'
 
-const { setActiveRegion } = ApiClient.getInstance()
+const { setActiveRegion, preferenceStore } = ApiClient.getInstance()
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -106,22 +108,38 @@ const restoreSession = async (
 }
 
 const getUserDetails = async (user) => {
+  if (typeof window.analytics === 'undefined') return
+
   // Need this here again bc not able to use AppContainer state and ensure
   // that sandbox state would be set on time for both users logging in for
   // first time and for users who are already logged in
   const features = await axios.get('/clarity/features.json').catch(() => null)
   const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
+  const customerTier = pathStrOr(CustomerTiers.Freedom, 'customer_tier', features)
 
   // Identify the user in Segment using Keystone ID
-  if (typeof window.analytics !== 'undefined') {
-    if (sandbox) {
-      window.analytics.identify()
-    } else {
-      window.analytics.identify(user.id, {
-        email: user.email,
-      })
-    }
+  if (sandbox) {
+    return window.analytics.identify()
   }
+
+  const payload: any = {
+    email: user.email,
+  }
+  if (
+    isDecco(features) &&
+    (customerTier === CustomerTiers.Growth || customerTier === CustomerTiers.Enterprise)
+  ) {
+    try {
+      const externalId = await preferenceStore.getGlobalPreference(
+        GlobalPreferences.CustomerExternalId,
+      )
+      if (externalId) {
+        payload.accountExternalId = externalId
+        payload.contactExternalId = user.email
+      }
+    } catch (err) {}
+  }
+  window.analytics.identify(user.id, payload)
 }
 
 /**
