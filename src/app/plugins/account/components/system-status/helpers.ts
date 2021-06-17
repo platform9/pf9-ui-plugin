@@ -1,4 +1,5 @@
 import { isNumeric } from 'utils/misc'
+import { ServiceDetail } from 'api-client/model'
 
 export enum TaskStates {
   Ready = 'ready',
@@ -19,11 +20,11 @@ export const convertTaskStateToStatus = (taskState) =>
     [TaskStates.SuspendError]: 'error',
   }[taskState] || 'unknown')
 
-export const isSystemHealthy = (taskState, serviceDetails) => {
+export const isSystemHealthy = (taskState, serviceDetails = {}) => {
   if ([TaskStates.Error, TaskStates.ResumeError, TaskStates.SuspendError].includes(taskState)) {
     return false
   }
-  for (const service of serviceDetails) {
+  for (const service of Object.values<ServiceDetail>(serviceDetails)) {
     if (service.ready < service.desired) {
       return false
     }
@@ -31,7 +32,8 @@ export const isSystemHealthy = (taskState, serviceDetails) => {
   return true
 }
 
-export const isServiceHealthy = ({ desired, ready }) => desired === ready
+export const isServiceHealthy = ({ desired, ready }) =>
+  isNumeric(desired) && isNumeric(ready) && desired === ready
 
 export const isSystemResuming = (state) => ['suspended', 'resuming'].includes(state)
 

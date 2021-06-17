@@ -34,8 +34,8 @@ if (config.apiHost === undefined) {
 ApiClient.init({ keystoneEndpoint: `${config.apiHost}/keystone` })
 const { preferenceStore } = ApiClient.getInstance()
 
-const watchdog = new Watchdog(1000, store.dispatch)
-window.addEventListener('beforeunload', () => watchdog.destroy())
+Watchdog.init(1000, store.dispatch)
+window.addEventListener('beforeunload', () => Watchdog.getInstance().destroy())
 
 const loadTheme = async () => {
   try {

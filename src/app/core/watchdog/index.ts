@@ -17,6 +17,23 @@ interface WatchdogHandler {
 class Watchdog {
   static handlers: WatchdogHandler[] = [] as WatchdogHandler[]
   private timer: any = undefined
+  private static instance: Watchdog
+
+  static init(frequency, dispatch) {
+    if (!Watchdog.instance) {
+      Watchdog.instance = new Watchdog(frequency, dispatch)
+    }
+    return Watchdog.instance
+  }
+
+  static getInstance() {
+    if (!Watchdog.instance) {
+      throw new Error(
+        'Watchdog instance has not been initialized, please call Watchdog.init to instantiate it',
+      )
+    }
+    return Watchdog.instance
+  }
 
   constructor(public readonly frequency, private readonly dispatch) {
     this.setup()
@@ -43,6 +60,7 @@ class Watchdog {
   public destroy() {
     clearInterval(this.timer)
     this.timer = undefined
+    Watchdog.handlers = []
   }
 
   static register({ frequency = 0, handler }) {

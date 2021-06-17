@@ -16,7 +16,7 @@ import Summary from './summary'
 export default function AccountStatus() {
   const classes = useStyles()
   const { systemStatus } = useSelector<RootState, ClientState>(prop(clientStoreKey))
-  const elems = Object.entries(systemStatus?.serviceDetails).map(([name, details]) => (
+  const elems = Object.entries(systemStatus?.serviceDetails || {}).map(([name, details]) => (
     <ServiceCard name={name} details={details} taskState={systemStatus?.taskState} />
   ))
   return (

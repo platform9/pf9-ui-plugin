@@ -14,6 +14,8 @@ import { ClientState, clientStoreKey } from 'core/client/clientReducers'
 import SimpleLink from '../SimpleLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import { convertTaskStateToStatus } from 'app/plugins/account/components/system-status/helpers'
+import { isDecco } from 'core/utils/helpers'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   title: {
@@ -135,6 +137,7 @@ const NotificationsPopover = ({ className }) => {
     prop<string, NotificationState>(notificationStoreKey),
   )
   const { systemStatus } = useSelector(prop<string, ClientState>(clientStoreKey))
+  const { features } = useSelector(prop<string, SessionState>(sessionStoreKey))
   const [lastNotification] = notifications || []
   const inboxEl = useRef<HTMLElement>(null)
 
@@ -214,22 +217,24 @@ const NotificationsPopover = ({ className }) => {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          <SimpleLink
-            src={routes.accountStatus.root.path()}
-            className={classes.link}
-            onClick={handleClose}
-          >
-            <MenuItem className={clsx(classes.menuItem, classes.fullMenuItem)}>
-              <ClusterStatusSpan
-                className={classes.systemStateItem}
-                variant="header"
-                title={`System Task State: ${systemStatus.taskState}`}
-                status={convertTaskStateToStatus[systemStatus.taskState]}
-              >
-                Management Plane Health
-              </ClusterStatusSpan>
-            </MenuItem>
-          </SimpleLink>
+          {isDecco(features) && (
+            <SimpleLink
+              src={routes.accountStatus.root.path()}
+              className={classes.link}
+              onClick={handleClose}
+            >
+              <MenuItem className={clsx(classes.menuItem, classes.fullMenuItem)}>
+                <ClusterStatusSpan
+                  className={classes.systemStateItem}
+                  variant="header"
+                  title={`System Task State: ${systemStatus?.taskState || 'Unknown'}`}
+                  status={convertTaskStateToStatus[systemStatus?.taskState]}
+                >
+                  Management Plane Health
+                </ClusterStatusSpan>
+              </MenuItem>
+            </SimpleLink>
+          )}
           <SimpleLink
             src={routes.notifications.path()}
             className={classes.link}

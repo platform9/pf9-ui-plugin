@@ -1,3 +1,4 @@
+import { cacheActions } from 'core/caching/cacheReducers'
 import { MessageTypes } from 'core/components/notifications/model'
 import { sessionActions } from 'core/session/sessionReducers'
 import moment from 'moment'
@@ -8,6 +9,7 @@ const sessionTimeoutCheck = (session, showToast) => (dispatch) => {
   const sessionExpired = moment().isAfter(expiresAt)
   if (sessionExpired) {
     dispatch(sessionActions.destroySession())
+    dispatch(cacheActions.clearCache())
     showToast('The session has expired, please log in again', MessageTypes.warning)
   }
 }
