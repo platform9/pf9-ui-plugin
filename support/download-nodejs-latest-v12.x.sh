@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-PKGS_URL=https://nodejs.org/download/release/latest-v10.x/
-SUMS_URL=https://nodejs.org/download/release/latest-v10.x/SHASUMS256.txt
+PKGS_URL=https://nodejs.org/download/release/latest-v12.x/
+SUMS_URL=https://nodejs.org/download/release/latest-v12.x/SHASUMS256.txt
 DETECTED_OS="$(uname -s)"
 
 function download() {

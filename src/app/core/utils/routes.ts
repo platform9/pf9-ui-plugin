@@ -259,6 +259,20 @@ export const routes = {
         },
         name: 'Infrastructure:Clusters:Import:EKS',
       }),
+      aks: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/import/aks`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:Clusters:Import:AKS',
+      }),
+      gke: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/import/gke`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:Clusters:Import:GKE',
+      }),
     },
     imported: {
       list: Route.register({
@@ -686,6 +700,13 @@ export const routes = {
       name: 'SsoManagement:Group:Edit',
     }),
   },
+  customTheme: Route.register({
+    url: `${pluginRoutePrefix}/theme`,
+    defaultParams: {
+      plugin: AppPlugins.MyAccount,
+    },
+    name: 'CustomTheme',
+  }),
   prometheus: {
     list: Route.register({
       url: `${pluginRoutePrefix}/prometheus`,

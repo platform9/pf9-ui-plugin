@@ -19,16 +19,17 @@ const postToken = (req, res) => {
       },
     })
   }
+
   if (!auth || !auth.identity) {
     return sendAuthError()
   }
-
   // Password authentication
   const passwordMethod = auth.identity.password
   if (passwordMethod) {
     const {
       user: { name, password },
     } = passwordMethod
+
     const user = User.getAuthenticatedUser(name, password)
     if (!user) {
       return sendAuthError()

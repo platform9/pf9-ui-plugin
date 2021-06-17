@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     padding: theme.spacing(2, 8),
     margin: theme.spacing(2, 0),
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
+    backgroundColor: hexToRgbaCss(theme.palette.primary.main, 0.1),
   },
   column: {
     margin: theme.spacing(2, 0),

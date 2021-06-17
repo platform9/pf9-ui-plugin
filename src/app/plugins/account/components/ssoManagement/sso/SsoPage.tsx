@@ -20,6 +20,12 @@ import { createSsoConfig, deleteSsoConfig, loadSsoConfig } from './actions'
 import Progress from 'core/components/progress/Progress'
 import SsoEnabledDialog from './SsoEnabledDialog'
 import { SsoProviders } from './model'
+import AccountUpgradeDialog from '../../theme/AccountUpgradeDialog'
+import { CustomerTiers, ssoEnabledTiers } from 'app/constants'
+import { pathOr, prop } from 'ramda'
+import { useSelector } from 'react-redux'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { RootState } from 'app/store'
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -32,7 +38,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   wizardLabel: {
     margin: theme.spacing(1, 0),
   },
-  textArea: {
+  fullWidth: {
     width: '100% !important',
   },
   field: {
@@ -62,6 +68,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   filename: {
     marginLeft: theme.spacing(0.5),
   },
+  error: {
+    color: theme.palette.red[500],
+  },
 }))
 
 interface State {
@@ -81,6 +90,11 @@ const customCodeMirrorOptions = {
 }
 
 const updateSsoSettings = (data, setLoading, setDialogOpened, updateParams) => {
+  // Validate that only metadataUrl or metadata is defined
+  if (data.metadataUrl && data.metadata) {
+    return
+  }
+
   const sendRequests = async () => {
     // If SSO config already exists, delete old one and create a new one
     // Otherwise just create a new one
@@ -114,6 +128,9 @@ const SsoPage = () => {
   const classes = useStyles({})
   const [loading, setLoading] = useState(true)
   const [dialogOpened, setDialogOpened] = useState(false)
+  const [upgradeDialogOpened, setUpgradeDialogOpened] = useState(false)
+  const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
+  const { features } = session
   const { params, updateParams, getParamsUpdater } = useParams<State>({
     enableSso: false,
     ssoIsEnabled: false,
@@ -131,12 +148,14 @@ const SsoPage = () => {
           entity_id: entityId,
           provider: ssoProvider,
           metadata_url: metadataUrl,
+          metadata,
         }: any = await loadSsoConfig()
         updateParams({
           defaultAttributeMap,
           entityId,
           ssoProvider,
           metadataUrl,
+          metadata,
           enableSso: true,
           ssoIsEnabled: true,
         })
@@ -155,12 +174,26 @@ const SsoPage = () => {
       updateParams({ enableSso: false, ssoIsEnabled: false })
       return
     }
+    if (
+      !params.enableSso &&
+      !ssoEnabledTiers.includes(pathOr(CustomerTiers.Freedom, ['customer_tier'], features))
+    ) {
+      // If SSO is not available for customer tier
+      setUpgradeDialogOpened(true)
+      return
+    }
     updateParams({ enableSso: !params.enableSso })
   }, [params, updateParams, deleteSsoConfig])
 
   return (
     <div className={classes.ssoPage}>
       <DocumentMeta title="SSO Management" bodyClasses={['form-view']} />
+      {upgradeDialogOpened && (
+        <AccountUpgradeDialog
+          feature="Enterprise SSO"
+          onClose={() => setUpgradeDialogOpened(false)}
+        />
+      )}
       <Progress loading={loading}>
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
@@ -212,12 +245,16 @@ const SsoPage = () => {
               <Text variant="caption1" className={classes.wizardLabel}>
                 SAML Metadata (XML) from your SSO Provider
               </Text>
+              <Text variant="body2">
+                You may specify a metadata URL or upload a metadata XML file.
+              </Text>
               <div className={classes.field}>
                 <TextField
                   id="metadataUrl"
                   label="URL"
                   onChange={getParamsUpdater('metadataUrl')}
                   value={params.metadataUrl}
+                  required={!params.metadata}
                 />
                 <Text variant="body2" className={classes.orLabel}>
                   or
@@ -231,6 +268,20 @@ const SsoPage = () => {
                   {params.metadataFileName}
                 </Text>
               </div>
+              <CodeMirror
+                id="metadata"
+                label="SAML Metadata (XML)"
+                options={customCodeMirrorOptions}
+                onChange={getParamsUpdater('metadata')}
+                value={params.metadata}
+                className={classes.fullWidth}
+                required={!params.metadataUrl}
+              />
+              {params.metadataUrl && params.metadata && (
+                <Text variant="body2" className={classes.error}>
+                  Please specify only the metadata URL or only the metadata XML
+                </Text>
+              )}
               <Text variant="caption1" className={classes.wizardLabel}>
                 SSO Provider Attribute MAP in XML
               </Text>
@@ -244,6 +295,8 @@ const SsoPage = () => {
                 options={customCodeMirrorOptions}
                 onChange={getParamsUpdater('defaultAttributeMap')}
                 value={params.defaultAttributeMap}
+                className={classes.fullWidth}
+                required
               />
               <div className={classes.attributeMapButtons}>
                 <Button

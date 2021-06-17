@@ -14,7 +14,7 @@ import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDeta
 import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
-import OnboardingPage from './components/onboarding/OnboardingPage'
+import OnboardingPage from './components/onboarding/onboarding-page'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
@@ -54,6 +54,8 @@ import ImportedClusterDetailsPage from './components/infrastructure/importedClus
 import VirtualMachinesPage from './components/virtual-machines'
 import VirtualMachineDetailPage from './components/virtual-machines/details'
 import AddVirtualMachinePage from './components/virtual-machines/add'
+import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
+import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
 
 import { isDecco } from 'core/utils/helpers'
 
@@ -120,6 +122,18 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/clusters/import/eks', exact: true },
       requiredRoles: 'admin',
       component: ImportEKSClusterPage,
+    },
+    {
+      name: 'Import AKS Cluster',
+      link: { path: '/infrastructure/clusters/import/aks', exact: true },
+      requiredRoles: 'admin',
+      component: ImportAKSClusterPage,
+    },
+    {
+      name: 'Import GKE Cluster',
+      link: { path: '/infrastructure/clusters/import/gke', exact: true },
+      requiredRoles: 'admin',
+      component: ImportGKEClusterPage,
     },
     {
       name: 'Imported Cluster Details',

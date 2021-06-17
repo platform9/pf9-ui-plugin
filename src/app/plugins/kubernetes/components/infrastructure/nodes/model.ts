@@ -9,6 +9,12 @@ export enum NodeState {
   Unauthorized = 'Unauthorized',
 }
 
+export type errorMessageLevel = 'warn'
+
+export enum ErrorMessageCodes {
+  timeDrift = 'HOST_TIMEDRIFT_DETECTED',
+}
+
 export interface INodesSelector extends Node {
   status: string
   combined: ICombinedHost

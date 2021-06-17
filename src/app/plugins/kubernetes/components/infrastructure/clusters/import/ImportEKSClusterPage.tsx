@@ -25,8 +25,10 @@ import ReviewClustersTable from './ReviewClustersTable'
 import { registerExternalClusters } from './actions'
 import { importedClusterActions } from '../../importedClusters/actions'
 import { trackEvent } from 'utils/tracking'
+import Bugsnag from '@bugsnag/js'
+import { ClusterCloudPlatforms } from 'app/constants'
 
-const toggleRegion = (region, wizardContext, setWizardContext) => {
+export const toggleRegion = (region, wizardContext, setWizardContext) => {
   wizardContext.regions.includes(region)
     ? setWizardContext({ regions: wizardContext.regions.filter((r) => r !== region) })
     : setWizardContext({ regions: [...wizardContext.regions, region].sort() })
@@ -65,15 +67,20 @@ const ImportEKSClusterPage = () => {
 
   const handleSubmit = async (data) => {
     setSubmitting(true)
-    trackEvent('Import EKS Clusters', {
+    const metadata = {
       cloud_provider_id: data.cloudProviderId,
       regions: data.regions,
       clusters: data.finalSelectedClusters.map((cluster) => cluster.id),
-    })
+    }
+    Bugsnag.leaveBreadcrumb('Attempting to import EKS clusters', metadata)
+    trackEvent('Import EKS Clusters', metadata)
     await registerExternalClusters({
       cloudProviderId: data.cloudProviderId,
       clusters: data.finalSelectedClusters,
+      stack: ClusterCloudPlatforms.EKS,
+      detailsKey: 'region',
     })
+
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
     reloadImportedClusters(true)
@@ -155,6 +162,7 @@ const ImportEKSClusterPage = () => {
                       value={wizardContext.selectedClusters}
                       selectedRegions={wizardContext.regions}
                       className={classes.clusters}
+                      stack={ClusterCloudPlatforms.EKS}
                     />
                   </div>
                 </FormFieldCard>
@@ -177,6 +185,7 @@ const ImportEKSClusterPage = () => {
                     selectedClusters={wizardContext.selectedClusters}
                     onChange={(value) => setWizardContext({ finalSelectedClusters: value })}
                     value={wizardContext.finalSelectedClusters}
+                    stack={ClusterCloudPlatforms.EKS}
                     required
                   />
                 </FormFieldCard>

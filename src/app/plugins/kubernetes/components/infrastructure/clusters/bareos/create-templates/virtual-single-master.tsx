@@ -260,23 +260,33 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         onNext={bareOSClusterTracking.wZStepFive(trackingFields)}
       >
         <ValidatedForm
+          fullWidth
+          classes={{ root: classes.validatedFormContainer }}
           initialValues={wizardContext}
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
-          title="Advanced Configuration"
+          elevated={false}
+          withAddonManager
         >
           {({ values }) => (
             <>
-              <AdvancedApiConfigFields values={values} />
-              {/* Enable Application Catalog */}
-              {/* <CheckboxField
+              <FormFieldCard title="Advanced Configuration">
+                <AdvancedApiConfigFields values={values} />
+                {/* Enable Application Catalog */}
+                {/* <CheckboxField
               id="appCatalogEnabled"
               label="Enable Application Catalog"
               info="Enable the Helm Application Catalog on this cluster"
             /> */}
 
-              <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
-              <TagsField />
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
+                <TagsField />
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={['enableTopologyManager']}
+                />
+              </FormFieldCard>
             </>
           )}
         </ValidatedForm>

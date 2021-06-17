@@ -41,6 +41,7 @@ import { updateClarityStore } from 'utils/clarityHelper'
 import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 import Theme from 'core/themes/model'
+import Bugsnag from '@bugsnag/js'
 
 const { setActiveRegion } = ApiClient.getInstance()
 
@@ -169,6 +170,12 @@ const AppContainer = () => {
       const sandboxFlag = pathStrOr(false, 'data.experimental.sandbox', initialFeatures)
       const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', initialFeatures)
       const airgapped = pathStrOr(false, 'data.experimental.airgapped', initialFeatures)
+      const duVersion = pathStrOr('', 'data.releaseVersion', initialFeatures)
+
+      Bugsnag.addMetadata('App', {
+        customerTier,
+        duVersion,
+      })
 
       // Segment tracking
       if (!analyticsOff && !airgapped) {
