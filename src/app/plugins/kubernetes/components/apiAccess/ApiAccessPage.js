@@ -5,21 +5,33 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 import KubeConfigListPage from './kubeConfig/KubeConfigListPage'
 import TerraformListPage from './TerraformListPage'
 import ApiServicesPage from './ApiServicesPage'
+import { makeStyles } from '@material-ui/styles'
+import DocumentMeta from 'core/components/DocumentMeta'
 
-const ApiAccessPage = () => (
-  <PageContainer>
-    <Tabs>
-      <Tab value="api" label="API Services">
-        <ApiServicesPage />
-      </Tab>
-      <Tab value="kubeconfig" label="KubeConfig">
-        <KubeConfigListPage />
-      </Tab>
-      <Tab value="terraform" label="Terraform">
-        <TerraformListPage />
-      </Tab>
-    </Tabs>
-  </PageContainer>
-)
+const useStyles = makeStyles((theme) => ({
+  tab: {
+    backgroundColor: 'transparent',
+  },
+}))
+
+const ApiAccessPage = () => {
+  const classes = useStyles()
+  return (
+    <PageContainer>
+      <DocumentMeta title="Api Access" bodyClasses={['form-view']} />
+      <Tabs className={classes.tab}>
+        <Tab value="api" label="API Services">
+          <ApiServicesPage />
+        </Tab>
+        <Tab value="kubeconfig" label="KubeConfig">
+          <KubeConfigListPage />
+        </Tab>
+        <Tab value="terraform" label="Terraform">
+          <TerraformListPage />
+        </Tab>
+      </Tabs>
+    </PageContainer>
+  )
+}
 
 export default ApiAccessPage

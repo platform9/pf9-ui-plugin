@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Grid, Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
+import { Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'
 import PropTypes from 'prop-types'
+import clsx from 'clsx'
 
 const TabContext = React.createContext({})
 export const Consumer = TabContext.Consumer
@@ -90,9 +91,9 @@ class Tabs extends PureComponent {
 
   render() {
     const { tabs, value } = this.state
-    const { children, classes, useUrlHashes, compact } = this.props
+    const { children, classes, useUrlHashes, compact, className } = this.props
     return (
-      <Paper className={this.props.classes.root}>
+      <Paper className={clsx(this.props.classes.root, className)}>
         <div className={classes.tabColor}>
           <MDTabs
             value={value}
@@ -130,11 +131,13 @@ export const withTabContext = (Component) => (props) => {
 Tabs.propTypes = {
   compact: PropTypes.bool,
   useUrlHashes: PropTypes.bool,
+  className: PropTypes.string,
 }
 
 Tabs.defaultProps = {
   compact: false,
   useUrlHashes: true,
+  className: undefined,
 }
 
 export default compose(withStyles(styles), withRouter)(Tabs)

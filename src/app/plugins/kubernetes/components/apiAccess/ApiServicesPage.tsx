@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-boolean-cast */
 import React, { useCallback, useEffect, useState } from 'react'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -16,6 +17,8 @@ import Text from 'core/elements/text'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ApiRequestHelper from './ApiRequestHelper'
 import { Route } from 'core/utils/routes'
+import { Dialog } from '@material-ui/core'
+import IconButton from 'core/elements/icon-button'
 
 const searchTarget = 'name'
 const requestVerbs = ['GET', 'PATCH', 'PUT', 'POST', 'DELETE']
@@ -36,25 +39,35 @@ const useStyles = makeStyles<Theme>((theme) => ({
     minWidth: 'maxContent',
   },
   serviceCards: {
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    marginTop: theme.spacing(2),
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, minmax(200px, 300px))',
+    gridGap: theme.spacing(2),
+    marginTop: theme.spacing(3),
   },
   formFieldCard: {
-    maxWidth: 'inherit',
+    paddingTop: 24,
+    maxWidth: 1285,
+    minHeight: 400,
+    display: 'grid',
+    justifyContent: 'stretch',
+    gridTemplateRows: '40px 60px 1fr',
+    gridGap: 16,
+
+    '& > header': {
+      margin: 0,
+    },
   },
   methods: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 250px)',
+    gridTemplateColumns: 'repeat(auto-fill, 250px)',
+    gridTemplateRows: 'min-content',
     gridGap: theme.spacing(1),
-    marginTop: theme.spacing(3),
   },
   url: {
     marginTop: theme.spacing(1),
   },
   apiDetails: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
     marginTop: theme.spacing(3),
   },
   requestHelper: {
@@ -63,6 +76,14 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   methodCard: {
     width: 'auto',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 30,
+    right: 46,
+  },
+  modalBody: {
+    position: 'relative',
   },
 }))
 
@@ -78,6 +99,7 @@ const ApiServicesPage = () => {
   const [activeApi, setActiveApi] = useState('')
   const [apiMethods, setApiMethods] = useState([])
   const [activeMethod, setActiveMethod] = useState({})
+  const [showApiDialog, setShowApiDialog] = useState(false)
 
   const { history, location } = useReactRouter()
   const route = Route.getCurrentRoute()
@@ -94,6 +116,7 @@ const ApiServicesPage = () => {
   }
 
   const services = serviceCatalog.filter((service) => whitelist.includes(service.name))
+  // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
   const serviceNames = pluck('name', services).sort()
 
   useEffect(() => {
@@ -137,20 +160,35 @@ const ApiServicesPage = () => {
     return apiServices[activeApi].apiMethodsMetadata
   }, [activeApi])
 
+  const handleMethodCardClick = (method) => {
+    setActiveMethod(method)
+    setShowApiDialog(true)
+  }
+  const onClose = () => {
+    setActiveMethod({})
+    setShowApiDialog(false)
+  }
+
   return (
-    <div className={classes.apiServicesPage}>
-      <div className={classes.serviceCards}>
-        {serviceNames.map((name) => (
-          <Card key={name} id={name} active={activeApi === name} onClick={setActiveApi}>
-            <Text variant="h5">{ApiServices[name]}</Text>
-            <Text variant="caption3" className={classes.url}>
-              {getServiceUrl(name)}
-            </Text>
-          </Card>
-        ))}
-      </div>
-      <div className={classes.apiDetails}>
-        <div>
+    <>
+      <div className={classes.apiServicesPage}>
+        <div className={classes.serviceCards}>
+          {serviceNames.map((name) => (
+            <Card
+              key={name}
+              id={name}
+              active={activeApi === name}
+              onClick={setActiveApi}
+              height={110}
+            >
+              <Text variant="h5">{ApiServices[name]}</Text>
+              <Text variant="caption3" className={classes.url}>
+                {getServiceUrl(name)}
+              </Text>
+            </Card>
+          ))}
+        </div>
+        <div className={classes.apiDetails}>
           <FormFieldCard title="Request Methods" className={classes.formFieldCard}>
             <Filter
               data={getAllApiMethods()}
@@ -164,7 +202,7 @@ const ApiServicesPage = () => {
                   key={method.name}
                   id={method}
                   active={false}
-                  onClick={setActiveMethod}
+                  onClick={handleMethodCardClick}
                   className={classes.methodCard}
                 >
                   <Text variant="body1">{method.name}</Text>
@@ -173,11 +211,19 @@ const ApiServicesPage = () => {
             </div>
           </FormFieldCard>
         </div>
-        <div className={classes.requestHelper}>
-          <ApiRequestHelper api={activeApi} metadata={activeMethod}></ApiRequestHelper>
-        </div>
+        <Dialog
+          maxWidth={false}
+          open={showApiDialog}
+          className={classes.requestHelper}
+          onBackdropClick={onClose}
+        >
+          <div className={classes.modalBody}>
+            <IconButton icon="times-circle" onClick={onClose} className={classes.closeButton} />
+            <ApiRequestHelper api={activeApi} metadata={activeMethod} />
+          </div>
+        </Dialog>
       </div>
-    </div>
+    </>
   )
 }
 

@@ -14,6 +14,7 @@ import './codemirror.css'
 import { makeStyles } from '@material-ui/styles'
 
 require('codemirror/mode/yaml/yaml')
+require('codemirror/mode/javascript/javascript')
 
 const defaultOptions = {
   lineNumbers: true,

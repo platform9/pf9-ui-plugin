@@ -8,6 +8,7 @@ import BulletList from 'core/components/BulletList'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import CloudProviderCard from '../common/CloudProviderCard'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
+import { noop } from 'utils/fp'
 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
@@ -46,6 +47,9 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: {
     marginTop: theme.spacing(4),
   },
+  card: {
+    marginTop: 24,
+  },
 }))
 
 const requirements = ['Go v1.13+ and', 'Terraform']
@@ -54,6 +58,7 @@ const TerraformListPage = () => {
   const classes = useStyles()
   return (
     <FormFieldCard
+      className={classes.card}
       title="Build Clusters Using Terraform"
       link={
         <div>
@@ -79,8 +84,8 @@ const TerraformListPage = () => {
           <b>Supported Clouds</b>
         </Text>
         <div className={classes.cloudTypes}>
-          <CloudProviderCard type={CloudProviders.Aws} active={false} />
-          <CloudProviderCard type={CloudProviders.Azure} active={false} />
+          <CloudProviderCard type={CloudProviders.Aws} active={false} onClick={noop} />
+          <CloudProviderCard type={CloudProviders.Azure} active={false} onClick={noop} />
         </div>
       </div>
       <div className={classes.buttonContainer}>

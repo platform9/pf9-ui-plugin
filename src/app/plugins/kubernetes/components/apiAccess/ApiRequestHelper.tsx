@@ -23,27 +23,33 @@ const methodsWithBody = ['POST', 'PUT', 'PATCH']
 
 const useStyles = makeStyles<Theme>((theme) => ({
   apiRequestHelper: {
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    backgroundColor: theme.components.header.background,
+    width: '90vw',
+    height: '80vh',
+    display: 'grid',
+    gridTemplateRows: '75px 1fr',
   },
   container: {
-    margin: theme.spacing(2),
-    display: 'flex',
-    flexFlow: 'column nowrap',
+    margin: theme.spacing(2, 6, 3, 6),
+    display: 'grid',
+    alignContent: 'stretch',
   },
   request: {
     display: 'flex',
     flexFlow: 'column nowrap',
   },
   header: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: theme.spacing(2),
+    borderBottom: `1px solid ${theme.palette.grey[500]}`,
+    margin: '24px 32px 0 32px',
+    paddingLeft: 16,
   },
   text: {
-    color: '#FFF',
-    marginBottom: theme.spacing(2),
+    color: theme.palette.grey[900],
+  },
+  breakWord: {
+    wordBreak: 'break-all',
+  },
+  titleBreak: {
+    marginTop: 16,
   },
   button: {
     marginLeft: theme.spacing(0),
@@ -52,7 +58,30 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginBottom: theme.spacing(2),
   },
   form: {
-    flexFlow: 'column nowrap',
+    display: 'grid',
+    gridTemplateColumns: '375px 1fr',
+    gridTemplateRows: '1fr',
+    alignContent: 'stretch',
+    justifyContent: 'stretch',
+    gridGap: 16,
+
+    [theme.breakpoints.down(890)]: {
+      gridTemplateColumns: 'auto',
+      gridTemplateRows: 'max-content 1fr',
+    },
+
+    '& #jsonResponse': {
+      display: 'grid',
+      gridTemplateRows: 'max-content 1fr',
+      alignContent: 'stretch',
+      justifyContent: 'stretch;',
+    },
+    '& #jsonResponse .CodeMirror': {
+      height: 'calc(80vh - 180px)',
+      [theme.breakpoints.down(890)]: {
+        height: '500px',
+      },
+    },
   },
   textField: {
     backgroundColor: '#FFF',
@@ -66,6 +95,10 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'flex',
     flexFlow: 'column nowrap',
     marginBottom: theme.spacing(2),
+
+    '& .validatedFormInput': {
+      width: '100% !important',
+    },
   },
 }))
 
@@ -157,11 +190,11 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
     }
     try {
       const response = await {
-        GET: () => apiClient.basicGet(params),
-        POST: () => apiClient.basicPost(params),
-        PATCH: () => apiClient.basicPatch(params),
-        PUT: () => apiClient.basicPut(params),
-        DELETE: () => apiClient.basicDelete(params),
+        GET: async () => apiClient.basicGet(params),
+        POST: async () => apiClient.basicPost(params),
+        PATCH: async () => apiClient.basicPatch(params),
+        PUT: async () => apiClient.basicPut(params),
+        DELETE: async () => apiClient.basicDelete(params),
       }[metadata.type]()
 
       return response
@@ -185,29 +218,28 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
 
   return (
     <div className={clsx(classes.apiRequestHelper, className)}>
+      <header className={classes.header}>
+        <Text variant="h3" className={classes.text}>
+          {metadata.name}
+        </Text>
+      </header>
       <div className={classes.container}>
-        <div className={classes.header}>
-          <Text variant="h3" className={classes.text}>
-            {metadata.name}
-          </Text>
-        </div>
-        <div className={classes.container}>
-          <ValidatedForm classes={{ root: classes.form }} elevated={false} onSubmit={handleSubmit}>
-            <Text className={classes.text} variant="h6">
-              URL:
+        <ValidatedForm classes={{ root: classes.form }} elevated={false} onSubmit={handleSubmit}>
+          <div>
+            <Text className={classes.text} variant="subtitle1">
+              Request URL
             </Text>
-            <TextField
-              disabled
-              fullWidth
-              className={classes.urlField}
-              id={'url'}
-              label={'URL'}
-              value={requestUrl}
-            />
+            <Text
+              className={clsx(classes.text, classes.breakWord)}
+              component="span"
+              variant="body2"
+            >
+              {requestUrl}
+            </Text>
             {metadata.params?.length > 0 && (
               <div className={classes.parameters}>
-                <Text className={classes.text} variant="h6">
-                  Parameters:
+                <Text className={clsx(classes.text, classes.titleBreak)} variant="subtitle1">
+                  Request Parameters
                 </Text>
                 {metadata.params.map((paramName) =>
                   renderParamField({ classes, paramName, params, getParamsUpdater }),
@@ -221,20 +253,22 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
               <div className={classes.request}>
                 <SubmitButton className={classes.button}>Make API Request</SubmitButton>
                 {!!errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-                <CodeMirror
-                  id="jsonResponse"
-                  label={
-                    <CopyToClipboard copyText={apiResponse} inline={true}>
-                      JSON Response
-                    </CopyToClipboard>
-                  }
-                  value={apiResponse}
-                  options={{ mode: 'json' }}
-                ></CodeMirror>
               </div>
             )}
-          </ValidatedForm>
-        </div>
+          </div>
+          {enableRequest && (
+            <CodeMirror
+              id="jsonResponse"
+              label={
+                <CopyToClipboard copyText={apiResponse} inline>
+                  JSON Response
+                </CopyToClipboard>
+              }
+              value={apiResponse}
+              options={{ mode: 'json' }}
+            />
+          )}
+        </ValidatedForm>
       </div>
     </div>
   )
