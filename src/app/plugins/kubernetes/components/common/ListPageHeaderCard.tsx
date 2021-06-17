@@ -71,6 +71,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     backgroundColor: theme.palette.grey['000'],
     padding: theme.spacing(1.5, 2, 0, 0),
     marginRight: 17,
+    minHeight: 210,
   },
   count: {
     gridArea: 'phc-count',

@@ -1,9 +1,26 @@
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Divider } from '@material-ui/core'
 import Theme from 'core/themes/model'
 import clsx from 'clsx'
 import FontAwesomeIcon from '../FontAwesomeIcon'
+import Text from 'core/elements/text'
+
+const useIconInfoStyles = makeStyles<Theme, { spacer: boolean }>((theme: Theme) => ({
+  alertTitle: {
+    display: 'flex',
+    alignItems: 'center',
+
+    '& i': {
+      color: theme.palette.blue[500],
+      fontSize: 22,
+      marginRight: 4,
+    },
+  },
+  infoContainer: {
+    margin: ({ spacer }) => (spacer ? '60px 0 40px 0' : '16px 0'),
+  },
+}))
 
 const useStyles = makeStyles<Theme, { error: boolean }>((theme: Theme) => ({
   container: {
@@ -87,6 +104,24 @@ const Info = ({
       {title && isExpanded && <Divider className={classes.divider} />}
       {(!title || isExpanded) && children}
     </div>
+  )
+}
+
+export const IconInfo: FC<{
+  icon: string
+  title: string | React.ReactNode
+  spacer?: boolean
+  className?: string
+}> = ({ icon, title, children, className = '', spacer = true }) => {
+  const classes = useIconInfoStyles({ spacer })
+  return (
+    <Info className={clsx(classes.infoContainer, className)}>
+      <Text className={classes.alertTitle} variant="body2">
+        <FontAwesomeIcon>{icon}</FontAwesomeIcon> {title}
+      </Text>
+      {!!children && <br />}
+      {children}
+    </Info>
   )
 }
 

@@ -34,14 +34,12 @@ const InterfacePicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Pr
       // Pooja requested we not take choices from those ranges.
       // 192.168.122.1 is a libvirt virtual bridge (virbr0) IP
       // 198.51.100.1 is some private IP that WE assign to an interface for running dnsmasq on ironic host
-      if (hosts.length < 1) { return [] }
-      const host = hosts.find(host => host.id === hostId)
-      return host.networkInterfaces.map(iface => (
-        { label: iface.label, value: iface }
-      ))
-    },
-      [hosts],
-    )
+      if (hosts.length < 1) {
+        return []
+      }
+      const host = hosts.find((host) => host.id === hostId)
+      return host.networkInterfaces.map((iface) => ({ label: iface.label, value: iface }))
+    }, [hosts])
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
@@ -61,7 +59,7 @@ const InterfacePicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Pr
         options={options}
         showAll={showAll}
         loading={hostsLoading}
-        className='validatedFormInput'
+        className="validatedFormInput"
       />
     )
   },

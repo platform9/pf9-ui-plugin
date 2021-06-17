@@ -11,6 +11,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Picklist from 'core/components/Picklist'
 import { emptyArr } from 'utils/fp'
 import { both, T } from 'ramda'
+import RefreshButton from '../buttons/refresh-button'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -117,26 +118,11 @@ const ListTableToolbar = ({
   editDisabledInfo,
   deleteCond,
   deleteDisabledInfo,
+  hideDelete,
+  listTableParams,
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
-  const reloadButton = useMemo(
-    () =>
-      onReload && (
-        <Tooltip title="Refresh list">
-          <FontAwesomeIcon
-            className={classes.button}
-            solid
-            size="lg"
-            aria-label="Refresh list"
-            onClick={onReload}
-          >
-            sync
-          </FontAwesomeIcon>
-        </Tooltip>
-      ),
-    [onReload],
-  )
 
   const allActions = useMemo(
     () => [
@@ -152,7 +138,7 @@ const ListTableToolbar = ({
             },
           ]
         : emptyArr),
-      ...(onDelete
+      ...(onDelete && !hideDelete
         ? [
             {
               label: 'Delete',
@@ -175,7 +161,12 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <ListTableBatchActions batchActions={allActions} selected={selected} onRefresh={onRefresh} />
+      <ListTableBatchActions
+        batchActions={allActions}
+        selected={selected}
+        onRefresh={onRefresh}
+        listTableParams={listTableParams}
+      />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {Array.isArray(filters)
@@ -213,7 +204,7 @@ const ListTableToolbar = ({
               </Button>
             </Tooltip>
           )}
-          {reloadButton}
+          {onReload && <RefreshButton onRefresh={onReload} />}
         </Toolbar>
       </div>
     </Toolbar>
@@ -260,6 +251,7 @@ ListTableToolbar.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
   onChangeRowsPerPage: PropTypes.func.isRequired,
   rowsPerPageOptions: PropTypes.arrayOf(PropTypes.number),
+  hideDelete: PropTypes.bool,
 }
 
 export default ListTableToolbar

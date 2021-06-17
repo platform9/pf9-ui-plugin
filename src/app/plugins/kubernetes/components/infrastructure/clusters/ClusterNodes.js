@@ -10,6 +10,8 @@ import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import Progress from 'core/components/progress/Progress'
+import RemoteSupportDialog from '../nodes/RemoteSupportDialog'
+import { isAdmin } from './helpers'
 
 const tableColumns = columns.filter(
   (column) => !['clusterName', 'isSpotInstance'].includes(column.id),
@@ -37,8 +39,18 @@ const ClusterNodes = () => {
         columns: tableColumns,
         emptyText: 'Nothing yet, waiting for nodes...',
         uniqueIdentifier: 'uuid',
+        searchTargets: ['name', 'uuid'],
         onReload: handleRefresh,
-        showCheckboxes: false,
+        showCheckboxes: true,
+        multiSelection: false,
+        batchActions: [
+          {
+            cond: isAdmin,
+            icon: 'headset',
+            label: 'Remote Support',
+            dialog: RemoteSupportDialog,
+          },
+        ],
       }),
     [handleRefresh],
   )

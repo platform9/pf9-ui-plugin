@@ -69,6 +69,8 @@ const useWizardStepperStyles = makeStyles((theme) => ({
   stepperRoot: {
     backgroundColor: 'transparent',
     padding: 0,
+    flexWrap: 'wrap',
+    marginBottom: theme.spacing(4),
     '& .MuiStepConnector-root': {
       display: 'none',
     },

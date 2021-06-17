@@ -1,12 +1,11 @@
 import React from 'react'
-import InfoPanel from 'core/components/InfoPanel'
+import InfoPanel, { getFieldsForCard, IDetailFields } from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
 import Text from 'core/elements/text'
 import { makeStyles, withStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { path } from 'ramda'
 import { IClusterSelector } from './model'
 import { CloudProviders, CloudProvidersFriendlyName } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
@@ -14,33 +13,8 @@ import { castBoolToStr, formatDate } from 'utils/misc'
 import ExternalLink from 'core/components/ExternalLink'
 import { applicationLoadBalancer } from 'k8s/links'
 
-interface IClusterDetailFields {
-  id: string
-  title: string
-  required?: boolean
-  helpMessage?: string | React.ReactNode
-  condition?: (cluster: IClusterSelector) => boolean
-  render?: (value: string | boolean) => string | React.ReactNode
-}
-
-const getFieldsForCard = (fields: IClusterDetailFields[], cluster: IClusterSelector) => {
-  const fieldsToDisplay = {}
-  fields.forEach((field) => {
-    const { id, title, required = false, condition, render, helpMessage } = field
-    const shouldRender = condition ? condition(cluster) : true
-    const value = path<string | boolean>(id.split('.'), cluster)
-    if (shouldRender && (required || !!value || value === false)) {
-      fieldsToDisplay[title] = {
-        value: render ? render(value) : value,
-        helpMessage,
-      }
-    }
-  })
-  return fieldsToDisplay
-}
-
 // Common
-const clusterOverviewFields: IClusterDetailFields[] = [
+const clusterOverviewFields: Array<IDetailFields<IClusterSelector>> = [
   {
     id: 'created_at',
     title: 'Cluster Created',
@@ -79,24 +53,6 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   { id: 'privileged', title: 'Privileged', required: true, render: castBoolToStr() },
   { id: 'uuid', title: 'Unique ID', required: true },
   { id: 'dockerRoot', title: 'Docker Root Directory', required: true },
-  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: castBoolToStr() },
-  {
-    id: 'etcdBackup.storageProperties.localPath',
-    title: 'ETCD Backup Storage Path',
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
-  {
-    id: 'etcdBackup.intervalInMins',
-    title: 'ETCD Backup Interval',
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
-  { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
-  {
-    id: 'etcdVersion',
-    title: 'ETCD version',
-    required: true,
-    condition: (cluster) => !!cluster.etcdBackupEnabled,
-  },
   { id: 'k8sApiPort', title: 'K8S API Server port', required: true },
   { id: 'mtuSize', title: 'MTU size', required: true },
   { id: 'flannelIfaceLabel', title: 'Flannel interface' },
@@ -205,22 +161,73 @@ const csiDriverFields = [
   },
 ]
 
+const etcdBackupFields = [
+  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: castBoolToStr() },
+  {
+    id: 'etcdBackup.taskStatus',
+    title: 'Task Status',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  {
+    id: 'etcdBackup.storageProperties.localPath',
+    title: 'ETCD Backup Storage Path',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  {
+    id: 'etcdBackup.intervalInMins',
+    title: 'ETCD Backup Interval',
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+  { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
+  {
+    id: 'etcdVersion',
+    title: 'ETCD version',
+    required: true,
+    condition: (cluster) => !!cluster.etcdBackupEnabled,
+  },
+]
+
 const overviewStats = (cluster) => getFieldsForCard(clusterOverviewFields, cluster)
 const bareOsNetworkingProps = (cluster) => getFieldsForCard(bareOsNetworkingFields, cluster)
 const awsCloudProps = (cluster) => getFieldsForCard(awsCloudFields, cluster)
 const azureCloudProps = (cluster) => getFieldsForCard(azureCloudFields, cluster)
 const csiDriverProps = (driver: any) => getFieldsForCard(csiDriverFields, driver)
+const etcdBackupProps = (cluster) => getFieldsForCard(etcdBackupFields, cluster)
 
-const renderCloudInfo = (cluster) => {
+const renderCloudInfo = (cluster, classes) => {
   switch (cluster.cloudProviderType) {
     case 'aws':
-      return <InfoPanel title="Cloud Properties" items={awsCloudProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={awsCloudProps(cluster)}
+        />
+      )
     case 'local':
-      return <InfoPanel title="Networking" items={bareOsNetworkingProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Networking"
+          items={bareOsNetworkingProps(cluster)}
+        />
+      )
     case 'azure':
-      return <InfoPanel title="Cloud Properties" items={azureCloudProps(cluster)} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={azureCloudProps(cluster)}
+        />
+      )
     default:
-      return <InfoPanel title="Cloud Properties" items={{ 'Data not found': '' }} />
+      return (
+        <InfoPanel
+          className={classes.card}
+          title="Cloud Properties"
+          items={{ 'Data not found': '' }}
+        />
+      )
   }
 }
 
@@ -231,6 +238,13 @@ const useStyles = makeStyles<Theme>((theme) => ({
     gridGap: '16px',
     alignItems: 'start',
     justifyItems: 'start',
+  },
+  column: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+  card: {
+    width: 'inherit',
   },
   text: {
     color: theme.palette.common.white,
@@ -248,15 +262,24 @@ const ClusterInfo = () => {
 
   const overview = overviewStats(cluster)
   const csiDrivers = cluster?.csiDrivers?.drivers || []
+  const etcdBackupFields = etcdBackupProps(cluster)
 
   return (
     <div className={classes.clusterInfo}>
-      <InfoPanel title="Overview" items={overview} />
-
-      {renderCloudInfo(cluster)}
-      {csiDrivers.length > 0 && (
-        <InfoPanel title="CSI Driver Details" items={csiDrivers.map(csiDriverProps)} />
-      )}
+      <div className={classes.column}>
+        <InfoPanel className={classes.card} title="Overview" items={overview} />
+        {csiDrivers.length > 0 && (
+          <InfoPanel
+            className={classes.card}
+            title="CSI Driver Details"
+            items={csiDrivers.map(csiDriverProps)}
+          />
+        )}
+      </div>
+      <div className={classes.column}>
+        {renderCloudInfo(cluster, classes)}
+        <InfoPanel className={classes.card} title="ETCD Backup" items={etcdBackupFields} />
+      </div>
     </div>
   )
 }

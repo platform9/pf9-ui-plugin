@@ -50,12 +50,17 @@ const useStyles = makeStyles<Theme, { variant: TextVariant }>((theme) => ({
   },
 }))
 
-function Text({ className, variant, ...props }: TextProps) {
-  const { text } = useStyles({ variant })
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
+const Text: React.ComponentType<TextProps> = React.forwardRef(
+  ({ className, variant, ...props }, ref?: React.Ref<HTMLElement>) => {
+    const { text } = useStyles({ variant })
 
-  // TODO: figure out how to supress mui invalid variant console message
-  const muiVariant = muiValidVariants.includes(variant) ? variant : undefined
-  return <AnyTypography {...props} variant={muiVariant} className={clsx(text, className)} />
-}
+    // TODO: figure out how to supress mui invalid variant console message
+    const muiVariant = muiValidVariants.includes(variant) ? variant : undefined
+    return (
+      <AnyTypography {...props} ref={ref} variant={muiVariant} className={clsx(text, className)} />
+    )
+  },
+)
 
 export default Text

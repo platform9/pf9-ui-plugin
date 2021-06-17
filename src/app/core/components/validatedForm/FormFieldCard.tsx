@@ -5,7 +5,7 @@ import Theme from 'core/themes/model'
 import clsx from 'clsx'
 
 interface ContainerProps {
-  title?: string
+  title?: string | JSX.Element
   link?: JSX.Element
   topContent?: JSX.Element
   className?: string
@@ -13,7 +13,7 @@ interface ContainerProps {
   inputsWidth?: number
   middleHeader?: JSX.Element
 }
-const defaultMaxWidth = 800
+const defaultMaxWidth = 932
 
 export const useStyles = makeStyles<Theme, ContainerProps>((theme) => ({
   root: {
@@ -46,8 +46,9 @@ export const useStyles = makeStyles<Theme, ContainerProps>((theme) => ({
   },
   titleRight: {
     width: '45%',
-    display: 'flex',
-    justifyContent: 'space-between',
+    display: 'grid',
+    gridTemplateColumns: '1fr max-content',
+    gridGap: theme.spacing(1),
     color: theme.palette.grey[700],
   },
 }))

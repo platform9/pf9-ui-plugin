@@ -5,18 +5,24 @@ import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import ExternalLink from 'core/components/ExternalLink'
-import { nodePrerequisitesDocumentationLink } from 'k8s/links'
+import { nodePrerequisitesDocumentationLink, pmkCliOverviewLink } from 'k8s/links'
+import {
+  configureCliCommand,
+  downloadAndInstallPf9CliCommand,
+  runPf9CliCommand,
+} from '../clusters/constants'
+import Info from 'core/components/validatedForm/Info'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     padding: theme.spacing(2, 8),
     margin: theme.spacing(2, 0),
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
+    backgroundColor: hexToRgbaCss(theme.palette.primary.main, 0.1),
   },
   column: {
     margin: theme.spacing(2, 0),
@@ -56,33 +62,66 @@ const useStyles = makeStyles((theme: Theme) => ({
     float: 'right',
     margin: theme.spacing(1),
   },
+  collapsedContainer: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    marginLeft: theme.spacing(2),
+  },
 }))
 
-const downloadAndInstallCommand = 'bash <(curl -sL http://pf9.io/get_cli)'
-
-// Not super enthused about this. Need to have different content for bareos flow vs landing page.
-export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
-  const classes = useStyles({})
+export const OsRequirements = () => {
+  const classes = useStyles()
   return (
-    <>
-      <div className={classes.headerDiv}>
-        <ExternalLink
-          className={classes.externalLink}
-          url={nodePrerequisitesDocumentationLink}
-          icon="file-alt"
-        >
-          Pre-requisites Documentation
-        </ExternalLink>
-        <Text variant="h6">OS Requirements</Text>
+    <Info title="OS Requirements" expanded={false}>
+      <div className={classes.collapsedContainer}>
+        <div className={classes.headerDiv}>
+          <ExternalLink
+            className={classes.externalLink}
+            url={nodePrerequisitesDocumentationLink}
+            icon="file-alt"
+          >
+            Pre-requisites Documentation
+          </ExternalLink>
+        </div>
+        <p>
+          <Text component="span">
+            You will need a physical or virtual machine with Ubuntu (18.04/20.04) or CentOS (7.X)
+            installed.
+          </Text>
+        </p>
       </div>
-      <p>
-        <Text component="span">
-          You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
-          (7.6/7.7/7.8) installed.
+    </Info>
+  )
+}
+
+export const CliAdvancedOptions = () => {
+  const classes = useStyles()
+  return (
+    <Info title="CLI Advanced Options" expanded={false}>
+      <div className={classes.collapsedContainer}>
+        <div className={classes.headerDiv}>
+          <ExternalLink className={classes.externalLink} url={pmkCliOverviewLink} icon="file-alt">
+            Learn more about PF9CTL
+          </ExternalLink>
+          <Text component="p" variant="subtitle2">
+            Create clusters and more directly using the CLI
+          </Text>
+        </div>
+        <p className={classes.spacer} />
+        <Text component="span" variant="body1">
+          You can use the{' '}
+          <CopyToClipboard copyText="pf9ctl">
+            <CodeBlock>pf9ctl</CodeBlock>
+          </CopyToClipboard>{' '}
+          CLI directly to use one or more PMK clusters. Type{' '}
+          <CopyToClipboard copyText="pf9ctl --help">
+            <CodeBlock>pf9ctl --help</CodeBlock>
+          </CopyToClipboard>{' '}
+          to see the full features and options the CLI supports
         </Text>
-      </p>
-      <DownloadCliWalkthrough />
-    </>
+        <p> </p>
+      </div>
+    </Info>
   )
 }
 
@@ -95,10 +134,19 @@ const DownloadCliWalkthrough = (): JSX.Element => {
       <Text variant="h6">Use the PF9 CLI to connect nodes to the Platform9 Management Plane</Text>
       <NumberedSteps
         step={1}
-        title="Download and install the CLI"
+        title="Download the CLI for each node"
         description={
-          <CopyToClipboard copyText={downloadAndInstallCommand}>
-            <CodeBlock>{downloadAndInstallCommand}</CodeBlock>
+          <CopyToClipboard copyText={downloadAndInstallPf9CliCommand}>
+            <CodeBlock>{downloadAndInstallPf9CliCommand}</CodeBlock>
+          </CopyToClipboard>
+        }
+      />
+      <NumberedSteps
+        step={2}
+        title="Configure the CLI"
+        description={
+          <CopyToClipboard copyText={configureCliCommand}>
+            <CodeBlock>{configureCliCommand}</CodeBlock>
           </CopyToClipboard>
         }
       />
@@ -116,13 +164,13 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         </CopyToClipboard>
       </Text>
       <NumberedSteps
-        step={2}
+        step={3}
         title={
-          'Run the PF9 CLI using ‘prep-node’ to attach the Node to the Platform9 Management plane'
+          'Using a user with SUDO privileges, run the PF9 CLI command Prep-Node to attach the node to Platform9.'
         }
         description={
-          <CopyToClipboard copyText="pf9ctl cluster prep-node">
-            <CodeBlock>pf9ctl cluster prep-node</CodeBlock>
+          <CopyToClipboard copyText={runPf9CliCommand}>
+            <CodeBlock>{runPf9CliCommand}</CodeBlock>
           </CopyToClipboard>
         }
       />

@@ -2,6 +2,7 @@ import React from 'react'
 import ListTable from 'core/components/listTable/ListTable'
 import NoContentMessage from 'core/components/NoContentMessage'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { emptyArr } from 'utils/fp'
 
 const createListTableComponent = ({
   title,
@@ -10,21 +11,24 @@ const createListTableComponent = ({
   displayName = name,
   columns,
   uniqueIdentifier = 'id',
-  searchTarget = 'name',
-  paginate,
-  showCheckboxes,
+  searchTargets = ['name'],
+  paginate = true,
+  showCheckboxes = true,
+  multiSelection = true,
   onReload,
-  onRefresh,
+  onRefresh = undefined,
   compactTable = false,
+  batchActions = emptyArr,
 }) => {
   const CustomListTable = ({
     data,
-    onAdd,
-    onDelete,
-    onEdit,
-    rowActions,
-    loading,
-    onSortChange,
+    onAdd = undefined,
+    onDelete = undefined,
+    onEdit = undefined,
+    rowActions = undefined,
+    loading = false,
+    onSortChange = undefined,
+    listTableParams = undefined,
   }) => {
     const [{ visibleColumns, columnsOrder, rowsPerPage }, updatePrefs] = useScopedPreferences(name)
 
@@ -45,7 +49,8 @@ const createListTableComponent = ({
         rowActions={rowActions}
         paginate={paginate}
         showCheckboxes={showCheckboxes}
-        searchTarget={searchTarget}
+        multiSelection={multiSelection}
+        searchTargets={searchTargets}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
@@ -57,6 +62,8 @@ const createListTableComponent = ({
         uniqueIdentifier={uniqueIdentifier}
         loading={loading}
         compactTable={compactTable}
+        batchActions={batchActions}
+        listTableParams={listTableParams}
       />
     )
   }

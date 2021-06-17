@@ -16,7 +16,7 @@ import { IUseDataLoader } from '../infrastructure/nodes/model'
 import PicklistDefault from 'core/components/Picklist'
 import { Chip } from '@material-ui/core'
 import Text from 'core/elements/text'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
@@ -92,7 +92,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginBottom: theme.spacing(),
     display: 'grid',
     gridTemplateColumns: '1fr 40px',
-    background: hexToRGBA(theme.palette.primary.main, 0.1),
+    background: hexToRgbaCss(theme.palette.primary.main, 0.1),
     padding: theme.spacing(1, 2),
     borderRadius: '4px',
     border: '1px solid rgba(74, 163, 223, 0.5)',
@@ -103,6 +103,7 @@ const RbacChecklist = ({ clusterId, onChange, value, initialRules, ...rest }) =>
   const classes = useStyles({})
   const [editingGroup, setEditingGroup] = useState<IRbacChecklistState>(null)
   const [checkedItems, setCheckedItems] = useState<IApiGroupWithRoles>(emptyObj)
+
   const [apiGroups, loadingApiGroups]: IUseDataLoader<IRbacAPIGroup> = useDataLoader(
     apiGroupsLoader,
     {
@@ -201,7 +202,7 @@ const AddRbacApiGroup: FC<IAddRbacApiGroupProps> = ({
     if (groups.length === 0) {
       return
     }
-    if (!selectedGroup.name) {
+    if (!selectedGroup.name || !selectedGroup.resources.length) {
       const selectedApiGroup = groups[0]
       const selectedGroupResource = (selectedApiGroup.resources || [])[0]
 
@@ -242,7 +243,7 @@ const AddRbacApiGroup: FC<IAddRbacApiGroupProps> = ({
           ref={resourceRef}
           label="Resources"
           name="selectedResource"
-          value={selectedResource.name}
+          value={selectedResource?.name}
           onChange={handleResourceChange}
           options={resourceOptions}
           showAll={false}

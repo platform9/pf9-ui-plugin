@@ -44,6 +44,7 @@ const rootPath = '/ui/images/icon-cloudproviders'
 const icons = {
   [CloudProviders.Aws]: `${rootPath}/cloudaws-default${iconSize}.png`,
   [CloudProviders.Azure]: `${rootPath}/cloudazure-default${iconSize}.png`,
+  [CloudProviders.Gcp]: `${rootPath}/cloudgoogle-default${iconSize}.png`,
   [CloudProviders.VirtualMachine]: `${rootPath}/vm-default${iconSize}.png`,
   [CloudProviders.PhysicalMachine]: `${rootPath}/physical-default${iconSize}.png`,
 }
@@ -51,16 +52,17 @@ const icons = {
 const labels = {
   [CloudProviders.Aws]: 'Amazon Web Services',
   [CloudProviders.Azure]: 'Microsoft Azure',
+  [CloudProviders.Gcp]: 'Google Cloud',
   [CloudProviders.VirtualMachine]: 'BareOS Virtual Machines',
   [CloudProviders.PhysicalMachine]: 'BareOS Physical Servers',
 }
 
 const CloudProviderCard: FC<Props> = (props) => {
-  const { type, disabled, image = icons[type], label = labels[type], src, onClick } = props
+  const { type, disabled, image = icons[type], label = labels[type], src, onClick, active } = props
   const classes = useStyles(props)
   const { history } = useReactRouter()
   const handleClick = () => {
-    if (disabled) return
+    if (disabled || active) return
     if (onClick) return onClick(type)
     history.push(src)
   }

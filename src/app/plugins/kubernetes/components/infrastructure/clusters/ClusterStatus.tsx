@@ -15,6 +15,7 @@ import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
 import { routes } from 'core/utils/routes'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
   ({
@@ -61,18 +62,20 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   iconColor: {
     fontSize: ({ variant }) => (variant === 'header' ? '1rem' : theme.typography.body1.fontSize),
     color: ({ status }) => getIconOrBubbleColor(status, theme),
+    justifySelf: 'end',
   },
 }))
 
 type StatusVariant = 'table' | 'header'
 
-const iconMap = new Map([
+const iconMap = new Map<IClusterStatus, { icon: string; classes: string }>([
   ['fail', { icon: 'times', classes: '' }],
   ['ok', { icon: 'check', classes: '' }],
   ['pause', { icon: 'pause-circle', classes: '' }],
   ['unknown', { icon: 'question-circle', classes: '' }],
   ['error', { icon: 'exclamation-triangle', classes: '' }],
   ['loading', { icon: 'sync', classes: 'fa-spin' }],
+  ['upgrade', { icon: 'arrow-circle-up', classes: '' }],
 ])
 
 interface Props {
@@ -108,10 +111,15 @@ const ClusterStatusSpan: FC<Props> = (props) => {
 
 export default ClusterStatusSpan
 
-const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
-  <ClusterStatusSpan iconStatus title={taskError} status="error" variant={variant}>
+export const renderErrorStatus = (nodesDetailsUrl, variant, text) => (
+  <ClusterStatusSpan
+    iconStatus
+    title="Click the link to view more details"
+    status="error"
+    variant={variant}
+  >
     <SimpleLink variant="error" src={nodesDetailsUrl}>
-      Error
+      {text}
     </SimpleLink>
   </ClusterStatusSpan>
 )
@@ -133,8 +141,9 @@ const renderTransientStatus = ({ uuid, connectionStatus }, variant) => {
 
 interface IClusterStatusProps {
   cluster: IClusterSelector
-  variant: StatusVariant
+  variant?: StatusVariant
   message?: string
+  iconStatus?: boolean
 }
 
 export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
@@ -165,7 +174,14 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
           )}
         </ClusterStatusSpan>
       )}
-      {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
+      {(cluster.taskError || cluster.etcdBackup?.taskErrorDetail) &&
+        renderErrorStatus(routes.cluster.detail.path({ id: cluster.uuid }), variant, 'Error')}
+      {clockDriftDetectedInNodes(cluster.nodes) &&
+        renderErrorStatus(
+          routes.cluster.nodes.path({ id: cluster.uuid }),
+          variant,
+          'Node Clock Drift',
+        )}
     </div>
   )
 }

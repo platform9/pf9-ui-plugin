@@ -1,15 +1,16 @@
-import { isNilOrEmpty, emptyArr, emptyObj } from 'app/utils/fp'
-import PropTypes from 'prop-types'
-import React, { useState, useMemo, useCallback, useRef } from 'react'
-import ConfirmationDialog from './ConfirmationDialog'
-import useToggler from 'core/hooks/useToggler'
 import { defaultUniqueIdentifier } from 'app/constants'
-import { pluck, path } from 'ramda'
+import { emptyArr, emptyObj, isNilOrEmpty } from 'app/utils/fp'
+import CreateButton from 'core/components/buttons/CreateButton'
+import PageContainerHeader from 'core/components/pageContainer/PageContainerHeader'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import useToggler from 'core/hooks/useToggler'
+import PropTypes from 'prop-types'
+import { path, pluck } from 'ramda'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import useReactRouter from 'use-react-router'
 import { pathJoin } from 'utils/misc'
-import PageContainerHeader from 'core/components/pageContainer/PageContainerHeader'
-import CreateButton from 'core/components/buttons/CreateButton'
-import useDataUpdater from 'core/hooks/useDataUpdater'
+import ConfirmationDialog from './ConfirmationDialog'
+import DropdownButton from './DropdownButton'
 
 const CRUDListContainer = ({
   children,
@@ -17,12 +18,12 @@ const CRUDListContainer = ({
   nameProp,
   addText,
   addButton: AddButton,
+  addButtonConfigs,
   AddDialog,
   EditDialog,
   DeleteDialog,
   addUrl,
   editUrl,
-  customEditUrlFn,
   deleteFn,
   uniqueIdentifier,
 }) => {
@@ -37,7 +38,11 @@ const CRUDListContainer = ({
 
   const deleteEnabled = !!handleRemove
   const editEnabled = EditDialog || editUrl
-  const addEnabled = AddDialog || addUrl
+  const addEnabled = AddDialog || addUrl || addButtonConfigs
+
+  const validAddButtonConfigs = addButtonConfigs
+    ? addButtonConfigs.filter((config) => (config.cond ? config.cond() : true))
+    : []
 
   const deleteConfirmText = useMemo(() => {
     if (isNilOrEmpty(selectedItems)) {
@@ -84,9 +89,11 @@ const CRUDListContainer = ({
         )
         return
       }
-      history.push(
-        customEditUrlFn ? customEditUrlFn(selectedRow, selectedId) : pathJoin(editUrl, selectedId),
-      )
+      const urlResult =
+        typeof editUrl === 'function'
+          ? editUrl(selectedRow, selectedId)
+          : pathJoin(editUrl, selectedId)
+      history.push(urlResult)
     } else if (EditDialog) {
       setSelectedItems(selected)
       toggleEditDialog()
@@ -118,10 +125,33 @@ const CRUDListContainer = ({
       )}
       {addEnabled && (
         <PageContainerHeader>
-          {AddButton ? (
-            <AddButton onClick={handleAdd} />
+          {addButtonConfigs ? (
+            // If addButtonConfigs supplied, override standard method
+            <>
+              {validAddButtonConfigs && validAddButtonConfigs.length && (
+                <PageContainerHeader>
+                  {validAddButtonConfigs.length === 1 ? (
+                    <CreateButton
+                      onClick={() => {
+                        history.push(validAddButtonConfigs[0].link)
+                      }}
+                    >
+                      {validAddButtonConfigs[0].label}
+                    </CreateButton>
+                  ) : (
+                    <DropdownButton links={validAddButtonConfigs} addText={addText} />
+                  )}
+                </PageContainerHeader>
+              )}
+            </>
           ) : (
-            <CreateButton onClick={handleAdd}>{addText}</CreateButton>
+            <>
+              {AddButton ? (
+                <AddButton onClick={handleAdd} />
+              ) : (
+                <CreateButton onClick={handleAdd}>{addText}</CreateButton>
+              )}
+            </>
           )}
         </PageContainerHeader>
       )}
@@ -142,7 +172,7 @@ CRUDListContainer.propTypes = {
   EditDialog: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 
   addUrl: PropTypes.string,
-  editUrl: PropTypes.string,
+  editUrl: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 
   /**
    * Handler that is responsible for deleting the entity.

@@ -1,0 +1,15 @@
+apiVersion: kubevirt.io/v1
+kind: PersistentVolumeClaim
+metadata:
+  name: clone-of-pvc-1
+  namespace: myns
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: cloning
+  resources:
+    requests:
+      storage: 5Gi
+  dataSource:
+    kind: PersistentVolumeClaim
+    name: pvc-1

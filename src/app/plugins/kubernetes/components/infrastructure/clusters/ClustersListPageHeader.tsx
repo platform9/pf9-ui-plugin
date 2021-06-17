@@ -33,11 +33,13 @@ export const ClusterListHeader = () => {
     return getUsageTotals(items, curUsagePaths, maxUsagePaths)
   }, [])
   return (
-    <ListPageHeader<IClusterSelector>
-      report={clusterStatusCardProps}
-      loaderFn={clusterActions.list}
-      totalUsageFn={handleGetUsage}
-      documentMeta={<DocumentMeta title="Clusters" />}
-    />
+    <>
+      <ListPageHeader<IClusterSelector>
+        report={clusterStatusCardProps}
+        loaderFn={clusterActions.list}
+        totalUsageFn={handleGetUsage}
+        documentMeta={<DocumentMeta title="Clusters" />}
+      />
+    </>
   )
 }

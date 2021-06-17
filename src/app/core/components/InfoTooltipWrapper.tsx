@@ -8,7 +8,12 @@ interface Props {
   children: any
 }
 
-const InfoTooltipWrapper: FunctionComponent<Props> = ({ info = "", placement, className, children }) => {
+const InfoTooltipWrapper: FunctionComponent<Props> = ({
+  info = '',
+  placement,
+  className,
+  children,
+}) => {
   const [open, setOpen] = useState(false)
   const openTooltip = useCallback(() => setOpen(true), [])
   const closeTooltip = useCallback(() => setOpen(false), [])
@@ -18,6 +23,7 @@ const InfoTooltipWrapper: FunctionComponent<Props> = ({ info = "", placement, cl
       <div
         onMouseEnter={openTooltip}
         onMouseLeave={closeTooltip}
+        onMouseOut={closeTooltip}
         onFocus={openTooltip}
         onBlur={closeTooltip}
         onClick={closeTooltip}

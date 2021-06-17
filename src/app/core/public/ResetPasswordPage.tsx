@@ -8,9 +8,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import CheckIcon from '@material-ui/icons/Check'
 import ClearIcon from '@material-ui/icons/Clear'
 import ListItemText from '@material-ui/core/ListItemText'
-import Visibility from '@material-ui/icons/Visibility'
-import VisibilityOff from '@material-ui/icons/VisibilityOff'
-import IconButton from '@material-ui/core/IconButton'
 import { propSatisfies } from 'ramda'
 import useParams from 'core/hooks/useParams'
 import ApiClient from 'api-client/ApiClient'
@@ -30,7 +27,8 @@ import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
 import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { loginUrl } from 'app/constants.js'
+import { loginUrl } from 'app/constants'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -155,20 +153,23 @@ const renderPasswordValidationCheck: IPasswordValidationCheck = (passwordValue) 
 
 const ResetPasswordPage: React.FC = () => {
   const classes = useStyles({})
-  const { history, match, location } = useReactRouter()
+  const { history, location } = useReactRouter()
   const searchParams = new URLSearchParams(location.search)
+  const emailId = searchParams.get('username')
+  const token = searchParams.get('token')
+
   const { params, updateParams, getParamsUpdater } = useParams({
     ...initialState,
-    emailId: searchParams.get('username'),
+    emailId,
   })
   const togglePasswordMask: ITogglePasswordMask = (key) => () =>
     updateParams({ [key]: !params[key] })
   const renderPasswordMask: IPasswordMask = (key) => ({
     endAdornment: (
       <InputAdornment position="end">
-        <IconButton aria-label="toggle password visibility" onClick={togglePasswordMask(key)}>
-          {params[key] ? <Visibility /> : <VisibilityOff />}
-        </IconButton>
+        <FontAwesomeIcon aria-label="toggle password visibility" onClick={togglePasswordMask(key)}>
+          {params[key] ? 'eye' : 'eye-slash'}
+        </FontAwesomeIcon>
       </InputAdornment>
     ),
   })
@@ -182,6 +183,7 @@ const ResetPasswordPage: React.FC = () => {
   const handleFormSubmit = async () => {
     if (params.isResetPasswordSuccessful) {
       history.push(loginUrl)
+      return
     }
 
     updateParams({
@@ -190,7 +192,7 @@ const ResetPasswordPage: React.FC = () => {
 
     try {
       const options: IApiData = {
-        secret: match.params.id,
+        token: token,
         username: params.emailId,
         password: params.confirmPassword,
       }
@@ -230,7 +232,6 @@ const ResetPasswordPage: React.FC = () => {
                         className={classes.textField}
                       />
                       <TextField
-                        variant="standard"
                         required
                         id="newPassword"
                         label="New Password"
@@ -241,7 +242,6 @@ const ResetPasswordPage: React.FC = () => {
                         className={classes.textField}
                       />
                       <TextField
-                        variant="standard"
                         required
                         id="confirmPassword"
                         label="Confirm Password"

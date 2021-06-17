@@ -1,9 +1,12 @@
 import React, { FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
+import clsx from 'clsx'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 
 interface Props {
   fill?: boolean
+  className?: any
   children: any
 }
 
@@ -15,14 +18,14 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   pre: {
     fontWeight: 600,
     fontFamily: 'monospace',
-    display: 'inline-block',
+    display: ({ fill }) => (fill ? 'flex' : 'inline-block'),
     backgroundColor: theme.components.code.background,
     color: theme.components.code.text,
     padding: theme.spacing(),
     margin: theme.spacing(0.5),
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',
-    maxHeight: 400,
+    maxHeight: ({ fill }) => (fill ? 'initial' : 400),
     overflow: 'auto',
     flexGrow: ({ fill }) => (fill ? 1 : 0),
 
@@ -30,17 +33,23 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       fontFamily: 'Courier',
     },
     '&::-webkit-scrollbar': {
-      width: 0,
+      width: 6,
+    },
+    '&::-webkit-scrollbar-track': {
       background: 'transparent',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: hexToRgbaCss(theme.palette.grey[500], 0.2),
+      borderRadius: 2,
     },
   },
 }))
 
-const CodeBlock: FunctionComponent<Props> = ({ children, fill = false }) => {
+const CodeBlock: FunctionComponent<Props> = ({ children, className, fill = false }) => {
   const styles = useStyles({ fill })
 
   return (
-    <pre className={styles.pre}>
+    <pre className={clsx(styles.pre, className)}>
       <code>{children}</code>
     </pre>
   )

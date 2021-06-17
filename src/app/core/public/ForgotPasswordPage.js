@@ -1,5 +1,4 @@
 import React from 'react'
-import axios from 'axios'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Button, Grid, Paper, TextField } from '@material-ui/core'
@@ -7,7 +6,8 @@ import Text from 'core/elements/text'
 import useParams from 'core/hooks/useParams'
 import Progress from 'core/components/progress/Progress'
 import Alert from 'core/components/Alert'
-import { loginUrl, forgotPasswordApiUrl } from 'app/constants.js'
+import { loginUrl, forgotPasswordApiUrl } from 'app/constants'
+import ApiClient from 'api-client/ApiClient'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,6 +54,7 @@ const ForgotPasswordPage = (props) => {
   })
   const { history } = useReactRouter()
   const classes = useStyles()
+  const { clemency } = ApiClient.getInstance()
 
   const handleEmailChange = () => (event) => {
     updateParams({
@@ -66,18 +67,17 @@ const ForgotPasswordPage = (props) => {
 
     if (params.isResetSuccessful) {
       history.push(loginUrl)
+      return
     }
 
     updateParams({
       loading: true,
     })
 
-    const body = { username: params.emailId }
-
     try {
-      const response = await axios.post(forgotPasswordApiUrl, body)
+      const response = await clemency.requestNewPassword(params.emailId)
 
-      response.status === 200
+      response.code === 200
         ? updateParams({ isResetSuccessful: true, loading: false })
         : updateParams({ isError: true, loading: false })
     } catch (err) {

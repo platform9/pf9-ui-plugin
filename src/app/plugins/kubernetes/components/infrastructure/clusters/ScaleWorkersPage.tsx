@@ -20,6 +20,7 @@ import ClusterHostChooser, {
   isUnassignedNode,
   inCluster,
   isNotMaster,
+  isConnected,
 } from './bareos/ClusterHostChooser'
 import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
@@ -134,9 +135,9 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
   const addBareOsWorkerNodes = (
     <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
       <ClusterHostChooser
-        selection="multiple"
+        selection="single"
         id="workersToAdd"
-        filterFn={isUnassignedNode}
+        filterFn={allPass([isUnassignedNode, isConnected])}
         validations={[minScaleValidator, maxScaleValidator]}
         required
       />
@@ -147,7 +148,7 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
   const removeBareOsWorkerNodes = (
     <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
       <ClusterHostChooser
-        selection="multiple"
+        selection="single"
         id="workersToRemove"
         filterFn={allPass([isNotMaster, inCluster(cluster.uuid)])}
         validations={[minScaleValidator, maxScaleValidator]}

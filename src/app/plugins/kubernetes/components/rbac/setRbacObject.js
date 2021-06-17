@@ -12,6 +12,9 @@ const processApiGroup = (apiGroup, apiGroupsList) => {
 
 const processApiGroupResources = (apiGroup, rule, apiGroupsList) => {
   const apiGroupFromList = apiGroupsList.find((_apiGroup) => _apiGroup.name === apiGroup)
+  if (!apiGroupFromList) {
+    return []
+  }
   const resourceNames = apiGroupFromList.resources.map((resource) => resource.name)
   const resources = rule.resources.map((resource) =>
     resource === '*' ? resourceNames : [resource],

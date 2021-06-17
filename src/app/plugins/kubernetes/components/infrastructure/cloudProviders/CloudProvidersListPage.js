@@ -3,6 +3,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import SimpleLink from 'core/components/SimpleLink'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import ResourceUsageTables from '../common/ResourceUsageTables'
+import { routes } from 'core/utils/routes'
 
 const toMHz = (bytes) => bytes / Math.pow(1024, 2)
 const toGB = (bytes) => bytes / Math.pow(1024, 3)
@@ -11,7 +12,7 @@ const renderDeployedCapacity = (_, { deployedCapacity }) => (
 )
 const renderClusterLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={routes.cluster.detail.path({ id: uuid })}>{name}</SimpleLink>
   </div>
 )
 const ClustersCell = ({ clusters }) => {
@@ -37,7 +38,7 @@ const ClustersCell = ({ clusters }) => {
 }
 const renderNodeLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={routes.nodes.detail.path({ id: uuid })}>{name}</SimpleLink>
   </div>
 )
 const NodesCell = ({ nodes }) => {
@@ -61,9 +62,34 @@ const NodesCell = ({ nodes }) => {
     </div>
   )
 }
-
+const renderImportedClusterLink = ({ uuid, name }) => (
+  <div key={uuid}>
+    <SimpleLink src={routes.cluster.imported.details.path({ id: uuid })}>{name}</SimpleLink>
+  </div>
+)
+const ImportedClustersCell = ({ importedClusters }) => {
+  if (!importedClusters || !importedClusters.length) {
+    return <div>0</div>
+  }
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <div>
+      {expanded ? (
+        <div>
+          {importedClusters.map(renderImportedClusterLink)}
+          <SimpleLink onClick={() => setExpanded(!expanded)}>(less details)</SimpleLink>
+        </div>
+      ) : (
+        <div>
+          {importedClusters.length}&nbsp;
+          <SimpleLink onClick={() => setExpanded(!expanded)}>(more details)</SimpleLink>
+        </div>
+      )}
+    </div>
+  )
+}
 export const options = {
-  addUrl: '/ui/kubernetes/infrastructure/cloudProviders/add',
+  addUrl: routes.cloudProviders.add.path(),
   addText: 'Add Cloud Provider',
   columns: [
     { id: 'name', label: 'Name' },
@@ -75,10 +101,15 @@ export const options = {
       render: (clusters) => <ClustersCell clusters={clusters} />,
     },
     { id: 'nodes', label: 'Nodes', render: (nodes) => <NodesCell nodes={nodes} /> },
+    {
+      id: 'importedClusters',
+      label: 'Imported Clusters',
+      render: (importedClusters) => <ImportedClustersCell importedClusters={importedClusters} />,
+    },
     { id: 'uuid', label: 'Unique ID' },
   ],
   cacheKey: ActionDataKeys.CloudProviders,
-  editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
+  editUrl: (_, id) => routes.cloudProviders.edit.path({ id }),
   editCond: ([selectedRow]) => selectedRow.type !== 'openstack',
   editDisabledInfo: () => 'Editing an Openstack cloud provider is not currently supported',
   deleteCond: ([selectedRow]) => selectedRow.type !== 'local',
@@ -87,6 +118,7 @@ export const options = {
   rowActions: [],
   title: 'Cloud Providers',
   uniqueIdentifier: 'uuid',
+  searchTargets: ['name', 'uuid'],
   multiSelection: false,
 }
 

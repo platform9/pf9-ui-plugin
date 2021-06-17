@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import clsx from 'clsx'
@@ -10,7 +10,7 @@ import ClusterNodes from './ClusterNodes'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
-import { Card } from '@material-ui/core'
+import { Card, Tooltip } from '@material-ui/core'
 import Text from 'core/elements/text'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
@@ -25,8 +25,18 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PollingData from 'core/components/PollingData'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { capitalizeString } from 'utils/misc'
+import { capitalizeString, cleanupStacktrace } from 'utils/misc'
 import { cloudProviderTypes } from 'k8s/components/infrastructure/cloudProviders/selectors'
+import { variantIcon } from 'core/components/Alert'
+import CodeBlock from 'core/components/CodeBlock'
+import CopyToClipboard from 'core/components/CopyToClipboard'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
+import ClusterDeployedApps from './cluster-deployed-apps'
+import { isDecco } from 'core/utils/helpers'
+import { useSelector } from 'react-redux'
+import { prop } from 'ramda'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import ClusterAlarms from './cluster-alarms'
 
 const oneSecond = 1000
 
@@ -57,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   headerCardContainer: {
-    width: 320,
+    width: 424,
     minHeight: 175,
     display: 'grid',
     gridTemplateRows: ({ hasLinks }) => `62px 1fr ${hasLinks ? 56 : 12}px`,
@@ -90,6 +100,9 @@ const useStyles = makeStyles((theme) => ({
       gridArea: 'header',
       margin: 0,
       color: theme.palette.grey[700],
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
     },
     '& p': {
       gridArea: 'cluster',
@@ -120,26 +133,104 @@ const useStyles = makeStyles((theme) => ({
   },
   tabContainer: {
     paddingTop: theme.spacing(2),
+    maxWidth: 1234,
+  },
+  headerCard: {
+    marginTop: theme.spacing(2),
   },
   detailsHeader: {
     display: 'grid',
-    gridTemplateColumns: '330px repeat(3, 250px)',
+    gridTemplateColumns: '434px repeat(3, 250px)',
     gridGap: theme.spacing(2),
     paddingBottom: 20,
   },
+  taskErrorMessage: {
+    maxHeight: 165,
+    fontSize: 14,
+    padding: theme.spacing(0, 2),
+    margin: 0,
+    marginTop: theme.spacing(2),
+    backgroundColor: 'transparent',
+    color: theme.palette.red[500],
+    fontWeight: 300,
+    lineHeight: '15px',
+  },
+  taskErrorAlert: {
+    maxHeight: 224,
+    padding: theme.spacing(0, 2, 2, 2),
+    marginBottom: theme.spacing(2),
+    border: `1px solid ${theme.palette.red[500]}`,
+    backgroundColor: hexToRgbaCss(theme.palette.red[500], 0.1),
+    borderRadius: 4,
+
+    '& > header': {
+      color: theme.palette.red[500],
+      borderBottom: `1px solid ${theme.palette.red[500]}`,
+      display: 'grid',
+      gridGap: theme.spacing(),
+      gridTemplateColumns: '22px 1fr 22px',
+      fontSize: 14,
+      height: 40,
+      alignItems: 'center',
+    },
+  },
 }))
 
+const clusterTaskErrorTitle = 'Error Impacting Cluster Availability'
+const etcdBackupTaskErrorTitle = 'ETCD Backup Error'
+
+const ClusterTaskError = ({ title, taskError }) => {
+  const classes = useStyles()
+  const formattedError = cleanupStacktrace(taskError)
+  return (
+    <div className={classes.taskErrorAlert}>
+      <header>
+        <FontAwesomeIcon>{variantIcon.error}</FontAwesomeIcon>
+        <Text variant="caption1">{title}</Text>
+        <CopyToClipboard copyText={formattedError} copyIcon="copy" codeBlock={false} />
+      </header>
+      <CodeBlock className={classes.taskErrorMessage}>{formattedError}</CodeBlock>
+    </div>
+  )
+}
+
 const ClusterDetailsPage = () => {
-  const { match } = useReactRouter()
+  const { match, history } = useReactRouter()
   const classes = useStyles()
   const [clusters, loading, reload] = useDataLoader(clusterActions.list, undefined, {
     loadingFeedback: false,
   })
-  const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
-  const clusterHeader = <ClusterStatusAndUsage cluster={cluster} loading={loading} />
+  const session = useSelector(prop(sessionStoreKey))
+  const { features } = session
+  const cluster = clusters.find((x) => x.uuid === match.params.id)
+
+  useEffect(() => {
+    if (!cluster) {
+      history.push(routes.cluster.list.path())
+    }
+  }, [cluster, history])
+
+  if (!cluster) {
+    return null
+  }
+
+  const clusterHeader = (
+    <>
+      <ClusterStatusAndUsage cluster={cluster} loading={loading} />
+      {cluster.taskError && (
+        <ClusterTaskError title={clusterTaskErrorTitle} taskError={cluster.taskError} />
+      )}
+      {cluster.etcdBackup?.taskErrorDetail && (
+        <ClusterTaskError
+          title={etcdBackupTaskErrorTitle}
+          taskError={cluster.etcdBackup.taskErrorDetail}
+        />
+      )}
+    </>
+  )
   return (
     <PageContainer className={classes.pageContainer}>
-      <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
+      <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 30} />
       <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
         « Back to Cluster List
       </SimpleLink>
@@ -162,6 +253,24 @@ const ClusterDetailsPage = () => {
             <ClusterInfo />
           </div>
         </Tab>
+        {isDecco(features) && (
+          <Tab value="deployedApps" label="Deployed Apps">
+            <div className={classes.tabContainer}>
+              {clusterHeader}
+              <ClusterDeployedApps cluster={cluster} />
+            </div>
+          </Tab>
+        )}
+        {cluster.hasPrometheus && (
+          <Tab value="alarms" label="Alarms">
+            <ClusterAlarms
+              cluster={cluster}
+              headerCard={
+                <ClusterStatus cluster={cluster} loading={loading} className={classes.headerCard} />
+              }
+            />
+          </Tab>
+        )}
       </Tabs>
     </PageContainer>
   )
@@ -169,8 +278,8 @@ const ClusterDetailsPage = () => {
 
 export default ClusterDetailsPage
 
-const ClusterStatusAndUsage = ({ cluster, loading }) => {
-  const { usage = emptyObj, name, links = emptyObj, cloudProviderType, version } = cluster
+const ClusterStatus = ({ cluster, loading, className }) => {
+  const { usage = emptyObj, name, links = emptyObj, cloudProviderType = '', version } = cluster
   const classes = useStyles()
   const clusterLinks = {
     grafana: usage.grafanaLink,
@@ -178,28 +287,37 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   }
   const deployment = cloudProviderTypes[cloudProviderType] || capitalizeString(cloudProviderType)
   return (
+    <HeaderCard
+      title={name}
+      subtitle={`${deployment} - ${version}`}
+      icon="project-diagram"
+      links={clusterLinks}
+      className={className}
+    >
+      <ClusterConnectionStatus
+        iconStatus
+        className={classes.statusColor}
+        variant="header"
+        cluster={cluster}
+        message={loading ? 'loading' : undefined}
+      />
+      <ClusterHealthStatus
+        iconStatus
+        className={classes.statusColor}
+        variant="header"
+        cluster={cluster}
+        message={loading ? 'loading' : undefined}
+      />
+    </HeaderCard>
+  )
+}
+
+const ClusterStatusAndUsage = ({ cluster, loading }) => {
+  const { usage = emptyObj } = cluster
+  const classes = useStyles()
+  return (
     <div className={classes.detailsHeader}>
-      <HeaderCard
-        title={name}
-        subtitle={`${deployment} - ${version}`}
-        icon="project-diagram"
-        links={clusterLinks}
-      >
-        <ClusterConnectionStatus
-          iconStatus
-          className={classes.statusColor}
-          variant="header"
-          cluster={cluster}
-          message={loading ? 'loading' : undefined}
-        />
-        <ClusterHealthStatus
-          iconStatus
-          className={classes.statusColor}
-          variant="header"
-          cluster={cluster}
-          message={loading ? 'loading' : undefined}
-        />
-      </HeaderCard>
+      <ClusterStatus cluster={cluster} loading={loading} />
       <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
       <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
       <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
@@ -207,15 +325,26 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   )
 }
 
-const HeaderCard = ({ title, subtitle, icon, loading = false, links, children }) => {
+export const HeaderCard = ({
+  title,
+  subtitle,
+  icon,
+  loading = false,
+  links = {},
+  children,
+  className,
+}) => {
   const hasLinks = !!links.grafana || !!links.dashboard || !!links.kubeconfig
   const classes = useStyles({ hasLinks })
   return (
-    <Card className={classes.headerCardContainer} elevation={0}>
+    <Card className={clsx(classes.headerCardContainer, className)} elevation={0}>
       <header className={classes.headerCardHeader}>
-        <Text variant="subtitle1" component="h1">
-          {title}
-        </Text>
+        <Tooltip title={title} interactive>
+          <Text variant="subtitle1" component="h1">
+            {title}
+          </Text>
+        </Tooltip>
+
         <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>
           {loading ? 'sync' : icon}
         </FontAwesomeIcon>

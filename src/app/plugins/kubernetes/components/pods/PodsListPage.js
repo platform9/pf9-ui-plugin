@@ -11,6 +11,23 @@ import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
+import { routes } from 'core/utils/routes'
+import { trackEvent } from 'utils/tracking'
+import SimpleLink from 'core/components/SimpleLink'
+import { makeStyles } from '@material-ui/styles'
+import { pathStrOr } from 'utils/fp'
+import Text from 'core/elements/text'
+import Bugsnag from '@bugsnag/js'
+
+const useStyles = makeStyles((theme) => ({
+  containerLogs: {
+    width: 'max-content',
+    '& b': {
+      fontWeight: 600,
+      whiteSpace: 'nowrap',
+    },
+  },
+}))
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -56,6 +73,14 @@ const ListPage = ({ ListContainer }) => {
     )
   }
 }
+const openLogsWindow = (log, pod) => () => {
+  Bugsnag.leaveBreadcrumb('Attempting to view pod logs', { log, pod })
+  const { name, id, clusterName, clusterId } = pod
+  const containerName = log.containerName
+  trackEvent('View Pod Logs', { name, id, clusterName, clusterId, containerName })
+  window.open(log.url, '_blank')
+}
+
 const renderName = (name, { dashboardUrl }) => {
   return (
     <span>
@@ -63,6 +88,25 @@ const renderName = (name, { dashboardUrl }) => {
       <br />
       <ExternalLink url={dashboardUrl}>dashboard</ExternalLink>
     </span>
+  )
+}
+
+const renderContainers = (value, pod) => <ContainerLogs pod={pod} />
+
+const ContainerLogs = ({ pod }) => {
+  const classes = useStyles()
+  const logs = pod.logs || []
+  return (
+    <>
+      {logs.map((log) => (
+        <Text key={log.containerName} variant="body2" className={classes.containerLogs}>
+          <span>
+            <b>{log.containerName}: </b>
+            <SimpleLink onClick={openLogsWindow(log, pod)}>View Container Logs</SimpleLink>
+          </span>
+        </Text>
+      ))}
+    </>
   )
 }
 
@@ -83,13 +127,14 @@ const renderStatus = (phase) => {
 
 export const options = {
   deleteFn: podActions.delete,
-  addUrl: '/ui/kubernetes/pods/add',
+  addUrl: routes.pods.add.path(),
   addText: 'Create New Pod',
   columns: [
     { id: 'name', label: 'Name', render: renderName },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'namespace', label: 'Namespace' },
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
+    { id: 'containers', label: 'Containers', render: renderContainers },
     { id: 'status.phase', label: 'Status', render: renderStatus },
     { id: 'status.hostIP', label: 'Node IP' },
     {

@@ -77,7 +77,32 @@ export interface IDocumentMetaProps {
   bodyClasses?: any[]
 }
 
-class DocumentMeta extends React.Component<IDocumentMetaProps, {}> {
+interface AddScriptElementToDomBodyProps {
+  id: string
+  textContent?: string
+  src?: string
+  onload?: (event) => void
+}
+
+export class DocumentMetaCls extends React.Component<IDocumentMetaProps, {}> {
+  static addScriptElementToDomBody({
+    id,
+    textContent,
+    src,
+    onload,
+  }: AddScriptElementToDomBodyProps) {
+    const existingScript = document.getElementById(id)
+    if (existingScript) return
+    const script = document.createElement('script')
+    script.id = id
+    script.textContent = textContent
+    if (src) {
+      script.src = src
+    }
+    script.onload = onload
+    document.body.appendChild(script)
+  }
+
   render() {
     return null
   }
@@ -86,4 +111,4 @@ class DocumentMeta extends React.Component<IDocumentMetaProps, {}> {
 export default withSideEffect(
   reducePropsToState,
   handleClientStateChange,
-)(DocumentMeta) as React.ComponentClass<IDocumentMetaProps>
+)(DocumentMetaCls) as React.ComponentClass<IDocumentMetaProps>

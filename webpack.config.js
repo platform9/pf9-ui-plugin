@@ -15,7 +15,6 @@ const env = process.env.NODE_ENV || 'development'
 const isDev = env === 'development'
 const isProd = env === 'production'
 const bugsnagKey = '3eb58c77ada2a9db70fc7a8e81e97b99'
-
 const extractCSS = new MiniCssExtractPlugin({
   // Options similar to the same options in webpackOptions.output
   // both options are optional
@@ -68,9 +67,21 @@ module.exports = {
         use: 'awesome-typescript-loader',
       },
       {
+        test: /\.ya?ml$/,
+        // type: 'json', // Required by Webpack v4
+        use: 'raw-loader',
+        // options: {
+        //   esModule: false,
+        // },
+      },
+      {
         test: /\.css$/,
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: ['file-loader'],
       },
       {
         enforce: 'pre',
@@ -144,6 +155,7 @@ module.exports = {
       developer: path.resolve(__dirname, 'src/app/plugins/developer'),
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
       openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
+      account: path.resolve(__dirname, 'src/app/plugins/account'),
       core: path.resolve(__dirname, 'src/app/core'),
       utils: path.resolve(__dirname, 'src/app/utils'),
       app: path.resolve(__dirname, 'src/app'),

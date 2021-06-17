@@ -5,7 +5,9 @@ import { FormControl, FormControlLabel, FormHelperText } from '@material-ui/core
 import { withStyles } from '@material-ui/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import withFormContext, {
+  ValidatedFormInputPropTypes,
+} from 'core/components/validatedForm/withFormContext'
 
 const styles = (theme) => ({
   root: {
@@ -39,6 +41,7 @@ class CheckboxField extends PureComponent {
       onClick,
       onChange,
       onMouseEnter,
+      formControlLabelClasses,
       ...restProps
     } = this.props
 
@@ -51,6 +54,7 @@ class CheckboxField extends PureComponent {
           error={hasError}
         >
           <FormControlLabel
+            classes={formControlLabelClasses}
             label={required ? `${label} *` : label}
             control={
               <Checkbox
@@ -74,6 +78,7 @@ CheckboxField.propTypes = {
   info: PropTypes.string,
   label: PropTypes.string,
   onChange: PropTypes.func,
+  formControlLabelClasses: PropTypes.any,
   ...ValidatedFormInputPropTypes,
 }
 

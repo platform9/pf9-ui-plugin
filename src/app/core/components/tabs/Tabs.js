@@ -15,6 +15,7 @@ const styles = (theme) => ({
     flexGrow: 1,
     width: '100%',
     boxShadow: '0 0 0 0',
+    background: 'transparent',
   },
   tabColor: {
     color: theme.palette.text.primary,

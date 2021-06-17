@@ -49,16 +49,20 @@ interface Props extends Omit<OutlinedTextFieldProps, 'onChange' | 'variant'> {
   onChange?: (e: any) => void
 }
 
-const Input: FC<Props> = ({ className = undefined, variant = 'light', ...rest }) => {
+const Input: FC<Props> = ({ className = undefined, variant = 'light', children, ...rest }) => {
   const { input } = useStyles({ variant })
-  return <MUITextField {...rest} variant="outlined" className={clsx(input, className)} />
+  return (
+    <MUITextField {...rest} variant="outlined" className={clsx(input, className)}>
+      {children}
+    </MUITextField>
+  )
 }
 
 const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
   input: {
     '& .MuiInputLabel-outlined': {
       textTransform: 'uppercase',
-      top: 3,
+      top: -3,
       ...theme.typography.inputLabel,
       color: theme.palette.grey[500],
       backgroundColor: ({ variant }) => getColor(theme, 'default', variant).background,
@@ -70,9 +74,20 @@ const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
       padding: '0 12px 0 5px',
       color: ({ variant }) => getColor(theme, 'default', variant).color,
     },
+    '& .MuiSelect-selectMenu': {
+      minHeight: 40,
+      lineHeight: '40px',
+      padding: theme.spacing(0, 2),
+      color: ({ variant }) => getColor(theme, 'default', variant).color,
+      background: ({ variant }) => getColor(theme, 'default', variant).background,
+    },
+    '& .MuiSelect-icon': {
+      color: ({ variant }) => getColor(theme, 'default', variant).color,
+      background: ({ variant }) => getColor(theme, 'default', variant).background,
+    },
     '& input': {
       ...theme.typography.inputPlaceholder,
-      minHeight: 54,
+      minHeight: 40,
       padding: theme.spacing(0, 2),
       color: ({ variant }) => getColor(theme, 'default', variant).color,
       background: ({ variant }) => getColor(theme, 'default', variant).background,

@@ -26,30 +26,36 @@ interface IUsageTotals {
 
 interface IListPageHeaderProps<T> {
   report: IStatusCardWithFilterProps
-  totalUsageFn: (items: T[]) => IUsageTotals
+  totalUsageFn?: (items: T[]) => IUsageTotals
   loaderFn: Function
   documentMeta?: JSX.Element
+  hideUsage?: Boolean
 }
 function ListPageHeader<T>({
   loaderFn,
   report,
   totalUsageFn,
   documentMeta,
+  hideUsage,
 }: IListPageHeaderProps<T>) {
   const classes = useStyles({})
   const [data, loading, reload]: IUseDataLoader<T> = useDataLoader(loaderFn, null, {
     loadingFeedback: false,
   }) as any
-  const totals = totalUsageFn(data)
+  const totals = totalUsageFn && totalUsageFn(data)
   return (
     <>
       {documentMeta && documentMeta}
-      <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 10} />
+      <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 30} />
       <div className={classes.container}>
         <ListPageHeaderCard {...report} className={classes.card} />
-        <UsageWidget title="Compute" stats={totals.compute} units="GHz" />
-        <UsageWidget title="Memory" stats={totals.memory} units="GiB" />
-        <UsageWidget title="Storage" stats={totals.disk} units="GiB" />
+        {!hideUsage && (
+          <>
+            <UsageWidget title="Compute" stats={totals.compute} units="GHz" />
+            <UsageWidget title="Memory" stats={totals.memory} units="GiB" />
+            <UsageWidget title="Storage" stats={totals.disk} units="GiB" />
+          </>
+        )}
       </div>
     </>
   )

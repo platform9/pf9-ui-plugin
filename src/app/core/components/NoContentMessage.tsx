@@ -7,13 +7,14 @@ import Text from 'core/elements/text'
 interface Props {
   message?: string
   defaultHeight?: number
+  variant?: 'dark' | 'light'
 }
 
-const useStyles = makeStyles<Theme, { height: number }>((theme) => ({
+const useStyles = makeStyles<Theme, Props>((theme) => ({
   messageContainer: {
     marginTop: theme.spacing(2),
-    backgroundColor: theme.palette.grey[100],
-    minHeight: ({ height }) => `${height}px`,
+    backgroundColor: ({ variant }) => theme.palette.grey[variant === 'dark' ? 100 : '000'],
+    minHeight: ({ defaultHeight }) => `${defaultHeight}px`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -24,8 +25,13 @@ const useStyles = makeStyles<Theme, { height: number }>((theme) => ({
   },
 }))
 
-const NoContentMessage: FC<Props> = ({ children, message, defaultHeight = 200 }) => {
-  const { messageContainer, messageTitle } = useStyles({ height: defaultHeight })
+const NoContentMessage: FC<Props> = ({
+  children,
+  message,
+  defaultHeight = 200,
+  variant = 'dark',
+}) => {
+  const { messageContainer, messageTitle } = useStyles({ defaultHeight, variant })
   return (
     <div className={messageContainer}>
       {message ? (

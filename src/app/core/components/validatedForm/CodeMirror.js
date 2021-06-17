@@ -12,14 +12,18 @@ import InfoTooltip from 'app/core/components/InfoTooltip'
 import { Controlled as BaseCodeMirror } from 'react-codemirror2'
 import './codemirror.css'
 import { makeStyles } from '@material-ui/styles'
+import clsx from 'clsx'
 
 require('codemirror/mode/yaml/yaml')
 require('codemirror/mode/javascript/javascript')
+require('codemirror/mode/xml/xml')
+require('codemirror/addon/display/autorefresh')
 
 const defaultOptions = {
   lineNumbers: true,
   mode: 'yaml',
   theme: 'default',
+  autoRefresh: true,
   extraKeys: {
     Tab: (cm) => {
       const spaces = Array(cm.getOption('indentUnit') + 1).join(' ')
@@ -63,9 +67,11 @@ const CodeMirror = ({
   options,
   info,
   placement = 'top-end',
+  className,
   ...restProps
 }) => {
   const codeMirrorInput = createRef()
+
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const openTooltip = useCallback(() => setOpen(true), [])
@@ -96,12 +102,20 @@ const CodeMirror = ({
 
   return (
     <InfoTooltip open={open} info={info} placement={placement}>
-      <FormControl id={id} error={hasError} className={classes.root}>
+      {/* <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
           <Text className={classes.coderMirrorHeader} variant="body1" component="div">
             {label}
           </Text>
-        </FormLabel>
+        </FormLabel> */}
+      <FormControl id={id} error={hasError} className={clsx(classes.root, className)}>
+        {label && (
+          <FormLabel>
+            <Text className={classes.coderMirrorHeader} variant="body1">
+              {label}
+            </Text>
+          </FormLabel>
+        )}
         <BaseCodeMirror
           {...restProps}
           ref={codeMirrorInput}
@@ -126,6 +140,7 @@ CodeMirror.propTypes = {
   value: PropTypes.string,
   info: PropTypes.string,
   placement: PropTypes.string,
+  className: PropTypes.string,
   ...ValidatedFormInputPropTypes,
 }
 

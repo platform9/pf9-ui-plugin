@@ -116,8 +116,9 @@ const ApiServicesPage = () => {
   }
 
   const services = serviceCatalog.filter((service) => whitelist.includes(service.name))
+
   // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-  const serviceNames = pluck('name', services).sort()
+  const serviceNames: any = pluck('name' as any, services).sort()
 
   useEffect(() => {
     const apiName = urlParams.get('api')

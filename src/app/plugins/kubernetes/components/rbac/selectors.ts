@@ -2,8 +2,10 @@ import { createSelector } from 'reselect'
 import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { whereEq, pipe, mergeLeft, find, propEq, prop } from 'ramda'
+import { whereEq, pipe, mergeLeft, propSatisfies, complement, isNil } from 'ramda'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import { findClusterName } from 'k8s/util/helpers'
+import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
 
 // Can be either 'User' or 'Group'
 const getSubjectsOfKind = (subjects, kind) =>
@@ -56,18 +58,24 @@ export const makeApiGroupsSelector = (
 }
 
 export const rolesSelector = createSelector(
-  [getDataSelector<DataKeys.KubeRoles>(DataKeys.KubeRoles, ['clusterId']), clustersSelector],
-  (items, clusters) => {
-    return items.map((item) => ({
-      ...item,
-      id: item?.metadata?.uid,
-      name: item?.metadata?.name,
-      namespace: item?.metadata?.namespace,
-      clusterName: pipe(find(propEq('uuid', item.clusterId)), prop<any>('name'))(clusters as any),
-      created: item?.metadata?.creationTimestamp,
-      pickerLabel: `Role: ${item?.metadata?.name}`,
-      pickerValue: `Role:${item?.metadata?.name}`,
-    }))
+  [
+    getDataSelector<DataKeys.KubeRoles>(DataKeys.KubeRoles, ['clusterId']),
+    clustersSelector,
+    importedClustersSelector,
+  ],
+  (items, clusters, importedClusters) => {
+    return items
+      .map((item) => ({
+        ...item,
+        id: item?.metadata?.uid,
+        name: item?.metadata?.name,
+        namespace: item?.metadata?.namespace,
+        clusterName: findClusterName([...clusters, ...importedClusters], item.clusterId),
+        created: item?.metadata?.creationTimestamp,
+        pickerLabel: `Role: ${item?.metadata?.name}`,
+        pickerValue: `Role:${item?.metadata?.name}`,
+      }))
+      .filter(propSatisfies(complement(isNil), 'clusterName'))
   },
 )
 
@@ -87,17 +95,23 @@ export const makeRolesSelector = (
 }
 
 export const roleActionsSelector = createSelector(
-  [getDataSelector<DataKeys.ClusterRoles>(DataKeys.ClusterRoles, ['clusterId']), clustersSelector],
-  (items) => {
-    return items.map((item, clusters) => ({
-      ...item,
-      id: item?.metadata?.uid,
-      name: item?.metadata?.name,
-      clusterName: pipe(find(propEq('uuid', item.clusterId)), prop<any>('name'))(clusters as any),
-      created: item?.metadata?.creationTimestamp,
-      pickerLabel: `Cluster Role: ${item?.metadata?.name}`,
-      pickerValue: `ClusterRole:${item?.metadata?.name}`,
-    }))
+  [
+    getDataSelector<DataKeys.ClusterRoles>(DataKeys.ClusterRoles, ['clusterId']),
+    clustersSelector,
+    importedClustersSelector,
+  ],
+  (items, clusters, importedClusters) => {
+    return items
+      .map((item) => ({
+        ...item,
+        id: item?.metadata?.uid,
+        name: item?.metadata?.name,
+        clusterName: findClusterName([...clusters, ...importedClusters], item.clusterId),
+        created: item?.metadata?.creationTimestamp,
+        pickerLabel: `Cluster Role: ${item?.metadata?.name}`,
+        pickerValue: `ClusterRole:${item?.metadata?.name}`,
+      }))
+      .filter(propSatisfies(complement(isNil), 'clusterName'))
   },
 )
 
@@ -108,7 +122,7 @@ export const makeRoleActionsSelector = (
   },
 ) => {
   return createSelector(
-    [rolesSelector, (_, params) => mergeLeft(params, defaultParams)],
+    [roleActionsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (items, params) => {
       const { orderBy, orderDirection } = params
       return pipe(createSorter({ orderBy, orderDirection }))(items)
@@ -118,18 +132,24 @@ export const makeRoleActionsSelector = (
 
 export const roleBindingsSelector = createSelector(
   // [makeParamsClustersSelector({ healthyClusters: true })], // do you mean to use `makeParamsClustersSelector({ healthyClusters: true })` here?
-  [getDataSelector<DataKeys.RoleBindings>(DataKeys.RoleBindings, ['clusterId']), clustersSelector],
-  (items, clusters) => {
-    return items.map((item) => ({
-      ...item,
-      id: item?.metadata?.uid,
-      name: item?.metadata?.name,
-      namespace: item?.metadata?.namespace,
-      clusterName: pipe(find(propEq('uuid', item.clusterId)), prop<any>('name'))(clusters as any),
-      created: item?.metadata?.creationTimestamp,
-      users: item.subjects ? getSubjectsOfKind(item.subjects, 'User') : [],
-      groups: item.subjects ? getSubjectsOfKind(item.subjects, 'Group') : [],
-    }))
+  [
+    getDataSelector<DataKeys.RoleBindings>(DataKeys.RoleBindings, ['clusterId']),
+    clustersSelector,
+    importedClustersSelector,
+  ],
+  (items, clusters, importedClusters) => {
+    return items
+      .map((item) => ({
+        ...item,
+        id: item?.metadata?.uid,
+        name: item?.metadata?.name,
+        namespace: item?.metadata?.namespace,
+        clusterName: findClusterName([...clusters, ...importedClusters], item.clusterId),
+        created: item?.metadata?.creationTimestamp,
+        users: item.subjects ? getSubjectsOfKind(item.subjects, 'User') : [],
+        groups: item.subjects ? getSubjectsOfKind(item.subjects, 'Group') : [],
+      }))
+      .filter(propSatisfies(complement(isNil), 'clusterName'))
   },
 )
 
@@ -153,17 +173,20 @@ export const roleBindingActionsSelector = createSelector(
   [
     getDataSelector<DataKeys.ClusterRoleBindings>(DataKeys.ClusterRoleBindings, ['clusterId']),
     clustersSelector,
+    importedClustersSelector,
   ],
-  (items, clusters) => {
-    return items.map((item) => ({
-      ...item,
-      id: item?.metadata?.uid,
-      name: item?.metadata?.name,
-      clusterName: pipe(find(propEq('uuid', item.clusterId)), prop<any>('name'))(clusters as any),
-      created: item?.metadata?.creationTimestamp,
-      users: item.subjects ? getSubjectsOfKind(item.subjects, 'User') : [],
-      groups: item.subjects ? getSubjectsOfKind(item.subjects, 'Group') : [],
-    }))
+  (items, clusters, importedClusters) => {
+    return items
+      .map((item) => ({
+        ...item,
+        id: item?.metadata?.uid,
+        name: item?.metadata?.name,
+        clusterName: findClusterName([...clusters, ...importedClusters], item.clusterId),
+        created: item?.metadata?.creationTimestamp,
+        users: item.subjects ? getSubjectsOfKind(item.subjects, 'User') : [],
+        groups: item.subjects ? getSubjectsOfKind(item.subjects, 'Group') : [],
+      }))
+      .filter(propSatisfies(complement(isNil), 'clusterName'))
   },
 )
 

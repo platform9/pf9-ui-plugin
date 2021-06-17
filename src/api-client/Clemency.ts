@@ -4,10 +4,10 @@ import ApiService from 'api-client/ApiService'
 export interface IApiData {
   username: string
   password: string
-  secret: string
+  token: string
 }
 
-type IResetPassword = ({ secret, username, password }: IApiData) => Promise<any>
+type IResetPassword = ({ token, username, password }: IApiData) => Promise<any>
 
 class Clemency extends ApiService {
   public getClassName() {
@@ -23,7 +23,7 @@ class Clemency extends ApiService {
   }
 
   requestNewPassword = async (username: string): Promise<any> => {
-    const body = { username }
+    const body = { username, ui_version: 'serenity' }
     return this.client.basicPost({
       url: `${this.baseUrl}/request`,
       body,
@@ -44,10 +44,10 @@ class Clemency extends ApiService {
     })
   }
 
-  resetPassword: IResetPassword = async ({ secret, username, password }) => {
-    const body = { username, password }
+  resetPassword: IResetPassword = async ({ token, username, password }) => {
+    const body = { username, password, token }
     return this.client.basicPost({
-      url: `${this.baseUrl}/reset/password/${secret}`,
+      url: `${this.baseUrl}/reset/password`,
       body,
       options: {
         clsName: this.getClassName(),
@@ -71,7 +71,7 @@ class Clemency extends ApiService {
   // this url format is strange but is a requirement for the API
   verifyActivateLink = async (username, otp): Promise<any> => {
     return this.client.basicGet({
-      url: `${this.baseUrl}/activate/username=${username}&otp=${otp}`,
+      url: `${this.baseUrl}/activate?username=${username}&otp=${otp}`,
       options: {
         clsName: this.getClassName(),
         mthdName: 'verifyActivateLink',

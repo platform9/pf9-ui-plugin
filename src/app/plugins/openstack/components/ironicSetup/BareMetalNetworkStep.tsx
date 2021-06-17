@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -8,10 +8,10 @@ import clsx from 'clsx'
 import { createNetwork } from 'openstack/components/networks/actions'
 import TenantPicklist from 'openstack/components/common/TenantPicklist'
 import { updateService } from 'openstack/components/resmgr/actions'
-import { useToast } from 'core/providers/ToastProvider'
-import { MessageTypes } from 'core/components/notifications/model'
 import { sleep } from 'utils/async'
 import Theme from 'core/themes/model'
+import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
+import { useDispatch } from 'react-redux'
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -39,9 +39,7 @@ const createNetworkLoop = async (body) => {
   } catch {
     await sleep(5000)
     await createNetworkLoop(body)
-    return
   }
-  return
 }
 
 const BareMetalNetworkStep = ({
@@ -52,7 +50,7 @@ const BareMetalNetworkStep = ({
   setSubmitting,
 }: Props) => {
   const { text, bold } = useStyles({})
-  const showToast = useToast()
+  const dispatch = useDispatch()
   const validatorRef = useRef(null)
 
   const setupValidator = (validate) => {
@@ -110,7 +108,13 @@ const BareMetalNetworkStep = ({
       })
     } catch (err) {
       setSubmitting(false)
-      showToast(err.message, MessageTypes.error)
+      dispatch(
+        notificationActions.registerNotification({
+          title: 'Bare Metal Network Error',
+          message: err.message,
+          type: NotificationType.error,
+        }),
+      )
       return false
     }
     setSubmitting(false)

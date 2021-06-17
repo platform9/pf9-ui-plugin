@@ -43,15 +43,19 @@ enum Panels {
 }
 
 const step1CodeBlock = (iface) => {
-  return (`ovs-vsctl add-br br-pf9 
-ovs-vsctl set bridge br-pf9 other_config:hwaddr=${pathOr("<mac of ethernet interface>", ['mac'], iface)}
-ovs-vsctl add-port br-pf9 ${pathOr("<ethernet interface>", ['name'], iface)}
-`)
+  return `ovs-vsctl add-br br-pf9
+ovs-vsctl set bridge br-pf9 other_config:hwaddr=${pathOr(
+    '<mac of ethernet interface>',
+    ['mac'],
+    iface,
+  )}
+ovs-vsctl add-port br-pf9 ${pathOr('<ethernet interface>', ['name'], iface)}
+`
 }
 
 const step2CodeBlock = (iface) => {
-  return (`BOOTPROTO=none
-DEVICE=${pathOr("<interface name>", ['name'], iface)}
+  return `BOOTPROTO=none
+DEVICE=${pathOr('<interface name>', ['name'], iface)}
 ONBOOT=yes
 TYPE=Ethernet
 USERCTL=no
@@ -59,23 +63,29 @@ NM_CONTROLLED=no
 TYPE=OVSPort
 DEVICETYPE=ovs
 OVS_BRIDGE=br-pf9
-`)
+`
 }
 
 const step3CodeBlock = (iface) => {
-  return (`DEVICE=br-pf9
+  return `DEVICE=br-pf9
 DEVICETYPE=ovs
 TYPE=OVSBridge
 BOOTPROTO=static
-IPADDR=${pathOr("<interface ip>", ['ip'], iface)}
-NETMASK=${pathOr("<interface netmask>", ['netmask'], iface)}
+IPADDR=${pathOr('<interface ip>', ['ip'], iface)}
+NETMASK=${pathOr('<interface netmask>', ['netmask'], iface)}
 ONBOOT=yes
 NM_CONTROLLED=no
-`)
+`
 }
 
-const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, title }: Props): JSX.Element => {
+const ControllerNetworkingStep = ({
+  wizardContext,
+  setWizardContext,
+  onNext,
+  title,
+}: Props): JSX.Element => {
   const { container, field, withCodeBlock, insidePanelContainer } = useStyles({})
+  const selectedHost = pathOr('', ['selectedHost', 0, 'id'], wizardContext)
 
   const [activePanels, setActivePanels] = useState(new Set([Panels.NetworkInterface]))
 
@@ -112,9 +122,9 @@ const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, tit
                 label="Network Interface"
                 onChange={(value) => setWizardContext({ networkInterface: value })}
                 info="Select an ethernet interface to use to communicate with baremetal nodes.
-                If you cannot find the interface you wish to use, you may skip this step and
-                fill in the appropriate information manually."
-                hostId={wizardContext.selectedHost[0].id}
+                  If you cannot find the interface you wish to use, you may skip this step and
+                  fill in the appropriate information manually."
+                hostId={selectedHost}
               />
             </div>
           </ExpansionPanel>
@@ -132,9 +142,7 @@ const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, tit
               className={field}
             >
               <CopyToClipboard fill copyText={step1CodeBlock(wizardContext.networkInterface)}>
-                <CodeBlock>
-                  {step1CodeBlock(wizardContext.networkInterface)}
-                </CodeBlock>
+                <CodeBlock>{step1CodeBlock(wizardContext.networkInterface)}</CodeBlock>
               </CopyToClipboard>
             </InfoTooltipWrapper>
           </ExpansionPanel>
@@ -148,7 +156,8 @@ const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, tit
             <div className={withCodeBlock}>
               Create a file with path
               <CodeBlock>
-                /etc/sysconfig/network-scripts/ifcfg-{pathOr("<ifacename>", ['networkInterface', 'name'], wizardContext)}
+                /etc/sysconfig/network-scripts/ifcfg-
+                {pathOr('<ifacename>', ['networkInterface', 'name'], wizardContext)}
               </CodeBlock>
             </div>
             <InfoTooltipWrapper
@@ -158,9 +167,7 @@ const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, tit
               className={field}
             >
               <CopyToClipboard fill copyText={step2CodeBlock(wizardContext.networkInterface)}>
-                <CodeBlock fill>
-                  {step2CodeBlock(wizardContext.networkInterface)}
-                </CodeBlock>
+                <CodeBlock fill>{step2CodeBlock(wizardContext.networkInterface)}</CodeBlock>
               </CopyToClipboard>
             </InfoTooltipWrapper>
           </ExpansionPanel>
@@ -181,9 +188,7 @@ const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, tit
               className={field}
             >
               <CopyToClipboard fill copyText={step3CodeBlock(wizardContext.networkInterface)}>
-                <CodeBlock fill>
-                  {step3CodeBlock(wizardContext.networkInterface)}
-                </CodeBlock>
+                <CodeBlock fill>{step3CodeBlock(wizardContext.networkInterface)}</CodeBlock>
               </CopyToClipboard>
             </InfoTooltipWrapper>
           </ExpansionPanel>
@@ -194,10 +199,8 @@ const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, tit
             completed={false}
             summary="Restart Network Service"
           >
-            <CopyToClipboard copyText='service network restart'>
-              <CodeBlock>
-                service network restart
-              </CodeBlock>
+            <CopyToClipboard copyText="service network restart">
+              <CodeBlock>service network restart</CodeBlock>
             </CopyToClipboard>
           </ExpansionPanel>
         </div>

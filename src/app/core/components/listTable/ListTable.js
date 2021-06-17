@@ -10,6 +10,7 @@ import {
   TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
+import { LoadingGifs } from 'app/constants'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import clsx from 'clsx'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
@@ -75,6 +76,13 @@ const styles = (theme) => ({
 })
 
 const minSearchLength = 3
+
+const determineCheckboxCond = (checkboxCond, row) => {
+  if (!checkboxCond) {
+    return true
+  }
+  return checkboxCond(row)
+}
 
 // Reject all columns that are not visible or excluded
 export const pluckVisibleColumnIds = (columns) =>
@@ -158,13 +166,26 @@ class ListTable extends PureComponent {
 
   areAllSelected = (data) => {
     const { selected } = this.state
-    const { selectedRows = selected } = this.props
-    return data.every((row) => includes(row, selectedRows))
+    const { selectedRows = selected, checkboxCond } = this.props
+    return data.every((row) => {
+      if (checkboxCond) {
+        // Ignore rows that do not meet condition criteria
+        return includes(row, selectedRows) || !checkboxCond(row)
+      }
+      return includes(row, selectedRows)
+    })
   }
 
   handleSelectAllClick = (event, checked) => {
+    // Todo: exclude rows with no checkbox condition
     const { selected } = this.state
-    const { paginate, onSelectedRowsChange, selectedRows = selected, onSelectAll } = this.props
+    const {
+      paginate,
+      onSelectedRowsChange,
+      selectedRows = selected,
+      onSelectAll,
+      checkboxCond,
+    } = this.props
     const filteredData = this.getFilteredRows()
     const paginatedData = paginate ? this.paginate(filteredData) : filteredData
 
@@ -175,6 +196,9 @@ class ListTable extends PureComponent {
     } else {
       // Remove active paginated rows from selected
       newSelected = selectedRows.filter((row) => !paginatedData.includes(row))
+    }
+    if (checkboxCond) {
+      newSelected = newSelected.filter((item) => checkboxCond(item))
     }
     if (onSelectedRowsChange) {
       // Controlled mode
@@ -190,9 +214,21 @@ class ListTable extends PureComponent {
 
   handleClick = moize(
     (row) => (event) => {
+      // Todo: exclude rows with no checkbox condition
       const { selected } = this.state
       const isSelected = this.isSelected(row)
-      const { multiSelection, onSelectedRowsChange, onSelect, selectedRows = selected } = this.props
+      const {
+        multiSelection,
+        onSelectedRowsChange,
+        onSelect,
+        selectedRows = selected,
+        checkboxCond,
+      } = this.props
+      if (checkboxCond) {
+        if (!checkboxCond(row)) {
+          return
+        }
+      }
       if (!multiSelection) {
         if (onSelectedRowsChange) {
           // Controlled mode
@@ -282,7 +318,7 @@ class ListTable extends PureComponent {
   }
 
   handleSearch = (value) => {
-    if (this.props.searchTarget) {
+    if (this.props.searchTargets) {
       this.setState({
         searchTerm: value,
       })
@@ -368,9 +404,11 @@ class ListTable extends PureComponent {
     }, data)
   }
 
-  filterBySearch = (data, target) => {
+  filterBySearch = (data, targets) => {
     const { searchTerm } = this.state
-    return data.filter((ele) => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter((ele) =>
+      targets.some((target) => ele[target].match(new RegExp(searchTerm, 'i')) !== null),
+    )
   }
 
   pluckDataIds = (rows) => rows.map(this.getRowId)
@@ -392,14 +430,14 @@ class ListTable extends PureComponent {
   }
 
   getFilteredRows = () => {
-    const { searchTarget, data, filters, onSortChange } = this.props
+    const { searchTargets, data, filters, onSortChange } = this.props
     const { searchTerm } = this.state
 
     const sortedData = onSortChange ? data : this.sortData(data)
     const searchData =
       !searchTerm || searchTerm.length < minSearchLength
         ? sortedData
-        : this.filterBySearch(sortedData, searchTarget)
+        : this.filterBySearch(sortedData, searchTargets)
     return filters ? this.applyFilters(searchData) : searchData
   }
 
@@ -452,7 +490,7 @@ class ListTable extends PureComponent {
   }
 
   renderRow = (row) => {
-    const { multiSelection, showCheckboxes, classes } = this.props
+    const { multiSelection, showCheckboxes, checkboxCond, classes } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes
@@ -470,10 +508,14 @@ class ListTable extends PureComponent {
       <TableRow hover key={uid} {...checkboxProps} className={classes.tableRow}>
         {showCheckboxes && (
           <TableCell padding="checkbox">
-            {multiSelection ? (
-              <Checkbox checked={isSelected} color="primary" />
-            ) : (
-              <Radio checked={isSelected} color="primary" />
+            {determineCheckboxCond(checkboxCond, row) && (
+              <>
+                {multiSelection ? (
+                  <Checkbox checked={isSelected} color="primary" />
+                ) : (
+                  <Radio checked={isSelected} color="primary" />
+                )}
+              </>
             )}
           </TableCell>
         )}
@@ -553,6 +595,9 @@ class ListTable extends PureComponent {
       extraToolbarContent,
       multiSelection,
       headless,
+      hideDelete,
+      alternativeTableContent,
+      listTableParams,
     } = this.props
 
     if (!data) {
@@ -592,7 +637,12 @@ class ListTable extends PureComponent {
       )
 
     return (
-      <Progress loading={loading} overlay renderContentOnMount>
+      <Progress
+        loading={loading}
+        overlay
+        renderContentOnMount
+        loadingImage={LoadingGifs.BluePinkTiles}
+      >
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
             <div className={clsx(classes.root, compactTable && classes.compactTableHeight)}>
@@ -622,10 +672,18 @@ class ListTable extends PureComponent {
                   rowsPerPage={rowsPerPage}
                   onChangeRowsPerPage={this.handleChangeRowsPerPage}
                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                  hideDelete={hideDelete}
+                  listTableParams={listTableParams}
                 />
               )}
-              <div className={classes.tableWrapper}>{tableContent}</div>
-              {!compactTable && this.renderPaginationControls(filteredData.length)}
+              {alternativeTableContent ? (
+                alternativeTableContent
+              ) : (
+                <div className={classes.tableWrapper}>{tableContent}</div>
+              )}
+              {!alternativeTableContent &&
+                !compactTable &&
+                this.renderPaginationControls(filteredData.length)}
             </div>
           </Grid>
         </Grid>
@@ -654,6 +712,7 @@ ListTable.propTypes = {
   onDelete: PropTypes.func,
   deleteCond: PropTypes.func,
   deleteDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  hideDelete: PropTypes.bool,
   onEdit: PropTypes.func,
   editCond: PropTypes.func,
   editDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
@@ -701,7 +760,7 @@ ListTable.propTypes = {
   onColumnsChange: PropTypes.func,
 
   showCheckboxes: PropTypes.bool,
-  searchTarget: PropTypes.string,
+  searchTargets: PropTypes.arrayOf(PropTypes.string),
 
   canEditColumns: PropTypes.bool,
   canDragColumns: PropTypes.bool,

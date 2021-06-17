@@ -14,10 +14,10 @@ import {
   of,
   identity,
   Dictionary,
-  whereEq,
   find,
   when,
   isNil,
+  dissocPath,
 } from 'ramda'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -31,6 +31,7 @@ import {
 } from 'utils/fp'
 import { defaultUniqueIdentifier } from 'app/constants'
 import DataKeys from 'k8s/DataKeys'
+import { isEqual } from 'lodash'
 
 export const paramsStoreKey = 'cachedParams'
 export const dataStoreKey = 'cachedData'
@@ -149,7 +150,16 @@ const reducers = {
       over(
         paramsLens,
         params
-          ? pipe(arrayIfNil, when(pipe(find(whereEq(params)), isNil), append(params)))
+          ? pipe(
+              arrayIfNil,
+              when(
+                pipe(
+                  find((item) => isEqual(item, params)),
+                  isNil,
+                ),
+                append(params),
+              ),
+            )
           : identity,
       ),
     )(state)
@@ -172,9 +182,10 @@ const reducers = {
   clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKeys }>>) => {
     const cacheKey = action?.payload?.cacheKey
     return cacheKey
-      ? pipe<CacheState, CacheState, CacheState>(
-          assocPath([dataStoreKey, cacheKey], emptyArr),
-          assocPath([paramsStoreKey, cacheKey], emptyArr),
+      ? pipe<CacheState, CacheState, CacheState, CacheState>(
+          dissocPath([dataStoreKey, cacheKey]),
+          dissocPath([paramsStoreKey, cacheKey]),
+          dissocPath([loadingStoreKey, cacheKey]),
         )(state)
       : initialState
   },

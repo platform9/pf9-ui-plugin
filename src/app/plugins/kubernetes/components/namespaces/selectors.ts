@@ -1,21 +1,27 @@
 import { createSelector } from 'reselect'
-import { pathOr } from 'ramda'
+import { pathOr, propEq, isNil, complement } from 'ramda'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-
-const findClusterName = (clusters, clusterId) => {
-  const cluster = clusters.find((x) => x.uuid === clusterId)
-  return (cluster && cluster.name) || ''
-}
+import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
 
 export const namespacesSelector = createSelector(
   getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
+  importedClustersSelector,
   getDataSelector<DataKeys.Namespaces>(DataKeys.Namespaces, ['clusterId']),
-  (rawClusters, rawNamespaces) => {
-    return rawNamespaces.map((ns) => ({
-      ...ns,
-      clusterName: findClusterName(rawClusters, ns.clusterId),
-      status: pathOr('N/A', ['status', 'phase'], ns),
-    }))
+  (rawClusters, importedClusters, rawNamespaces) => {
+    return rawNamespaces
+      .map((ns) => {
+        const cluster = [...rawClusters, ...importedClusters].find(propEq('uuid', ns.clusterId))
+        if (!cluster) {
+          // If no cluster if found, this item is invalid because the parent cluster has been deleted
+          return null
+        }
+        return {
+          ...ns,
+          clusterName: cluster.name,
+          status: pathOr('N/A', ['status', 'phase'], ns),
+        }
+      })
+      .filter(complement(isNil))
   },
 )

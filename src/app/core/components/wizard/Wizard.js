@@ -37,6 +37,10 @@ class Wizard extends PureComponent {
     }
   }
 
+  setActiveStep = (stepId, stepNum) => {
+    this.setState({ activeStepId: stepId, activeStep: stepNum })
+  }
+
   getActiveStepId = ({ steps }, activeStep) =>
     steps[activeStep] ? { activeStepId: steps[activeStep].stepId } : {}
 
@@ -64,7 +68,7 @@ class Wizard extends PureComponent {
   }
 
   handleNext = async () => {
-    const { onComplete } = this.props
+    const { onComplete, singleStep } = this.props
     const { steps, activeStep, wizardContext } = this.state
 
     // This is triggerSubmit in the ValidatedForm
@@ -73,6 +77,11 @@ class Wizard extends PureComponent {
       if (!ok) {
         return
       }
+    }
+
+    if (singleStep) {
+      onComplete(this.state.wizardContext)
+      return
     }
 
     this.setState(
@@ -112,6 +121,10 @@ class Wizard extends PureComponent {
     )
   }
 
+  setWizardCalloutFields = (fields) => {
+    this.setState((state) => ({ calloutFields: true }))
+  }
+
   setWizardContext = (newValues, cb) => {
     this.setState(
       (state) => ({ wizardContext: { ...state.wizardContext, ...newValues } }),
@@ -128,10 +141,13 @@ class Wizard extends PureComponent {
     handleNext: this.handleNext,
     addStep: this.addStep,
     activeStep: this.props.startingStep || 0,
+    setActiveStep: this.setActiveStep,
     steps: [],
     activeStepId: null,
     wizardContext: this.props.context || {},
     setWizardContext: this.setWizardContext,
+    setWizardCalloutFields: this.setWizardCalloutFields,
+    calloutFields: false,
   }
 
   render() {
@@ -153,20 +169,26 @@ class Wizard extends PureComponent {
 
     return (
       <WizardContext.Provider value={this.state}>
-        {showSteps && <WizardStepper steps={steps} activeStep={activeStep} />}
+        {showSteps && steps.length > 1 && <WizardStepper steps={steps} activeStep={activeStep} />}
         {renderStepsContent({
           wizardContext,
           setWizardContext,
           onNext: this.onNext,
           handleNext: this.handleNext,
+          handleBack: this.handleBack,
+          setActiveStep: this.setActiveStep,
         })}
         {!hideAllButtons && (
-          <WizardButtons>
+          <WizardButtons hasCalloutFields={this.state.calloutFields}>
             {onCancel && <CancelButton onClick={onCancel} />}
             {this.hasBack() && <PrevButton onClick={this.handleBack} />}
             {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
             {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
-            {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+            {this.isLastStep() && (
+              <NextButton onClick={this.handleNext} showForward={false}>
+                {submitLabel}
+              </NextButton>
+            )}
             {shouldShowFinishAndReview && this.isFinishAndReviewVisible() && (
               <NextButton onClick={this.onFinishAndReview} showForward={false}>
                 {finishAndReviewLabel}
@@ -193,6 +215,7 @@ Wizard.propTypes = {
   startingStep: PropTypes.number,
   hideBack: PropTypes.bool,
   hideAllButtons: PropTypes.bool,
+  singleStep: PropTypes.bool,
 }
 
 Wizard.defaultProps = {
@@ -206,6 +229,7 @@ Wizard.defaultProps = {
   startingStep: 0,
   hideBack: false,
   hideAllButtons: false,
+  singleStep: false,
 }
 
 export default withRouter(Wizard)

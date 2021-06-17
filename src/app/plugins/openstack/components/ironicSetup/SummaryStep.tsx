@@ -3,8 +3,8 @@ import { Paper } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import { hexToRGBA } from 'core/utils/colorHelpers'
-import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
+import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import networkActions, { networkIpAvailability } from 'openstack/components/networks/actions'
 import clsx from 'clsx'
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     // padding: theme.spacing(2, 8),
     margin: '8px 1%',
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
+    backgroundColor: hexToRgbaCss(theme.palette.primary.main, 0.1),
     width: '31%',
     minWidth: '340px',
     flexGrow: 0,

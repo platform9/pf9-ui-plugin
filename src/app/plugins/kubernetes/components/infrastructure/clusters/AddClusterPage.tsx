@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
@@ -13,6 +13,7 @@ import AwsClusterRequirements from './aws/AwsClusterRequirements'
 import AzureClusterRequirements from './azure/AzureClusterRequirements'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Theme from 'core/themes/model'
+import { routes } from 'core/utils/routes'
 
 const switchCase: any = objSwitchCase
 const requirementsMap = {
@@ -44,11 +45,18 @@ const AddClusterPage = () => {
   const { history, location } = useReactRouter()
   const providerType =
     new URLSearchParams(location.search).get('type') || CloudProviders.VirtualMachine
-  const [activeProvider, setActiveProvider] = useState(providerType)
+  const [activeProvider, setActiveProvider] = useState<CloudProviders>(
+    providerType as CloudProviders,
+  )
 
   const handleNextView = (url) => {
     history.push(url)
   }
+
+  useEffect(() => {
+    // update the url as the provider changes
+    history.push(routes.cluster.add.path({ type: activeProvider }))
+  }, [activeProvider])
 
   const ActiveView: ValueOf<typeof requirementsMap> = useMemo(
     () => switchCase(requirementsMap)(activeProvider),

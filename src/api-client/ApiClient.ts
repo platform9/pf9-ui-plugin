@@ -11,6 +11,8 @@ import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 import Clemency from 'api-client/Clemency'
+import Helm from './Helm'
+import Hagrid from './Hagrid'
 
 import { ID } from './keystone.model'
 
@@ -25,9 +27,13 @@ import {
   IRawRequestPostParams,
   IBasicRequestGetParams,
   IBasicRequestPostParams,
+  IBasicRequestDeleteParams,
 } from './model'
 import ApiService from 'api-client/ApiService'
 import Bugsnag from '@bugsnag/js'
+import { someAsync } from 'utils/async'
+import ApiError from 'core/errors/ApiError'
+import PreferenceStore from './PreferenceStore'
 
 interface ApiClientOptions {
   [key: string]: any
@@ -47,6 +53,9 @@ class ApiClient {
   public resMgr: ResMgr
   public qbert: Qbert
   public clemency: Clemency
+  public helm: Helm
+  public hagrid: Hagrid
+  public preferenceStore: PreferenceStore
   public catalog = {}
   public activeRegion: ID = null
   unscopedToken = null
@@ -67,7 +76,7 @@ class ApiClient {
 
   static getInstance() {
     if (!ApiClient.instance) {
-      throw new Error(
+      throw new ApiError(
         'ApiClient instance has not been initialized, please call ApiClient.init to instantiate it',
       )
     }
@@ -83,17 +92,22 @@ class ApiClient {
     return client
   }
 
-  static refreshApiEndpoints(instance = ApiClient.getInstance()) {
-    instance.keystone.initialize()
-    instance.cinder.initialize()
-    instance.glance.initialize()
-    instance.appbert.initialize()
-    instance.neutron.initialize()
-    instance.nova.initialize()
-    instance.murano.initialize()
-    instance.resMgr.initialize()
-    instance.qbert.initialize()
-    instance.clemency.initialize()
+  static async refreshApiEndpoints(instance = ApiClient.getInstance()) {
+    await someAsync([
+      instance.keystone.initialize(),
+      instance.cinder.initialize(),
+      instance.glance.initialize(),
+      instance.appbert.initialize(),
+      instance.neutron.initialize(),
+      instance.nova.initialize(),
+      instance.murano.initialize(),
+      instance.resMgr.initialize(),
+      instance.qbert.initialize(),
+      instance.clemency.initialize(),
+      instance.helm.initialize(),
+      instance.hagrid.initialize(),
+      instance.preferenceStore.initialize(),
+    ])
   }
 
   apiServices = {}
@@ -101,7 +115,7 @@ class ApiClient {
   constructor(options: ApiClientOptions) {
     this.options = options
     if (!options.keystoneEndpoint) {
-      throw new Error('keystoneEndpoint required')
+      throw new ApiError('keystoneEndpoint required')
     }
     const getResponseError: any = (cond as any)([
       [hasPathStr('response.data.error'), pathStr('response.data.error')],
@@ -116,6 +130,15 @@ class ApiClient {
       async (error) => {
         const url = error?.response?.config
         const data = error?.response?.data
+
+        // If data contains user password, remove it
+        if (url?.data?.includes('{"methods":["password"]')) {
+          const dataObj = JSON.parse(url.data)
+          if (dataObj?.auth?.identity?.password?.user?.password) {
+            dataObj.auth.identity.password.user.password = 'SENSITIVE_DATA_REMOVED'
+            url.data = JSON.stringify(dataObj)
+          }
+        }
 
         Bugsnag.addMetadata('Api Url', url)
         Bugsnag.addMetadata('Api Response', data)
@@ -136,6 +159,9 @@ class ApiClient {
     this.resMgr = this.addApiService(new ResMgr(this))
     this.qbert = this.addApiService(new Qbert(this))
     this.clemency = this.addApiService(new Clemency(this))
+    this.helm = this.addApiService(new Helm(this))
+    this.hagrid = this.addApiService(new Hagrid(this))
+    this.preferenceStore = this.addApiService(new PreferenceStore(this))
   }
 
   addApiService = <T extends ApiService>(apiClientInstance: T) => {
@@ -173,15 +199,29 @@ class ApiClient {
     return { headers }
   }
 
+  async getEndpoint({ version, endpoint, clsName }) {
+    if (endpoint === undefined) {
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
+    }
+    if (version !== undefined) {
+      endpoint = endpoint.replace(/\/v3$/, `/${version}`).replace(/\/v3\//, `/${version}/`)
+    }
+    // eslint-disable-next-line no-extra-boolean-cast
+    if (!!this.apiServices[clsName].scopedEnpointPath) {
+      return `${endpoint}/${this.apiServices[clsName].scopedEnpointPath()}`
+    }
+    return endpoint
+  }
+
   rawGet = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
+
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -189,14 +229,13 @@ class ApiClient {
 
   rawPost = async <T extends any>({
     url,
+    version,
     data,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.post<T>(pathJoin(endpoint, url), data, config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -204,14 +243,13 @@ class ApiClient {
 
   rawPut = async <T extends any>({
     url,
+    version,
     data,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.put<T>(pathJoin(endpoint, url), data, config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -219,14 +257,13 @@ class ApiClient {
 
   rawPatch = async <T extends any>({
     url,
+    version,
     data,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.patch<T>(pathJoin(endpoint, url), data, config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -234,13 +271,12 @@ class ApiClient {
 
   rawDelete = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.delete<T>(pathJoin(endpoint, url), config)
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
@@ -248,13 +284,12 @@ class ApiClient {
 
   basicGet = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     params = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), {
       params,
       ...this.getAuthHeaders(),
@@ -265,13 +300,12 @@ class ApiClient {
 
   basicPost = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.post<T>(
       pathJoin(endpoint, url),
       body,
@@ -283,13 +317,12 @@ class ApiClient {
 
   basicPatch = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.patch<T>(
       pathJoin(endpoint, url),
       body,
@@ -301,13 +334,12 @@ class ApiClient {
 
   basicPut = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.put<T>(
       pathJoin(endpoint, url),
       body,
@@ -319,16 +351,16 @@ class ApiClient {
 
   basicDelete = async <T extends any>({
     url,
+    version,
     endpoint = undefined,
     options: { clsName, mthdName },
-  }: IBasicRequestGetParams) => {
-    if (endpoint === undefined) {
-      endpoint = await this.apiServices[clsName].getApiEndpoint()
-    }
-    const response = await this.axiosInstance.delete<T>(
-      pathJoin(endpoint, url),
-      this.getAuthHeaders(),
-    )
+    data = undefined,
+  }: IBasicRequestDeleteParams) => {
+    endpoint = await this.getEndpoint({ endpoint, version, clsName })
+    const response = await this.axiosInstance.delete<T>(pathJoin(endpoint, url), {
+      ...this.getAuthHeaders(),
+      data,
+    })
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }

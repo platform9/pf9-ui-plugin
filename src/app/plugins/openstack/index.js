@@ -1,6 +1,7 @@
 import React from 'react'
 
 import DashboardPage from './components/dashboard/DashboardPage'
+import NotificationsPage from 'core/components/notifications/NotificationsPage'
 
 import AddTenantPage from './components/tenants/AddTenantPage'
 import TenantsListPage from './components/tenants/TenantsListPage'
@@ -48,7 +49,7 @@ import UpdateImagePage from './components/images/UpdateImagePage'
 
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
-import AppCatalogPage from 'k8s/components/apps/AppCatalogPage'
+import AppCatalogPage from 'k8s/components/app-catalog/app-catalog-page'
 
 import SshKeysPage from './components/sshkeys/SshKeysListPage'
 import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
@@ -71,6 +72,11 @@ OpenStack.registerPlugin = (pluginManager) => {
       name: 'Dashboard',
       link: { path: '/dashboard', exact: true, default: false },
       component: DashboardPage,
+    },
+    {
+      name: 'Notifications',
+      link: { path: '/notifications', exact: true },
+      component: NotificationsPage,
     },
     {
       name: 'Tenants',

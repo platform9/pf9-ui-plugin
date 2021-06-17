@@ -8,6 +8,7 @@ import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -40,7 +41,7 @@ const ListPage = ({ ListContainer }) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/rbac/roles/add',
+  addUrl: routes.rbac.addRoles.path(),
   addText: 'Add Role',
   columns: [
     { id: 'name', label: 'Name' },
@@ -50,9 +51,7 @@ export const options = {
   cacheKey: ActionDataKeys.KubeRoles,
   actions: roleActions,
   deleteFn: roleActions.delete,
-  editUrl: '/ui/kubernetes/rbac/roles/edit',
-  customEditUrlFn: (item, itemId) =>
-    `/ui/kubernetes/rbac/roles/edit/${itemId}/cluster/${item.clusterId}`,
+  editUrl: (item, id) => routes.rbac.editRoles.path({ id, clusterId: item.clusterId }),
   name: 'Roles',
   title: 'Roles',
   ListPage,

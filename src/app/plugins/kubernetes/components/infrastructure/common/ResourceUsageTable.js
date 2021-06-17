@@ -9,6 +9,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'grid',
     gridTemplateColumns: ({ valueOff }) => (!valueOff ? '58px 1fr 138px' : '58px 138px'),
+    gridGap: ({ valueOff }) => (valueOff ? '8px' : '0px'),
   },
   label: {
     color: theme.palette.grey[500],
@@ -38,11 +39,11 @@ const ResourceUsageTable = ({
   valueConverter,
   usedText,
   units,
-  stats,
+  stats = {},
   precision,
 }) => {
   const classes = useStyles({ valueOff })
-  const { current, max, percent = (current / max) * 100 } = stats
+  const { current = 0, max = 0, percent = (current / max) * 100 } = stats
 
   const curStr = valueConverter(current).toFixed(precision)
   const maxStr = valueConverter(max).toFixed(precision)

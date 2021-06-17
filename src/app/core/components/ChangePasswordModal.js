@@ -16,11 +16,8 @@ import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import CancelButton from 'core/components/buttons/CancelButton'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { logoutUrl } from 'app/constants.js'
+import { logoutUrl } from 'app/constants'
 import { useToast } from 'core/providers/ToastProvider'
-import Visibility from '@material-ui/icons/Visibility'
-import VisibilityOff from '@material-ui/icons/VisibilityOff'
-import IconButton from '@material-ui/core/IconButton'
 import {
   hasOneSpecialChar,
   hasOneNumber,
@@ -34,6 +31,7 @@ import {
 import actions from './actions'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
+import FontAwesomeIcon from './FontAwesomeIcon'
 
 const useStyles = makeStyles((theme) => ({
   alertContainer: {
@@ -167,12 +165,12 @@ const ChangePasswordModal = (props) => {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton
+                            <FontAwesomeIcon
                               aria-label="toggle password visibility"
                               onClick={togglePasswordMask('isOldPasswordMasked')}
                             >
-                              {params.isOldPasswordMasked ? <Visibility /> : <VisibilityOff />}
-                            </IconButton>
+                              {params.isOldPasswordMasked ? 'eye' : 'eye-slash'}
+                            </FontAwesomeIcon>
                           </InputAdornment>
                         ),
                       }}
@@ -188,12 +186,12 @@ const ChangePasswordModal = (props) => {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton
+                            <FontAwesomeIcon
                               aria-label="toggle password visibility"
                               onClick={togglePasswordMask('isNewPasswordMasked')}
                             >
-                              {params.isNewPasswordMasked ? <Visibility /> : <VisibilityOff />}
-                            </IconButton>
+                              {params.isNewPasswordMasked ? 'eye' : 'eye-slash'}
+                            </FontAwesomeIcon>
                           </InputAdornment>
                         ),
                       }}
@@ -209,12 +207,12 @@ const ChangePasswordModal = (props) => {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton
+                            <FontAwesomeIcon
                               aria-label="toggle password visibility"
                               onClick={togglePasswordMask('isConfirmPasswordMasked')}
                             >
-                              {params.isConfirmPasswordMasked ? <Visibility /> : <VisibilityOff />}
-                            </IconButton>
+                              {params.isConfirmPasswordMasked ? 'eye' : 'eye-slash'}
+                            </FontAwesomeIcon>
                           </InputAdornment>
                         ),
                       }}

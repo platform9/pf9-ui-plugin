@@ -37,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderBottom: `1px solid ${theme.palette.primary.light}`,
   },
   lowerBody: {
+    wordBreak: 'break-word',
     borderBottom: `1px solid ${theme.palette.primary.light}`,
   },
   name: {

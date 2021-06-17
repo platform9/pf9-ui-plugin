@@ -10,6 +10,7 @@ import { withProgress } from 'core/components/progress/Progress'
 import Button from 'core/elements/button'
 
 interface IConfirmationDialog {
+  loading?: boolean
   open: boolean
   title?: string
   text?: JSX.Element
@@ -49,7 +50,7 @@ class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
           <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.handleCancel} color="primary">
+          <Button onClick={this.handleCancel} color="secondary">
             {cancelText}
           </Button>
           <Button onClick={this.handleConfirm} color="primary" autoFocus>

@@ -1,39 +1,35 @@
 // libs
-import React, { useCallback, useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
+import { pathOr, prop } from 'ramda'
+import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/styles'
 // Constants
-import { allKey } from 'app/constants'
+import { allKey, CustomerTiers, UserPreferences } from 'app/constants'
 // Actions
 import { deploymentActions, podActions, serviceActions } from '../pods/actions'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { loadNodes } from '../infrastructure/nodes/actions'
-import { mngmUserActions } from '../userManagement/users/actions'
-import { mngmTenantActions } from '../userManagement/tenants/actions'
+import { mngmUserActions } from 'account/components/userManagement/users/actions'
+import { mngmTenantActions } from 'account/components/userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
 import StatusCard, { StatusCardProps } from './StatusCard'
 import Text from 'core/elements/text'
-
-import ClusterSetup, {
-  clustersHaveAccess,
-  clustersHaveMonitoring,
-} from 'k8s/components/onboarding/ClusterSetup'
-import PodSetup, { podSetupComplete } from 'k8s/components/onboarding/PodSetup'
-import useDataLoader from 'core/hooks/useDataLoader'
-import Progress from 'core/components/progress/Progress'
-import identity from 'ramda/es/identity'
-import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import Theme from 'core/themes/model'
-import { prop } from 'ramda'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
-import { useSelector } from 'react-redux'
 import {
   isHealthyStatus,
   isTransientStatus,
   isUnhealthyStatus,
 } from '../infrastructure/clusters/ClusterStatusUtils'
+import { importedClusterActions } from '../infrastructure/importedClusters/actions'
+import { ImportedClusterSelector } from '../infrastructure/importedClusters/model'
+import OnboardingPage from '../onboarding/onboarding-page'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { isDecco } from 'core/utils/helpers'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -45,7 +41,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     gridTemplateColumns: 'repeat(4, 290px)',
     gridTemplateAreas: `
       'cluster node pod cloud'
-      'user tenant deployment service'
+      'deployment service user tenant'
     `,
     gridGap: theme.spacing(2),
     marginTop: theme.spacing(2),
@@ -78,6 +74,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   pod: {
     gridArea: 'pod',
+  },
+  modal: {
+    position: 'fixed',
+    left: 0,
+    top: '55px',
+    width: '100vw',
+    height: 'calc(100vh - 55px)', // 55px is the toolbar height
+    overflow: 'auto',
+    zIndex: 5000,
+    backgroundColor: theme.palette.grey['100'],
+    padding: theme.spacing(2, 4),
+    boxSizing: 'border-box',
   },
 }))
 
@@ -116,11 +124,49 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
     piePrimary: 'healthy',
   }),
 }
+
+export const importedClusterStatusCardProps: IStatusCardWithFilterProps = {
+  entity: 'importedCluster',
+  permissions: ['admin'],
+  route: 'n/a',
+  addRoute: 'n/a',
+  title: 'Clusters Total',
+  icon: 'n/a',
+  dataLoader: [importedClusterActions.list, {}],
+  quantityFn: (clusters: ImportedClusterSelector[]) => ({
+    quantity: clusters.length,
+    // Possible "" value, not sure what to do with that
+    pieData: [
+      {
+        name: 'running',
+        value: clusters.filter((cluster) => cluster.status.phase === 'Running').length,
+        color: 'green.main',
+      },
+      {
+        name: 'pending',
+        value: clusters.filter((cluster) => cluster.status.phase === 'Pending').length,
+        color: 'yellow.main',
+      },
+      {
+        name: 'terminating',
+        value: clusters.filter((cluster) => cluster.status.phase === 'Terminating').length,
+        color: 'orange.main',
+      },
+      {
+        name: 'failing',
+        value: clusters.filter((cluster) => cluster.status.phase === 'Failing').length,
+        color: 'red.main',
+      },
+    ],
+    piePrimary: 'running',
+  }),
+}
+
 export const nodeStatusCardProps: IStatusCardWithFilterProps = {
   entity: 'node',
   permissions: ['admin'],
   route: routes.nodes.list.path(),
-  addRoute: routes.nodes.download.path(),
+  addRoute: routes.nodes.add.path(),
   title: 'Nodes',
   icon: 'ball-pile',
   dataLoader: [loadNodes, {}],
@@ -172,6 +218,11 @@ export const cloudStatusCardProps: IStatusCardWithFilterProps = {
         value: clouds.filter((cloud) => cloud.type === CloudProviders.Azure).length,
         color: 'azure.main',
       },
+      {
+        name: 'Google',
+        value: clouds.filter((cloud) => cloud.type === CloudProviders.Gcp).length,
+        color: 'googleYellow.main',
+      },
     ],
     graphType: 'donut',
   }),
@@ -181,6 +232,7 @@ const reports = [
   {
     entity: 'user',
     permissions: ['admin'],
+    overallPermissions: ['admin'],
     route: routes.userManagement.users.path(),
     addRoute: routes.userManagement.addUser.path(),
     title: 'Users',
@@ -193,6 +245,7 @@ const reports = [
   {
     entity: 'tenant',
     permissions: ['admin'],
+    overallPermissions: ['admin'],
     route: routes.userManagement.tenants.path(),
     addRoute: routes.userManagement.addTenant.path(),
     title: 'Tenants',
@@ -264,7 +317,7 @@ const reports = [
 ]
 
 const reportsWithPerms = (reports, role) => {
-  return reports.map((report) => {
+  const mappedReports = reports.map((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) {
       return report
@@ -272,12 +325,15 @@ const reportsWithPerms = (reports, role) => {
     // remove the add action when not permitted to
     return report.permissions.includes(role) ? report : { ...report, addRoute: '' }
   })
+  const filteredReports = mappedReports.filter((report) => {
+    if (!report.overallPermissions) {
+      return report
+    }
+    return report.overallPermissions.includes(role)
+  })
+  return filteredReports
 }
-const promptOnboardingSetup = (items: boolean[]) => {
-  const isComplete = items.every(identity)
-  // If any step is not ready then we need to return true to prompt for it.
-  return !isComplete
-}
+
 const nodeHealthStatus = ({ status }) => {
   if (status === 'converging') {
     return status
@@ -286,56 +342,58 @@ const nodeHealthStatus = ({ status }) => {
 }
 
 const DashboardPage = () => {
-  // need to be able to force update because states are captured in local storage :(
-  const [, updateState] = React.useState({})
-  const forceUpdate = useCallback(() => updateState({}), [])
   const classes = useStyles({})
+  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const displayName = session?.userDetails?.displayName
-  const isAdmin = isAdminRole(session)
+  const {
+    username,
+    userDetails: { displayName },
+    features,
+  } = session
+  // To avoid missing API errors for ironic region UX-751
+  const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
+  const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
+  const [clusters] = useDataLoader(clusterActions.list)
 
-  const [clusters, loadingClusters] = useDataLoader(clusterActions.list, { loadingFeedback: false })
-  const [pods, loadingPods] = useDataLoader(podActions.list, { loadingFeedback: false })
-  const hasClusters = !!clusters.length
-  const hasMonitoring = clustersHaveMonitoring(clusters)
-  const hasAccess = clustersHaveAccess()
-  const isLoading = loadingClusters || loadingPods
+  const showOnboarding = useMemo(
+    () =>
+      isDecco(features) &&
+      customerTier === CustomerTiers.Freedom &&
+      ((prefs.isOnboarded === undefined && clusters?.length === 0) ||
+        (prefs.isOnboarded !== undefined && prefs.isOnboarded === false)),
+    [features, customerTier, prefs.isOnboarded, clusters],
+  )
 
-  const showClusters = promptOnboardingSetup([hasClusters, hasAccess, hasMonitoring])
-  const showPods = !podSetupComplete(pods)
-  // const showOnboarding = isAdmin && (showClusters || showPods)
-  let showOnboarding = isAdmin && (showClusters || showPods)
-  showOnboarding = false
-
-  const handleComplete = useCallback(() => {
-    forceUpdate()
-  }, [])
-
-  const initialExpandedClusterPanel = useMemo(() => {
-    return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
-  }, [hasClusters, hasMonitoring, hasAccess])
+  useEffect(() => {
+    if (prefs.isOnboarded !== undefined) {
+      return
+    }
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: !showOnboarding })
+  }, [username, showOnboarding])
 
   return (
-    <section className={classes.cardColumn}>
-      <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
-
-      {isLoading && <Progress loading={isLoading} overlay />}
-      {false && showOnboarding && !isLoading && (
-        <>
-          <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
-          <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
-        </>
-      )}
-
-      {!isLoading && (
-        <div className={classes.dashboardMosaic}>
-          {reportsWithPerms(reports, session.userDetails.role).map((report) => (
-            <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-          ))}
+    <>
+      {showOnboarding && (
+        <div id="myModal" className={classes.modal}>
+          <OnboardingPage />
         </div>
       )}
-    </section>
+      {!showOnboarding && (
+        <section className={classes.cardColumn} id={`dashboard-page`}>
+          <Text id="dashboard-title" variant="h5">
+            Welcome{displayName ? ` ${displayName}` : ''}!
+          </Text>
+          {kubeRegion && (
+            <div className={classes.dashboardMosaic}>
+              {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+                <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+    </>
   )
 }
 

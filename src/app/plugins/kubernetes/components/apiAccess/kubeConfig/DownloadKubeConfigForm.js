@@ -7,6 +7,9 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import Alert from 'core/components/Alert'
 import { generateKubeConfig } from 'k8s/components/infrastructure/clusters/kubeconfig'
 import downloadFile from 'core/utils/downloadFile'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
+import { prop } from 'ramda'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   radioGroup: {
@@ -25,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
   errorContainer: {
     paddingLeft: '12px',
   },
+  inputFields: {
+    width: '100% !important',
+  },
 }))
 
 const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
@@ -32,15 +38,23 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
   const [authMethod, setAuthMethod] = useState('token')
   const [errorMessage, setErrorMessage] = useState()
   const [submitting, setSubmitting] = useState(false)
+  const selectSessionState = prop(sessionStoreKey)
+  const session = useSelector(selectSessionState)
+  const { isSsoToken } = session
 
   const handleSubmit = async (params) => {
     setErrorMessage(null)
     setSubmitting(true)
     const { username, password } = params
-    const { error, kubeconfig } = await generateKubeConfig(cluster.uuid, authMethod, {
-      username,
-      password,
-    })
+    const { error, kubeconfig } = await generateKubeConfig(
+      cluster.uuid,
+      authMethod,
+      {
+        username,
+        password,
+      },
+      isSsoToken,
+    )
 
     if (error) {
       setSubmitting(false)
@@ -88,7 +102,7 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
         </Grid>
         {authMethod === 'password' && (
           <Grid item xs={12} zeroMinWidth>
-            <PasswordForm classes={classes} />
+            <PasswordForm />
           </Grid>
         )}
         {!!errorMessage && (
@@ -110,21 +124,30 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
   )
 }
 
-const PasswordForm = ({ classes }) => (
-  <Grid container item xs={12}>
-    <Grid item xs={4} zeroMinWidth>
-      <h4>Username</h4>
+const PasswordForm = () => {
+  const classes = useStyles()
+  return (
+    <Grid container item xs={12}>
+      <Grid item xs={4} zeroMinWidth>
+        <h4>Username</h4>
+      </Grid>
+      <Grid item xs={8} zeroMinWidth>
+        <TextField className={classes.inputFields} id="username" label="username" required />
+      </Grid>
+      <Grid item xs={4} zeroMinWidth>
+        <h4>Password</h4>
+      </Grid>
+      <Grid item xs={8} zeroMinWidth>
+        <TextField
+          className={classes.inputFields}
+          id="password"
+          label="password"
+          type="password"
+          required
+        />
+      </Grid>
     </Grid>
-    <Grid item xs={8} zeroMinWidth>
-      <TextField id="username" label="username" required />
-    </Grid>
-    <Grid item xs={4} zeroMinWidth>
-      <h4>Password</h4>
-    </Grid>
-    <Grid item xs={8} zeroMinWidth>
-      <TextField id="password" label="password" type="password" required />
-    </Grid>
-  </Grid>
-)
+  )
+}
 
 export default DownloadKubeConfigForm

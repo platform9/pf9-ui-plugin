@@ -49,23 +49,25 @@ const createCRUDComponents = (options) => {
     renderEmptyTable = false,
     addButton,
     addUrl,
+    addButtonConfigs,
     AddDialog,
     EditDialog,
     DeleteDialog,
     editUrl,
     editCond,
     editDisabledInfo,
-    customEditUrlFn,
     debug,
     name,
     nameProp,
-    searchTarget = 'name',
+    searchTargets = ['name'],
     multiSelection = true,
     showCheckboxes,
     headlessTable,
     compactTable,
     blankFirstColumn,
     onSelect,
+    extraToolbarContent,
+    hideDelete,
   } = options
 
   // List
@@ -85,6 +87,7 @@ const createCRUDComponents = (options) => {
     orderDirection,
     getParamsUpdater,
     filters,
+    alternativeTableContent,
     ...rest
   }) => {
     return (
@@ -99,7 +102,7 @@ const createCRUDComponents = (options) => {
         editCond={editCond}
         editDisabledInfo={editDisabledInfo}
         multiSelection={multiSelection}
-        searchTarget={searchTarget}
+        searchTargets={searchTargets}
         uniqueIdentifier={uniqueIdentifier}
         showCheckboxes={showCheckboxes}
         compactTable={compactTable}
@@ -123,6 +126,9 @@ const createCRUDComponents = (options) => {
         onSortChange={getParamsUpdater('orderBy', 'orderDirection')}
         onRowsPerPageChange={getParamsUpdater('rowsPerPage')}
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
+        extraToolbarContent={extraToolbarContent}
+        hideDelete={hideDelete}
+        alternativeTableContent={alternativeTableContent}
       />
     )
   }
@@ -139,8 +145,8 @@ const createCRUDComponents = (options) => {
         addText={addText}
         addButton={addButton}
         editUrl={editUrl}
-        customEditUrlFn={customEditUrlFn}
         addUrl={addUrl}
+        addButtonConfigs={addButtonConfigs}
         deleteFn={deleteFn}
         uniqueIdentifier={uniqueIdentifier}
         AddDialog={AddDialog}

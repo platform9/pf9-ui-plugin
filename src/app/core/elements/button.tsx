@@ -9,7 +9,7 @@ interface Props extends Omit<ButtonProps, 'variant'> {
   color?: 'primary' | 'secondary'
   variant?: 'light' | 'dark'
   textVariant?: TextVariant
-  children: string
+  children: string | React.ReactNode
   disabled?: boolean
 }
 
@@ -51,6 +51,7 @@ const useStyles = makeStyles<Theme, { color: string; variant: string }>((theme: 
       getColor(theme, 'default', color, variant).backgroundColor,
     color: ({ color, variant }) => getColor(theme, 'default', color, variant).color,
     borderColor: ({ color, variant }) => getColor(theme, 'default', color, variant).borderColor,
+    borderRadius: 2,
 
     '&:hover': {
       backgroundColor: ({ color, variant }) =>

@@ -10,6 +10,9 @@ import NotificationsPopover from 'core/components/notifications/NotificationsPop
 import { imageUrls } from 'app/constants'
 import useReactRouter from 'use-react-router'
 import { routes } from 'core/utils/routes'
+import { prop } from 'ramda'
+import { preferencesStoreKey } from 'core/session/preferencesReducers'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -38,12 +41,15 @@ const useStyles = makeStyles((theme) => ({
   logo: {
     height: 29,
     marginLeft: 25,
+    cursor: 'pointer',
   },
 }))
 
 const Toolbar = ({ open }) => {
-  const classes = useStyles()
+  const classes = useStyles({})
   const { history } = useReactRouter()
+  const selectPrefsState = prop(preferencesStoreKey)
+  const { logoUrl } = useSelector(selectPrefsState)
 
   const handleLogoClick = useCallback(() => history.push(routes.dashboard.path()))
 
@@ -51,7 +57,7 @@ const Toolbar = ({ open }) => {
     <AppBar className={classes.appBar}>
       <MaterialToolbar variant="dense" disableGutters={!open}>
         <img
-          src={imageUrls.logoPrimary}
+          src={logoUrl || imageUrls.logoPrimary}
           onClick={handleLogoClick}
           alt="Platform9 Logo"
           className={classes.logo}

@@ -4,245 +4,262 @@ import { ICombinedHost } from '../common/model'
 
 export type IUseDataLoader<T> = [T[], boolean, (ignoreCache?: boolean) => T[]]
 
-export interface INodesSelector extends Node {
-  status: string
-  combined: ICombinedHost,
-  logs: string,
+export enum NodeState {
+  Authorized = 'Authorized',
+  Unauthorized = 'Unauthorized',
 }
 
-// export interface Resmgr {
-//   info: Info
-//   hypervisor_info: HypervisorInfo
-//   roles: string[]
-//   role_status: string
-//   extensions: Extensions
-//   message: string
-//   id: string
-// }
+export type errorMessageLevel = 'warn'
 
-// export interface Extensions {
-//   volumes_present: VolumesPresent
-//   kube_api_status: KubeAPIStatus
-//   listened_ports: ListenedPorts
-//   firewalld_status: FirewalldStatus
-//   interfaces: Interfaces
-//   cloud_metadata: CloudMetadata
-//   resource_usage: ResourceUsage
-//   physical_nics: PhysicalNics
-//   mounted_nfs: MountedNFS
-//   node_metadata: NodeMetadata
-//   pf9_kube_status: Pf9KubeStatus
-//   ip_address: IPAddress
-//   selinux_status: SelinuxStatus
-//   cpu_stats: CPUStats
-// }
+export enum ErrorMessageCodes {
+  timeDrift = 'HOST_TIMEDRIFT_DETECTED',
+}
 
-// export interface Pf9KubeStatus {
-//   status: string
-//   data: Pf9KubeStatusData
-// }
+export interface INodesSelector extends Node {
+  status: string
+  combined: ICombinedHost
+  logs: string
+  roles: ICombinedHost['roles']
+  operatingSystem: ICombinedHost['resmgr']['info']['os_info']
+  primaryNetwork: ICombinedHost['qbert']['primaryIp']
+  networkInterfaces: ICombinedHost['networkInterfaces']
+  cpuArchitecture: ICombinedHost['resmgr']['info']['arch']
+  message: ICombinedHost['resmgr']['message']
+}
 
-// export interface Pf9KubeStatusData {
-//   pf9_kube_start_attempt: number
-//   last_failed_status_check: string
-//   last_failed_task: string
-//   all_tasks: string[]
-//   current_task: string
-//   current_status_check: string
-//   completed_tasks: string[]
-//   pf9_kube_service_state: boolean
-//   all_status_checks: string[]
-//   last_failed_status_time: string
-//   pf9_kube_node_state: IKubeNodeState
-//   total_task_count: number
-//   status_check_timestamp: string
-// }
+export interface Resmgr {
+  info: Info
+  hypervisor_info: HypervisorInfo
+  roles: string[]
+  role_status: string
+  extensions: Extensions
+  message: string
+  id: string
+}
 
-// export type IKubeNodeState = 'failed' | 'ok' | 'converging' | 'retrying'
+export interface Extensions {
+  volumes_present: VolumesPresent
+  kube_api_status: KubeAPIStatus
+  listened_ports: ListenedPorts
+  firewalld_status: FirewalldStatus
+  interfaces: Interfaces
+  cloud_metadata: CloudMetadata
+  resource_usage: ResourceUsage
+  physical_nics: PhysicalNics
+  mounted_nfs: MountedNFS
+  node_metadata: NodeMetadata
+  pf9_kube_status: Pf9KubeStatus
+  ip_address: IPAddress
+  selinux_status: SelinuxStatus
+  cpu_stats: CPUStats
+}
 
-// export interface CloudMetadata {
-//   status: string
-//   data: CloudMetadataData
-// }
+export interface Pf9KubeStatus {
+  status: string
+  data: Pf9KubeStatusData
+}
 
-// export interface CloudMetadataData {
-//   instanceId: string
-//   publicHostname: string
-// }
+export interface Pf9KubeStatusData {
+  pf9_kube_start_attempt: number
+  last_failed_status_check: string
+  last_failed_task: string
+  all_tasks: string[]
+  current_task: string
+  current_status_check: string
+  completed_tasks: string[]
+  pf9_kube_service_state: boolean
+  all_status_checks: string[]
+  last_failed_status_time: string
+  pf9_kube_node_state: IKubeNodeState
+  total_task_count: number
+  status_check_timestamp: string
+}
 
-// export interface CPUStats {
-//   status: string
-//   data: CPUStatsData
-// }
+export type IKubeNodeState = 'failed' | 'ok' | 'converging' | 'retrying'
 
-// export interface CPUStatsData {
-//   load_average: string
-// }
+export interface CloudMetadata {
+  status: string
+  data: CloudMetadataData
+}
 
-// export interface FirewalldStatus {
-//   status: string
-//   data: FirewalldStatusData
-// }
+export interface CloudMetadataData {
+  instanceId: string
+  publicHostname: string
+}
 
-// export interface FirewalldStatusData {
-//   error: string
-// }
+export interface CPUStats {
+  status: string
+  data: CPUStatsData
+}
 
-// export interface Interfaces {
-//   status: string
-//   data: InterfacesData
-// }
+export interface CPUStatsData {
+  load_average: string
+}
 
-// export interface InterfacesData {
-//   iface_ip: { [key: string]: string }
-//   iface_info: { [key: string]: IfaceInfo }
-//   ovs_bridges: any[]
-// }
+export interface FirewalldStatus {
+  status: string
+  data: FirewalldStatusData
+}
 
-// export interface IfaceInfo {
-//   mac: string
-//   ifaces: Iface[]
-// }
+export interface FirewalldStatusData {
+  error: string
+}
 
-// export interface Iface {
-//   broadcast: string
-//   netmask: string
-//   addr: string
-// }
+export interface Interfaces {
+  status: string
+  data: InterfacesData
+}
 
-// export interface IPAddress {
-//   status: string
-//   data: string[]
-// }
+export interface InterfacesData {
+  iface_ip: { [key: string]: string }
+  iface_info: { [key: string]: IfaceInfo }
+  ovs_bridges: any[]
+}
 
-// export interface KubeAPIStatus {
-//   status: string
-//   data: KubeAPIStatusData
-// }
+export interface IfaceInfo {
+  mac: string
+  ifaces: Iface[]
+}
 
-// export interface KubeAPIStatusData {
-//   responding: boolean
-// }
+export interface Iface {
+  broadcast: string
+  netmask: string
+  addr: string
+}
 
-// export interface ListenedPorts {
-//   status: string
-//   data: ListenedPortsData
-// }
+export interface IPAddress {
+  status: string
+  data: string[]
+}
 
-// export interface ListenedPortsData {
-//   udp: string
-//   tcp: string
-// }
+export interface KubeAPIStatus {
+  status: string
+  data: KubeAPIStatusData
+}
 
-// export interface MountedNFS {
-//   status: string
-//   data: MountedNFSData
-// }
+export interface KubeAPIStatusData {
+  responding: boolean
+}
 
-// export interface MountedNFSData {
-//   mounted: any[]
-//   last_updated: string
-// }
+export interface ListenedPorts {
+  status: string
+  data: ListenedPortsData
+}
 
-// export interface NodeMetadata {
-//   status: string
-//   data: NodeMetadataData
-// }
+export interface ListenedPortsData {
+  udp: string
+  tcp: string
+}
 
-// export interface NodeMetadataData {
-//   isSpotInstance: boolean
-// }
+export interface MountedNFS {
+  status: string
+  data: MountedNFSData
+}
 
-// export interface PhysicalNics {
-//   status: string
-//   data: PhysicalNicsData
-// }
+export interface MountedNFSData {
+  mounted: any[]
+  last_updated: string
+}
 
-// export interface PhysicalNicsData {
-//   default: string
-//   cni0?: string
-//   eth0: string
-//   flannel0: string
-// }
+export interface NodeMetadata {
+  status: string
+  data: NodeMetadataData
+}
 
-// export interface ResourceUsage {
-//   status: string
-//   data: ResourceUsageData
-// }
+export interface NodeMetadataData {
+  isSpotInstance: boolean
+}
 
-// export interface ResourceUsageData {
-//   disk: CPU
-//   cpu: CPU
-//   memory: Memory
-// }
+export interface PhysicalNics {
+  status: string
+  data: PhysicalNicsData
+}
 
-// export interface CPU {
-//   total: number
-//   percent: number
-//   used: number
-// }
+export interface PhysicalNicsData {
+  default: string
+  cni0?: string
+  eth0: string
+  flannel0: string
+}
 
-// export interface Memory {
-//   available: number
-//   total: number
-//   percent: number
-// }
+export interface ResourceUsage {
+  status: string
+  data: ResourceUsageData
+}
 
-// export interface SelinuxStatus {
-//   status: string
-//   data: SelinuxStatusData
-// }
+export interface ResourceUsageData {
+  disk: CPU
+  cpu: CPU
+  memory: Memory
+}
 
-// export interface SelinuxStatusData {
-//   status: string
-// }
+export interface CPU {
+  total: number
+  percent: number
+  used: number
+}
 
-// export interface VolumesPresent {
-//   status: string
-//   data: Datum[]
-// }
+export interface Memory {
+  available: number
+  total: number
+  percent: number
+}
 
-// export interface Datum {
-//   name: string
-//   free: string
-//   size: string
-// }
+export interface SelinuxStatus {
+  status: string
+  data: SelinuxStatusData
+}
 
-// export interface HypervisorInfo {
-//   hypervisor_type: string
-// }
+export interface SelinuxStatusData {
+  status: string
+}
 
-// export interface Info {
-//   responding: boolean
-//   hostname: string
-//   last_response_time: string
-//   os_family: string
-//   arch: string
-//   os_info: string
-// }
+export interface VolumesPresent {
+  status: string
+  data: Datum[]
+}
 
-// // FIXME: we should definitely have something defined here
-// // eslint-disable-next-line @typescript-eslint/no-empty-interface
-// export interface RoleData {}
+export interface Datum {
+  name: string
+  free: string
+  size: string
+}
 
-// export interface Usage {
-//   compute: Compute
-//   memory: Compute
-//   disk: Compute
-// }
+export interface HypervisorInfo {
+  hypervisor_type: string
+}
 
-// export interface Compute {
-//   current: number
-//   max: number
-//   units: Units | string
-//   type: ComputeType | string
-// }
+export interface Info {
+  responding: boolean
+  hostname: string
+  last_response_time: string
+  os_family: string
+  arch: string
+  os_info: string
+}
 
-// export enum ComputeType {
-//   Used = 'used',
-// }
+// FIXME: we should definitely have something defined here
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface RoleData {}
 
-// export enum Units {
-//   GB = 'GB',
-//   GHz = 'GHz',
-// }
+export interface Usage {
+  compute: Compute
+  memory: Compute
+  disk: Compute
+}
+
+export interface Compute {
+  current: number
+  max: number
+  units: Units | string
+  type: ComputeType | string
+}
+
+export enum ComputeType {
+  Used = 'used',
+}
+
+export enum Units {
+  GB = 'GB',
+  GHz = 'GHz',
+}

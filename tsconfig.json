@@ -27,9 +27,18 @@
       "utils/*": ["src/app/utils/*"],
       "app/*": ["src/app/*"],
       "server/*": ["src/server/*"],
-      "api-client/*": ["src/api-client/*"]
-    }
+      "api-client/*": ["src/api-client/*"],
+      "account/*": ["src/app/plugins/account/*"]
+    },
+    "types": [
+      // load Cypress global type
+      "cypress"
+    ]
   },
   "exclude": ["./config*.js"],
-  "include": ["./src/**/*"]
+  "include": [
+    "./src/**/*",
+    // process only spec files
+    "cypress/**/*.ts"
+  ]
 }

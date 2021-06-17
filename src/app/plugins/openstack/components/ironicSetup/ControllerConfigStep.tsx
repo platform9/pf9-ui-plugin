@@ -8,12 +8,12 @@ import Text from 'core/elements/text'
 import DnsmasqPicklist from './DnsmasqPicklist'
 import BridgeDevicePicklist from './BridgeDevicePicklist'
 import { addRole } from 'openstack/components/resmgr/actions'
-import { useToast } from 'core/providers/ToastProvider'
-import { MessageTypes } from 'core/components/notifications/model'
 import PresetField from 'core/components/PresetField'
 import useDataLoader from 'core/hooks/useDataLoader'
 import networkActions from 'openstack/components/networks/actions'
 import Theme from 'core/themes/model'
+import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
+import { useDispatch } from 'react-redux'
 
 const useStyles = makeStyles((theme: Theme) => ({
   subheader: {
@@ -41,7 +41,7 @@ const ControllerConfigStep = ({
   setSubmitting,
 }: Props) => {
   const { subheader } = useStyles({})
-  const showToast = useToast()
+  const dispatch = useDispatch()
   const validatorRef = useRef(null)
 
   const [networks] = useDataLoader(networkActions.list)
@@ -107,7 +107,13 @@ const ControllerConfigStep = ({
       }
     } catch (err) {
       setSubmitting(false)
-      showToast(err.message, MessageTypes.error)
+      dispatch(
+        notificationActions.registerNotification({
+          title: 'Controller Config Error',
+          message: err.message,
+          type: NotificationType.error,
+        }),
+      )
       return false
     }
 

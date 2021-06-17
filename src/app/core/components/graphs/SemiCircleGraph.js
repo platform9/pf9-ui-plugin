@@ -3,7 +3,7 @@ import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 import AnimateValues from 'core/components/AnimateValues'
 import { describeArc } from 'core/utils/svgHelpers'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { hexToRgbaCss } from 'core/utils/colorHelpers'
 
 const strokeWidth = 12
 
@@ -15,7 +15,7 @@ const styles = (theme) => ({
   },
   barProgress: {
     fill: 'none',
-    stroke: hexToRGBA(theme.palette.blue[500], 0.5),
+    stroke: hexToRgbaCss(theme.palette.blue[500], 0.5),
     strokeWidth,
     strokeLinecap: 'square',
     strokeLinejoin: 'square',

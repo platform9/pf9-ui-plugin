@@ -23,6 +23,7 @@ interface IRequestOptions {
 }
 export interface IRawRequestGetParams {
   url: string
+  version?: string
   endpoint?: string
   config?: AxiosRequestConfig
   options: IRequestOptions
@@ -33,6 +34,7 @@ export interface IRawRequestPostParams extends IRawRequestGetParams {
 
 export interface IBasicRequestGetParams {
   url: string
+  version?: string
   params?: AxiosRequestConfig['params']
   endpoint?: string
   config?: AxiosRequestConfig
@@ -41,6 +43,7 @@ export interface IBasicRequestGetParams {
 
 export interface IBasicRequestPostParams {
   url: string
+  version?: string
   body?: any
   endpoint?: string
   config?: AxiosRequestConfig
@@ -51,6 +54,16 @@ export interface MethodMetadata {
   url: string
   type: string
   params?: string[]
+}
+
+export interface IBasicRequestDeleteParams {
+  url: string
+  version?: string
+  params?: AxiosRequestConfig['params']
+  data?: AxiosRequestConfig['data']
+  endpoint?: string
+  config?: AxiosRequestConfig
+  options: IRequestOptions
 }
 
 // import { AxiosResponse, AxiosRequestConfig } from 'axios'

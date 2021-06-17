@@ -14,7 +14,7 @@ export interface Host {
   info: Info
   role_status?: RoleStatus
   hypervisor_info: HypervisorInfoClass | string
-  extensions: ExtensionsClass | string
+  extensions: ExtensionsClass
   message: string | { warn: string }
   ovsBridges?: string[]
 }

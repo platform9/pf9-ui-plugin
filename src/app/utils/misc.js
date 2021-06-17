@@ -180,7 +180,7 @@ export const capitalizeString = (inputStr) =>
  * @param {string} str
  * @returns {string}
  */
-export const sanitizeUrl = (str) =>
+export const sanitizeUrl = (str = '') =>
   str
     .replace(/[^a-zA-Z0-9-_.]/g, '-') // replace non-valid url characters with hyphen
     .replace(/^-+/, '') // eliminate leading hyphens
@@ -202,3 +202,18 @@ export const normalizeUsername = (name = '') => {
 // Really simple indefinite article function, does not account for special
 // cases such as 'a user'
 export const indefiniteArticle = (word = '') => (/^([aeiou])/i.test(word) ? 'an' : 'a')
+
+export const cleanupStacktrace = (stacktrace = '') =>
+  stacktrace
+    .split('\n')
+    .filter((res) => !!res.trim())
+    .join('\n\n')
+
+export const compareArrByValue = (key, order = 'asc') => (a, b) => {
+  if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+    return 0
+  }
+  const comparison = a[key].localeCompare(b[key])
+
+  return order === 'desc' ? comparison * -1 : comparison
+}

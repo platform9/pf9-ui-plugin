@@ -31,7 +31,7 @@ export const makeScopedClient = async (tenantName = defaultTestTenant) => {
   const client = await makeUnscopedClient()
   const projects = await client.keystone.getProjects()
   const project = projects.find((x) => x.name === tenantName) || projects[0]
-  await client.keystone.changeProjectScope(project.id)
+  await client.keystone.changeProjectScopeWithToken(project.id, false)
   return client
 }
 

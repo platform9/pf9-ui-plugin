@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { IClusterSelector } from './model'
+import { IClusterAction } from './model'
 import SimpleLink from 'core/components/SimpleLink'
 import { Dialog, DialogTitle, DialogContent } from '@material-ui/core'
 import DownloadKubeConfigForm from 'k8s/components/apiAccess/kubeConfig/DownloadKubeConfigForm'
 
 interface Props {
-  cluster: IClusterSelector
+  cluster: IClusterAction
   icon?: string
   className?: string
 }

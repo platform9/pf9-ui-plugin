@@ -34,10 +34,12 @@ export interface GCluster<T> {
 }
 
 export interface INormalizedCluster {
+  uuid: string
   endpoint: string
   kubeconfigUrl: string
   isUpgrading: boolean
   nodes: Node[]
+  progressPercent: any
 }
 
 export type IGenericResource<T> = T & {
@@ -992,20 +994,21 @@ export interface GetKubernetesVersion {
 export interface Node {
   name: string
   uuid: string
-  primaryIp: string
-  isMaster: number
-  masterless: number
-  status: string
-  api_responding: number
-  projectId: string
-  startKube: number
-  actualKubeRoleVersion: string
-  nodePoolUuid: string
-  nodePoolName: string
-  clusterUuid: null | string
-  clusterName: null | string
-  cloudProviderType: string
-  clusterKubeRoleVersion: string
+  primaryIp?: string
+  isMaster?: number
+  masterless?: number
+  status?: string
+  api_responding?: number
+  projectId?: string
+  startKube?: number
+  actualKubeRoleVersion?: string
+  nodePoolUuid?: string
+  nodePoolName?: string
+  clusterUuid?: null | string
+  clusterName?: null | string
+  cloudProviderType?: string
+  clusterKubeRoleVersion?: string
+  isAuthorized?: boolean
 }
 
 export interface GetPrometheusAlerts {
@@ -1133,4 +1136,20 @@ export interface Status {
   inhibitedBy: any[]
   silencedBy: any[]
   state: string
+}
+
+export interface SupportedRoleVersions {
+  count: number
+  roles: Role[]
+}
+
+export interface Role {
+  uuid: string
+  k8sMajorVersion: number
+  k8sMinorVersion: number
+  k8sPatchVersion: number
+  pf9PatchVersion: number
+  roleVersion: string
+  addonsDetails: string
+  metadata: string
 }

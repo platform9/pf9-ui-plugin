@@ -5,10 +5,11 @@ import { propEq, prop, pipe, head, find, isEmpty } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { cacheActions } from 'core/caching/cacheReducers'
-import { sessionActions } from 'core/session/sessionReducers'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { updateClarityStore } from 'utils/clarityHelper'
 
 const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
@@ -18,15 +19,21 @@ const TenantChooser = (props) => {
   const [selectedTenantName, setSelectedTenantName] = useState()
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants, reloadTenants] = useDataLoader(loadUserTenants)
+  const selectSessionState = prop(sessionStoreKey)
+  const session = useSelector(selectSessionState)
+  const { isSsoToken } = session
   const dispatch = useDispatch()
   const curTenantName = useMemo(() => {
     if (selectedTenantName) {
       return selectedTenantName
     }
     if (currentTenant) {
-      return pipe(find(propEq('id', currentTenant)), prop('name'))(tenants)
+      // The || is just in case the currentTenant in prefs no longer exists
+      return pipe(find(propEq('id', currentTenant)), prop('name'))(tenants) || head(tenants)?.name
     }
-    return pipe(head, prop('name'))(tenants)
+    // match setupSession from AppContainer, set to service tenant if it exists
+    const tenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
+    return tenant.name
   }, [tenants, currentTenant, selectedTenantName])
 
   useEffect(() => {
@@ -36,27 +43,36 @@ const TenantChooser = (props) => {
     }
   }, [currentRegion, tenants])
 
+  useEffect(() => {
+    if (curTenantName && tenants.length && !currentTenant) {
+      // Set currentTenant in prefs on first-ever load
+      const tenant = tenants.find((t) => curTenantName === t.name)
+      updatePrefs({ currentTenant: tenant.id })
+    }
+  }, [curTenantName, tenants])
+
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
-    setSelectedTenantName(tenantName)
 
     const tenant = tenants.find(propEq('name', tenantName))
     if (!tenant) {
       return
     }
 
-    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
+    const { user, role, scopedToken } = await keystone.changeProjectScopeWithToken(
+      tenant.id,
+      isSsoToken,
+    )
+
+    setSelectedTenantName(tenantName)
+
+    dispatch(cacheActions.clearCache())
     dispatch(
       sessionActions.updateSession({
         userDetails: { ...user, role },
         scopedToken,
       }),
     )
-    updatePrefs({
-      currentTenant: tenant.id,
-    })
-    // Clearing the cache will cause all the current loaders to reload its data
-    dispatch(cacheActions.clearCache())
 
     setLoading(false)
   }
@@ -64,8 +80,9 @@ const TenantChooser = (props) => {
   const handleTenantSelect = useCallback(
     async (currentTenant) => {
       const fullTenantObj = tenants.find(propEq('name', currentTenant))
-      updatePrefs({ currentTenant: fullTenantObj.id })
+      updateClarityStore('tenantObj', fullTenantObj)
       await updateCurrentTenant(currentTenant)
+      updatePrefs({ currentTenant: fullTenantObj.id })
     },
     [tenants],
   )
@@ -74,7 +91,6 @@ const TenantChooser = (props) => {
     const isUserTenant = (x) => x.description !== 'Heat stack user project'
     return (tenants || []).filter(isUserTenant).map((x) => x.name)
   }, [tenants])
-
   const handleTooltipClose = useCallback(() => setTooltipOpen(false))
   const handleTooltipOpen = useCallback(() => setTooltipOpen(true))
 

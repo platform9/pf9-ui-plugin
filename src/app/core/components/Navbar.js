@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   Button,
+  Tooltip,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
@@ -24,11 +25,10 @@ import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { clarityDashboardUrl, helpUrl, ironicWizardUrl, dashboardUrl } from 'app/constants'
 import Text from 'core/elements/text'
-
 import SimpleLink from './SimpleLink'
-// import { withAppContext } from 'core/providers/AppProvider'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { connect } from 'react-redux'
+import { isDecco } from 'core/utils/helpers'
 
 export const drawerWidth = 180
 
@@ -40,7 +40,7 @@ const styles = (theme) => ({
     display: 'none !important',
   },
   bottomContent: {
-    display: 'flex',
+    display: ({ stack }) => (stack === 'my-account' ? 'none' : 'flex'),
     flexDirection: 'column',
     alignItems: 'center',
     padding: theme.spacing(2, 1, 1, 1),
@@ -49,8 +49,14 @@ const styles = (theme) => ({
       margin: theme.spacing(2, 0),
       textDecorationColor: '#e6e6e6 !important',
     },
-    '& span, & i': {
+    '& h6, & span, & i': {
       color: '#e6e6e6',
+    },
+    '& h6': {
+      width: '100%',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
     },
     '& button': {
       backgroundColor: '#f3f3f4',
@@ -74,7 +80,7 @@ const styles = (theme) => ({
     whiteSpace: 'nowrap',
     height: '100%',
     minHeight: '100vh',
-    backgroundColor: theme.components.sidebar.background,
+    backgroundColor: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].background,
   },
   drawerOpen: {
     width: drawerWidth,
@@ -94,7 +100,7 @@ const styles = (theme) => ({
     // },
   },
   paper: {
-    marginTop: 55,
+    marginTop: ({ hasSecondaryHeader }) => (hasSecondaryHeader ? 151 : 55),
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
@@ -118,15 +124,18 @@ const styles = (theme) => ({
     margin: 0,
   },
   activeNavItem: {
-    backgroundColor: theme.components.sidebar.activeBackground,
-    color: theme.components.sidebar.activeText,
+    backgroundColor: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].activeBackground,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].activeText,
   },
   currentNavLink: {
-    backgroundColor: [theme.components.sidebar.activeBackground, '!important'],
-    color: [theme.components.sidebar.activeText, '!important'],
+    backgroundColor: ({ stack = 'kubernetes' }) => [
+      theme.components.sidebar[stack].activeBackground,
+      '!important',
+    ],
+    color: ({ stack = 'kubernetes' }) => [theme.components.sidebar[stack].activeText, '!important'],
 
     '&:hover *': {
-      color: [theme.components.sidebar.hoverText, '!important'],
+      color: ({ stack = 'kubernetes' }) => [theme.components.sidebar[stack].hoverText],
     },
   },
   navHeading: {
@@ -163,23 +172,24 @@ const styles = (theme) => ({
     flex: 1,
   },
   navMenuItem: {
+    overflow: 'inherit',
     display: 'grid',
     gridTemplateColumns: '50px 1fr',
     padding: 0,
     minHeight: 45,
-    backgroundColor: theme.components.sidebar.background,
-    color: theme.components.sidebar.text,
-
+    backgroundColor: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].background,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].text,
     transition: 'background .3s ease',
 
     '& i, & span': {
       transition: 'color .3s ease',
     },
     '&:hover': {
-      backgroundColor: theme.components.sidebar.activeBackground,
+      backgroundColor: ({ stack = 'kubernetes' }) =>
+        theme.components.sidebar[stack].activeBackground,
     },
     '&:hover *': {
-      color: theme.components.sidebar.hoverText, // override child color styles
+      color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].hoverText, // override child color styles
     },
     borderTop: '2px solid transparent',
     borderBottom: '2px solid transparent',
@@ -199,7 +209,7 @@ const styles = (theme) => ({
   navMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: theme.components.sidebar.text,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].text,
   },
   toggleButton: {
     background: theme.components.header.background,
@@ -222,7 +232,7 @@ const styles = (theme) => ({
   currentNavMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: theme.components.sidebar.activeText,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].activeText,
   },
   navMenuList: {
     borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
@@ -275,12 +285,23 @@ const styles = (theme) => ({
   },
   sliderArrow: {
     width: '0.8em',
-    color: theme.components.sidebar.text,
+    color: ({ stack = 'kubernetes' }) => theme.components.sidebar[stack].text,
     cursor: 'pointer',
   },
   heavyWeight: {
     '& i': {
       fontWeight: 500,
+    },
+  },
+  linkFlag: {
+    position: 'absolute',
+    right: 0,
+    top: -4,
+    padding: '0px 3px 1px',
+    borderRadius: 4,
+    backgroundColor: theme.palette.pink.main,
+    '& > p': {
+      color: [theme.palette.grey['000'], '!important'],
     },
   },
 })
@@ -447,7 +468,7 @@ class Navbar extends PureComponent {
     ]
   }
 
-  renderNavLink = ({ nestedLinks, link, name, icon }, idx) => {
+  renderNavLink = ({ nestedLinks, link, name, flag = undefined, icon }, idx) => {
     const {
       open,
       classes,
@@ -497,6 +518,11 @@ class Navbar extends PureComponent {
             }}
             primary={name}
           />
+        )}
+        {flag && (
+          <div className={classes.linkFlag}>
+            <Text variant="caption4">{flag}</Text>
+          </div>
         )}
       </MenuItem>
     )
@@ -590,7 +616,7 @@ class Navbar extends PureComponent {
     const filteredSections = sections.filter(where({ id: equals(stack) }))
 
     // const { features } = getContext()
-    const isDecco = pathStrOr(false, 'experimental.kplane', features)
+    const isDeccoDU = isDecco(features)
     const isSandbox = pathStrOr(false, 'experimental.sandbox', features)
     const version = pathStrOr('4', 'releaseVersion', features)
 
@@ -610,7 +636,8 @@ class Navbar extends PureComponent {
         anchor="left"
         open={open}
       >
-        {withStackSlider ? this.renderStackSlider() : null}
+        {/* TODO: refactor to typescript file & use enum for stack comparison */}
+        {withStackSlider && stack !== 'my-account' ? this.renderStackSlider() : null}
         {filteredSections.length > 1
           ? this.renderSections(filteredSections)
           : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
@@ -620,7 +647,7 @@ class Navbar extends PureComponent {
             [classes.bottomContentClose]: !open,
           })}
         >
-          {!(isDecco || isSandbox) && (
+          {!(isDeccoDU || isSandbox) && (
             <Button onClick={this.handleNavigateToClarity}>
               <Text variant="caption2">Back to Legacy UI</Text>
               <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
@@ -629,9 +656,11 @@ class Navbar extends PureComponent {
           <SimpleLink src={helpUrl} className={classes.helpLink}>
             <FontAwesomeIcon>question-circle</FontAwesomeIcon> <span>Need Help?</span>
           </SimpleLink>
-          <Text variant="caption2" component="span">
-            Version {version}
-          </Text>
+          <Tooltip title={version}>
+            <Text variant="caption2" component="h6">
+              Version {version}
+            </Text>
+          </Tooltip>
         </div>
       </Drawer>
     )

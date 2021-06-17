@@ -26,13 +26,11 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   gridContainer: {
     marginTop: theme.spacing(2),
   },
-  // ellipsis: {
-  //   maxWidth: 160,
-  //   whiteSpace: 'nowrap',
-  //   overflow: 'hidden',
-  //   textOverflow: 'ellipsis',
-  //   display: 'block',
-  // },
+  ellipsis: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   renderPane: {
     display: 'flex',
     flexDirection: 'column',
@@ -58,28 +56,25 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     padding: theme.spacing(1, 2, 0, 2),
     display: 'grid',
     gridGap: theme.spacing(2),
-    gridTemplateColumns: '1fr min-content',
+    gridTemplateColumns: '1fr max-content',
     alignItems: 'center',
   },
   paneHeader: {
     display: 'grid',
-    gridTemplateRows: '38px 1fr',
+    gridTemplateRows: 'minmax(38px, max-content) 1fr',
     alignItems: 'stretch',
     minHeight: 118,
     border: `1px solid ${theme.palette.grey[300]}`,
     borderRadius: 4,
-    margin: theme.spacing(0, 2),
   },
   paneBody: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(2, 0),
   },
   tablePolling: {
     display: 'flex',
     justifyContent: 'flex-end',
-    maxWidth: 1130,
   },
   tableChooser: {
-    maxWidth: 1130,
     display: 'grid',
     gridTemplateColumns: `
       minmax(400px, 500px)
@@ -97,12 +92,16 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     justifyItems: 'stretch',
     gridGap: 8,
   },
+  selectedNodeStatus: {
+    fontSize: 14,
+    color: theme.palette.blue.main,
+  },
   nodeCard: {
     cursor: 'pointer',
     borderRadius: 4,
     border: `1px solid ${theme.palette.grey[300]}`,
     display: 'grid',
-    gridTemplateColumns: 'minmax(150px, max-content) 1fr',
+    gridTemplateColumns: 'minmax(150px, 350px) 1fr',
     alignItems: 'start',
     justifyItems: 'start',
     padding: 8,
@@ -110,6 +109,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
 
     '& > article': {
       justifySelf: 'start',
+      width: '100%',
     },
     '& > div': {
       width: '100%',
@@ -176,7 +176,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
   const searchParams = new URLSearchParams(location.search)
   const linkedNodeUUID = searchParams.get('node') || null
 
-  const [selectedNode, setSelectedNode] = useState(null)
+  const [selectedNodeUuid, setSelectedNodeUuid] = useState(null)
   const [
     clusters,
     loadingClusters,
@@ -193,14 +193,15 @@ export const NodeHealthWithTasksToggler: FC = () => {
         .filter((node) => clusterNodesUids.includes(node.uuid))
         .sort(sortNodesByTasks)
 
-      const uuid = selectedNode ? selectedNode.uuid : linkedNodeUUID || filteredNodes[0]?.uuid
-      const nodeToSelect = filteredNodes.find((node) => node.uuid === uuid)
-      setSelectedNode(nodeToSelect || null) // always update as node data refreshes
+      const uuid = selectedNodeUuid || linkedNodeUUID || filteredNodes?.[0]?.uuid || null
+      if (uuid && uuid !== selectedNodeUuid) {
+        setSelectedNodeUuid(uuid || null)
+      }
 
       return filteredNodes
     }
     return emptyArr
-  }, [cluster, nodes, selectedNode])
+  }, [cluster, nodes, selectedNodeUuid])
 
   const handleReload = useCallback(
     (ignoreCache) => {
@@ -210,9 +211,13 @@ export const NodeHealthWithTasksToggler: FC = () => {
     [reloadClusters, reloadNodes],
   )
 
+  // Node stats change on every render cycle so need to not memoize this
+  const selectedNode = nodes.find((node) => selectedNodeUuid === node.uuid)
+
   const classes = useStyles({})
   const kubeStatusData: Pf9KubeStatusData =
-    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || ({} as Pf9KubeStatusData)
   const selectedNodeAllTasks = kubeStatusData.all_tasks || []
   const selectedNodeCompletedTasks = kubeStatusData.completed_tasks || []
   const lastSelectedNodesFailedTask = kubeStatusData.last_failed_task || []
@@ -222,10 +227,14 @@ export const NodeHealthWithTasksToggler: FC = () => {
   }`
   const shouldShowStateStatus = !!nodeState && nodeState !== 'ok'
   const selectedNodeStatus = shouldShowStateStatus ? (
-    <NodeTaskStatus status={nodeState}>
+    <NodeTaskStatus status={nodeState} className={classes.selectedNodeStatus}>
       {(nodeState.includes('fail') || nodeState === 'retrying') && (
-        <ExternalLink className={classes.linkSpacer} url={nodeInstallTroubleshooting}>
-          Troubleshooting Help
+        <ExternalLink
+          className={classes.linkSpacer}
+          textVariant="body2"
+          url={nodeInstallTroubleshooting}
+        >
+          Install Help
         </ExternalLink>
       )}
     </NodeTaskStatus>
@@ -281,17 +290,19 @@ export const NodeHealthWithTasksToggler: FC = () => {
                     [classes.nodeCardSelected]: selectedNode && selectedNode.uuid === node.uuid,
                   })}
                   elevation={0}
-                  onClick={() => setSelectedNode(node)}
+                  onClick={() => setSelectedNodeUuid(node.uuid)}
                 >
                   <article>
                     <Tooltip title={node.name}>
-                      <Text variant="subtitle2" component="h3">
+                      <Text variant="subtitle2" className={classes.ellipsis} component="h3">
                         {node.name}
                       </Text>
                     </Tooltip>
-                    <Text variant="body2" component="p">
-                      ({node.primaryIp})
-                    </Text>
+                    <Tooltip title={node.primaryIp}>
+                      <Text variant="body2" className={classes.ellipsis} component="p">
+                        ({node.primaryIp})
+                      </Text>
+                    </Tooltip>
                   </article>
                   <div>
                     <Text className={classes.nodeProgressLabel} variant="caption3" component="p">
@@ -313,7 +324,9 @@ export const NodeHealthWithTasksToggler: FC = () => {
           <header className={classes.paneHeader}>
             <div className={classes.paneHeaderTitle}>
               <Tooltip title={selectedNodeTitle || ''}>
-                <Text variant="subtitle1">{selectedNodeTitle}</Text>
+                <Text variant="subtitle1" className={classes.ellipsis}>
+                  {selectedNodeTitle}
+                </Text>
               </Tooltip>
               {!!selectedNode && selectedNodeStatus}
             </div>

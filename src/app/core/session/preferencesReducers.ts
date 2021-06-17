@@ -3,7 +3,7 @@ import { mergeLeft, over, lensPath } from 'ramda'
 
 export interface PreferencesState {
   username: string
-  key: string
+  key: string | string[]
   prefs: { [key: string]: { [key: string]: any } }
 }
 
@@ -15,8 +15,23 @@ const {
   name: 'preferences',
   initialState: {},
   reducers: {
+    updateLogo: (state, { payload }) => {
+      return {
+        ...state,
+        logoUrl: payload.logoUrl,
+      }
+    },
+    resetGlobalPrefs: (state) => {
+      return {
+        ...state,
+        logoUrl: '',
+      }
+    },
     updatePrefs: (state, { payload }: PayloadAction<PreferencesState>) => {
-      return over(lensPath([payload.username, payload.key]), mergeLeft(payload.prefs), state)
+      const path = Array.isArray(payload.key)
+        ? [payload.username].concat(payload.key)
+        : [payload.username, payload.key]
+      return over(lensPath(path), mergeLeft(payload.prefs), state)
     },
   },
 })

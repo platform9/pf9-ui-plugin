@@ -10,6 +10,7 @@ import ApiClient from 'api-client/ApiClient'
 import { appUrlRoot } from 'app/constants'
 import { useDispatch } from 'react-redux'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { updateClarityStore } from 'utils/clarityHelper'
 
 const currentSectionRegex = new RegExp(`^${appUrlRoot}/[^/]+/?[^/]*`, 'i')
 
@@ -24,6 +25,7 @@ const RegionChooser = (props) => {
   const [regions, loadingRegions, reloadRegions] = useDataLoader(regionActions.list)
   const dispatch = useDispatch()
   const [selectedRegion, setRegion] = useState()
+
   const curRegionId = useMemo(() => {
     if (selectedRegion) {
       return selectedRegion
@@ -43,18 +45,33 @@ const RegionChooser = (props) => {
 
   const handleRegionSelect = useCallback(
     async (regionId) => {
-      const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
       setLoading(true)
-      setRegion(regionId)
-      setActiveRegion(regionId)
-      await keystone.resetCookie()
 
-      updatePrefs({ currentRegion: regionId })
-      // Clearing the cache will cause all the current loaders to reload its data
-      await dispatch(cacheActions.clearCache())
+      try {
+        const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
 
-      // Redirect to the root of the current section (there's no need to reload all the app)
-      history.push(currentSection)
+        updateClarityStore(
+          'regionObj',
+          regions.find((r) => regionId === r.id),
+        )
+        setRegion(regionId)
+        setActiveRegion(regionId)
+
+        await keystone.resetCookie()
+
+        await ApiClient.refreshApiEndpoints()
+
+        await dispatch(cacheActions.clearCache())
+
+        // Redirect to the root of the current section (there's no need to reload all the app)
+        // Must be done prior to updatePrefs until improved url management system is in place
+        // bc of listener in AuthenticatedContainer which may also redirect
+        history.push(currentSection)
+
+        updatePrefs({ currentRegion: regionId })
+      } catch (err) {
+        console.error(err)
+      }
 
       setLoading(false)
     },
@@ -70,8 +87,15 @@ const RegionChooser = (props) => {
     if (!curRegionId || !regions.length) {
       return
     }
-    updatePrefs({ currentRegion: curRegionId })
-    setActiveRegion(curRegionId)
+    updateClarityStore(
+      'regionObj',
+      regions.find((r) => curRegionId === r.id),
+    )
+    if (!currentRegion) {
+      // Set currentRegion in prefs on first-ever load
+      updatePrefs({ currentRegion: curRegionId })
+      setActiveRegion(curRegionId)
+    }
   }, [curRegionId, regions])
 
   return (

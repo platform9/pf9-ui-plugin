@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -9,8 +9,8 @@ import clsx from 'clsx'
 import useDataLoader from 'core/hooks/useDataLoader'
 import networkActions from 'openstack/components/networks/actions'
 import { createSubnet } from 'openstack/components/networks/subnets/actions'
-import { useToast } from 'core/providers/ToastProvider'
-import { MessageTypes } from 'core/components/notifications/model'
+import { notificationActions, NotificationType } from 'core/notifications/notificationReducers'
+import { useDispatch } from 'react-redux'
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -59,7 +59,7 @@ const BareMetalSubnetStep = ({
   setSubmitting,
 }: Props) => {
   const { text, bold } = useStyles({})
-  const showToast = useToast()
+  const dispatch = useDispatch()
   const validatorRef = useRef(null)
 
   const [networks, networksLoading] = useDataLoader(networkActions.list)
@@ -93,7 +93,13 @@ const BareMetalSubnetStep = ({
       })
     } catch (err) {
       setSubmitting(false)
-      showToast(err.message, MessageTypes.error)
+      dispatch(
+        notificationActions.registerNotification({
+          title: 'Controller Config Error',
+          message: err.message,
+          type: NotificationType.error,
+        }),
+      )
       return false
     }
 

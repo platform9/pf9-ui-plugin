@@ -10,6 +10,7 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   healthyClusters: true,
@@ -42,7 +43,7 @@ const ListPage = ({ ListContainer }) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/storage_classes/add',
+  addUrl: routes.storage.add.path(),
   addText: 'Add Storage Class',
   columns: [
     { id: 'name', label: 'Name' },

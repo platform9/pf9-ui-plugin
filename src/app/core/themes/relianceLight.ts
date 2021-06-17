@@ -1,3 +1,4 @@
+import { AppPlugins } from 'app/constants'
 import { generateTheme } from './helpers'
 
 export const colors = {
@@ -62,17 +63,43 @@ export const colors = {
     500: '#4AA3DF',
     700: '#1E699C',
   },
+  googleYellow: {
+    500: '#F4B400',
+  },
 }
 const components = {
   header: {
     background: colors.grey[900],
   },
   sidebar: {
-    background: colors.grey[800],
-    activeBackground: colors.grey['000'],
-    text: colors.grey[200],
-    activeText: '#000000',
-    hoverText: '#000000',
+    [AppPlugins.MyAccount]: {
+      background: colors.grey[200],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[800],
+      activeText: colors.grey[800],
+      hoverText: '#000000',
+    },
+    [AppPlugins.Kubernetes]: {
+      background: colors.grey[800],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[200],
+      activeText: '#000000',
+      hoverText: '#000000',
+    },
+    [AppPlugins.OpenStack]: {
+      background: colors.grey[800],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[200],
+      activeText: '#000000',
+      hoverText: '#000000',
+    },
+    [AppPlugins.BareMetal]: {
+      background: colors.grey[800],
+      activeBackground: colors.grey['000'],
+      text: colors.grey[200],
+      activeText: '#000000',
+      hoverText: '#000000',
+    },
   },
   dashboardCard: {
     background: '#FFF',
@@ -154,7 +181,7 @@ export const typography = {
   },
   inputPlaceholder: {
     fontFamily: 'Eina04',
-    fontSize: '18px',
+    fontSize: '14px',
     fontWeight: 'normal',
     fontStretch: 'normal',
     fontStyle: 'normal',
@@ -214,7 +241,6 @@ export const typography = {
     fontStyle: 'normal',
     lineHeight: 'normal',
     letterSpacing: 'normal',
-    textAlign: 'right',
   },
 
   buttonSecondary: {
@@ -292,17 +318,19 @@ export const typography = {
   },
 }
 
-const relianceLightTheme = generateTheme({
-  palette: { colors, primary: 'blue', secondary: 'pink', type: 'light' },
-  typography: {
-    fontFamily: '"Eina04"',
-    fontSize: 14,
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
-    typography,
-  },
+const relianceLightTheme = {
+  theme: generateTheme({
+    palette: { colors, primary: 'blue', secondary: 'pink', type: 'light' },
+    typography: {
+      fontFamily: '"Eina04"',
+      fontSize: 14,
+      fontWeightLight: 300,
+      fontWeightRegular: 400,
+      fontWeightMedium: 500,
+      typography,
+    },
+  }),
   components,
-})
+}
 // relianceLightTheme.palette.
 export default relianceLightTheme

@@ -10,6 +10,7 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import DateCell from 'core/components/listTable/cells/DateCell'
+import { routes } from 'core/utils/routes'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -24,33 +25,27 @@ const ListPage = ({ ListContainer }) => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [namespaces, loading, reload] = useDataLoader(namespaceActions.list, params)
     return (
-      <PageContainer>
-        <Tabs>
-          <Tab value="namespace" label="Namespaces">
-            <ListContainer
-              loading={loading}
-              reload={reload}
-              data={namespaces}
-              getParamsUpdater={getParamsUpdater}
-              filters={
-                <ClusterPicklist
-                  selectFirst={false}
-                  onChange={getParamsUpdater('clusterId')}
-                  value={params.clusterId}
-                  onlyMasterNodeClusters
-                />
-              }
-              {...pick(listTablePrefs, params)}
-            />
-          </Tab>
-        </Tabs>
-      </PageContainer>
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={namespaces}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <ClusterPicklist
+            selectFirst={false}
+            onChange={getParamsUpdater('clusterId')}
+            value={params.clusterId}
+            onlyMasterNodeClusters
+          />
+        }
+        {...pick(listTablePrefs, params)}
+      />
     )
   }
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/namespaces/add',
+  addUrl: routes.namespaces.add.path(),
   addText: 'Add Namespace',
   columns: [
     { id: 'name', label: 'Name' },

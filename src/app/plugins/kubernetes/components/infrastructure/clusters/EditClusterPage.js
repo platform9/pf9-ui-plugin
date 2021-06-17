@@ -6,17 +6,25 @@ import { emptyObj, objToKeyValueArr, keyValueArrToObj } from 'utils/fp'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import TextField from 'core/components/validatedForm/TextField'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix, defaultEtcBackupPath } from 'app/constants'
 import { clusterActions } from './actions'
-import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
-import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
-import EtcdBackupFields from './EtcdBackupFields'
+import Name from './form-components/name'
+import TagsField from './form-components/tags'
+import DocumentMeta from 'core/components/DocumentMeta'
+import { AddonTogglers } from './form-components/cluster-addon-manager'
+import { makeStyles } from '@material-ui/styles'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
+
+const useStyles = makeStyles((theme) => ({
+  validatedFormContainer: {
+    display: 'grid',
+    gridGap: theme.spacing(2),
+  },
+}))
 
 // Hide pf9-system:monitoring tag from the display
 // bc that tag should be handled completely by appbert.
@@ -26,6 +34,7 @@ const tagsToOmit = ['pf9-system:monitoring']
 
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
+  const classes = useStyles()
   const clusterId = match.params.id
   const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
@@ -70,41 +79,36 @@ const EditClusterPage = () => {
   )
 
   return (
-    <FormWrapper
-      title={`Edit Cluster ${initialValues.name || ''}`}
-      loading={loadingClusters || updating}
-      message={updating ? 'Submitting form...' : 'Loading Cluster...'}
-      backUrl={listUrl}
-    >
-      <ValidatedForm
-        title="Basic Details"
-        formActions={<SubmitButton>Update Cluster</SubmitButton>}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
+    <>
+      <DocumentMeta title="Edit Cluster" bodyClasses={['form-view']} />
+      <FormWrapper
+        title={`Edit Cluster ${initialValues.name || ''}`}
+        loading={loadingClusters || updating}
+        message={updating ? 'Submitting form...' : 'Loading Cluster...'}
+        backUrl={listUrl}
       >
-        {/* Cluster Name */}
-        <TextField id="name" label="Name" info="Name of the cluster" required />
+        <ValidatedForm
+          title="Basic Details"
+          classes={{ root: classes.validatedFormContainer }}
+          formActions={<SubmitButton>Update Cluster</SubmitButton>}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          withAddonManager
+        >
+          {/* Cluster Name */}
+          <Name setWizardContext={getParamsUpdater} />
 
-        {/* Etcd Backup */}
-        <CheckboxField
-          id="etcdBackup"
-          label="Enable Etcd Backup"
-          info="Enable automated etcd backups on this cluster"
-          onChange={getParamsUpdater('etcdBackup')}
-          value={params.etcdBackup}
-        />
+          {/* Tags */}
+          <TagsField info="Edit tag metadata on this cluster" blacklistedTags={tagsToOmit} />
 
-        {params.etcdBackup && <EtcdBackupFields />}
-
-        {/* Tags */}
-        <KeyValuesField
-          id="tags"
-          label="Tags"
-          info="Edit tag metadata on this cluster"
-          blacklistedTags={tagsToOmit}
-        />
-      </ValidatedForm>
-    </FormWrapper>
+          <AddonTogglers
+            wizardContext={params}
+            setWizardContext={getParamsUpdater}
+            addons={['etcdBackup']}
+          />
+        </ValidatedForm>
+      </FormWrapper>
+    </>
   )
 }
 

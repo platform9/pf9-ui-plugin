@@ -7,6 +7,7 @@ import { prepend, identity, pipe, map, isEmpty } from 'ramda'
 import Progress from 'core/components/progress/Progress'
 import { allKey, noneKey } from 'app/constants'
 import { isNilOrEmpty, emptyArr, ensureArray } from 'utils/fp'
+import FontAwesomeIcon from './FontAwesomeIcon'
 
 /**
  * Picklist is a bare-bones widget-only implmentation.
@@ -21,6 +22,17 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     maxHeight: 400,
+  },
+  addNewItemOption: {
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
+    gridGap: theme.spacing(1),
+    margin: theme.spacing(0, 1, 0, 1),
+    borderTop: `0.97px solid ${theme.palette.grey[300]}`,
+    borderBottom: `0.97px solid ${theme.palette.grey[300]}`,
+    '& > i': {
+      color: theme.palette.blue[500],
+    },
   },
 }))
 
@@ -40,6 +52,9 @@ const Picklist = React.forwardRef((props, ref) => {
     formField,
     inline,
     multiple = false,
+    addNewItemOption,
+    addNewItemOptionLabel,
+    addNewItemHandler,
     ...restProps
   } = props
   const classes = useStyles(props)
@@ -86,22 +101,43 @@ const Picklist = React.forwardRef((props, ref) => {
       : value
     : value
 
-  // If loading is different than true, it means we are not performing any async
-  // operation to load the options, hence we can render the contents on mount
+  // When loading we want to remove the visual elements inside the borders as
+  // the loading content will be populated there
+  const loadingProps = loading
+    ? {
+        placeholder: '',
+        label: '',
+        value: '',
+      }
+    : {}
   return (
-    <Progress inline={inline} overlay loading={loading} renderContentOnMount={loading !== true}>
+    <Progress inline={inline} overlay loading={loading} renderContentOnMount message="Loading">
       <TextField
         {...restProps}
         ref={ref}
-        disabled={disabled || (isEmpty(options) && !showNone)}
+        disabled={disabled || (isEmpty(options) && !showNone && !addNewItemOption)}
         select
         classes={{ root: classes.root }}
         label={label}
         value={nonEmptyValue || (multiple ? emptyArr : '')}
+        {...loadingProps}
         SelectProps={selectProps}
         onChange={handleChange}
         inputProps={inputProps}
       >
+        {addNewItemOption && (
+          <MenuItem
+            onClick={addNewItemHandler}
+            className={classes.addNewItemOption}
+            value={noneKey}
+            key="addNewItemOption"
+          >
+            <FontAwesomeIcon solid size="sm" className={classes.plusIcon}>
+              plus-circle
+            </FontAwesomeIcon>
+            {addNewItemOptionLabel}
+          </MenuItem>
+        )}
         {items}
       </TextField>
     </Progress>
@@ -132,6 +168,9 @@ Picklist.propTypes = {
   variant: PropTypes.string,
   multiple: PropTypes.bool,
   inline: PropTypes.bool,
+  addNewItemOption: PropTypes.bool,
+  addNewItemOptionLabel: PropTypes.string,
+  addNewItemHandler: PropTypes.func,
 }
 
 Picklist.defaultProps = {
@@ -143,6 +182,7 @@ Picklist.defaultProps = {
   variant: 'outlined',
   multiple: false,
   inline: true,
+  addNewItemOption: false,
 }
 
 export default Picklist

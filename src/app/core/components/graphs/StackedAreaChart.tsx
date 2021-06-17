@@ -59,6 +59,7 @@ interface Props<T extends string, V extends string> {
   xAxis: T
   keys: Array<AreaChartType<V>>
   responsive?: boolean
+  responsiveHeight?: number
   verticalAxisLines?: boolean
   CustomTooltip?: JSX.Element
 }
@@ -72,6 +73,7 @@ function StackedAreaChart<Axis extends string, Types extends string>({
   xAxis,
   verticalAxisLines = false,
   responsive = false,
+  responsiveHeight = 250,
   CustomTooltip = undefined,
 }: Props<Axis, Types>) {
   const theme: any = useTheme()
@@ -108,7 +110,7 @@ function StackedAreaChart<Axis extends string, Types extends string>({
   }
 
   return responsive ? (
-    <ResponsiveContainer width="100%" height={250}>
+    <ResponsiveContainer width="100%" height={responsiveHeight}>
       {renderAreaChart()}
     </ResponsiveContainer>
   ) : (

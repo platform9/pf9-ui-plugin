@@ -3,9 +3,8 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import ClusterDomainPicklist from '../clusters/ClusterDomainPicklist'
-import AwsClusterSshKeyPicklist from '../clusters/AwsClusterSshKeyPicklist'
+import AwsClusterSshKeyPicklist from '../clusters/aws/AwsClusterSshKeyPicklist'
 import Info from 'core/components/validatedForm/Info'
 import ExternalLink from 'core/components/ExternalLink'
 import { awsPrerequisitesLink, awsRoute53HelpLink } from 'k8s/links'
@@ -15,11 +14,19 @@ import { pathStrOr } from 'utils/fp'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
 import { getIcon, getIconClass, RegionAvailability } from './helpers'
+import Button from 'core/elements/button'
+import { CloudProviders, CloudDefaults } from './model'
+import CloudProviderRegionField from '../clusters/form-components/cloud-provider-region'
+import SshKeyPicklist from '../clusters/form-components/ssh-key-picklist'
+import { UserPreferences } from 'app/constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
-  field: {
+  card: {
     marginTop: theme.spacing(2),
-    maxWidth: 'none',
+  },
+  info: {
+    display: 'grid',
+    gridTemplateColumns: 'min-content 1fr',
   },
   spaceRight: {
     marginRight: theme.spacing(4),
@@ -27,35 +34,48 @@ const useStyles = makeStyles((theme: Theme) => ({
   checkIcon: {
     color: theme.palette.green[500],
     marginRight: theme.spacing(1),
+    alignSelf: 'center',
   },
   timesIcon: {
     color: theme.palette.red[500],
     marginRight: theme.spacing(1),
+    alignSelf: 'center',
   },
   circleIcon: {
     color: theme.palette.grey['200'],
     marginRight: theme.spacing(1),
+    alignSelf: 'center',
   },
   smallLink: {
     marginTop: '6px',
+  },
+  selectionArea: {
+    display: 'grid',
+    gridTemplateColumns: '80% 20%',
+  },
+  setDefaultButton: {
+    alignSelf: 'center',
+    justifySelf: 'flex-end',
   },
 }))
 
 interface Props {
   wizardContext: any
   setWizardContext: any
+  updateUserDefaults: any
+  cloudDefaults: any
 }
 
 const getRoute53String = (classes, loading, regionId, available) =>
   loading || !regionId
-    ? 'Region needed for Route 53'
+    ? 'Select a region to validate Route53 Configuration'
     : available
     ? 'Route 53 Domains Available'
     : 'Route 53 Domains Unavailable'
 
 const getSshKeyString = (classes, loading, regionId, available) =>
   loading || !regionId
-    ? 'Region needed for SSH keys'
+    ? 'Select a Region to validate SSH Key availability'
     : available
     ? 'SSH Keys Detected'
     : 'No SSH Keys Detected'
@@ -63,13 +83,16 @@ const getSshKeyString = (classes, loading, regionId, available) =>
 const Route53Availability = ({ domains, loading, regionId }) => {
   const classes = useStyles({})
   const available = domains?.length
+
   return (
-    <Text variant="body2" className={classes.spaceRight}>
+    <div className={classes.info}>
       <FontAwesomeIcon className={getIconClass(classes, loading, regionId, available)} solid>
         {getIcon(classes, loading, regionId, available)}
       </FontAwesomeIcon>
-      {getRoute53String(classes, loading, regionId, available)}
-    </Text>
+      <Text variant="body2" className={classes.spaceRight}>
+        {getRoute53String(classes, loading, regionId, available)}
+      </Text>
+    </div>
   )
 }
 
@@ -78,16 +101,23 @@ const SshKeyAvailability = ({ keypairs, loading, regionId }) => {
   const available = keypairs?.length
 
   return (
-    <Text variant="body2" className={classes.spaceRight}>
+    <div className={classes.info}>
       <FontAwesomeIcon className={getIconClass(classes, loading, regionId, available)} solid>
         {getIcon(classes, loading, regionId, available)}
       </FontAwesomeIcon>
-      {getSshKeyString(classes, loading, regionId, available)}
-    </Text>
+      <Text variant="body2" className={classes.spaceRight}>
+        {getSshKeyString(classes, loading, regionId, available)}
+      </Text>
+    </div>
   )
 }
 
-const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props) => {
+const AwsCloudProviderVerification = ({
+  wizardContext,
+  setWizardContext,
+  updateUserDefaults,
+  cloudDefaults,
+}: Props) => {
   const classes = useStyles({})
 
   const [regions, regionsLoading] = useDataLoader(loadCloudProviderDetails, {
@@ -96,20 +126,23 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
 
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
-    cloudProviderRegionId: wizardContext.cloudProviderRegionId,
+    cloudProviderRegionId: wizardContext.region,
   })
 
   const domains = pathStrOr([], '0.domains', details)
   const keypairs = pathStrOr([], '0.keyPairs', details)
 
+  const handleSetUserDefault = (values) => updateUserDefaults(UserPreferences.Aws, values)
+
   return (
     <>
       <FormFieldCard
         title="AWS Region Availability"
+        className={classes.card}
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability classes={classes} regions={regions}></RegionAvailability>
+              <RegionAvailability classes={classes} regions={regions} />
             )}
           </>
         }
@@ -118,26 +151,42 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
             <Text variant="caption2">AWS Help</Text>
           </ExternalLink>
         }
-        className={classes.field}
       >
         <Text variant="body2">
           Platform9 deploys Kubernetes clusters into specified AWS Regions.
         </Text>
-        <PicklistField
-          DropdownComponent={CloudProviderRegionPicklist}
-          id="region"
-          label="Region"
-          cloudProviderId={wizardContext.cloudProviderId}
-          onChange={(region) => setWizardContext({ cloudProviderRegionId: region })}
-          value={wizardContext.cloudProviderRegionId}
-        />
+        <div className={classes.selectionArea}>
+          <CloudProviderRegionField
+            cloudProviderType={CloudProviders.Aws}
+            onChange={(value, label) => setWizardContext({ region: value })}
+            wizardContext={wizardContext}
+            values={wizardContext}
+          />
+          <Button
+            color="primary"
+            variant="light"
+            className={classes.setDefaultButton}
+            disabled={
+              !wizardContext.region || cloudDefaults[CloudDefaults.Region] === wizardContext.region
+            }
+            onClick={() =>
+              handleSetUserDefault({
+                [CloudDefaults.Region]: wizardContext.region,
+                [CloudDefaults.RegionLabel]: wizardContext.regionLabel,
+              })
+            }
+          >
+            Set As Default
+          </Button>
+        </div>
       </FormFieldCard>
       <FormFieldCard
-        title="Route 53 Domain Name Registration"
+        title="AWS Native Clusters: Route53 Domains (Optional)"
+        className={classes.card}
         middleHeader={
           <Route53Availability
             loading={loading}
-            regionId={wizardContext.cloudProviderRegionId}
+            regionId={wizardContext.region}
             domains={domains}
           />
         }
@@ -146,20 +195,42 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
             <Text variant="caption2">AWS Help</Text>
           </ExternalLink>
         }
-        className={classes.field}
       >
         <Text variant="body2">
-          Platform9 utilizes Route53 Domains to route traffic to clusters under management.
+          Platform9 can utilize Route53 Domains to route traffic to AWS Native Clusters. Route53 is
+          optional and not required for EKS.
         </Text>
-        <PicklistField
-          DropdownComponent={ClusterDomainPicklist}
-          id="awsDomain"
-          label="Route 53 Domain"
-          cloudProviderId={wizardContext.cloudProviderId}
-          cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-          disabled={!(wizardContext.cloudProviderId && wizardContext.cloudProviderRegionId)}
-        />
-        {wizardContext.cloudProviderRegionId && !loading && !domains.length && (
+        <div className={classes.selectionArea}>
+          <PicklistField
+            DropdownComponent={ClusterDomainPicklist}
+            id="awsDomain"
+            label="Route 53 Domain"
+            cloudProviderId={wizardContext.cloudProviderId}
+            cloudProviderRegionId={wizardContext.region}
+            disabled={!(wizardContext.cloudProviderId && wizardContext.region)}
+            onChange={(value, label) =>
+              setWizardContext({ awsDomain: value, awsDomainLabel: label })
+            }
+          />
+          <Button
+            color="primary"
+            variant="light"
+            className={classes.setDefaultButton}
+            disabled={
+              !wizardContext.awsDomain ||
+              cloudDefaults[CloudDefaults.Domain] === wizardContext.awsDomain
+            }
+            onClick={() =>
+              handleSetUserDefault({
+                [CloudDefaults.Domain]: wizardContext.awsDomain,
+                [CloudDefaults.DomainLabel]: wizardContext.awsDomainLabel,
+              })
+            }
+          >
+            Set As Default
+          </Button>
+        </div>
+        {wizardContext.region && !loading && !domains.length && (
           <Info>
             <div>No registered Route53 Domains have been detected.</div>
             <div>Please register at least one domain with AWS Route53 to use Platform9.</div>
@@ -172,11 +243,12 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         )}
       </FormFieldCard>
       <FormFieldCard
-        title="SSH Key"
+        title="AWS Native Clusters: SSH Keys"
+        className={classes.card}
         middleHeader={
           <SshKeyAvailability
             loading={loading}
-            regionId={wizardContext.cloudProviderRegionId}
+            regionId={wizardContext.region}
             keypairs={keypairs}
           />
         }
@@ -185,17 +257,32 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
             <Text variant="caption2">AWS Help</Text>
           </ExternalLink>
         }
-        className={classes.field}
       >
-        <Text variant="body2">SSH Keys are required for access to manage EC2 Instances.</Text>
-        <PicklistField
-          DropdownComponent={AwsClusterSshKeyPicklist}
-          disabled={!(wizardContext.cloudProviderId && wizardContext.cloudProviderRegionId)}
-          id="sshKey"
-          label="SSH Key"
-          cloudProviderId={wizardContext.cloudProviderId}
-          cloudProviderRegionId={wizardContext.cloudProviderRegionId}
-        />
+        <Text variant="body2">
+          When building AWS Native Clusters, SSH Keys are required to access and configure EC2
+          Instances. SSH Keys are not required to Manage EKS Clusters.
+        </Text>
+        <div className={classes.selectionArea}>
+          <SshKeyPicklist
+            dropdownComponent={AwsClusterSshKeyPicklist}
+            values={wizardContext}
+            info=""
+            wizardContext={wizardContext}
+            setWizardContext={setWizardContext}
+            required={false}
+          />
+          <Button
+            color="primary"
+            variant="light"
+            className={classes.setDefaultButton}
+            disabled={
+              !wizardContext.sshKey || cloudDefaults[CloudDefaults.SshKey] === wizardContext.sshKey
+            }
+            onClick={() => handleSetUserDefault({ [CloudDefaults.SshKey]: wizardContext.sshKey })}
+          >
+            Set As Default
+          </Button>
+        </div>
       </FormFieldCard>
     </>
   )

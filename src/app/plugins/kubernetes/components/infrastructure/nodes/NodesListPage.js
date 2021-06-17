@@ -22,12 +22,17 @@ import { listTablePrefs, allKey } from 'app/constants'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
-import { orderInterfaces } from './NodeDetailsPage'
+import { orderInterfaces } from './helper'
 import { makeStyles } from '@material-ui/styles'
 import { routes } from 'core/utils/routes'
 import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import ResourceUsageTables from '../common/ResourceUsageTables'
+import NodesStatePicklist from './nodes-state-picklist'
+import NodeAuthDialog from './NodeAuthDialog'
+import { NodeState } from './model'
+import { clockDriftDetectedInNodes, hasClockDrift } from './helper'
+import { renderErrorStatus } from '../clusters/ClusterStatus'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -44,22 +49,35 @@ const useStyles = makeStyles((theme) => ({
 
 const defaultParams = {
   clusterId: allKey,
+  state: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Nodes', listTablePrefs)
 
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(loadNodes, params)
-    // Filter nodes based on cluster
-    const filteredNodes = data.filter((node) => {
+    const [nodes, loading, reload] = useDataLoader(loadNodes, params)
+
+    const filterByCluster = (node) => {
       if (params.clusterId === allKey) {
         return true
       } else if (params.clusterId === '') {
         return !node.clusterUuid
-      } else if (params.clusterId) {
+      } else {
         return node.clusterUuid === params.clusterId
       }
+    }
+
+    const filterByNodeState = (node) => {
+      if (params.state === allKey) {
+        return true
+      } else {
+        return params.state === NodeState.Authorized ? node.isAuthorized : !node.isAuthorized
+      }
+    }
+
+    const filteredNodes = nodes.filter((node) => {
+      return filterByCluster(node) && filterByNodeState(node)
     })
 
     return (
@@ -77,6 +95,7 @@ const ListPage = ({ ListContainer }) => {
               selectFirst={false}
               showNone
             />
+            <NodesStatePicklist onChange={getParamsUpdater('state')} value={params.state} />
           </>
         }
         {...pick(listTablePrefs, params)}
@@ -197,9 +216,13 @@ export const renderNodeHealthStatus = (_, node, onClick = undefined) => {
     fields.label
   )
   return (
-    <ClusterStatusSpan title={fields.label} status={fields.status}>
-      {onClick ? <SimpleLink onClick={() => onClick(node)}>{fields.label}</SimpleLink> : content}
-    </ClusterStatusSpan>
+    <>
+      <ClusterStatusSpan title={fields.label} status={fields.status}>
+        {onClick ? <SimpleLink onClick={() => onClick(node)}>{fields.label}</SimpleLink> : content}
+      </ClusterStatusSpan>
+      {hasClockDrift(node) &&
+        renderErrorStatus(routes.nodes.detail.path({ id: node.uuid }), 'table', 'Node Clock Drift')}
+    </>
   )
 }
 
@@ -261,12 +284,13 @@ const isAdmin = (selected, store) => {
 
 export const options = {
   addText: 'Onboard a Node',
-  addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
+  addUrl: routes.nodes.add.path(),
   columns,
   cacheKey: ActionDataKeys.Nodes,
   name: 'Nodes',
   title: 'Nodes',
   uniqueIdentifier: 'uuid',
+  searchTargets: ['name', 'uuid'],
   multiSelection: false,
   batchActions: [
     {
@@ -276,7 +300,13 @@ export const options = {
       dialog: RemoteSupportDialog,
     },
     {
-      cond: ([node]) => !node.clusterUuid,
+      cond: ([node]) => !node.isAuthorized,
+      icon: 'plus-circle',
+      label: 'Authorize',
+      dialog: NodeAuthDialog,
+    },
+    {
+      cond: ([node]) => node.isAuthorized && !node.clusterUuid,
       icon: 'trash-alt',
       label: 'Deauthorize',
       dialog: NodeDeAuthDialog,

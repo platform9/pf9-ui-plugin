@@ -1,28 +1,30 @@
-import { pluck, pipe, values, head } from 'ramda'
+import { head, pipe, pluck, values } from 'ramda'
 import { getHighestRole, trackApiMethodMetadata } from './helpers'
-import { pathJoin, capitalizeString } from 'utils/misc'
+import { capitalizeString, pathJoin } from 'utils/misc'
 import { pathStr } from 'utils/fp'
 import ApiService from 'api-client/ApiService'
 import {
   AuthToken,
-  GetProjectsAuth,
-  GetServiceCatalog,
-  GetRegions,
+  Catalog,
+  GetAllTenantsAllUsers,
+  GetCredentials,
   GetFeatureLinks,
   GetFeatures,
-  GetAllTenantsAllUsers,
-  GetUsers,
-  GetCredentials,
+  GetProjectsAuth,
+  GetRegions,
   GetRoles,
+  GetServiceCatalog,
   GetUserRoleAssignments,
+  GetUsers,
+  IInterfaceByName,
+  ServicesByName,
+  ServicesByRegion,
   UpdateProject,
   UpdateUser,
-  Catalog,
-  ServicesByRegion,
-  ServicesByName,
-  IInterfaceByName,
 } from './keystone.model'
 import DataKeys from 'k8s/DataKeys'
+import ApiClient from 'api-client/ApiClient'
+import ApiError from 'core/errors/ApiError'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -31,6 +33,24 @@ const constructAuthFromToken = (token: string, projectId?: string) => {
       identity: {
         methods: ['token'],
         token: { id: token },
+      },
+    },
+  }
+}
+
+const constructAuthFromSaml = (token: string, projectId?: string) => {
+  return {
+    auth: {
+      identity: {
+        methods: ['saml2'],
+        saml2: {
+          id: token,
+        },
+      },
+      scope: {
+        project: {
+          id: projectId,
+        },
       },
     },
   }
@@ -46,6 +66,52 @@ const constructAuthFromCredentials = (username, password) => {
             name: username,
             domain: { id: 'default' },
             password,
+          },
+        },
+      },
+    },
+  }
+}
+
+const constructAuthFromCredentialsWithProjectId = (username, password, projectId) => {
+  return {
+    auth: {
+      identity: {
+        methods: ['password'],
+        password: {
+          user: {
+            name: username,
+            domain: { id: 'default' },
+            password,
+          },
+        },
+      },
+      scope: {
+        project: {
+          id: projectId,
+        },
+      },
+    },
+  }
+}
+
+const constructAuthFromCredentialsTotp = (username, password, totp) => {
+  return {
+    auth: {
+      identity: {
+        methods: ['password', 'totp'],
+        password: {
+          user: {
+            name: username,
+            domain: { id: 'default' },
+            password,
+          },
+        },
+        totp: {
+          user: {
+            name: username,
+            domain: { id: 'default' },
+            passcode: totp,
           },
         },
       },
@@ -123,6 +189,14 @@ class Keystone extends ApiService {
 
   get tokensUrl() {
     return `${this.v3}/auth/tokens?nocatalog`
+  }
+
+  get identityProvidersUrl() {
+    return `${this.v3}/OS-FEDERATION/identity_providers`
+  }
+
+  get ssoLoginUrl() {
+    return `${this.v3}/OS-FEDERATION/identity_providers/IDP1/protocols/saml2/auth`
   }
 
   get usersUrl() {
@@ -235,6 +309,22 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  getGroupRoleAssignments = async (groupId) => {
+    // Todo: typings for this API
+    const data = await this.client.basicGet<any>({
+      url: this.roleAssignments,
+      params: {
+        'group.id': groupId,
+        include_names: true,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getGroupRoleAssignments',
+      },
+    })
+    return data.role_assignments
+  }
+
   @trackApiMethodMetadata({
     url: '/v3/projects/{tenantId}/users/{userId}/roles/{roleId}',
     type: 'PUT',
@@ -268,8 +358,37 @@ class Keystone extends ApiService {
       })
       return { tenantId, userId, roleId }
     } catch (err) {
-      throw new Error('Unable to delete non-existant project')
+      throw new ApiError('Unable to delete non-existant project')
     }
+  }
+
+  getIdpProtocols = async () => {
+    const data = await this.client.basicGet<any>({
+      url: `${this.identityProvidersUrl}/IDP1/protocols`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getIdpProtocols',
+      },
+    })
+    return data.protocols
+  }
+
+  addIdpProtocol = async (mappingId) => {
+    const body = {
+      protocol: {
+        mapping_id: mappingId,
+      },
+    }
+    // Currently hardcode IDP1 as the idp and saml2 as the protocol until change needed
+    const data = await this.client.basicPut<any>({
+      url: `${this.identityProvidersUrl}/IDP1/protocols/saml2`,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addIdpProtocol',
+      },
+    })
+    return data.protocol
   }
 
   @trackApiMethodMetadata({ url: '/v3/groups', type: 'GET' })
@@ -284,6 +403,74 @@ class Keystone extends ApiService {
     return data.groups
   }
 
+  createGroup = async (params) => {
+    const body = { group: params }
+    const data = await this.client.basicPost<any>({
+      url: this.groupsUrl,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createGroup',
+      },
+    })
+    return data.group
+  }
+
+  updateGroup = async (id, params) => {
+    const body = { group: params }
+    const url = `${this.groupsUrl}/${id}`
+    const data = await this.client.basicPatch<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateGroup',
+      },
+    })
+    return data.group
+  }
+
+  deleteGroup = async (groupId) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: `${this.groupsUrl}/${groupId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteGroup',
+        },
+      })
+      return groupId
+    } catch (err) {
+      throw new ApiError('Unable to delete non-existant group')
+    }
+  }
+
+  addGroupRole = async ({ tenantId, groupId, roleId }) => {
+    await this.client.basicPut<string>({
+      url: pathJoin(this.projectsUrl, `${tenantId}/groups/${groupId}/roles/${roleId}`),
+      body: null,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addGroupRole',
+      },
+    })
+  }
+
+  deleteGroupRole = async ({ tenantId, groupId, roleId }) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: pathJoin(this.projectsUrl, `${tenantId}/groups/${groupId}/roles/${roleId}`),
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteGroupRole',
+        },
+      })
+      return { tenantId, groupId, roleId }
+    } catch (err) {
+      throw new ApiError('Unable to delete non-existant role')
+    }
+  }
+
   @trackApiMethodMetadata({ url: '/v3/OS-FEDERATION/mappings', type: 'GET' })
   getGroupMappings = async () => {
     const data = await this.client.basicGet<any>({
@@ -294,6 +481,48 @@ class Keystone extends ApiService {
       },
     })
     return data.mappings
+  }
+
+  createGroupMapping = async (id, params) => {
+    const body = { mapping: params }
+    const data = await this.client.basicPut<any>({
+      url: `${this.groupMappingsUrl}/${id}`,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createGroupMapping',
+      },
+    })
+    return data.mapping
+  }
+
+  updateGroupMapping = async (id, params) => {
+    const body = { mapping: params }
+    const url = `${this.groupMappingsUrl}/${id}`
+    const data = await this.client.basicPatch<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateGroupMapping',
+      },
+    })
+    return data.mapping
+  }
+
+  deleteGroupMapping = async (mappingId) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: `${this.groupMappingsUrl}/${mappingId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteGroupMapping',
+        },
+      })
+      return mappingId
+    } catch (err) {
+      throw new ApiError('Unable to delete non-existant group mapping')
+    }
   }
 
   @trackApiMethodMetadata({ url: '/v3/roles', type: 'GET' })
@@ -353,19 +582,30 @@ class Keystone extends ApiService {
       })
       return projectId
     } catch (err) {
-      throw new Error('Unable to delete non-existant project')
+      throw new ApiError('Unable to delete non-existant project')
     }
   }
 
-  changeProjectScope = async (projectId) => {
-    const body = constructAuthFromToken(this.client.unscopedToken, projectId)
+  changeProjectScopeWithToken = async (projectId, isSsoToken) => {
+    const body = isSsoToken
+      ? constructAuthFromSaml(this.client.unscopedToken, projectId)
+      : constructAuthFromToken(this.client.unscopedToken, projectId)
+    return this.changeProjectScope(projectId, body, 'changeProjectScopeWithToken')
+  }
+
+  changeProjectScopeWithCredentials = async (username, password, projectId) => {
+    const body = constructAuthFromCredentialsWithProjectId(username, password, projectId)
+    return this.changeProjectScope(projectId, body, 'changeProjectScopeWithCredentials')
+  }
+
+  changeProjectScope = async (projectId, body, mthdName) => {
     try {
       const response = await this.client.rawPost<AuthToken>({
         url: this.tokensUrl,
         data: body,
         options: {
           clsName: this.getClassName(),
-          mthdName: 'changeProjectScope',
+          mthdName,
         },
       })
       const scopedToken = response.headers['x-subject-token']
@@ -376,18 +616,23 @@ class Keystone extends ApiService {
       const _user = pathStr('data.token.user', response)
       // Extra properties in user are required to ensure
       // functionality in the old UI
-      const user = {
-        ..._user,
-        username: _user.name,
-        userId: _user.id,
-        role: role,
-        displayName: _user.displayname || _user.name,
-      }
       this.client.activeProjectId = projectId
       this.client.scopedToken = scopedToken
       await this.getServiceCatalog()
+      const user = await this.getUser(_user.id)
 
-      return { user, role, scopedToken }
+      await ApiClient.refreshApiEndpoints()
+
+      return {
+        user: {
+          ...user,
+          userId: user.id,
+          role: role,
+          displayName: user.displayname || user.name,
+        },
+        role,
+        scopedToken,
+      }
     } catch (err) {
       // authentication failed
       console.error(err)
@@ -395,8 +640,10 @@ class Keystone extends ApiService {
     }
   }
 
-  authenticate = async (username, password) => {
-    const body = constructAuthFromCredentials(username, password)
+  authenticate = async (username, password, totp = '') => {
+    const body = totp
+      ? constructAuthFromCredentialsTotp(username, password, totp)
+      : constructAuthFromCredentials(username, password)
     try {
       const response = await this.client.rawPost<AuthToken>({
         url: this.tokensUrl,
@@ -412,6 +659,30 @@ class Keystone extends ApiService {
       return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
       // authentication failed
+      console.log(err)
+      return {}
+    }
+  }
+
+  authenticateSso = async () => {
+    try {
+      const response = await this.client.rawGet<any>({
+        url: this.ssoLoginUrl,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'authenticateSso',
+        },
+      })
+      const { expires_at: expiresAt, issued_at: issuedAt, user } = response?.data?.token || {}
+      const username = user.name || 'Unknown'
+
+      const unscopedToken = response.headers['x-subject-token']
+      this.client.unscopedToken = unscopedToken
+      return { unscopedToken, username, expiresAt, issuedAt, ssoLogin: true }
+    } catch (err) {
+      // Redirect to login page manually
+      // When implementing hagrid this will be dynamic, get from API
+      location.href = '/Shibboleth.sso/Login'
       return {}
     }
   }
@@ -466,9 +737,11 @@ class Keystone extends ApiService {
     }
   }
 
-  renewScopedToken = async () => {
+  renewScopedToken = async (isSsoToken) => {
     const projectId = this.client.activeProjectId
-    const body = constructAuthFromToken(this.client.unscopedToken, projectId)
+    const body = isSsoToken
+      ? constructAuthFromSaml(this.client.unscopedToken, projectId)
+      : constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
       const response = await this.client.rawPost<AuthToken>({
         url: this.tokensUrl,
@@ -520,6 +793,7 @@ class Keystone extends ApiService {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'internal')
       const { links } = await this.client.basicGet<any>({
+        endpoint: null,
         url: linksUrl,
         options: {
           clsName: this.getClassName(),
@@ -628,7 +902,7 @@ class Keystone extends ApiService {
     const services = await this.getServicesForActiveRegion()
     const endpoint = pathStr(`${serviceName}.${type}.url`, services)
     if (!endpoint) {
-      throw new Error(`${capitalizeString(serviceName)} endpoint not available in active region`)
+      throw new ApiError(`${capitalizeString(serviceName)} endpoint not available in active region`)
     }
     return endpoint
   }
@@ -643,6 +917,36 @@ class Keystone extends ApiService {
       },
     })
     return data.credentials
+  }
+
+  addCredential = async (params) => {
+    const body = {
+      credential: params,
+    }
+    const data = await this.client.basicPost<any>({
+      url: this.credentialsUrl,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addCredential',
+      },
+    })
+    return data.credential
+  }
+
+  deleteCredential = async (credentialId) => {
+    try {
+      await this.client.basicDelete<any>({
+        url: `${this.credentialsUrl}/${credentialId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteCredential',
+        },
+      })
+      return credentialId
+    } catch (err) {
+      throw new ApiError('Unable to delete non-existent credential')
+    }
   }
 
   @trackApiMethodMetadata({ url: '/v3/users/{userId}', type: 'GET', params: ['userId'] })
@@ -725,7 +1029,7 @@ class Keystone extends ApiService {
       })
       return userId
     } catch (err) {
-      throw new Error('Unable to delete non-existant user')
+      throw new ApiError('Unable to delete non-existant user')
     }
   }
 }

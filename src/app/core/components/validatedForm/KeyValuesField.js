@@ -23,18 +23,24 @@ const KeyValuesField = React.forwardRef(
       keySuggestions,
       valueSuggestions,
       blacklistedTags = [],
+      keyLabel,
+      valueLabel,
       ...restProps
     },
     ref,
   ) => (
     <FormControl id={id} error={hasError} {...restProps} ref={ref}>
-      <Text variant="caption">{required ? `${label} *` : label}</Text>
+      <Text variant="caption1">{required ? `${label} *` : label}</Text>
+      <br />
       <KeyValues
         entries={value !== undefined ? value : []}
         onChange={onChange}
         keySuggestions={keySuggestions}
         valueSuggestions={valueSuggestions}
         blacklistedTags={blacklistedTags}
+        addLabel={`Add ${label}`}
+        keyLabel={keyLabel}
+        valueLabel={valueLabel}
       />
       {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
     </FormControl>

@@ -1,11 +1,14 @@
-import React, { useMemo, useEffect, forwardRef } from 'react'
+import React, { useMemo, useEffect, forwardRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { isEmpty, propOr, head } from 'ramda'
+import { isEmpty, propOr, head, project, path } from 'ramda'
 import Picklist from 'core/components/Picklist'
-import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
 import { allKey } from 'app/constants'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { getAllClusters } from 'k8s/components/infrastructure/clusters/actions'
+import { allClustersSelector } from '../infrastructure/clusters/selectors'
+import { useSelector } from 'react-redux'
+import { cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ClusterPicklist = forwardRef(
@@ -18,6 +21,8 @@ const ClusterPicklist = forwardRef(
       onlyMasterNodeClusters,
       onlyAppCatalogEnabled,
       onlyHealthyClusters,
+      value,
+      filterFn,
       ...rest
     },
     ref,
@@ -28,12 +33,33 @@ const ClusterPicklist = forwardRef(
       prometheusClusters: onlyPrometheusEnabled,
       healthyClusters: onlyHealthyClusters,
     }
-    const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
-    const options = useMemo(() => projectAs({ label: 'name', value: 'uuid' }, clusters), [clusters])
+
+    const selector = allClustersSelector()
+    const allClusters = useSelector((state) => selector(state, defaultParams))
+
+    const clustersLoading = useSelector(
+      path([cacheStoreKey, loadingStoreKey, ActionDataKeys.Clusters]),
+    )
+    const importedClustersLoading = useSelector(
+      path([cacheStoreKey, loadingStoreKey, ActionDataKeys.ImportedClusters]),
+    )
+    const allClustersLoading = clustersLoading && importedClustersLoading
+
+    useEffect(() => {
+      getAllClusters()
+    }, [])
+
+    const filteredClusters = useMemo(() => (filterFn ? filterFn(allClusters) : allClusters), [
+      allClusters,
+    ])
+
+    const options = useMemo(() => {
+      return [...projectAs({ label: 'name', value: 'uuid' }, filteredClusters)]
+    }, [filteredClusters])
 
     // Select the first cluster as soon as clusters are loaded
     useEffect(() => {
-      if (!isEmpty(options) && selectFirst) {
+      if (!isEmpty(options) && selectFirst && !value) {
         onChange(propOr(allKey, 'value', head(options)))
       }
     }, [options])
@@ -43,8 +69,9 @@ const ClusterPicklist = forwardRef(
         {...rest}
         ref={ref}
         onChange={onChange}
-        loading={loading || clustersLoading}
+        loading={loading || allClustersLoading}
         options={options}
+        value={value}
       />
     )
   },
@@ -60,6 +87,7 @@ ClusterPicklist.propTypes = {
   onlyPrometheusEnabled: PropTypes.bool,
   onlyHealthyClusters: PropTypes.bool,
   selectFirst: PropTypes.bool,
+  filterFn: PropTypes.func,
 }
 
 ClusterPicklist.defaultProps = {
