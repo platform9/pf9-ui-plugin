@@ -1,16 +1,21 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, FC } from 'react'
 import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { NotificationState, notificationStoreKey } from 'core/notifications/notificationReducers'
 import { min, prop } from 'ramda'
 import Theme from 'core/themes/model'
-import { Popover, Tooltip } from '@material-ui/core'
+import { Popover, Tooltip, Menu, MenuItem } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { routes } from 'core/utils/routes'
-import useReactRouter from 'use-react-router'
 import clsx from 'clsx'
 import ErrorIcon from '@material-ui/icons/Error'
+import { ClientState, clientStoreKey } from 'core/client/clientReducers'
+import SimpleLink from '../SimpleLink'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import { convertTaskStateToStatus } from 'app/plugins/account/components/system-status/helpers'
+import { isDecco } from 'core/utils/helpers'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   title: {
@@ -69,6 +74,33 @@ const useStyles = makeStyles<Theme>((theme) => ({
     alignContent: 'center',
     justifyContent: 'center',
   },
+  inboxMenuContainer: {
+    marginTop: 15,
+    minWidth: 260,
+  },
+  menuItem: {
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
+    display: 'grid',
+    minWidth: 150,
+    gridTemplateColumns: '20px max-content 1fr',
+    gridGap: theme.spacing(1),
+    padding: theme.spacing(0, 2),
+    minHeight: 55,
+  },
+  fullMenuItem: {
+    gridTemplateColumns: '1fr',
+    justifyItems: 'center',
+    borderBottom: `1px solid ${theme.palette.grey[200]}`,
+  },
+  link: {
+    textDecoration: 'none !important',
+    color: 'rgba(0, 0, 0, 0.87)',
+  },
+  systemStateItem: {
+    fontSize: 16,
+  },
 }))
 
 const usePopoverStyles = makeStyles<Theme>((theme) => ({
@@ -78,7 +110,7 @@ const usePopoverStyles = makeStyles<Theme>((theme) => ({
     flexFlow: 'column nowrap',
     padding: 0,
     backgroundColor: '#FFF',
-    marginTop: theme.spacing(5),
+    marginTop: 20,
     width: 400,
     maxHeight: 600,
     border: 0,
@@ -87,7 +119,7 @@ const usePopoverStyles = makeStyles<Theme>((theme) => ({
       content: "' '",
       position: 'absolute',
       top: -20,
-      right: 10,
+      right: 73,
       borderBottom: `10px solid ${theme.components.error.main}`,
       borderRight: '10px solid transparent',
       borderLeft: '10px solid transparent',
@@ -104,31 +136,42 @@ const NotificationsPopover = ({ className }) => {
   const { notifications, unreadCount } = useSelector(
     prop<string, NotificationState>(notificationStoreKey),
   )
-  const { history } = useReactRouter()
+  const { systemStatus } = useSelector(prop<string, ClientState>(clientStoreKey))
+  const { features } = useSelector(prop<string, SessionState>(sessionStoreKey))
   const [lastNotification] = notifications || []
   const inboxEl = useRef<HTMLElement>(null)
 
   const popoverClasses = usePopoverStyles({})
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const open = Boolean(anchorEl)
+  const [dropdownTarget, setDropdownTarget] = React.useState(null)
+  const popoverOpen = Boolean(anchorEl) && dropdownTarget === 'popover'
+  const dropdownOpen = Boolean(anchorEl) && dropdownTarget === 'dropdown'
   const classes = useStyles({})
-  const id = open ? 'simple-popover' : undefined
+  const id = popoverOpen ? 'simple-popover' : dropdownOpen ? 'simple-dropdown' : undefined
 
   useEffect(() => {
+    if (dropdownTarget === 'dropdown') {
+      return
+    }
     if (lastNotification) {
       setAnchorEl(inboxEl)
+      setDropdownTarget('popover')
       clearTimeout(lastTimeout)
       lastTimeout = setTimeout(() => {
         setAnchorEl(null)
+        setDropdownTarget(null)
       }, errorTimeout)
     }
   }, [lastNotification])
   const handleClose = () => {
     setAnchorEl(null)
+    setDropdownTarget(null)
   }
 
-  const redirectToNotifications = () => {
-    history.push(routes.notifications.path())
+  const handleOpenDropdown = (event) => {
+    clearTimeout(lastTimeout)
+    setDropdownTarget('dropdown')
+    setAnchorEl(inboxEl)
   }
 
   // @ts-ignore
@@ -136,7 +179,7 @@ const NotificationsPopover = ({ className }) => {
     <div className={clsx(className, classes.container)}>
       <Tooltip title={'Notifications'}>
         <FontAwesomeIcon
-          onClick={redirectToNotifications}
+          onClick={handleOpenDropdown}
           aria-describedby={id}
           ref={inboxEl}
           className={classes.inbox}
@@ -145,30 +188,89 @@ const NotificationsPopover = ({ className }) => {
         </FontAwesomeIcon>
       </Tooltip>
       {unreadCount ? <span className={classes.notifCount}>{min(unreadCount, 99)}</span> : null}
-      <Popover
-        id={id}
-        anchorReference="anchorEl"
-        anchorEl={anchorEl}
-        classes={popoverClasses}
-        open={open}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        {lastNotification?.silent === false ? (
-          <Text component="div" className={classes.title} variant="caption">
-            <ErrorIcon className={classes.errIcon} />
-            {lastNotification?.message}
-          </Text>
-        ) : null}
-      </Popover>
+      {dropdownTarget === 'popover' && (
+        <Popover
+          id={id}
+          anchorReference="anchorEl"
+          anchorEl={anchorEl?.current}
+          classes={popoverClasses}
+          open={popoverOpen}
+          onClose={handleClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        >
+          {lastNotification?.silent === false ? (
+            <Text component="div" className={classes.title} variant="caption">
+              <ErrorIcon className={classes.errIcon} />
+              {lastNotification?.message}
+            </Text>
+          ) : null}
+        </Popover>
+      )}
+      {dropdownTarget === 'dropdown' && (
+        <Menu
+          id="inbox-menu"
+          PopoverClasses={{ paper: classes.inboxMenuContainer }}
+          anchorReference="anchorEl"
+          anchorEl={anchorEl?.current}
+          open={dropdownOpen}
+          onClose={handleClose}
+          getContentAnchorEl={null}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        >
+          {isDecco(features) && (
+            <SimpleLink
+              src={routes.accountStatus.root.path()}
+              className={classes.link}
+              onClick={handleClose}
+            >
+              <MenuItem className={clsx(classes.menuItem, classes.fullMenuItem)}>
+                <ClusterStatusSpan
+                  className={classes.systemStateItem}
+                  variant="header"
+                  title={`System Task State: ${systemStatus?.taskState || 'Unknown'}`}
+                  status={convertTaskStateToStatus[systemStatus?.taskState]}
+                >
+                  Management Plane Health
+                </ClusterStatusSpan>
+              </MenuItem>
+            </SimpleLink>
+          )}
+          <SimpleLink
+            src={routes.notifications.path()}
+            className={classes.link}
+            onClick={handleClose}
+          >
+            <DropdownMenuItem
+              icon="exclamation-circle"
+              count={unreadCount}
+              title="Events & Errors"
+            />
+          </SimpleLink>
+        </Menu>
+      )}
     </div>
+  )
+}
+
+const DropdownMenuItem: FC<{ title?: string; icon?: string; count?: number }> = ({
+  title = undefined,
+  icon = undefined,
+  count = undefined,
+  children,
+  ...props
+}) => {
+  const classes = useStyles({})
+  return (
+    <MenuItem {...props} className={classes.menuItem}>
+      {icon && (
+        <FontAwesomeIcon size="md" className={classes.menuIcon}>
+          {icon}
+        </FontAwesomeIcon>
+      )}
+      {count && <Text variant="body1">{count}</Text>}
+      {title && <Text variant="body1">{title}</Text>}
+      {children}
+    </MenuItem>
   )
 }
 
