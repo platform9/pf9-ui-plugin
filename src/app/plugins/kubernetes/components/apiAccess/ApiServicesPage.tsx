@@ -60,7 +60,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   methods: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, 250px)',
-    gridTemplateRows: 'min-content',
+    gridTemplateRows: 'repeat(auto-fill, 80px)',
     gridGap: theme.spacing(1),
   },
   url: {
