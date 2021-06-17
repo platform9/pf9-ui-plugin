@@ -11,6 +11,7 @@ import { AppPlugins, ssoEnabledTiers, userAccountPrefix } from 'app/constants'
 import UserSettingsIndexPage from './components/user-settings/user-settings-index-page'
 import AddGroupPage from './components/ssoManagement/groups/AddGroupPage'
 import EditGroupPage from './components/ssoManagement/groups/EditGroupPage'
+import SystemStatusPage from './components/system-status'
 import { pathOr } from 'ramda'
 import CustomThemePage from './components/theme/CustomThemePage'
 
@@ -28,6 +29,15 @@ MyAccount.registerPlugin = (pluginManager) => {
   plugin.registerSecondaryHeader(MyAccountHeader)
 
   plugin.registerRoutes([
+    {
+      name: 'System Status',
+      link: {
+        path: routes.accountStatus.root.toString(userAccountPrefix),
+        exact: true,
+        default: true,
+      },
+      component: SystemStatusPage,
+    },
     {
       name: 'User Settings',
       link: {

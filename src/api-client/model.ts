@@ -1,5 +1,17 @@
 import { AxiosRequestConfig } from 'axios'
 
+export interface DDUHealth {
+  task_state: string
+  desired_services: number
+  ready_services: number
+  service_details: { [key: string]: ServiceDetail }
+}
+
+export interface ServiceDetail {
+  desired: number
+  ready: number
+}
+
 export interface CustomerMetadata {
   [key: string]: any
 }
