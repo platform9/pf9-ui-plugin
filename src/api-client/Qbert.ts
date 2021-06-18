@@ -1313,6 +1313,20 @@ class Qbert extends ApiService {
     })
   }
 
+  /* RBAC Profiles */
+  getRbacProfiles = async (namespace) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/${namespace}/clusterprofile`
+    const response = await this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRbacProfiles',
+      },
+    })
+    return response && response.items
+  }
+
   createRbacProfile = async (body) => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile`
     const response = await this.client.basicPost({
