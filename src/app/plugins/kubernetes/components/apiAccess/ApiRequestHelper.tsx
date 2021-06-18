@@ -12,12 +12,12 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { pathJoin } from 'utils/misc'
-import { replaceTextBetweenCurlyBraces } from 'api-client/helpers'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import ClusterPicklist from '../common/ClusterPicklist'
 import useParams from 'core/hooks/useParams'
 import CloudProviderPicklist from '../common/CloudProviderPicklist'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
+import { createUrlWithQueryString } from 'core/utils/routes'
 
 const methodsWithBody = ['POST', 'PUT', 'PATCH']
 
@@ -168,7 +168,7 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
         const catalogMap = arrToObjByKey('name', serviceCatalog)
         serviceEndpoint = catalogMap[api].url
       }
-      const endpoint = replaceTextBetweenCurlyBraces(metadata.url, params)
+      const endpoint = createUrlWithQueryString(metadata.url, params)
       const url = pathJoin(serviceEndpoint, endpoint)
       setRequestUrl(url)
     }
@@ -207,7 +207,7 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
   const handleSubmit = async ({ body, ...inputValues }) => {
     let url = metadata.url
     if (metadata.params.length > 0) {
-      url = replaceTextBetweenCurlyBraces(url, inputValues)
+      url = createUrlWithQueryString(url, inputValues)
     }
 
     const response = await makeApiRequest(url, body)

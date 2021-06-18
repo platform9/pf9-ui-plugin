@@ -364,7 +364,6 @@ class Qbert extends ApiService {
     return supportedRoleVersions
   }
 
-  @trackApiMethodMetadata({ url: '/clusters', type: 'POST' })
   createCluster = async (body) => {
     // Note: This API response only returns new `uuid` in the response.
     // You might want to do a GET afterwards if you need any of the cluster information.
@@ -393,11 +392,6 @@ class Qbert extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/upgrade?type={type}',
-    type: 'POST',
-    params: ['clusterUuid', 'type'],
-  })
   upgradeCluster = async (clusterId, type) => {
     const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade`, { type })
     return this.client.basicPost({
@@ -515,6 +509,10 @@ class Qbert extends ApiService {
     return discoveredClusters
   }
 
+  @trackApiMethodMetadata({
+    url: '/externalClusters/register',
+    type: 'POST',
+  })
   registerExternalCluster = async (body) => {
     const url = '/externalClusters/register'
     const registeredCluster = await this.client.basicPost<any>({
@@ -754,6 +752,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/virtualmachineinstances',
+    type: 'GET',
+    params: ['clusterUuid'],
+  })
   getVirtualMachineInstances = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/virtualmachineinstances`
     const data = await this.client.basicGet<GetVirtualMachines>({
@@ -766,6 +769,11 @@ class Qbert extends ApiService {
     return data.items.map((item) => ({ ...item, clusterId }))
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/virtualmachines',
+    type: 'GET',
+    params: ['clusterUuid'],
+  })
   getVirtualMachines = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/virtualmachines`
     const data = await this.client.basicGet<GetVirtualMachines>({
@@ -778,6 +786,12 @@ class Qbert extends ApiService {
     return data.items.map((item) => ({ ...item, clusterId }))
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/virtualmachineinstances/{name}',
+    type: 'GET',
+    params: ['clusterUuid', 'namespace', 'name'],
+  })
   getVirtualMachineDetails = async (clusterId, namespace, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`
     const data = await this.client.basicGet<GetVirtualMachineDetails>({
@@ -805,6 +819,12 @@ class Qbert extends ApiService {
     return data
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/{virtualMachineType}',
+    type: 'POST',
+    params: ['clusterUuid', 'namespace', 'virtualMachineType'],
+  })
   createVirtualMachine = async (clusterId, namespace, body, vmType = '') => {
     const virtualMachineType = `${vmType.toLowerCase()}s`
     const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/${virtualMachineType}`
@@ -818,6 +838,12 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/virtualmachineinstances/{name}',
+    type: 'PUT',
+    params: ['clusterUuid', 'namespace', 'name'],
+  })
   updateVirtualMachine = async (clusterId, namespace, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`
     return this.client.basicPut({
@@ -829,6 +855,12 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/virtualmachineinstances/{name}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'name'],
+  })
   deleteVirtualMachine = async (clusterId, namespace, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`
     return this.client.basicDelete({
@@ -840,6 +872,12 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/subresources.kubevirt.io/v1/namespaces/{namespace}/virtualmachines/{name}/{powerOn}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'name', 'powerOn'],
+  })
   powerVirtualMachine = async (clusterId, namespace, name, powerOn = true) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/subresources.kubevirt.io/v1/namespaces/${namespace}/virtualmachines/${name}/${
       powerOn ? 'start' : 'stop'
@@ -1470,6 +1508,12 @@ class Qbert extends ApiService {
     }))
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences',
+    type: 'GET',
+    params: ['clusterUuid'],
+  })
   getAlertManagerSilences = async (clusterId): Promise<any> => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences`
     const silences = await this.client.basicGet<any>({
@@ -1485,6 +1529,12 @@ class Qbert extends ApiService {
     }))
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   createAlertManagerSilence = async (clusterId, body): Promise<any> => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences`
     const silence = await this.client.basicPost<any>({
@@ -1501,6 +1551,12 @@ class Qbert extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silence/{silenceId}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'silenceId'],
+  })
   deleteAlertManagerSilence = async (clusterId, silenceId): Promise<any> => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silence/${silenceId}`
     return this.client.basicDelete({

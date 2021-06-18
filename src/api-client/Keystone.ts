@@ -309,6 +309,11 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/role_assignments?user.id={userId}&include_names={includeNames}',
+    type: 'GET',
+    params: ['userId', 'includeNames'],
+  })
   getGroupRoleAssignments = async (groupId) => {
     // Todo: typings for this API
     const data = await this.client.basicGet<any>({
@@ -362,6 +367,10 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/OS-FEDERATION/identity_providers/IDP1/protocols',
+    type: 'GET',
+  })
   getIdpProtocols = async () => {
     const data = await this.client.basicGet<any>({
       url: `${this.identityProvidersUrl}/IDP1/protocols`,
@@ -373,6 +382,10 @@ class Keystone extends ApiService {
     return data.protocols
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/OS-FEDERATION/identity_providers/IDP1/protocols/saml2',
+    type: 'PUT',
+  })
   addIdpProtocol = async (mappingId) => {
     const body = {
       protocol: {
@@ -403,6 +416,7 @@ class Keystone extends ApiService {
     return data.groups
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups', type: 'POST' })
   createGroup = async (params) => {
     const body = { group: params }
     const data = await this.client.basicPost<any>({
@@ -416,6 +430,7 @@ class Keystone extends ApiService {
     return data.group
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups/{id}', type: 'PATCH', params: ['id'] })
   updateGroup = async (id, params) => {
     const body = { group: params }
     const url = `${this.groupsUrl}/${id}`
@@ -430,6 +445,7 @@ class Keystone extends ApiService {
     return data.group
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups/{groupId}', type: 'DELETE', params: ['groupId'] })
   deleteGroup = async (groupId) => {
     try {
       await this.client.basicDelete<any>({
@@ -445,6 +461,11 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/{tenantId}/groups/{groupId}/roles/{roleId}',
+    type: 'PUT',
+    params: ['tenantId', 'groupId', 'roleId'],
+  })
   addGroupRole = async ({ tenantId, groupId, roleId }) => {
     await this.client.basicPut<string>({
       url: pathJoin(this.projectsUrl, `${tenantId}/groups/${groupId}/roles/${roleId}`),
@@ -456,6 +477,11 @@ class Keystone extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/{tenantId}/groups/{groupId}/roles/{roleId}',
+    type: 'DELETE',
+    params: ['tenantId', 'groupId', 'roleId'],
+  })
   deleteGroupRole = async ({ tenantId, groupId, roleId }) => {
     try {
       await this.client.basicDelete<any>({
@@ -483,6 +509,7 @@ class Keystone extends ApiService {
     return data.mappings
   }
 
+  @trackApiMethodMetadata({ url: '/v3/OS-FEDERATION/mappings/{id}', type: 'PUT', params: ['id'] })
   createGroupMapping = async (id, params) => {
     const body = { mapping: params }
     const data = await this.client.basicPut<any>({
@@ -496,6 +523,7 @@ class Keystone extends ApiService {
     return data.mapping
   }
 
+  @trackApiMethodMetadata({ url: '/v3/OS-FEDERATION/mappings/{id}', type: 'PATCH', params: ['id'] })
   updateGroupMapping = async (id, params) => {
     const body = { mapping: params }
     const url = `${this.groupMappingsUrl}/${id}`
@@ -510,6 +538,11 @@ class Keystone extends ApiService {
     return data.mapping
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/OS-FEDERATION/mappings/{id}',
+    type: 'DELETE',
+    params: ['id'],
+  })
   deleteGroupMapping = async (mappingId) => {
     try {
       await this.client.basicDelete<any>({
@@ -919,6 +952,7 @@ class Keystone extends ApiService {
     return data.credentials
   }
 
+  @trackApiMethodMetadata({ url: '/v3/credentials', type: 'POST' })
   addCredential = async (params) => {
     const body = {
       credential: params,
@@ -934,6 +968,11 @@ class Keystone extends ApiService {
     return data.credential
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/credentials/{credentialId}',
+    type: 'DELETE',
+    params: ['credentialId'],
+  })
   deleteCredential = async (credentialId) => {
     try {
       await this.client.basicDelete<any>({
