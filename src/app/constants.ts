@@ -85,6 +85,9 @@ export const notFoundErr = 'ERR_NOT_FOUND'
 // Documentation
 export const pf9DocOrigin = 'https://docs.platform9.com'
 
+// Ideas
+export const pf9IdeasLink = 'https://ideas.platform9.com'
+
 // Clarity
 export const clarityUrlRoot = '/clarity/index.html#'
 export const clarityDashboardUrl = `${clarityUrlRoot}/dashboard`

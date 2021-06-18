@@ -882,6 +882,43 @@ export const routes = {
       },
       name: 'RBAC:ClusterRoleBindings:Edit',
     }),
+    profiles: {
+      root: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      add: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/add`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Add',
+      }),
+      profiles: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles#profiles`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      drift: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles#drift`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      edit: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/edit/:id`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Edit',
+      }),
+    },
   },
   password: {
     reset: Route.register({ url: `${appUrlRoot}/reset/password`, name: 'Password:Reset' }),

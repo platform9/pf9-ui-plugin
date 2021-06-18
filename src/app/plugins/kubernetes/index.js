@@ -56,7 +56,7 @@ import VirtualMachineDetailPage from './components/virtual-machines/details'
 import AddVirtualMachinePage from './components/virtual-machines/add'
 import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
 import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
-
+import RbacProfilesIndexPage from './components/rbac/profiles/rbac-profiles-index-page'
 import { isDecco } from 'core/utils/helpers'
 
 class Kubernetes extends React.PureComponent {
@@ -392,6 +392,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/alarms', exact: true },
       component: MonitoringPage,
     },
+    {
+      name: 'RBAC Profiles',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles', exact: true },
+      component: RbacProfilesIndexPage,
+    },
   ])
 
   const hostPrefix = '' // set to another host during development
@@ -521,6 +527,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
           link: { path: '/apps#repositories', requiredRoles: ['admin'] },
         },
       ],
+    },
+    {
+      name: 'Cluster Profiles',
+      icon: 'user-shield',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles' },
     },
     // TODO: Disabled till all CRUD operations are implemented
     // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },

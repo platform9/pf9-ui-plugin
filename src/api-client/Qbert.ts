@@ -1021,6 +1021,20 @@ class Qbert extends ApiService {
     })
   }
 
+  /* RBAC Profiles */
+  getRbacProfiles = async (namespace) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/${namespace}/clusterprofile`
+    const response = await this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRbacProfiles',
+      },
+    })
+    return response && response.items
+  }
+
   /* Managed Apps */
   getPrometheusInstances = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`
