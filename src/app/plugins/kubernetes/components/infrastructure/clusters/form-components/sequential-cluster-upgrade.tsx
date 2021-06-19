@@ -8,6 +8,7 @@ const SequentialClusterUpgradeField = ({ wizardContext, setWizardContext }) => {
       <CheckboxField
         id="sequentialClusterUpgrade"
         label="Sequential"
+        disabled={wizardContext.upgradingTo}
         infoPlacement="right-end"
         onChange={(value) =>
           setWizardContext(handleSetUpgradeStrategy(value, 'sequentialClusterUpgrade'))

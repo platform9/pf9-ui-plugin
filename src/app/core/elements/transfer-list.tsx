@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import List from '@material-ui/core/List'
@@ -9,6 +9,7 @@ import Checkbox from '@material-ui/core/Checkbox'
 import Button from '@material-ui/core/Button'
 import Paper from '@material-ui/core/Paper'
 import SearchBar from 'core/components/SearchBar'
+import Text from './text'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,41 +33,51 @@ const useStyles = makeStyles((theme) => ({
   listItem: {
     borderBottom: '1px solid #ddd',
   },
+  text: {
+    marginBottom: theme.spacing(1),
+  },
+  list: {
+    justifyContent: 'space-between',
+  },
 }))
 
-function not(a, b) {
-  return a.filter((valueA) => {
-    if (b.length > 0) {
-      return b.filter((valueB) => {
-        return valueB.name
-          ? valueB.name.indexOf(valueA.name) === -1
-          : valueB.indexOf(valueA.name) === -1
-      })
-    }
-  })
+function comparer(otherArray) {
+  return function(current) {
+    return (
+      otherArray.filter(function(other) {
+        return other.name === current.name
+      }).length === 0
+    )
+  }
 }
 
 function intersection(a, b) {
-  return a.filter((valueA) => {
-    if (b.length > 0) {
-      return b.filter((valueB) => {
-        return valueB.name ? valueB.name.indexOf(valueA) !== -1 : valueB.indexOf(valueA) !== -1
-      })
-    }
-  })
+  return a.filter((value) => b.includes(value))
 }
 
-export default function TransferList({ clusterNodes }) {
-  console.log('clusterNodes', clusterNodes)
+function uniqueList(list) {
+  let unique = []
+  unique = Object.values(
+    list.reduce((acc, item) => {
+      acc[item.uuid] = item
+      return acc
+    }, {}),
+  )
+  return unique
+}
+
+let leftClusterNodes = []
+let rightClusterNodes = []
+export default function TransferList({ clusterNodes, setWizardContext, wizardContext }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState([])
-  const [searchTerm, setSearchTerm] = React.useState('')
+  const [searchLeft, setSearchLeft] = React.useState('')
+  const [searchRight, setSearchRight] = React.useState('')
   const [left, setLeft] = React.useState(clusterNodes)
   const [right, setRight] = React.useState([])
 
   const leftChecked = intersection(checked, left)
   const rightChecked = intersection(checked, right)
-  console.log(leftChecked, rightChecked)
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value)
     const newChecked = [...checked]
@@ -82,40 +93,40 @@ export default function TransferList({ clusterNodes }) {
 
   const handleCheckedRight = () => {
     setRight(right.concat(leftChecked))
-    setLeft(not(left, leftChecked))
-    setChecked(not(checked, leftChecked))
+    setLeft(left.filter(comparer(leftChecked)))
+    setChecked([])
   }
 
   const handleCheckedLeft = () => {
     setLeft(left.concat(rightChecked))
-    setRight(not(right, rightChecked))
-    setChecked(not(checked, rightChecked))
+    setRight(right.filter(comparer(rightChecked)))
+    setChecked([])
   }
 
-  const customList = (items) => (
+  const customList = (items, listName) => (
     <Paper className={classes.paper}>
       <List dense component="div" role="list">
         {items.map((value) => {
-          const labelId = `transfer-list-item-${value.name ? value.name : value}-label`
+          const labelId = `transfer-list-item-${listName}-${value.uuid}-label`
 
           return (
             <ListItem
               className={classes.listItem}
-              key={value.name ? value.name : value}
+              key={value.uuid}
               role="listitem"
               button
-              onClick={handleToggle(value.name ? value.name : value)}
+              onClick={handleToggle(value)}
             >
               <ListItemIcon>
                 <Checkbox
                   color={'primary'}
-                  checked={checked.indexOf(value.name ? value.name : value) !== -1}
+                  checked={checked.indexOf(value) !== -1}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ 'aria-labelledby': labelId }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={`${value.name ? value.name : value}`} />
+              <ListItemText id={labelId} primary={`${value.name}`} />
             </ListItem>
           )
         })}
@@ -124,17 +135,49 @@ export default function TransferList({ clusterNodes }) {
     </Paper>
   )
 
-  const handleSearchChange = (searchTerm) => setSearchTerm(searchTerm)
+  useEffect(() => {
+    if (!searchRight) {
+      rightClusterNodes = []
+      rightClusterNodes = uniqueList(rightClusterNodes.concat(right))
+    }
+    if (!searchLeft) {
+      leftClusterNodes = []
+      leftClusterNodes = uniqueList(leftClusterNodes.concat(left))
+    }
+
+    setWizardContext({ batchUpgradeNodes: right })
+  }, [right, left])
+
+  useEffect(() => {
+    setLeft(
+      leftClusterNodes.filter((value) =>
+        value.name.toLowerCase().includes(searchLeft.toLowerCase()),
+      ),
+    )
+  }, [searchLeft])
+
+  useEffect(() => {
+    setRight(
+      rightClusterNodes.filter((value) =>
+        value.name.toLowerCase().includes(searchRight.toLowerCase()),
+      ),
+    )
+  }, [searchRight])
+
+  const handleLeftSearchChange = (search) => setSearchLeft(search)
+
+  const handleRightSearchChange = (search) => setSearchRight(search)
 
   return (
-    <Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
+    <Grid container justify="space-between" alignItems="center" className={classes.root}>
       <Grid item>
+        <Text className={classes.text}> Cluster nodes</Text>
         <SearchBar
           className={classes.search}
-          onSearchChange={handleSearchChange}
-          searchTerm={searchTerm}
+          onSearchChange={handleLeftSearchChange}
+          searchTerm={searchLeft}
         />
-        {customList(left)}
+        {customList(left, 'left')}
       </Grid>
       <Grid item>
         <Grid container direction="column" alignItems="center">
@@ -178,13 +221,14 @@ export default function TransferList({ clusterNodes }) {
           </Button> */}
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid item className={classes.list}>
+        <Text className={classes.text}> Selected nodes</Text>
         <SearchBar
           className={classes.search}
-          onSearchChange={handleSearchChange}
-          searchTerm={searchTerm}
+          onSearchChange={handleRightSearchChange}
+          searchTerm={searchRight}
         />
-        {customList(right)}
+        {customList(right, 'right')}
       </Grid>
     </Grid>
   )

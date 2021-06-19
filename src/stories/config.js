@@ -10,6 +10,7 @@ const {
 const envs = {
   stage: { region: 'k8s1', apiHost: 'https://ui-staging.platform9.horse' },
   dev: { region: 'k8s1', apiHost: 'https://ui-dev.platform9.horse' },
+  decco: { region: 'k8s1', apiHost: 'https://du-ui-dev-decco-1.platform9.horse' },
 }
 /* eslint-enable */
 const config = {
@@ -42,6 +43,6 @@ const config = {
 }
 /* CHANGE ME */
 const getServer = (target) => envs[target]
-config.development = Object.assign(config.development, getServer('dev'))
+config.development = Object.assign(config.development, getServer('decco'))
 const env = process.env.NODE_ENV || 'development'
 module.exports = config[env]

@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { handleSetUpgradeStrategy } from '../../clusters/UpgradeClusterPage'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import TextField from 'core/components/validatedForm/TextField'
 import Text from 'core/elements/text'
 import { IconInfo } from 'core/components/validatedForm/Info'
+import { WizardContext } from 'core/components/wizard/Wizard'
 
 const PercentageClusterUpgradeField = ({ wizardContext, setWizardContext }) => {
   return (
@@ -12,6 +13,7 @@ const PercentageClusterUpgradeField = ({ wizardContext, setWizardContext }) => {
       <CheckboxField
         id="percentageClusterUpgrade"
         label="Percentage"
+        disabled={wizardContext.upgradingTo}
         infoPlacement="right-end"
         onChange={(value) =>
           setWizardContext(handleSetUpgradeStrategy(value, 'percentageClusterUpgrade'))
@@ -24,30 +26,39 @@ const PercentageClusterUpgradeField = ({ wizardContext, setWizardContext }) => {
   )
 }
 
-export const PercentageClusterUpgradeAddonField = ({ values }) => (
-  <FormFieldCard title="Percentage Configuration">
-    <IconInfo
-      icon="info-circle"
-      title="Specify the percentage of nodes to upgrade in parallel."
-      spacer={false}
-    >
-      <Text variant="body2">
-        <b>Cluster:</b>
-        {values?.name}
-      </Text>
-      <Text variant="body2">
-        <b>Total Worker Nodes:</b>
-        {values?.workerNodes?.length}
-      </Text>
-    </IconInfo>
-    <TextField
-      id="percentage"
-      label="Worker nodes to upgrade in parallel"
-      type="number"
-      step="1"
-      required
-    />
-  </FormFieldCard>
-)
+export const PercentageClusterUpgradeAddonField = ({ values }) => {
+  const {
+    wizardContext,
+    setWizardContext,
+  }: { wizardContext: any; setWizardContext: any } = useContext(WizardContext) as any
+
+  return (
+    <FormFieldCard title="Percentage Configuration">
+      <IconInfo
+        icon="info-circle"
+        title="Specify the percentage of nodes to upgrade in parallel."
+        spacer={false}
+      >
+        <Text variant="body2">
+          <b>Cluster:</b>
+          {values?.name}
+        </Text>
+        <Text variant="body2">
+          <b>Total Worker Nodes:</b>
+          {values?.workerNodes?.length}
+        </Text>
+      </IconInfo>
+      <TextField
+        id="percentage"
+        label="Worker nodes to upgrade in parallel"
+        type="number"
+        value={wizardContext.batchUpgradePercent}
+        onChange={(value) => setWizardContext({ batchUpgradePercent: value })}
+        step="1"
+        required
+      />
+    </FormFieldCard>
+  )
+}
 
 export default PercentageClusterUpgradeField

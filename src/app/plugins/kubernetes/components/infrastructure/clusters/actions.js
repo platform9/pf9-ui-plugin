@@ -153,6 +153,33 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       const updatedCluster = await qbert.getClusterDetails(cluster.uuid)
       return adjustWith(propEq('uuid', cluster.uuid), mergeLeft(updatedCluster), prevItems)
     },
+    upgradeClusterOnPercentage: async (
+      { cluster, upgradeType, batchUpgradePercent },
+      prevItems,
+    ) => {
+      Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster on percentage', {
+        clusterId: cluster.uuid,
+      })
+      await qbert.upgradeClusterOnPercentage(cluster.uuid, upgradeType, batchUpgradePercent)
+      trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
+
+      // Multiple fields change on cluster upgrade, best to reload the entity to get updated values
+      // Ideally the upgrade cluster call would return the updated entity
+      const updatedCluster = await qbert.getClusterDetails(cluster.uuid)
+      return adjustWith(propEq('uuid', cluster.uuid), mergeLeft(updatedCluster), prevItems)
+    },
+    upgradeClusterInBatches: async ({ cluster, upgradeType, batchUpgradeNodes }, prevItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster in batches', {
+        clusterId: cluster.uuid,
+      })
+      await qbert.upgradeClusterInBatches(cluster.uuid, upgradeType, batchUpgradeNodes)
+      trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
+
+      // Multiple fields change on cluster upgrade, best to reload the entity to get updated values
+      // Ideally the upgrade cluster call would return the updated entity
+      const updatedCluster = await qbert.getClusterDetails(cluster.uuid)
+      return adjustWith(propEq('uuid', cluster.uuid), mergeLeft(updatedCluster), prevItems)
+    },
     updateTag: async ({ cluster, key, val }, prevItems) => {
       const body = {
         tags: { ...(cluster.tags || {}), [key]: val },

@@ -362,6 +362,34 @@ class Qbert extends ApiService {
     })
   }
 
+  upgradeClusterOnPercentage = async (clusterId, type, batchUpgradePercent) => {
+    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`, {
+      batchUpgradePercent,
+    })
+    return this.client.basicPost({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'upgradeClusterOnPercentage',
+      },
+    })
+  }
+
+  upgradeClusterInBatches = async (clusterId, type, batchUpgradeNodes) => {
+    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`, {
+      batchUpgradeNodes,
+    })
+    return this.client.basicPost({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'upgradeClusterInBatches',
+      },
+    })
+  }
+
   deleteCluster = async (clusterId) => {
     const url = `/clusters/${clusterId}`
     return this.client.basicDelete({
