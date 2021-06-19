@@ -610,6 +610,15 @@ export const routes = {
       },
     }),
   },
+  accountStatus: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/status`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'AccountStatus:Root',
+    }),
+  },
   userSettings: {
     root: Route.register({
       url: `${pluginRoutePrefix}/user_settings`,
