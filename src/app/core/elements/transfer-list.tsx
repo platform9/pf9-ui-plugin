@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button'
 import Paper from '@material-ui/core/Paper'
 import SearchBar from 'core/components/SearchBar'
 import Text from './text'
+import { intersection } from 'ramda'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,10 +50,6 @@ function comparer(otherArray) {
       }).length === 0
     )
   }
-}
-
-function intersection(a, b) {
-  return a.filter((value) => b.includes(value))
 }
 
 function uniqueList(list) {

@@ -6,6 +6,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import Text from 'core/elements/text'
 import { IconInfo } from 'core/components/validatedForm/Info'
 import { WizardContext } from 'core/components/wizard/Wizard'
+import { InputAdornment } from '@material-ui/core'
 
 const PercentageClusterUpgradeField = ({ wizardContext, setWizardContext }) => {
   return (
@@ -54,7 +55,10 @@ export const PercentageClusterUpgradeAddonField = ({ values }) => {
         type="number"
         value={wizardContext.batchUpgradePercent}
         onChange={(value) => setWizardContext({ batchUpgradePercent: value })}
-        step="1"
+        InputProps={{
+          inputProps: { min: 0, max: 100 },
+          startAdornment: <InputAdornment position="start">%</InputAdornment>,
+        }}
         required
       />
     </FormFieldCard>
