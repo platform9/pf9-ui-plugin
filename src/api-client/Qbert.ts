@@ -362,13 +362,12 @@ class Qbert extends ApiService {
     })
   }
 
-  upgradeClusterOnPercentage = async (clusterId, type, batchUpgradePercent) => {
-    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`, {
-      batchUpgradePercent,
-    })
+  upgradeClusterOnPercentage = async (clusterId, type, body) => {
+    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`)
     return this.client.basicPost({
       url,
       version: 'v4',
+      body,
       options: {
         clsName: this.getClassName(),
         mthdName: 'upgradeClusterOnPercentage',
@@ -376,13 +375,12 @@ class Qbert extends ApiService {
     })
   }
 
-  upgradeClusterInBatches = async (clusterId, type, batchUpgradeNodes) => {
-    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`, {
-      batchUpgradeNodes,
-    })
+  upgradeClusterInBatches = async (clusterId, type, body) => {
+    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`)
     return this.client.basicPost({
       url,
       version: 'v4',
+      body,
       options: {
         clsName: this.getClassName(),
         mthdName: 'upgradeClusterInBatches',

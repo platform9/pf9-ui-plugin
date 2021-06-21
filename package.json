@@ -49,8 +49,7 @@
     "totp-generator": "^0.0.7",
     "url-pattern": "^1.0.3",
     "use-react-router": "^1.0.7",
-    "uuid": "^3.2.1",
-    "yarn": "^1.22.10"
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",

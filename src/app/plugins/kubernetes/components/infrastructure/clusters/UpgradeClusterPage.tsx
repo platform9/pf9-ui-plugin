@@ -5,9 +5,6 @@ import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { routes } from 'core/utils/routes'
 import FormWrapperDefault from 'core/components/FormWrapper'
-import { Button, Dialog, DialogActions, List, ListItem } from '@material-ui/core'
-import DocumentMeta from 'core/components/DocumentMeta'
-import { CloudProviders } from '../cloudProviders/model'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
@@ -19,42 +16,16 @@ import Theme from 'core/themes/model'
 import { AddonTogglers } from './form-components/cluster-addon-manager'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import Text from 'core/elements/text'
+import { pluck } from 'ramda'
+import ClusterBatchUpgradeDialog from './ClusterBatchUpgradeDialog'
+import DocumentMeta from 'core/components/DocumentMeta'
+import SubmitButton from 'core/components/buttons/SubmitButton'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
   validatedFormContainer: {
     display: 'grid',
     gridGap: theme.spacing(2),
-  },
-  dialogContainer: {
-    padding: theme.spacing(1, 3),
-  },
-  dialogHeader: {
-    padding: theme.spacing(1, 0),
-    borderBottom: `1px solid ${theme.palette.grey[300]}`,
-    fontWeight: 600,
-  },
-  selectedNodesText: {
-    marginTop: theme.spacing(2),
-  },
-  nodeList: {
-    margin: theme.spacing(1),
-    width: '50%',
-    height: '200px',
-    overflow: 'auto',
-  },
-  nodeNameTitle: {
-    padding: theme.spacing(0.5),
-    borderBottom: `1px solid ${theme.palette.grey[900]}`,
-  },
-  listNodes: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'start',
-    borderBottom: `1px solid ${theme.palette.grey[300]}`,
-  },
-  dialogActions: {
-    marginTop: theme.spacing(10),
   },
   text: {
     marginTop: theme.spacing(0.5),
@@ -108,6 +79,7 @@ const UpgradeClusterPage = () => {
 
   const submitLastStep = (params) => {
     history.push(routes.cluster.list.path())
+    handleClose()
   }
 
   // @ts-ignore
@@ -163,55 +135,13 @@ const UpgradeClusterPage = () => {
     [upgradeType],
   )
 
-  const confirmBatchUpgrade = useCallback(() => {
-    // const batchUpgradeNodes = wizardContext.batchUpgradeNodes
-    // upgradeClusterInBatches({ cluster, upgradeType, batchUpgradeNodes })
-  }, [upgradeClusterInBatches])
-
-  const renderModalConfirmationDialog = (wizardContext) => {
-    return (
-      <Dialog open fullWidth maxWidth="md" onClose={handleClose}>
-        <div className={classes.dialogContainer}>
-          <Text variant="body1" className={classes.dialogHeader}>
-            Warning: Partial Cluster Upgrade
-          </Text>
-          <div className={classes.dialogContent}>
-            <Text variant="body2">
-              The selected nodes will be upgraded in parallel, any worker nodes that are not
-              included in this batch will need to be upgraded once the batch upgrade is complete.
-            </Text>
-            <Text variant="body2" className={classes.selectedNodesText}>
-              Selected Nodes
-            </Text>
-            <div className={classes.nodeList}>
-              <List>
-                <Text variant="body2" className={classes.nodeNameTitle}>
-                  Node Name
-                </Text>
-                {wizardContext.batchUpgradeNodes &&
-                  wizardContext.batchUpgradeNodes.map((node) => (
-                    <ListItem key={node.uuid} className={classes.listNodes}>
-                      {node.name}
-                    </ListItem>
-                  ))}
-              </List>
-            </div>
-            <Text variant="body2" className={classes.selectedNodesText}>
-              Nodes Excluded from Upgrade: 25
-            </Text>
-            <Text variant="body2" className={classes.selectedNodesText}>
-              Nodes Already Upgraded: 10
-            </Text>
-          </div>
-          <DialogActions className={classes.dialogActions}>
-            <Button variant="contained" color="secondary" onClick={confirmBatchUpgrade}>
-              Continue With Upgrade
-            </Button>
-          </DialogActions>
-        </div>
-      </Dialog>
-    )
-  }
+  const confirmBatchUpgrade = useCallback(
+    (wizardContext) => {
+      const batchUpgradeNodes = pluck('uuid' as any, wizardContext.batchUpgradeNodes)
+      upgradeClusterInBatches({ cluster, upgradeType, batchUpgradeNodes })
+    },
+    [upgradeClusterInBatches],
+  )
 
   return (
     <>
@@ -221,15 +151,15 @@ const UpgradeClusterPage = () => {
           align="right"
           onComplete={handleSubmit}
           context={cluster}
-          hideBack
           submitLabel="Upgrade Now"
+          hideAllButtons
         >
           {({ wizardContext, setWizardContext, onNext, handleNext }) => {
             return (
               <>
                 <WizardMeta
                   fields={wizardContext}
-                  icon={<CloudProviderCard active type={CloudProviders.Aws} />}
+                  icon={<CloudProviderCard active type={cluster.cloudProviderType} />}
                   keyOverrides={wizardMetaFormattedNames}
                   calloutFields={wizardMetaCalloutFields}
                 >
@@ -286,7 +216,17 @@ const UpgradeClusterPage = () => {
                         </>
                       )}
                     </ValidatedForm>
-                    {showModal && renderModalConfirmationDialog(wizardContext)}
+                    {showModal && (
+                      <ClusterBatchUpgradeDialog
+                        wizardContext={wizardContext}
+                        handleClose={handleClose}
+                        confirmBatchUpgrade={confirmBatchUpgrade}
+                        cluster={cluster}
+                      />
+                    )}
+                    <SubmitButton onClick={() => handleSubmit(wizardContext)}>
+                      Upgrade Now
+                    </SubmitButton>
                   </WizardStep>
                 </WizardMeta>
               </>

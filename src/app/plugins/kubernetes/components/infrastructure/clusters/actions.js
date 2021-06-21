@@ -160,7 +160,8 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster on percentage', {
         clusterId: cluster.uuid,
       })
-      await qbert.upgradeClusterOnPercentage(cluster.uuid, upgradeType, batchUpgradePercent)
+      const body = { batchUpgradePercent }
+      await qbert.upgradeClusterOnPercentage(cluster.uuid, upgradeType, body)
       trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
 
       // Multiple fields change on cluster upgrade, best to reload the entity to get updated values
@@ -172,7 +173,8 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster in batches', {
         clusterId: cluster.uuid,
       })
-      await qbert.upgradeClusterInBatches(cluster.uuid, upgradeType, batchUpgradeNodes)
+      const body = { batchUpgradeNodes }
+      await qbert.upgradeClusterInBatches(cluster.uuid, upgradeType, body)
       trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
 
       // Multiple fields change on cluster upgrade, best to reload the entity to get updated values
