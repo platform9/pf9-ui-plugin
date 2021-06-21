@@ -65,8 +65,8 @@ const Toolbar = ({ open }) => {
         <div className={classes.rightTools}>
           <RegionChooser className={classes.leftMargin} />
           <TenantChooser className={classes.leftMargin} />
-          <UserMenu className={classes.leftMargin} />
           <NotificationsPopover className={classes.leftMargin} />
+          <UserMenu className={classes.leftMargin} />
         </div>
       </MaterialToolbar>
     </AppBar>
