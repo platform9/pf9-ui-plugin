@@ -1,6 +1,14 @@
 {
-  "baseUrl": "http://localhost:3000",
+  "baseUrl": "https://pmkft-1620747884-26914.platform9.io/",
   "viewportWidth": 1920,
   "viewportHeight": 1080,
-  "projectId": "k5ua2x"
+  "projectId": "k5ua2x",
+  "reporter": "mochawesome",
+  "reporterOptions": {
+    "reportDir": "cypress/reports/mocha",
+    "overwrite": false,
+    "html": true,
+    "json": true
+  },
+  "video": true
 }

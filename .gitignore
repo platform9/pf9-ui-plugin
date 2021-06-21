@@ -23,3 +23,5 @@ node-v*-linux-x64.tar.gz
 node/
 
 snapshots.js
+
+cypress/reports
