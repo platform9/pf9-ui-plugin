@@ -103,7 +103,6 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           withAddonManager
           elevated={false}
         >
-
           {({ setFieldValue, values }) => (
             <>
               {/* Cluster Name */}
@@ -123,7 +122,6 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
               {/* Cluster Settings */}
               <FormFieldCard title="Cluster Settings">
                 <KubernetesVersion />
-
 
                 <Divider className={classes.divider} />
                 <Text variant="caption1">Cluster Network Stack</Text>
@@ -239,24 +237,27 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         onNext={bareOSClusterTracking.wZStepFive(trackingFields)}
       >
         <ValidatedForm
+          fullWidth
+          classes={{ root: classes.validatedFormContainer }}
           initialValues={wizardContext}
           onSubmit={setWizardContext}
-          title="Advanced Configuration"
           triggerSubmit={onNext}
           elevated={false}
           withAddonManager
         >
           {({ values }) => (
             <>
-              <AdvancedApiConfigFields values={values} />
+              <FormFieldCard title="Advanced Configuration">
+                <AdvancedApiConfigFields values={values} />
 
-              <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
-              <TagsField />
-              <AddonTogglers
-                wizardContext={wizardContext}
-                setWizardContext={setWizardContext}
-                addons={['enableTopologyManager']}
-              />
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
+                <TagsField />
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={['enableTopologyManager']}
+                />
+              </FormFieldCard>
             </>
           )}
         </ValidatedForm>
