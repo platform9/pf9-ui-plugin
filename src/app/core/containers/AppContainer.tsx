@@ -42,8 +42,14 @@ import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 import Theme from 'core/themes/model'
 import Bugsnag from '@bugsnag/js'
+import Watchdog from 'core/watchdog'
+import systemHealthCheck from 'core/watchdog/system-health'
+import { isDecco } from 'core/utils/helpers'
+import config from '../../../../config'
 
 const { setActiveRegion } = ApiClient.getInstance()
+
+const urlBase = process.env.NODE_ENV !== 'production' ? config.apiHost : ''
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -109,7 +115,7 @@ const getUserDetails = async (user) => {
   // Need this here again bc not able to use AppContainer state and ensure
   // that sandbox state would be set on time for both users logging in for
   // first time and for users who are already logged in
-  const features = await axios.get('/clarity/features.json').catch(() => null)
+  const features = await axios.get(`${urlBase}/clarity/features.json`).catch(() => null)
   const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
 
   // Identify the user in Segment using Keystone ID
@@ -163,8 +169,7 @@ const AppContainer = () => {
       // Features are requested again later for the specific logged-in region,
       // whereas this one is done on the master DU from which the UI is served.
       // Ignore exception if features.json not found (for local development)
-
-      const initialFeatures = await axios.get('/clarity/features.json').catch(() => null)
+      const initialFeatures = await axios.get(`${urlBase}/clarity/features.json`).catch(() => null)
       const customerTier = pathStrOr(CustomerTiers.Freedom, 'data.customer_tier', initialFeatures)
       setCustomerTier(customerTier)
       const sandboxFlag = pathStrOr(false, 'data.experimental.sandbox', initialFeatures)
@@ -201,6 +206,9 @@ const AppContainer = () => {
           (!initialFeatures?.data?.experimental?.kplane &&
             pathStrOr(false, 'data.experimental.sso', initialFeatures)),
       })
+      if (isDecco(initialFeatures.data)) {
+        Watchdog.register({ handler: systemHealthCheck, frequency: 1000 * 60 * 10 })
+      }
     }
 
     const validateSession = async () => {
