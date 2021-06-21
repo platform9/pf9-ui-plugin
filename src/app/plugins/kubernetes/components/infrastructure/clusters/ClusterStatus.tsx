@@ -28,9 +28,7 @@ const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
     loading: theme.palette.blue.main,
     unknown: theme.palette.grey.main,
     upgrade: theme.palette.orange.main,
-    online: theme.palette.green.main,
     degraded: theme.palette.orange.main,
-    offline: theme.palette.red.main,
   }[status] || theme.palette.red.main)
 
 const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
@@ -84,8 +82,6 @@ const iconMap = new Map<
   ['error', { icon: 'exclamation-triangle', classes: '' }],
   ['loading', { icon: 'sync', classes: 'fa-spin' }],
   ['upgrade', { icon: 'arrow-circle-up', classes: '' }],
-  ['online', { icon: 'check', classes: '' }],
-  ['offline', { icon: 'times', classes: '' }],
   ['degraded', { icon: 'check', classes: '' }],
 ])
 
@@ -248,7 +244,12 @@ export const ClusterApiServerHealthStatus: FC<IClusterStatusProps> = ({
   const fields = getClusterApiServerHealthStatus(cluster)
 
   return (
-    <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant} {...rest}>
+    <ClusterStatusSpan
+      title={fields.message}
+      status={fields.clusterStatus}
+      variant={variant}
+      {...rest}
+    >
       {variant === 'header' ? (
         label || fields.label
       ) : (

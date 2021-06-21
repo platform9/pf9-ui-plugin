@@ -370,17 +370,17 @@ export const clusterApiServerHealthStatusFields: {
 } = {
   online: {
     message: 'API server is responding for all nodes',
-    status: 'online',
+    clusterStatus: 'ok',
     label: 'Online',
   },
   degraded: {
     message: 'API server is not responding for 1 or more nodes',
-    status: 'degraded',
+    clusterStatus: 'degraded',
     label: 'Degraded',
   },
   offline: {
     message: 'API server is not responding for any nodes',
-    status: 'offline',
+    clusterStatus: 'fail',
     label: 'Offline',
   },
 }

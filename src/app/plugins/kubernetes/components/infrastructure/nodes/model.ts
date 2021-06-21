@@ -13,7 +13,7 @@ export type ApiServerHealthStatus = 'online' | 'offline'
 export interface ApiServerHealthStatusFields {
   label: string
   message: string
-  status: string
+  clusterStatus: string
 }
 
 export type errorMessageLevel = 'warn'

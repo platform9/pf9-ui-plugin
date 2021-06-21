@@ -30,12 +30,7 @@ import ResourceUsageTables from '../common/ResourceUsageTables'
 import NodesStatePicklist from './nodes-state-picklist'
 import NodeAuthDialog from './NodeAuthDialog'
 import { NodeState } from './model'
-import {
-  orderInterfaces,
-  clockDriftDetectedInNodes,
-  hasClockDrift,
-  nodeApiServerHealthStatusFields,
-} from './helper'
+import { orderInterfaces, hasClockDrift, nodeApiServerHealthStatusFields } from './helper'
 import { renderErrorStatus } from '../clusters/ClusterStatus'
 import NodeRolesPicklist from './node-roles-picklist'
 
@@ -250,7 +245,7 @@ const renderApiServerHealth = (_, node) => {
 
   return (
     <>
-      <ClusterStatusSpan title={fields.message} status={fields.status}>
+      <ClusterStatusSpan title={fields.message} status={fields.clusterStatus}>
         {fields.label}
       </ClusterStatusSpan>
     </>

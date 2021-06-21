@@ -53,11 +53,11 @@ export const nodeApiServerHealthStatusFields: {
   online: {
     label: 'Online',
     message: 'API server is responding on this node',
-    status: 'online',
+    clusterStatus: 'ok',
   },
   offline: {
     label: 'Offline',
     message: 'API server is not responding on this node',
-    status: 'offline',
+    clusterStatus: 'fail',
   },
 }
