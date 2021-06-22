@@ -67,7 +67,7 @@ const SupportedDistributionsAndPrerequisitesInfo = () => {
         <Text>
           If your node operating system isn't supported, please email us at support@platform9.com.
         </Text>
-        <p></p>
+        <p/>
         <Text>Follow these prerequisites to prepare your nodes: </Text>
         <ul>
           <li key="kubernetes">
@@ -94,7 +94,7 @@ const TipsAndTroubleshootingInfo = () => {
             outside your organization.
           </Text>
         </div>
-        <p className={classes.spacer}></p>
+        <p className={classes.spacer}/>
         <Text variant="subtitle2">Troubleshooting</Text>
         <div className={classes.infoContainer}>
           <Text>Here are some quick tips if you don't see your node:</Text>
@@ -122,9 +122,9 @@ const DownloadHostAgentPage = () => {
         </Text>
       </p>
       <DownloadHostAgentWalkthrough osOptions={hostAgentDownloadOsOptions} />
-      <p className={classes.spacer}></p>
+      <p className={classes.spacer}/>
       <SupportedDistributionsAndPrerequisitesInfo />
-      <p className={classes.spacer}></p>
+      <p className={classes.spacer}/>
       <TipsAndTroubleshootingInfo />
     </div>
   )
