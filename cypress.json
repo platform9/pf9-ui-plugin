@@ -1,5 +1,5 @@
 {
-  "baseUrl": "https://pmkft-1620747884-26914.platform9.io/",
+  "baseUrl": "http://localhost:3000",
   "viewportWidth": 1920,
   "viewportHeight": 1080,
   "projectId": "k5ua2x",

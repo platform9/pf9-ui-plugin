@@ -24,3 +24,8 @@ import 'cypress-xpath'
 import 'cypress-mochawesome-reporter/register'
 
 import './types/userTypes'
+
+Cypress.on('uncaught:exception', () => {
+    return false
+})
+  
