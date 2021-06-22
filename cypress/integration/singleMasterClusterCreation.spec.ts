@@ -1,17 +1,13 @@
 import 'cypress-wait-until'
-
-const user: userDetails = {
-  username: 'kingshuk.nandy@afourtech.com',
-  password: 'Test@1234',
-  completeName: 'Kingshuk Nandy',
-}
-
-const clusterName: string = 'SingleMasterCluster-Test-1'
+import { loadConfig } from 'cypress/support/commands'
+import { Config } from 'cypress/support/types'
 
 describe('Single Master Cluster Precondition', () => {
+  var config: Config
   before(() => {
-    cy.login(user)
-    cy.minHealthyNodesRequired(2)
+    config=loadConfig()
+    cy.login()
+    cy.minHealthyNodesRequired(config.singleMasterClusterData.totalNodes)
   })
 
   it('Should be able add cluster of type "SingleMaster"', () => {
@@ -20,7 +16,7 @@ describe('Single Master Cluster Precondition', () => {
     cy.contains('BareOS Virtual Cluster')
     cy.xpath("//span[contains(text(),'Single Master Cluster')]").click()
     cy.wait('@supportedRoleVersions')
-    cy.get('#name').type(clusterName)
+    cy.get('#name').type(config.singleMasterClusterData.clusterName)
     cy.get('#kubeRoleVersion').click()
     cy.get("li[data-value='1.18.10-pmk.1547']").click()
     cy.xpath("//span[text()='IPv4']/preceding::input[@type='radio']").should('be.checked')
@@ -36,7 +32,7 @@ describe('Single Master Cluster Precondition', () => {
   })
   it('Should be able to setup Worker Nodes', () => {
     cy.contains('Select nodes to add as Worker Nodes')
-    var desiredNodeCount = 2
+    var desiredNodeCount:number = 1
     cy.xpath("//tr[@class='MuiTableRow-root']//input[@type='checkbox']").each(($el: string) => {
       cy.wrap($el).click()
       desiredNodeCount--
@@ -61,11 +57,7 @@ describe('Single Master Cluster Precondition', () => {
     cy.contains('Complete').click()
   })
   it('Should be able to verify Cluster Creation Completed Successfully', () => {
-    // cy.waitUntil(()=>{
-    //     cy.xpath("//article//following-sibling::div/p",{timeout: 60000}).each(($el)=>{
-    //         cy.get($el).contains(/^Completed all [0-9]+ tasks successfully$/)
-    //     })
-    //   })
+    // TODO: Remove the hardcoded wait
     cy.wait(240000).then(() => {
       cy.xpath('//article//following-sibling::div/p', { timeout: 60000 }).each(($el) => {
         const ele1 = ($el as unknown) as string
@@ -75,6 +67,6 @@ describe('Single Master Cluster Precondition', () => {
   })
 
   after(() => {
-    cy.deleteCluster(clusterName)
+    cy.deleteCluster(config.singleMasterClusterData.clusterName)
   })
 })

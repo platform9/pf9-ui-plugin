@@ -1,16 +1,13 @@
 import 'cypress-wait-until'
-
-const user: userDetails = {
-  username: 'kingshuk.nandy@afourtech.com',
-  password: 'Test@1234',
-  completeName: 'Kingshuk Nandy',
-}
-const clusterName: string = 'OneClickCluster'
+import { loadConfig } from 'cypress/support/commands'
+import { Config } from 'cypress/support/types'
 
 describe('One Click Cluster Precondition', () => {
+  var config: Config 
   before(() => {
-    cy.login(user)
-    cy.minHealthyNodesRequired(1)
+    config=loadConfig()
+    cy.login()
+    cy.minHealthyNodesRequired(config.oneClickClusterData.totalNodes)
   })
 
   it('Should be able add cluster of type "One-Click Cluster"', () => {
@@ -19,7 +16,7 @@ describe('One Click Cluster Precondition', () => {
     cy.contains('BareOS Virtual Cluster')
     cy.xpath("//span[contains(text(),'One-Click Cluster')]").click()
     cy.wait('@supportedRoleVersions')
-    cy.get('#name').type(clusterName)
+    cy.get('#name').type(config.oneClickClusterData.clusterName)
     cy.get('#kubeRoleVersion').click()
     cy.get("li[data-value='1.18.10-pmk.1547']").click()
   })
@@ -47,6 +44,6 @@ describe('One Click Cluster Precondition', () => {
   })
 
   after(() => {
-    cy.deleteCluster(clusterName)
+    cy.deleteCluster(config.oneClickClusterData.clusterName)
   })
 })

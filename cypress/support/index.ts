@@ -13,17 +13,8 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-// Import commands.js using ES2015 syntax:
-// import './commands'
-import './commands/commonUtils'
-import './commands/selectorUtility'
-
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
 import 'cypress-xpath'
 import 'cypress-mochawesome-reporter/register'
-
-import './types/userTypes'
 
 Cypress.on('uncaught:exception', () => {
     return false

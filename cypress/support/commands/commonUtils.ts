@@ -1,12 +1,13 @@
-export{}
+import { developmentConfig, testConfig } from "../config"
+import { Config, UserDetails } from "../types"
+
 declare global{
 
     // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace Cypress {
+    export namespace Cypress {
         interface Chainable {
-            login(user:userDetails):void
+            login():void
             minHealthyNodesRequired(nodes: number): Chainable<string>
-            deleteCluster(clusterName: string): void
         }
     }
 }
@@ -16,19 +17,20 @@ declare global{
  * @param user
  * @returns none
  */
-Cypress.Commands.add('login', (user:userDetails) => {
+Cypress.Commands.add('login', () => {
+    const userCred:UserDetails=loadConfig().loginCredentials
     cy.intercept(/\/qbert\/.*\/v1alpha2\/clusters$/).as('clusters')
     cy.intercept(/\/qbert\/.*\/nodes$/).as('nodes')
 
     cy.visit('/')
-    cy.get('#email').clear().type(user.username)
-    cy.get('#password').clear().type(user.password)
+    cy.get('#email').clear().type(userCred.username)
+    cy.get('#password').clear().type(userCred.password)
     cy.get('span').contains('Sign In').click()
 
     cy.wait('@clusters', { requestTimeout: 30000, responseTimeout: 30000 })
     cy.wait('@nodes', { requestTimeout: 30000, responseTimeout: 30000 })
     // Validate user Name displayedis as expected
-    cy.contains(user.completeName)
+    cy.contains(userCred.completeName)
 })
 
 /**
@@ -48,40 +50,16 @@ Cypress.Commands.add('login', (user:userDetails) => {
       })
   })
 
-  /**
- * @description This command does deletes the clusters based on the name
- * @param clusterName
- * @returns none
- */
-Cypress.Commands.add('deleteCluster', (clusterName: string) => {
-    let clusterCount = 1 
-    cy.contains('Dashboard').click()
-    cy.get('#cluster-card')
-      .find('h1.MuiTypography-root.MuiTypography-h1')
-      .invoke('text')
-      .then((cluster) => {
-        clusterCount = parseInt(cluster) // get the current cluster count
-        cy.wrap(clusterCount).should('be.gt', 0)
-        cy.contains('Infrastructure').click()
-        cy.get('tbody.MuiTableBody-root')
-          .find('span.MuiIconButton-label')
-          .find('input[type="radio"]')
-          .each((radioButton) => { // loop throght all the available clusters
-            cy.wrap(radioButton).click()
-            cy.contains('Delete').should('be.visible')
-            cy.contains('Delete').click()
-            cy.get('div[class="MuiDialogContent-root"]')
-              .find('b')
-              .invoke('text')
-              .then((clusterToBeDelete) => {
-                // delete the clusters based on provided name
-                if (clusterToBeDelete === clusterName) { 
-                  cy.get('#clusterName').type(clusterToBeDelete)
-                  cy.contains('Delete this cluster').should('be.visible')
-                  cy.contains('Delete this cluster').click()
-                  cy.wait(10000) // ToDo : Make this wait dynamically for the output.
-                } else cy.contains("Don't Delete").click()
-              })
-          })
-      })
-  })
+/**
+ * @description Method for loading different Config
+ * @returns It returns specific environment Config
+ */  
+export function loadConfig():Config {
+    const env: string = process.env.NODE_ENV
+    if(env ==='development'){
+       return developmentConfig
+    }else if(env==='test'){
+        return testConfig
+    }
+}
+

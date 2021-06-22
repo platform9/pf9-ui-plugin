@@ -176,7 +176,7 @@
     "test": "yarn test:unit",
     "test:client": "cross-env NODE_ENV=test jest src/api-client",
     "test:client:watch": "cross-env NODE_ENV=test jest --watch src/api-client",
-    "test:e2e": "cross-env NODE_ENV=test jest -i e2e-tests/",
+    "test:e2e": "cross-env NODE_ENV=test jest -i  e2e-tests/",
     "test:integration": "cross-env NODE_ENV=test cypress run",
     "cypress:open": "cross-env NODE_ENV=test ./node_modules/.bin/cypress open",
     "cypress:run": "cross-env NODE_ENV=test ./node_modules/.bin/cypress run",
@@ -187,7 +187,8 @@
     "test:ci:windows:record": "cross-env NODE_ENV=test bin-up cypress run --record --group",
     "test:unit": "cross-env NODE_ENV=test jest --coverage src/app src/server",
     "test:unit:watch": "cross-env NODE_ENV=test jest --watch --coverage src/app src/server",
-    "test:login": "cross-env NODE_ENV=test cypress run --spec ./cypress/integration/login.spec.js"
+    "test:loginOther": "cross-env NODE_ENV=test cypress run --spec ./cypress/integration/test.spec.ts",
+     "cypress:openWindows": "./node_modules/.bin/cypress open"
   },
   "keywords": [
     "Platform9",
