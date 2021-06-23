@@ -55,7 +55,8 @@ Cypress.Commands.add('login', () => {
  * @returns It returns specific environment Config
  */  
 export function loadConfig():Config {
-    const env: string = process.env.NODE_ENV
+    const env: string = Cypress.env('ENV')
+    
     if(env ==='development'){
        return developmentConfig
     }else if(env==='test'){
