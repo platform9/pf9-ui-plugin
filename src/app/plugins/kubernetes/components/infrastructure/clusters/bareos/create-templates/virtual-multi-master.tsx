@@ -124,7 +124,10 @@ const VirtualMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
 
               {/* Cluster Settings */}
               <FormFieldCard title="Cluster Settings">
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <Divider className={classes.divider} />
                 <Text variant="caption1">Cluster Network Stack</Text>

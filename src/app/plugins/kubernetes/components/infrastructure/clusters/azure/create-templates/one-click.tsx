@@ -162,7 +162,10 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
               {/* SSH Key */}
               <SshKeyTextField wizardContext={wizardContext} setWizardContext={setWizardContext} />
 
-              <KubernetesVersion />
+              <KubernetesVersion
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+              />
             </FormFieldCard>
 
             <FormFieldCard title="Default Settings for New Cluster">

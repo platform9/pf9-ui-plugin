@@ -349,7 +349,10 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
               <FormFieldCard title="Cluster Settings">
                 {/* Kubernetes Version */}
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <CheckboxField
                   id="useRoute53"
@@ -379,7 +382,12 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 <AddonTogglers
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
+                  addons={[
+                    'etcdBackup',
+                    'prometheusMonitoringEnabled',
+                    'enableCAS',
+                    'profileEngine',
+                  ]}
                 />
               </FormFieldCard>
             </>
