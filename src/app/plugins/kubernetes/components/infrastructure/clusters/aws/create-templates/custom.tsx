@@ -74,6 +74,7 @@ export const initialContext = {
   useRoute53: false,
   domainId: '',
   azs: [],
+  enableProfileAgent: false,
 }
 
 const columns = [
@@ -187,6 +188,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginBottom: theme.spacing(1),
   },
 }))
+
+const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileEngine']
 
 interface Props {
   wizardContext: any
@@ -380,14 +383,9 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 {/* Managed Add-Ons */}
                 <Text variant="caption1">Managed Add-Ons</Text>
                 <AddonTogglers
+                  addons={configStepAddOns}
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={[
-                    'etcdBackup',
-                    'prometheusMonitoringEnabled',
-                    'enableCAS',
-                    'profileEngine',
-                  ]}
                 />
               </FormFieldCard>
             </>

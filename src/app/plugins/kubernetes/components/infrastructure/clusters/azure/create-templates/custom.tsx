@@ -72,6 +72,7 @@ export const initialContext = {
   networkStack: 'ipv4',
   privileged: true,
   allowWorkloadsOnMaster: false,
+  enableProfileAgent: false,
 }
 
 const columns = [
@@ -183,6 +184,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
     margin: theme.spacing(3, 0),
   },
 }))
+
+const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileEngine']
 
 interface Props {
   wizardContext: any
@@ -331,7 +334,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <AddonTogglers
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
+                  addons={configStepAddOns}
                 />
               </FormFieldCard>
             </>

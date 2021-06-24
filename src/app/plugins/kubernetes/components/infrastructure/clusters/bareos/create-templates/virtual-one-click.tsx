@@ -45,6 +45,7 @@ export const initialContext = {
   calicoIPv6: 'none',
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
   useHostname: false,
+  enableProfileAgent: false,
 }
 
 const columns = [

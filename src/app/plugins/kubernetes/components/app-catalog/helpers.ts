@@ -39,6 +39,8 @@ export const filterConnectedClusters = (currentRepository, repositories, cluster
  * If versionA > versionB, returns 1
  * If versionA < versionB, returns -1
  * If versionA === versionB, return 0
+ *
+ * Ex. compareVersions("1.19.6-pmk.1625", "1.20.5-pmk.1831") returns -1
  */
 export const compareVersions = (versionA: string, versionB: string) => {
   const a = versionA.split('.')
@@ -48,7 +50,7 @@ export const compareVersions = (versionA: string, versionB: string) => {
     if (a[i] === undefined) {
       a[i] = '0'
     }
-    if ([i] === undefined) {
+    if (b[i] === undefined) {
       b[i] = '0'
     }
 
@@ -56,8 +58,12 @@ export const compareVersions = (versionA: string, versionB: string) => {
       const intA = parseInt(a[i])
       const intB = parseInt(b[i])
 
-      if (intA === NaN || intB == NaN) {
+      if (isNaN(intA) && isNaN(intB)) {
         return 0
+      } else if (isNaN(intA)) {
+        return -1
+      } else if (isNaN(intB)) {
+        return 1
       }
 
       if (intA > intB) {

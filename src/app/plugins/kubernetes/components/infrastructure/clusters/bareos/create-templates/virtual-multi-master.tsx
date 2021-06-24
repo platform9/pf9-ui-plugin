@@ -67,6 +67,7 @@ export const initialContext = {
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
   useHostname: false,
   nodeRegistrationType: 'ipAddress',
+  enableProfileAgent: false,
 }
 
 interface Props {
@@ -81,6 +82,7 @@ const clusterAddons = [
   'prometheusMonitoringEnabled',
   'networkPluginOperator',
   'kubevirtPluginOperator',
+  'profileEngine',
 ]
 const trackingFields = {
   platform: CloudProviders.VirtualMachine,
