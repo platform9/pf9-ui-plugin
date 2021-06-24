@@ -210,7 +210,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 export const parseClusterParams = async (params) => {
   // Maybe todo: change these to use the params selector instead to enable filtering?
   const allClusters = await getAllClusters()
-  const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
+  const { clusterId = pathOr(allKey, [0, 'uuid'], allClusters) } = params
   return [clusterId, allClusters]
 }
 
