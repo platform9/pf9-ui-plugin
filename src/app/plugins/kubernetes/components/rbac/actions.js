@@ -3,7 +3,7 @@ import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clusterActions, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import {
   apiGroupsSelector,
   makeApiGroupsSelector,
@@ -390,4 +390,36 @@ export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.Cluste
   entityName: 'Cluster Role Binding',
   indexBy: 'clusterId',
   selectorCreator: makeRoleBindingActionssSelector,
+})
+
+export const rbacProfileActions = createCRUDActions(ActionDataKeys.RbacProfiles, {
+  createFn: async (data) => {
+    const roles = Object.values(data.roles).map(
+      ({ name, namespace }) => `${namespace}/roles/${name}`,
+    )
+    const roleBindings = Object.values(data.roleBindings).map(
+      ({ name, namespace }) => `${namespace}/rolebindings/${name}`,
+    )
+    const clusterRoles = Object.values(data.clusterRoles).map(({ name }) => `clusterroles/${name}`)
+    const clusterRoleBindings = Object.values(data.clusterRoleBindings).map(
+      ({ name }) => `clusterrolebindings/${name}`,
+    )
+    const body = {
+      apiVersion: 'sunpike.platform9.com/v1alpha2',
+      kind: 'ClusterProfile',
+      metadata: { name: data.profileName },
+      spec: {
+        cloneFrom: data.baseCluster,
+        namespaceScopedResources: [...roles, ...roleBindings],
+        clusterScopedResources: [...clusterRoles, ...clusterRoleBindings],
+        reapInterval: 30,
+      },
+    }
+    Bugsnag.leaveBreadcrumb('Attempting to create a rbac profile', body)
+    await qbert.createRbacProfile(body)
+    trackEvent('Create Rbac Profile', body)
+  },
+  uniqueIdentifier,
+  entityName: 'RBAC Profiles',
+  indexBy: 'clusterId',
 })

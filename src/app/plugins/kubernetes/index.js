@@ -11,7 +11,6 @@ import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/app-catalog/apps-index-page'
 import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
-import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
 import OnboardingPage from './components/onboarding/onboarding-page'
@@ -57,6 +56,7 @@ import VirtualMachineDetailPage from './components/virtual-machines/details'
 import AddVirtualMachinePage from './components/virtual-machines/add'
 import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
 import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
+import CreateRbacProfile from 'k8s/components/rbac/profiles/create'
 
 import { isDecco } from 'core/utils/helpers'
 
@@ -344,6 +344,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac', exact: true },
       component: RbacIndexPage,
+    },
+    {
+      name: 'Add RBAC Profile',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/add', exact: true },
+      component: CreateRbacProfile,
     },
     {
       name: 'Add Role',
