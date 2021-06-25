@@ -57,8 +57,9 @@ import AddVirtualMachinePage from './components/virtual-machines/add'
 import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
 import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
 import CreateRbacProfile from 'k8s/components/rbac/profiles/create'
-
+import RbacProfilesIndexPage from './components/rbac/profiles/rbac-profiles-index-page'
 import { isDecco } from 'core/utils/helpers'
+import DeployRbacProfilePage from './components/rbac/profiles/deploy/deploy-rbac-profile-page'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -399,6 +400,18 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/alarms', exact: true },
       component: MonitoringPage,
     },
+    {
+      name: 'RBAC Profiles',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles', exact: true },
+      component: RbacProfilesIndexPage,
+    },
+    {
+      name: 'Deploy RBAC Profile',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/deploy/:name', exact: true },
+      component: DeployRbacProfilePage,
+    },
   ])
 
   const hostPrefix = '' // set to another host during development
@@ -528,6 +541,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
           link: { path: '/apps#repositories', requiredRoles: ['admin'] },
         },
       ],
+    },
+    {
+      name: 'Cluster Profiles',
+      icon: 'users-cog',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles' },
     },
     // TODO: Disabled till all CRUD operations are implemented
     // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },

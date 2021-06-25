@@ -32,6 +32,7 @@ export interface CustomerMetadata {
 interface IRequestOptions {
   clsName: string
   mthdName: string
+  config?: any
 }
 export interface IRawRequestGetParams {
   url: string

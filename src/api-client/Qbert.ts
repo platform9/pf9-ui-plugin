@@ -1313,6 +1313,20 @@ class Qbert extends ApiService {
     })
   }
 
+  /* RBAC Profiles */
+  getRbacProfiles = async () => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile`
+    const response = await this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRbacProfiles',
+      },
+    })
+    return response && response.items
+  }
+
   createRbacProfile = async (body) => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile`
     const response = await this.client.basicPost({
@@ -1322,6 +1336,64 @@ class Qbert extends ApiService {
       options: {
         clsName: this.getClassName(),
         mthdName: 'createRbacProfile',
+      },
+    })
+    return response
+  }
+
+  patchRbacProfile = async (name, body) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile/${name}`
+    const response = await this.client.basicPatch<any>({
+      url,
+      body,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'patchRbacProfile',
+        config: {
+          headers: {
+            'Content-Type': 'application/merge-patch+json',
+          },
+        },
+      },
+    })
+    return response
+  }
+
+  deleteRbacProfile = async (name) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile/${name}`
+    await this.client.basicDelete({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteRbacProfile',
+      },
+    })
+  }
+
+  getRbacProfileBindings = async () => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebinding`
+    const response = await this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRbacProfileBindings',
+      },
+    })
+    return response && response.items
+  }
+
+  createRbacProfileBinding = async (body) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebinding`
+    const response = await this.client.basicPost({
+      url,
+      body,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createClusterClusterRoleBinding',
       },
     })
     return response

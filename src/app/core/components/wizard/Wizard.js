@@ -160,6 +160,7 @@ class Wizard extends PureComponent {
       onCancel,
       showFinishAndReviewButton,
       hideAllButtons,
+      buttonCalloutMargin,
     } = this.props
     const shouldShowFinishAndReview =
       typeof showFinishAndReviewButton === 'function'
@@ -181,7 +182,10 @@ class Wizard extends PureComponent {
           setActiveStep: this.setActiveStep,
         })}
         {!hideAllButtons && (
-          <WizardButtons hasCalloutFields={this.state.calloutFields}>
+          <WizardButtons
+            calloutMargin={buttonCalloutMargin}
+            hasCalloutFields={this.state.calloutFields}
+          >
             {onCancel && <CancelButton onClick={onCancel} />}
             {this.hasBack() && <PrevButton onClick={this.handleBack} />}
             {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
