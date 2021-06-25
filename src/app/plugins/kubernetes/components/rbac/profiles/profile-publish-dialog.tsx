@@ -3,7 +3,7 @@ import { Dialog, DialogActions, makeStyles } from '@material-ui/core'
 import Theme from 'core/themes/model'
 import Button from 'core/elements/button'
 import Text from 'core/elements/text'
-import { patchRbacProfile, rbacProfilesActions } from './actions'
+import { patchRbacProfile, rbacProfileActions } from './actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -35,7 +35,7 @@ const ProfilePublishDialog = ({ profile, className = '' }: Props) => {
   const handleOpen = () => setModal(true)
   const handleClose = () => setModal(false)
 
-  const [, , reloadRbacProfiles] = useDataLoader(rbacProfilesActions.list)
+  const [, , reloadRbacProfiles] = useDataLoader(rbacProfileActions.list)
 
   const publishProfile = useCallback(async () => {
     const body = {

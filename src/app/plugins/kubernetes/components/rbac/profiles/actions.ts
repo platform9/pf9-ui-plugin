@@ -10,14 +10,37 @@ const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'metadata.name'
 
-export const rbacProfilesActions = createCRUDActions(ActionDataKeys.RbacProfiles, {
+export const rbacProfileActions = createCRUDActions(ActionDataKeys.RbacProfiles, {
   listFn: async () => {
     Bugsnag.leaveBreadcrumb('Attempting to get rbac profiles')
     const response = await qbert.getRbacProfiles()
     return response
   },
   createFn: async (data) => {
-    Bugsnag.leaveBreadcrumb('Attempting to create rbac profile')
+    const roles = Object.values(data.roles).map(
+      ({ name, namespace }) => `${namespace}/roles/${name}`,
+    )
+    const roleBindings = Object.values(data.roleBindings).map(
+      ({ name, namespace }) => `${namespace}/rolebindings/${name}`,
+    )
+    const clusterRoles = Object.values(data.clusterRoles).map(({ name }) => `clusterroles/${name}`)
+    const clusterRoleBindings = Object.values(data.clusterRoleBindings).map(
+      ({ name }) => `clusterrolebindings/${name}`,
+    )
+    const body = {
+      apiVersion: 'sunpike.platform9.com/v1alpha2',
+      kind: 'ClusterProfile',
+      metadata: { name: data.profileName },
+      spec: {
+        cloneFrom: data.baseCluster,
+        namespaceScopedResources: [...roles, ...roleBindings],
+        clusterScopedResources: [...clusterRoles, ...clusterRoleBindings],
+        reapInterval: 30,
+      },
+    }
+    Bugsnag.leaveBreadcrumb('Attempting to create a rbac profile', body)
+    await qbert.createRbacProfile(body)
+    trackEvent('Create Rbac Profile', body)
   },
   updateFn: async (data) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile')

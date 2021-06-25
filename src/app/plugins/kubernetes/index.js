@@ -544,7 +544,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'Cluster Profiles',
-      icon: 'user-shield',
+      icon: 'users-cog',
       requiredRoles: 'admin',
       link: { path: '/rbac_profiles' },
     },

@@ -3,7 +3,7 @@ import FormWrapper from 'core/components/FormWrapper'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'core/utils/routes'
 import useReactRouter from 'use-react-router'
-import { rbacProfileBindingsActions, rbacProfilesActions } from './actions'
+import { rbacProfileBindingsActions, rbacProfileActions } from './actions'
 import { propEq } from 'ramda'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Wizard from 'core/components/wizard/Wizard'
@@ -117,7 +117,7 @@ const DeployRbacProfilePage = () => {
   const classes = useStyles({})
   const { history, match } = useReactRouter()
   const profileName = match?.params?.name
-  const [profiles, profilesLoading] = useDataLoader(rbacProfilesActions.list)
+  const [profiles, profilesLoading] = useDataLoader(rbacProfileActions.list)
   // When wireframes are finalized for how to manage active profiles,
   // add below back in and display that info in the clusters list
   const [, , refreshProfileBindings] = useDataLoader(rbacProfileBindingsActions.list)

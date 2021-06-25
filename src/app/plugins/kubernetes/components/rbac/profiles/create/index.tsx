@@ -8,7 +8,9 @@ import ClusterRolesStep from 'k8s/components/rbac/profiles/create/cluster-roles-
 import RoleBindingsStep from 'k8s/components/rbac/profiles/create/role-bindings-step'
 import ClusterRoleBindingsStep from 'k8s/components/rbac/profiles/create/cluster-role-bindings-step'
 import ReviewStep from 'k8s/components/rbac/profiles/create/review-step'
-import { rbacProfileActions } from 'k8s/components/rbac/actions'
+import { rbacProfileActions } from '../actions'
+import useReactRouter from 'use-react-router'
+import { routes } from 'core/utils/routes'
 
 const CreateRbacProfile = () => {
   const initialContext = useMemo(
@@ -22,8 +24,10 @@ const CreateRbacProfile = () => {
     }),
     [],
   )
+  const { history } = useReactRouter()
   const handleSubmit = useCallback(async (params) => {
     await rbacProfileActions.create(params)
+    history.push(routes.rbac.profiles.list.path())
   }, [])
 
   return (

@@ -2,7 +2,7 @@ import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { routes } from 'core/utils/routes'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { rbacProfilesActions } from './actions'
+import { rbacProfileActions } from './actions'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { makeStyles } from '@material-ui/core'
 import Theme from 'core/themes/model'
@@ -81,11 +81,11 @@ export const options = {
     { id: 'action', label: 'Action', render: renderActionButton },
   ],
   cacheKey: ActionDataKeys.RbacProfiles,
-  deleteFn: rbacProfilesActions.delete,
+  deleteFn: rbacProfileActions.delete,
   // editUrl: (_, id) => routes.rbac.profiles.edit.path({ id }),
   // editCond: ([selectedRow]) => selectedRow.status === 'published',
   name: 'RbacProfiles',
-  loaderFn: rbacProfilesActions.list,
+  loaderFn: rbacProfileActions.list,
   title: 'RBAC Profiles',
   uniqueIdentifier: 'name',
   searchTargets: ['metadata.name'],
