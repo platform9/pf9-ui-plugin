@@ -3,43 +3,12 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { routes } from 'core/utils/routes'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { rbacProfilesActions } from './actions'
-// import useDataLoader from 'core/hooks/useDataLoader'
-// import { listTablePrefs } from 'app/constants'
-// import { createUsePrefParamsHook } from 'core/hooks/useParams'
-// import { pick } from 'ramda'
-// import useScopedPreferences from 'core/session/useScopedPreferences'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { makeStyles } from '@material-ui/core'
 import Theme from 'core/themes/model'
 import Button from 'core/elements/button'
 import ProfilePublishDialog from './profile-publish-dialog'
 import SimpleLink from 'core/components/SimpleLink'
-
-// const defaultParams = {
-//   orderBy: 'name',
-//   orderDirection: 'asc',
-// }
-// const usePrefParams = createUsePrefParamsHook('RbacProfiles', listTablePrefs)
-
-// const ListPage = ({ ListContainer }) => {
-//   return () => {
-//     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-//     const [{ currentTenant }] = useScopedPreferences()
-//     const [data, loading, reload] = useDataLoader(rbacProfilesActions.list, {
-//       ...params,
-//       namespace: currentTenant,
-//     })
-//     return (
-//       <ListContainer
-//         loading={loading}
-//         reload={reload}
-//         data={data}
-//         getParamsUpdater={getParamsUpdater}
-//         {...pick(listTablePrefs, params)}
-//       />
-//     )
-//   }
-// }
 
 interface Params {
   status?: string
@@ -116,13 +85,11 @@ export const options = {
   // editUrl: (_, id) => routes.rbac.profiles.edit.path({ id }),
   // editCond: ([selectedRow]) => selectedRow.status === 'published',
   name: 'RbacProfiles',
-  // profiles actions file needs to be imported & used somewhere
   loaderFn: rbacProfilesActions.list,
   title: 'RBAC Profiles',
-  // uniqueIdentifier: 'metadata.uid',
+  uniqueIdentifier: 'name',
   searchTargets: ['metadata.name'],
   multiSelection: false,
-  // ListPage,
 }
 
 const components = createCRUDComponents(options)

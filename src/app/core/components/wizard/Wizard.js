@@ -152,7 +152,6 @@ class Wizard extends PureComponent {
 
   render() {
     const { wizardContext, setWizardContext, steps, activeStep } = this.state
-    console.log(wizardContext)
     const {
       showSteps,
       children,

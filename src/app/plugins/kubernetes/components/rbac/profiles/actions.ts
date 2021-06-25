@@ -4,10 +4,11 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { makeRbacProfilesSelector, rbacProfilesSelector } from './selectors'
 import uuid from 'uuid'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
-const uniqueIdentifier = 'metadata.uid'
+const uniqueIdentifier = 'metadata.name'
 
 export const rbacProfilesActions = createCRUDActions(ActionDataKeys.RbacProfiles, {
   listFn: async () => {
@@ -22,7 +23,10 @@ export const rbacProfilesActions = createCRUDActions(ActionDataKeys.RbacProfiles
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile')
   },
   deleteFn: async ({ name }, currentItems) => {
-    Bugsnag.leaveBreadcrumb('Attempting to update rbac profile')
+    Bugsnag.leaveBreadcrumb('Attempting to delete rbac profile', { name })
+    trackEvent('Delete RBAC Profile', {
+      name,
+    })
     return qbert.deleteRbacProfile(name)
   },
   uniqueIdentifier,
@@ -38,20 +42,24 @@ export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacP
     return response
   },
   createFn: async ({ cluster, profileName }) => {
-    const clusterName = cluster[0].name
+    const clusterId = cluster[0].name
     const body = {
       apiVersion: 'sunpike.platform9.com/v1alpha2',
       kind: 'ClusterProfileBinding',
       metadata: {
-        name: `${profileName}-${clusterName}-${uuid.v4()}`,
+        name: `${profileName}-${clusterId}-${uuid.v4()}`,
       },
       spec: {
-        clusterRef: clusterName,
-        profileRef: profileName,
+        clusterRef: clusterId,
+        profileRef: `sunpike-profiles/default/${profileName}`,
         dryRun: false,
       },
     }
-    Bugsnag.leaveBreadcrumb('Attempting to create rbac profile binding')
+    Bugsnag.leaveBreadcrumb('Attempting to create rbac profile binding', { clusterId, profileName })
+    trackEvent('Create RBAC Profile Binding', {
+      clusterId,
+      profileName,
+    })
     const profileBinding = await qbert.createRbacProfileBinding(body)
     return profileBinding
   },
@@ -61,7 +69,7 @@ export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacP
   deleteFn: async ({ name }, currentItems) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile binding')
   },
-  uniqueIdentifier: 'metadata.name',
+  uniqueIdentifier,
   entityName: 'RbacProfileBinding',
 })
 

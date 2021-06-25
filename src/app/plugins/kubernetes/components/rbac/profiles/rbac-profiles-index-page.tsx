@@ -4,11 +4,6 @@ import Tab from 'core/components/tabs/Tab'
 import RbacProfilesListPage from './rbac-profiles-list-page'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import DriftAnalyticsPage from './drift-analytics-page'
-// Need to import the actions file somewhere in the app for it
-// to load up, is there somewhere better?
-//@ts-ignore
-import { rbacProfilesActions } from './actions'
-console.log(rbacProfilesActions, 'rbac profiles actions')
 
 const RbacProfilesIndexPage = () => (
   <PageContainer>
