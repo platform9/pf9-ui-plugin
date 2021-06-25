@@ -905,6 +905,22 @@ export const routes = {
       },
       name: 'RBAC:ClusterRoleBindings:Edit',
     }),
+    profiles: {
+      add: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/add`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Add',
+      }),
+      list: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/list`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+    },
   },
   password: {
     reset: Route.register({ url: `${appUrlRoot}/reset/password`, name: 'Password:Reset' }),

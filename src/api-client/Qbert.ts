@@ -1313,6 +1313,20 @@ class Qbert extends ApiService {
     })
   }
 
+  createRbacProfile = async (body) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile`
+    const response = await this.client.basicPost({
+      url,
+      body,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createRbacProfile',
+      },
+    })
+    return response
+  }
+
   /* Managed Apps */
   @trackApiMethodMetadata({
     url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses',

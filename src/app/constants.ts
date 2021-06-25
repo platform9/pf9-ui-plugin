@@ -15,6 +15,7 @@ export const resetPasswordApiUrl = '/clemency/reset/password'
 export const forgotPasswordApiUrl = '/clemency/request'
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const ironicWizardUrl = `${appUrlRoot}/metalstack/setup`
+export const profilesHelpUrl = `${appUrlRoot}/help`
 export const allKey = '__all__'
 export const noneKey = '__none__'
 export const listTablePrefs = [
