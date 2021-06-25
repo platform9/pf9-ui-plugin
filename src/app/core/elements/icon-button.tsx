@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import Theme from 'core/themes/model'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/styles'
@@ -6,20 +6,20 @@ import { ButtonProps } from '@material-ui/core'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 interface Props extends Omit<ButtonProps, 'variant'> {
-  children: string
   disabled?: boolean
   icon?: string
 }
 
-const IconButton = ({
+const IconButton: FC<Props> = ({
   className = undefined,
   icon = undefined,
   children,
   disabled = false,
-}: Props) => {
+  ...props
+}) => {
   const classes = useStyles({})
   return (
-    <button className={clsx(classes.button, className, { disabled })}>
+    <button className={clsx(classes.button, className, { disabled })} {...props}>
       <FontAwesomeIcon className={classes.icon} size="2x">
         {icon || children}
       </FontAwesomeIcon>

@@ -312,13 +312,36 @@ export const routes = {
       plugin: AppPlugins.Kubernetes,
     },
   }),
-  apiAccess: Route.register({
-    url: `${pluginRoutePrefix}/api_access`,
-    name: 'APIAccess',
-    defaultParams: {
-      plugin: AppPlugins.Kubernetes,
-    },
-  }),
+  apiAccess: {
+    api: Route.register({
+      url: `${pluginRoutePrefix}/api-access`,
+      name: 'ApiAccess:API',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    apiServices: Route.register({
+      url: `${pluginRoutePrefix}/api-access#api-services`,
+      name: 'ApiAccess:APIServices',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    kubeConfig: Route.register({
+      url: `${pluginRoutePrefix}/api-access#kubeconfig`,
+      name: 'ApiAccess:KubeConfig',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    terraform: Route.register({
+      url: `${pluginRoutePrefix}/api-access#terraform`,
+      name: 'ApiAccess:Terraform',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+  },
   notifications: Route.register({
     url: `${pluginRoutePrefix}/notifications`,
     name: 'Notifications',

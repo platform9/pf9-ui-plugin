@@ -43,6 +43,7 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import OnboardingBanner from './components/onboarding/OnboardingBanner'
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
+import ApiServicesPage from './components/apiAccess/ApiServicesPage'
 import OnboardNewNodePage from './components/infrastructure/nodes/onboard-new-node-page'
 import AddRepositoryPage from './components/app-catalog/repositories/add-repository-page'
 import DeployAppPage from './components/app-catalog/deployed-apps/deploy-app-page'
@@ -305,7 +306,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'API Access',
-      link: { path: '/api_access', exact: true },
+      link: { path: '/api-access', exact: true },
       component: ApiAccessPage,
     },
     {
@@ -466,7 +467,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
-    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
+    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api-access') },
   ]
 
   // These nav items are in active development but not shown in production.
@@ -532,7 +533,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac' },
     },
-    { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
+    { name: 'API Access', icon: 'key', link: { path: '/api-access' } },
   ]
 
   const navItems = useClarityLinks ? clarityNavItems : devNavItems
