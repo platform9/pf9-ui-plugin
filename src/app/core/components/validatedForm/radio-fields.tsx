@@ -33,6 +33,7 @@ interface FormProps {
   errorMessage?: string
   onChange: (isChecked: boolean) => void
   formControlLabelClasses?: any
+  disabled?: boolean
 }
 interface Props extends FormProps, ValidatedFormProps, WithStyles<typeof styles> {}
 
@@ -72,7 +73,7 @@ const RadioFields = compose(
                       color="primary"
                       checked={optionValue === value}
                       onChange={() => this.handleChange(optionValue)}
-                      disabled={disabled}
+                      disabled={this.props.disabled || disabled}
                     />
                   }
                 />

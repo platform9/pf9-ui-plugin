@@ -16,7 +16,6 @@ import {
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
-import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { both, omit, prop } from 'ramda'
 import React, { useState } from 'react'
@@ -32,7 +31,6 @@ import {
   canScaleMasters,
   canScaleWorkers,
   canUpgradeCluster,
-  notBusy,
   isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
@@ -282,7 +280,7 @@ export const options = {
     { id: 'tags', label: 'Metadata', render: renderMetaData },
   ],
   cacheKey: ActionDataKeys.Clusters,
-  editUrl: (_, id) => routes.cluster.edit.path({ id }),
+  // editUrl: (_, id) => routes.cluster.edit.path({ id }),
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
@@ -295,6 +293,21 @@ export const options = {
       icon: 'info-circle',
       label: 'Details',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
+    },
+    {
+      icon: 'edit',
+      label: 'Edit',
+      routeTo: (rows) => routes.cluster.edit.path({ id: rows[0].uuid }),
+    },
+    {
+      cond: both(isAdmin, canUpgradeCluster),
+      icon: 'level-up',
+      label: 'Upgrade Cluster',
+      dialog: ClusterUpgradeDialog,
+      disabledInfo: ([cluster]) =>
+        !!cluster && clockDriftDetectedInNodes(cluster.nodes)
+          ? 'Cannot upgrade cluster: clock drift detected in at least one node'
+          : 'Cannot upgrade cluster',
     },
     {
       cond: both(isAdmin, canScaleMasters),
@@ -311,23 +324,14 @@ export const options = {
         !!cluster && isAzureAutoscalingCluster(cluster)
           ? 'Scaling Azure autoscaling clusters is not yet supported'
           : 'Cannot scale workers: cluster is busy',
+      showDivider: true,
     },
-    {
-      cond: both(isAdmin, canUpgradeCluster),
-      icon: 'level-up',
-      label: 'Upgrade Cluster',
-      dialog: ClusterUpgradeDialog,
-      disabledInfo: ([cluster]) =>
-        !!cluster && clockDriftDetectedInNodes(cluster.nodes)
-          ? 'Cannot upgrade cluster: clock drift detected in at least one node'
-          : 'Cannot upgrade cluster',
-    },
-    {
-      cond: both(isAdmin, notBusy),
-      icon: 'chart-bar',
-      label: 'Monitoring',
-      dialog: PrometheusAddonDialog,
-    },
+    // {
+    //   cond: both(isAdmin, notBusy),
+    //   icon: 'chart-bar',
+    //   label: 'Monitoring',
+    //   dialog: PrometheusAddonDialog,
+    // },
     // Disable logging till all CRUD features for log datastores are implemented.
     /* {
       cond: false,

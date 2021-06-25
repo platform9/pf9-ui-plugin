@@ -1,7 +1,7 @@
 import React from 'react'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 
-const KubevirtPluginOperator = ({ wizardContext, setWizardContext }) => (
+const KubevirtPluginOperator = ({ wizardContext, setWizardContext, disabled = false }) => (
   <CheckboxField
     id="deployKubevirt"
     label="Enable KubeVirt"
@@ -9,6 +9,7 @@ const KubevirtPluginOperator = ({ wizardContext, setWizardContext }) => (
     infoPlacement="right-end"
     value={wizardContext.deployKubevirt}
     onChange={(value) => setWizardContext({ deployKubevirt: value })}
+    disabled={disabled}
   />
 )
 

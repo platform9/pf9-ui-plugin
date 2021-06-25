@@ -83,8 +83,13 @@ const addonMap = {
 }
 
 interface WizardAddonContext {
-  addons: string[]
-  setAddonContext: (addons: string[]) => void
+  addons: Addon[]
+  setAddonContext: (addons: Addon[]) => void
+}
+
+interface Addon {
+  addon: string
+  disabled?: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -98,11 +103,16 @@ export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
   }, [memoizedDep(addons)])
   return (
     <Suspense fallback="loading...">
-      {addons.map((addon) => {
+      {addons?.map(({ addon, disabled = false }) => {
         const Addon = getAddonComponent(addon, 'toggler')
         return (
           Addon && (
-            <Addon key={addon} wizardContext={wizardContext} setWizardContext={setWizardContext} />
+            <Addon
+              key={addon}
+              wizardContext={wizardContext}
+              setWizardContext={setWizardContext}
+              disabled={disabled}
+            />
           )
         )
       })}
@@ -115,7 +125,7 @@ export const AddonDetailCards = ({ wizardContext, setWizardContext, values }) =>
 
   return (
     <Suspense fallback="loading...">
-      {addons.map((addon) => {
+      {addons?.map(({ addon, disabled = false }) => {
         const addonId = getAddonComponent(addon, 'formId') || addon
         const { component: Addon, reverse = false } = getAddonComponent(addon, 'details')
         if (!values[addonId]) {

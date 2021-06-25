@@ -45,6 +45,13 @@ const useStyles = makeStyles((theme) => ({
       color: 'inherit',
     },
   },
+  divider: {
+    width: 1,
+    height: 32,
+    backgroundColor: theme.palette.grey[200],
+    margin: theme.spacing(0, 2),
+    border: 'none',
+  },
 }))
 
 export const ToolbarActionIcon = ({ icon }) => {
@@ -127,16 +134,20 @@ export const ListTableBatchActions = ({
   onRefresh = undefined,
   listTableParams = undefined,
 }) => {
+  const classes = useStyles()
   return (
     <>
       {batchActions.map((action) => (
-        <ListTableAction
-          key={action.label}
-          {...action}
-          onRefresh={onRefresh}
-          selected={selected}
-          listTableParams={listTableParams}
-        />
+        <React.Fragment key={action.label}>
+          <ListTableAction
+            key={action.label}
+            {...action}
+            onRefresh={onRefresh}
+            selected={selected}
+            listTableParams={listTableParams}
+          />
+          {action.showDivider && <hr className={classes.divider} />}
+        </React.Fragment>
       ))}
     </>
   )

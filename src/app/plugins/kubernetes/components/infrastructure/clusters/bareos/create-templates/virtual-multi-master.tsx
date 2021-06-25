@@ -76,12 +76,15 @@ interface Props {
 }
 
 const clusterAddons = [
-  'etcdBackup',
-  'enableMetallbLayer2',
-  'prometheusMonitoringEnabled',
-  'networkPluginOperator',
-  'kubevirtPluginOperator',
+  { addon: 'etcdBackup' },
+  { addon: 'enableMetallbLayer2' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'networkPluginOperator' },
+  { addon: 'kubevirtPluginOperator' },
 ]
+
+const advancedClusterAddons = [{ addon: 'enableTopologyManager' }]
+
 const trackingFields = {
   platform: CloudProviders.VirtualMachine,
   target: ClusterCreateTypes.MultiMaster,
@@ -275,7 +278,7 @@ const VirtualMultiMasterCluster: FC<Props> = ({ onNext, ...props }) => {
                 <AddonTogglers
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['enableTopologyManager']}
+                  addons={advancedClusterAddons}
                 />
               </FormFieldCard>
             </>
