@@ -3,11 +3,31 @@ import { mergeLeft, pipe } from 'ramda'
 import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
+import { determineProfileResources } from './helpers'
+
+const determineProfileAction = (profile) => {
+  const status = profile.status.phase
+  if (status === 'published') {
+    return 'deploy'
+  } else if (status === 'draft') {
+    return 'publish'
+  }
+  return 'none'
+}
 
 export const rbacProfilesSelector = createSelector(
   [getDataSelector(DataKeys.RbacProfiles)],
   (rbacProfiles) => {
-    console.log(rbacProfiles, 'rbac profiles in selector')
+    return rbacProfiles.map((profile) => {
+      const profileResources = determineProfileResources(profile)
+      return {
+        ...profile,
+        action: determineProfileAction(profile),
+        id: profile.metadata.uid,
+        name: profile.metadata.name,
+        ...profileResources,
+      }
+    })
     return rbacProfiles
   },
 )

@@ -920,6 +920,13 @@ export const routes = {
         },
         name: 'RBAC:RbacProfiles:Add',
       }),
+      deploy: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/deploy/:name`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Deploy',
+      }),
       profiles: Route.register({
         url: `${pluginRoutePrefix}/rbac_profiles#profiles`,
         defaultParams: {

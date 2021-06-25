@@ -3,28 +3,17 @@ import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { makeRbacProfilesSelector, rbacProfilesSelector } from './selectors'
+import uuid from 'uuid'
 
 const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'metadata.uid'
-console.log('==============this got loaded up=============')
+
 export const rbacProfilesActions = createCRUDActions(ActionDataKeys.RbacProfiles, {
-  listFn: async ({ namespace }) => {
-    console.log('rbac profiles list function')
+  listFn: async () => {
     Bugsnag.leaveBreadcrumb('Attempting to get rbac profiles')
-    console.log(namespace, 'pass this into rbac profiles get after done testing')
-    const response = await qbert.getRbacProfiles('default')
-    // Surface namespace like we do clusterId for indexing purposes
-    // When we switch tenants, we will need to update the list of profiles
-    // to match the new one. Not sure if it will automatically pull
-    // the profiles for the new namespace, but test it once I can
-    const mappedResponse = response.map((profile) => {
-      return {
-        ...profile,
-        namespace: profile.metadata.namespace,
-      }
-    })
-    return mappedResponse
+    const response = await qbert.getRbacProfiles()
+    return response
   },
   createFn: async (data) => {
     Bugsnag.leaveBreadcrumb('Attempting to create rbac profile')
@@ -32,12 +21,51 @@ export const rbacProfilesActions = createCRUDActions(ActionDataKeys.RbacProfiles
   updateFn: async (data) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile')
   },
-  deleteFn: async ({ id }, currentItems) => {
+  deleteFn: async ({ name }, currentItems) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile')
+    return qbert.deleteRbacProfile(name)
   },
   uniqueIdentifier,
   entityName: 'RbacProfile',
   selector: rbacProfilesSelector,
   selectorCreator: makeRbacProfilesSelector,
-  // indexBy: 'namespace',
 })
+
+export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacProfileBindings, {
+  listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get rbac profile bindings')
+    const response = await qbert.getRbacProfileBindings()
+    return response
+  },
+  createFn: async ({ cluster, profileName }) => {
+    const clusterName = cluster[0].name
+    const body = {
+      apiVersion: 'sunpike.platform9.com/v1alpha2',
+      kind: 'ClusterProfileBinding',
+      metadata: {
+        name: `${profileName}-${clusterName}-${uuid.v4()}`,
+      },
+      spec: {
+        clusterRef: clusterName,
+        profileRef: profileName,
+        dryRun: false,
+      },
+    }
+    Bugsnag.leaveBreadcrumb('Attempting to create rbac profile binding')
+    const profileBinding = await qbert.createRbacProfileBinding(body)
+    return profileBinding
+  },
+  updateFn: async (data) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update rbac profile binding')
+  },
+  deleteFn: async ({ name }, currentItems) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update rbac profile binding')
+  },
+  uniqueIdentifier: 'metadata.name',
+  entityName: 'RbacProfileBinding',
+})
+
+export const patchRbacProfile = async (name, body) => {
+  const response = await qbert.patchRbacProfile(name, body)
+  return response
+}
