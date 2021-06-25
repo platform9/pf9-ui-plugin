@@ -87,7 +87,7 @@ const clusterAddons = [
   'prometheusMonitoringEnabled',
   'networkPluginOperator',
   'kubevirtPluginOperator',
-  'profileEngine',
+  'profileAgent',
 ]
 const trackingFields = {
   platform: CloudProviders.VirtualMachine,

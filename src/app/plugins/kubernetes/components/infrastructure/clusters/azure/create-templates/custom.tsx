@@ -185,7 +185,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileEngine']
+const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileAgent']
 
 interface Props {
   wizardContext: any

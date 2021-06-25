@@ -28,7 +28,7 @@ const MetalLbAddonLayer2Field = React.lazy(async () =>
   })),
 )
 
-const ProfileEngineField = React.lazy(async () => import('./profile-engine'))
+const ProfileAgentField = React.lazy(async () => import('./profile-agent'))
 
 const EtcdBackupFields = React.lazy(async () => import('./etcd-backup'))
 const EdcdBackupAddonFields = React.lazy(async () =>
@@ -57,8 +57,8 @@ const addonMap = {
     toggler: KubevirtPluginOperator,
     details: { component: null },
   },
-  profileEngine: {
-    toggler: ProfileEngineField,
+  profileAgent: {
+    toggler: ProfileAgentField,
     details: { component: null },
   },
   etcdBackup: {
