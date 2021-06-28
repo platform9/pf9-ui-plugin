@@ -11,7 +11,6 @@ import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/app-catalog/apps-index-page'
 import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
-import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
 import OnboardingPage from './components/onboarding/onboarding-page'
@@ -56,9 +55,12 @@ import VirtualMachineDetailPage from './components/virtual-machines/details'
 import AddVirtualMachinePage from './components/virtual-machines/add'
 import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
 import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
-
 import UpgradeClusterPage from './components/infrastructure/clusters/UpgradeClusterPage'
 import { isDecco } from 'core/utils/helpers'
+import CreateRbacProfile from 'k8s/components/rbac/profiles/create'
+import RbacProfilesIndexPage from './components/rbac/profiles/rbac-profiles-index-page'
+import DeployRbacProfilePage from './components/rbac/profiles/deploy/deploy-rbac-profile-page'
+
 class Kubernetes extends React.PureComponent {
   render() {
     return <h1>Kubernetes Plugin</h1>
@@ -311,7 +313,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'API Access',
-      link: { path: '/api_access', exact: true },
+      link: { path: '/api-access', exact: true },
       component: ApiAccessPage,
     },
     {
@@ -349,6 +351,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac', exact: true },
       component: RbacIndexPage,
+    },
+    {
+      name: 'Add RBAC Profile',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/add', exact: true },
+      component: CreateRbacProfile,
     },
     {
       name: 'Add Role',
@@ -397,6 +405,18 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Alarms',
       link: { path: '/alarms', exact: true },
       component: MonitoringPage,
+    },
+    {
+      name: 'RBAC Profiles',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles', exact: true },
+      component: RbacProfilesIndexPage,
+    },
+    {
+      name: 'Deploy RBAC Profile',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/deploy/:name', exact: true },
+      component: DeployRbacProfilePage,
     },
   ])
 
@@ -472,7 +492,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
-    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
+    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api-access') },
   ]
 
   // These nav items are in active development but not shown in production.
@@ -528,6 +548,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
         },
       ],
     },
+    {
+      name: 'Cluster Profiles',
+      icon: 'users-cog',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles' },
+    },
     // TODO: Disabled till all CRUD operations are implemented
     // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
     // { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
@@ -538,7 +564,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac' },
     },
-    { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
+    { name: 'API Access', icon: 'key', link: { path: '/api-access' } },
   ]
 
   const navItems = useClarityLinks ? clarityNavItems : devNavItems

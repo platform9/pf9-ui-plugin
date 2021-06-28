@@ -206,7 +206,7 @@ const AppContainer = () => {
           (!initialFeatures?.data?.experimental?.kplane &&
             pathStrOr(false, 'data.experimental.sso', initialFeatures)),
       })
-      if (isDecco(initialFeatures.data)) {
+      if (isDecco(initialFeatures?.data)) {
         Watchdog.register({ handler: systemHealthCheck, frequency: 1000 * 60 * 10 })
       }
     }

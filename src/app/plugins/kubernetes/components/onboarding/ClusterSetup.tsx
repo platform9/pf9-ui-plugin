@@ -70,7 +70,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   }, [])
 
   const handleAccessCluster = useCallback(() => {
-    history.push(routes.apiAccess.path())
+    history.push(routes.apiAccess.api.path())
   }, [])
 
   const togglePanel = useCallback(
