@@ -20,7 +20,6 @@ import CodeMirror from 'core/components/validatedForm/CodeMirror'
 const useStyles = makeStyles((theme) => ({
   root: {
     width: 715,
-    marginTop: theme.spacing(4),
   },
   formCard: {
     marginTop: theme.spacing(0.5),

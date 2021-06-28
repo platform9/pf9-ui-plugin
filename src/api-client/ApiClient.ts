@@ -18,7 +18,7 @@ import { ID } from './keystone.model'
 
 import { normalizeResponse } from 'api-client/helpers'
 import { hasPathStr, pathStr } from 'utils/fp'
-import { prop, has, cond, T, identity, when } from 'ramda'
+import { prop, has, cond, T, identity, when, mergeDeepLeft } from 'ramda'
 import { isPlainObject, pathJoin } from 'utils/misc'
 // import { IApiClient } from './model'
 // import ApiCache from './cache-client'
@@ -333,13 +333,13 @@ class ApiClient {
     version,
     endpoint = undefined,
     body = undefined,
-    options: { clsName, mthdName },
+    options: { clsName, mthdName, config },
   }: IBasicRequestPostParams) => {
     endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.patch<T>(
       pathJoin(endpoint, url),
       body,
-      this.getAuthHeaders(),
+      mergeDeepLeft(this.getAuthHeaders(), config),
     )
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
