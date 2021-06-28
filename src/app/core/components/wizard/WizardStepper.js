@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { withStyles, makeStyles } from '@material-ui/styles'
 import { Stepper, StepConnector, Step, StepLabel } from '@material-ui/core'
 import clsx from 'clsx'
-import { Check } from '@material-ui/icons'
 import Text from 'core/elements/text'
 
 const stepIconsSize = 36

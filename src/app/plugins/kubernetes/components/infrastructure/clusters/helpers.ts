@@ -271,7 +271,7 @@ export const createBareOSCluster = async (data) => {
     ...workerNodes.map((uuid) => ({ isMaster: false, uuid })),
   ]
 
-  await qbert.attach(cluster.uuid, nodes)
+  await qbert.attachNodes(cluster.uuid, nodes)
 
   return cluster
 }
