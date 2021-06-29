@@ -1341,7 +1341,7 @@ class Qbert extends ApiService {
 
   /* RBAC Profiles */
   getRbacProfiles = async () => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles`
     const response = await this.client.basicGet<any>({
       url,
       version: 'v4',
@@ -1354,7 +1354,7 @@ class Qbert extends ApiService {
   }
 
   createRbacProfile = async (body) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles`
     const response = await this.client.basicPost({
       url,
       body,
@@ -1368,7 +1368,7 @@ class Qbert extends ApiService {
   }
 
   patchRbacProfile = async (name, body) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile/${name}`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles/${name}`
     const response = await this.client.basicPatch<any>({
       url,
       body,
@@ -1387,7 +1387,7 @@ class Qbert extends ApiService {
   }
 
   deleteRbacProfile = async (name) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofile/${name}`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles/${name}`
     await this.client.basicDelete({
       url,
       version: 'v4',
@@ -1399,7 +1399,7 @@ class Qbert extends ApiService {
   }
 
   getRbacProfileBindings = async () => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebinding`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebindings`
     const response = await this.client.basicGet<any>({
       url,
       version: 'v4',
@@ -1412,7 +1412,7 @@ class Qbert extends ApiService {
   }
 
   createRbacProfileBinding = async (body) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebinding`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebindings`
     const response = await this.client.basicPost({
       url,
       body,
