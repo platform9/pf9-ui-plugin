@@ -392,42 +392,21 @@ class Qbert extends ApiService {
     })
   }
 
-  upgradeCluster = async (clusterId, type) => {
-    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade`, { type })
-    return this.client.basicPost({
-      url,
-      version: 'v4',
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'upgradeCluster',
-      },
-    })
-  }
-
-  upgradeClusterOnPercentage = async (clusterId, type, body) => {
+  upgradeClusterNodes = async (clusterId, type, body = null) => {
     const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`)
-    return this.client.basicPost({
+    const upgradeClusterNodesOptions = {
       url,
       version: 'v4',
-      body,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'upgradeClusterOnPercentage',
+        mthdName: 'upgradeClusterNodes',
       },
-    })
-  }
-
-  upgradeClusterInBatches = async (clusterId, type, body) => {
-    const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`)
-    return this.client.basicPost({
-      url,
-      version: 'v4',
-      body,
-      options: {
-        clsName: this.getClassName(),
-        mthdName: 'upgradeClusterInBatches',
-      },
-    })
+    }
+    if (body) {
+      return this.client.basicPost({ ...upgradeClusterNodesOptions, body })
+    } else {
+      return this.client.basicPost({ ...upgradeClusterNodesOptions })
+    }
   }
 
   @trackApiMethodMetadata({

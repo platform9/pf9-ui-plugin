@@ -16,7 +16,6 @@ import Theme from 'core/themes/model'
 import { AddonTogglers } from './form-components/cluster-addon-manager'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import Text from 'core/elements/text'
-import { pluck } from 'ramda'
 import ClusterBatchUpgradeDialog from './ClusterBatchUpgradeDialog'
 import DocumentMeta from 'core/components/DocumentMeta'
 import SubmitButton from 'core/components/buttons/SubmitButton'
@@ -71,33 +70,25 @@ const UpgradeClusterPage = () => {
   const classes = useStyles({})
   const cluster = clusters.find((x) => x.uuid === match.params.id)
   const defaultState = getUpgradeTarget(cluster)
+  cluster.selectedUpgradeVersion =
+    defaultState === 'minor' ? cluster.minorUpgradeRoleVersion : cluster.patchUpgradeRoleVersion
+
+  cluster.upgradeType = defaultState
   const [upgradeType, setUpgradeType] = useState(defaultState)
   const [showModal, setModal] = useState(false)
 
   const handleOpen = () => setModal(true)
   const handleClose = () => setModal(false)
 
-  const submitLastStep = (params) => {
+  const onComplete = () => {
     history.push(routes.cluster.list.path())
     handleClose()
   }
 
   // @ts-ignore
-  const [upgradeCluster, upgradingCluster] = useDataUpdater(
-    (clusterActions as any).upgradeCluster,
-    submitLastStep,
-  )
-
-  // @ts-ignore
-  const [upgradeClusterOnPercentage, upgradingClusterOnPercentage] = useDataUpdater(
-    (clusterActions as any).upgradeClusterOnPercentage,
-    submitLastStep,
-  )
-
-  // @ts-ignore
-  const [upgradeClusterInBatches, upgradingClusterInBatches] = useDataUpdater(
-    (clusterActions as any).upgradeClusterInBatches,
-    submitLastStep,
+  const [upgradeClusterNodes, upgradingClusterNodes] = useDataUpdater(
+    (clusterActions as any).upgradeClusterNodes,
+    onComplete,
   )
 
   const wizardMetaFormattedNames = {
@@ -113,34 +104,36 @@ const UpgradeClusterPage = () => {
   const handleSubmit = useCallback(
     (wizardContext) => {
       if (wizardContext.percentageClusterUpgrade) {
-        const batchUpgradePercent = wizardContext.batchUpgradePercent
-        upgradeClusterOnPercentage({ cluster, upgradeType, batchUpgradePercent })
+        upgradeClusterNodes(wizardContext)
+        onComplete()
       }
 
       if (wizardContext.sequentialClusterUpgrade) {
-        upgradeCluster({ cluster, upgradeType })
+        upgradeClusterNodes(wizardContext)
+        onComplete()
       }
 
       if (wizardContext.advancedBatchUpgrade) {
         handleOpen()
       }
     },
-    [upgradeClusterOnPercentage, upgradeType],
-  )
-
-  const handleChange = useCallback(
-    (event, upgradeChoice) => {
-      setUpgradeType(upgradeChoice)
-    },
     [upgradeType],
   )
 
+  const handleChange = useCallback((event, setWizardContext) => {
+    const upgradeChoice = event.target.value
+    setUpgradeType(upgradeChoice)
+    const selectedUpgradeVersion =
+      upgradeChoice === 'minor' ? cluster.minorUpgradeRoleVersion : cluster.patchUpgradeRoleVersion
+    setWizardContext({ selectedUpgradeVersion })
+  }, [])
+
   const confirmBatchUpgrade = useCallback(
     (wizardContext) => {
-      const batchUpgradeNodes = pluck('uuid' as any, wizardContext.batchUpgradeNodes)
-      upgradeClusterInBatches({ cluster, upgradeType, batchUpgradeNodes })
+      upgradeClusterNodes(wizardContext)
+      onComplete()
     },
-    [upgradeClusterInBatches],
+    [upgradeClusterNodes],
   )
 
   return (
@@ -191,18 +184,22 @@ const UpgradeClusterPage = () => {
                               <RadioGroup
                                 name="Upgrade Type"
                                 value={upgradeType}
-                                onChange={handleChange}
+                                onChange={(event) => handleChange(event, setWizardContext)}
                               >
-                                <FormControlLabel
-                                  value={UpgradeTypes.Minor}
-                                  control={<Radio color="primary" />}
-                                  label={`Minor - ${cluster.minorUpgradeRoleVersion}`}
-                                />
-                                <FormControlLabel
-                                  value={UpgradeTypes.Patch}
-                                  control={<Radio color="primary" />}
-                                  label={`Patch - ${cluster.patchUpgradeRoleVersion}`}
-                                />
+                                {cluster.minorUpgradeRoleVersion && (
+                                  <FormControlLabel
+                                    value={UpgradeTypes.Minor}
+                                    control={<Radio color="primary" />}
+                                    label={`Minor - ${cluster.minorUpgradeRoleVersion}`}
+                                  />
+                                )}
+                                {cluster.patchUpgradeRoleVersion && (
+                                  <FormControlLabel
+                                    value={UpgradeTypes.Patch}
+                                    control={<Radio color="primary" />}
+                                    label={`Patch - ${cluster.patchUpgradeRoleVersion}`}
+                                  />
+                                )}
                               </RadioGroup>
                             </FormFieldCard>
                           )}

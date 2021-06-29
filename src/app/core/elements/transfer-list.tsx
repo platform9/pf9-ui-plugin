@@ -1,31 +1,36 @@
 import React, { useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Checkbox from '@material-ui/core/Checkbox'
 import Button from '@material-ui/core/Button'
-import Paper from '@material-ui/core/Paper'
 import SearchBar from 'core/components/SearchBar'
 import Text from './text'
 import { intersection } from 'ramda'
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    margin: 'auto',
+  listWrapper: {
+    display: 'grid',
+    gridTemplateColumns: '360px auto 360px',
+    justifyContent: 'space-between',
+    minHeight: '300px',
   },
   search: {
     marginBottom: '10px !important',
   },
-  paper: {
-    width: 300,
-    height: 260,
+  listContainer: {
+    maxHeight: 260,
     overflow: 'auto',
     boxShadow: 'none',
     borderTop: '1px solid #000',
     borderRadius: '0px',
+  },
+  listButtons: {
+    flexDirection: 'column',
+    display: 'inline-flex',
+    justifyContent: 'center',
   },
   button: {
     margin: theme.spacing(0.5, 0),
@@ -36,9 +41,6 @@ const useStyles = makeStyles((theme) => ({
   },
   text: {
     marginBottom: theme.spacing(1),
-  },
-  list: {
-    justifyContent: 'space-between',
   },
 }))
 
@@ -66,15 +68,15 @@ function uniqueList(list) {
 let leftClusterNodes = []
 let rightClusterNodes = []
 export default function TransferList({ clusterNodes, setWizardContext, wizardContext }) {
-  const classes = useStyles()
+  const classes = useStyles({})
   const [checked, setChecked] = React.useState([])
   const [searchLeft, setSearchLeft] = React.useState('')
   const [searchRight, setSearchRight] = React.useState('')
   const [left, setLeft] = React.useState(clusterNodes)
   const [right, setRight] = React.useState([])
-
   const leftChecked = intersection(checked, left)
   const rightChecked = intersection(checked, right)
+
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value)
     const newChecked = [...checked]
@@ -100,8 +102,8 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
     setChecked([])
   }
 
-  const customList = (items, listName) => (
-    <Paper className={classes.paper}>
+  const renderList = (items, listName) => (
+    <div className={classes.listContainer}>
       <List dense component="div" role="list">
         {items.map((value) => {
           const labelId = `transfer-list-item-${listName}-${value.uuid}-label`
@@ -129,7 +131,7 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
         })}
         <ListItem />
       </List>
-    </Paper>
+    </div>
   )
 
   useEffect(() => {
@@ -166,67 +168,45 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
   const handleRightSearchChange = (search) => setSearchRight(search)
 
   return (
-    <Grid container justify="space-between" alignItems="center" className={classes.root}>
-      <Grid item>
+    <div className={classes.listWrapper}>
+      <div>
         <Text className={classes.text}> Cluster nodes</Text>
         <SearchBar
           className={classes.search}
           onSearchChange={handleLeftSearchChange}
           searchTerm={searchLeft}
         />
-        {customList(left, 'left')}
-      </Grid>
-      <Grid item>
-        <Grid container direction="column" alignItems="center">
-          {/* <Button
-            variant="outlined"
-            size="small"
-            className={classes.button}
-            onClick={handleAllRight}
-            disabled={left.length === 0}
-            aria-label="move all right"
-          >
-            ≫
-          </Button> */}
-          <Button
-            size="small"
-            className={classes.button}
-            onClick={handleCheckedRight}
-            disabled={leftChecked.length === 0}
-            aria-label="move selected right"
-          >
-            &gt;
-          </Button>
-          <Button
-            size="small"
-            className={classes.button}
-            onClick={handleCheckedLeft}
-            disabled={rightChecked.length === 0}
-            aria-label="move selected left"
-          >
-            &lt;
-          </Button>
-          {/* <Button
-            variant="outlined"
-            size="small"
-            className={classes.button}
-            onClick={handleAllLeft}
-            disabled={right.length === 0}
-            aria-label="move all left"
-          >
-            ≪
-          </Button> */}
-        </Grid>
-      </Grid>
-      <Grid item className={classes.list}>
+        {renderList(left, 'left')}
+      </div>
+      <div className={classes.listButtons}>
+        <Button
+          size="small"
+          className={classes.button}
+          onClick={handleCheckedRight}
+          disabled={leftChecked.length === 0}
+          aria-label="move selected right"
+        >
+          &gt;
+        </Button>
+        <Button
+          size="small"
+          className={classes.button}
+          onClick={handleCheckedLeft}
+          disabled={rightChecked.length === 0}
+          aria-label="move selected left"
+        >
+          &lt;
+        </Button>
+      </div>
+      <div>
         <Text className={classes.text}> Selected nodes</Text>
         <SearchBar
           className={classes.search}
           onSearchChange={handleRightSearchChange}
           searchTerm={searchRight}
         />
-        {customList(right, 'right')}
-      </Grid>
-    </Grid>
+        {renderList(right, 'right')}
+      </div>
+    </div>
   )
 }

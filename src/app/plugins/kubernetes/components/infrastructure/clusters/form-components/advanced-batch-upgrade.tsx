@@ -7,6 +7,12 @@ import Text from 'core/elements/text'
 import TransferList from 'core/elements/transfer-list'
 import { makeStyles } from '@material-ui/core/styles'
 import { WizardContext } from 'core/components/wizard/Wizard'
+import {
+  filterInInitialUpgrade,
+  filterInProgressUpgrade,
+  getNodeVersionToCompare,
+} from '../ClusterBatchUpgradeDialog'
+import { partition } from 'ramda'
 
 const useStyles = makeStyles((theme) => ({
   text: {
@@ -36,19 +42,15 @@ export const AdvancedBatchUpgradeAddonField = ({ values }) => {
     wizardContext,
     setWizardContext,
   }: { wizardContext: any; setWizardContext: any } = useContext(WizardContext) as any
-
   const classes = useStyles()
+  const nodeVersionToCompare = getNodeVersionToCompare(wizardContext)
+  const [upgradedNodes, toBeUpgradedNodes] = partition(
+    wizardContext.upgradingTo
+      ? filterInProgressUpgrade(nodeVersionToCompare)
+      : filterInInitialUpgrade(nodeVersionToCompare),
+    wizardContext.workerNodes,
+  )
 
-  // const isUpgraded = (node) => {
-  //   if (values.upgradingTo === null) return true
-  //   else if (node.actualKubeRoleVersion === values.upgradingTo) {
-  //     return true
-  //   } else {
-  //     return false
-  //   }
-  // }
-
-  // const [workerNodes, upgradedNodes] = partition(isUpgraded, values.workerNodes)
   return (
     <FormFieldCard title="Batch Upgrade Strategy">
       <IconInfo
@@ -59,21 +61,21 @@ export const AdvancedBatchUpgradeAddonField = ({ values }) => {
       >
         <Text className={classes.text} variant="body2">
           <b>Total Worker Nodes :</b>
-          {values?.workerNodes?.length}
+          {wizardContext?.workerNodes?.length}
         </Text>
         <Text className={classes.text} variant="body2">
           <b>Upgraded Worker Nodes :</b>
-          {values?.workerNodes?.length}
+          {upgradedNodes?.length}
         </Text>
 
         <Text className={classes.text} variant="body2">
           <b>Nodes Excluded from Batch :</b>
-          {values?.workerNodes?.length}
+          {toBeUpgradedNodes?.length}
         </Text>
       </IconInfo>
       <Text>Select the nodes to include in this batch</Text>
       <TransferList
-        clusterNodes={values.nodes}
+        clusterNodes={toBeUpgradedNodes}
         setWizardContext={setWizardContext}
         wizardContext={wizardContext}
       />
