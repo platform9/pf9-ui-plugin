@@ -53,6 +53,24 @@ Cypress.Commands.add('login', () => {
   })
 
 /**
+ * @description This command select Nodes both for master and worker
+ * @param desiredNodeCount
+ * @param xpath
+ * @returns none
+ */
+ Cypress.Commands.add('checkNodes', (desiredNodeCount: number, xpath: string) => {
+    cy.xpath(xpath).each(($el: string, index: number) => {
+      // leave the first index which select all nodes
+      if (index > 0 && desiredNodeCount <= index) {
+        cy.wrap($el)
+          .click({ force: true })
+          .should('be.checked')
+        desiredNodeCount--
+      }
+    })
+  })  
+
+  /**
  * @description It selects master nodes
  * @param desiredNodeCount
  * @returns none
