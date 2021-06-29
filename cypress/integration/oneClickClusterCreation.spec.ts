@@ -2,7 +2,7 @@ import 'cypress-wait-until'
 import { loadConfig } from 'cypress/support/commands'
 import { Config } from 'cypress/support/types'
 
-describe('One Click Cluster Precondition', () => {
+describe('One Click Cluster Creation', () => {
   var config: Config 
   before(() => {
     config=loadConfig()
@@ -14,7 +14,7 @@ describe('One Click Cluster Precondition', () => {
     cy.intercept('GET', /\/.*clusters\/supportedRoleVersions$/).as('supportedRoleVersions')
     cy.get("a[href='/ui/kubernetes/infrastructure/clusters/add']", { timeout: 3000 }).click()
     cy.contains('BareOS Virtual Cluster')
-    cy.xpath("//span[contains(text(),'One-Click Cluster')]").click()
+    cy.getByTestId('One-Click Cluster').click()
     cy.wait('@supportedRoleVersions')
     cy.get('#name').type(config.oneClickClusterData.clusterName)
     cy.get('#kubeRoleVersion').click()
@@ -22,13 +22,14 @@ describe('One Click Cluster Precondition', () => {
   })
 
   it('Should be able to select a node', () => {
-    var desiredNodeCount = 1
-    cy.xpath("//tr[@class='MuiTableRow-root']//input[@type='radio']").each(($el) => {
-      cy.wrap($el).click()
-      desiredNodeCount--
-      if (desiredNodeCount === 0) return false
-      return false
-    })
+    // var desiredNodeCount = 1
+    // cy.getByTestId('node-selection').each(($el) => {
+    //   cy.wrap($el).click()
+    //   desiredNodeCount--
+    //   if (desiredNodeCount === 0) return false
+    //   return false
+    // })
+    cy.selectMasterNodes(1)
   })
 
   it('Should be able to review and complete setting up the cluster', () => {
@@ -37,7 +38,7 @@ describe('One Click Cluster Precondition', () => {
 
   it('Should be able to verify Cluster Creation Completed Successfully', () => {
     cy.wait(240000).then(() => {
-      cy.xpath('//article//following-sibling::div/p', { timeout: 60000 }).each(($el: string) => {
+      cy.getByTestId('progress-bar-status').each(($el: string) => {
         cy.get($el).contains(/^Completed all [0-9]+ tasks successfully$/)
       })
     })

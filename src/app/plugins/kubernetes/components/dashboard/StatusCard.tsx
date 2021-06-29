@@ -148,7 +148,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
     <div id={`${entity}-card`} className={clsx(contentContainer, className)}>
       <header className={header}>
         <Link to={route} className={cardTitleLink}>
-          <Text variant="h1" className={text}>
+          <Text data-testid={`${entity}-count`} variant="h1" className={text}>
             {loading ? <CircularProgress size={38} color="inherit" /> : quantity}
           </Text>
           <Text variant="body2" component="h2" className={cardTitle}>

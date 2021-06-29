@@ -1,9 +1,9 @@
 import {Config} from './../types'
 export const developmentConfig:Config={
     loginCredentials: {
-        username: 'kingshuk.nandy@afourtech.com',
-        password: 'Test@1234',
-        completeName: 'Kingshuk Nandy'
+        username: 'test.user@afourtech.com',
+        password: 'Afour@123',
+        completeName: 'Test User'
     },
     singleMasterClusterData: {
         clusterName: 'SingleMasterCluster-1',
@@ -13,9 +13,9 @@ export const developmentConfig:Config={
     },
     multiMasterClusterData: {
         clusterName: 'MultiMasterCluster-1',
-        totalNodes: 3,
-        masterNodes: 2,
-        workerNodes: 1,
+        totalNodes: 5,
+        masterNodes: 3,
+        workerNodes: 2,
         virtualIP: '10.128.146.121'  
     },
     oneClickClusterData: {

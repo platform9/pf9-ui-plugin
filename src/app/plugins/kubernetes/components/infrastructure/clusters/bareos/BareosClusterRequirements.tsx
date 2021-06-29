@@ -206,16 +206,16 @@ const BareOSClusterRequirements: FC<Props> = ({ onComplete, provider }) => {
         </IconInfo>
         <div className={classes.actionRow}>
           <Text variant="caption1">For simple & quick cluster creation with default settings:</Text>
-          <SubmitButton onClick={handleClick(ClusterCreateTypes.OneClick)}>
+          <SubmitButton data-testid='One-Click Cluster' onClick={handleClick(ClusterCreateTypes.OneClick)}>
             One-Click Cluster
           </SubmitButton>
         </div>
         <div className={classes.actionRow}>
           <Text variant="caption1">For more customized cluster creation:</Text>
-          <SubmitButton onClick={handleClick(ClusterCreateTypes.SingleMaster)}>
+          <SubmitButton data-testid='Single Master Cluster' onClick={handleClick(ClusterCreateTypes.SingleMaster)}>
             Single Master Cluster
           </SubmitButton>
-          <SubmitButton onClick={handleClick(ClusterCreateTypes.MultiMaster)}>
+          <SubmitButton data-testid='Multi-Master Cluster' onClick={handleClick(ClusterCreateTypes.MultiMaster)}>
             Multi-Master Cluster
           </SubmitButton>
         </div>

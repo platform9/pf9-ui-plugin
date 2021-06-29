@@ -8,6 +8,8 @@ declare global{
         interface Chainable {
             login():void
             minHealthyNodesRequired(nodes: number): Chainable<string>
+            selectMasterNodes(desiredNodeCount: number): void
+            selectWorkerNodes(desiredNodeCount: number): void
         }
     }
 }
@@ -23,7 +25,7 @@ Cypress.Commands.add('login', () => {
     cy.intercept(/\/qbert\/.*\/nodes$/).as('nodes')
 
     cy.visit('/')
-    cy.get('#email').clear().type(userCred.username)
+    cy.get('#email',{timeout: 20000}).clear().type(userCred.username)
     cy.get('#password').clear().type(userCred.password)
     cy.get('span').contains('Sign In').click()
 
@@ -51,6 +53,36 @@ Cypress.Commands.add('login', () => {
   })
 
 /**
+ * @description It selects master nodes
+ * @param desiredNodeCount
+ * @returns none
+ */
+  Cypress.Commands.add('selectMasterNodes', (desiredNodeCount: number) => {
+    cy.getByTestId('thody-masterNodes').find('input').each(($el: string, index: number) => {
+      if ( index < desiredNodeCount) {
+        cy.wrap($el)
+          .click({ force: true })
+          .should('be.checked')
+      }
+    })
+  })
+
+/**
+ * @description It selects master nodes
+ * @param desiredNodeCount
+ * @returns none
+ */
+  Cypress.Commands.add('selectWorkerNodes', (desiredNodeCount: number) => {
+    cy.getByTestId('thody-workerNodes').find('input').each(($el: string, index: number) => {
+       if ( index < desiredNodeCount) {
+        cy.wrap($el)
+          .click({ force: true })
+          .should('be.checked')
+      }
+    })
+  })  
+  
+/**
  * @description Method for loading different Config
  * @returns It returns specific environment Config
  */  
@@ -62,5 +94,6 @@ export function loadConfig():Config {
     }else if(env==='test'){
         return testConfig
     }
+    return developmentConfig
 }
 

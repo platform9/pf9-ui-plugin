@@ -4,8 +4,8 @@ import {Config} from './../types'
 export const testConfig:Config={
     loginCredentials: {
         username: 'test.user@afourtech.com',
-        password: 'Test@1234',
-        completeName: 'Kingshuk Nandy'
+        password: 'Afour@123',
+        completeName: 'Test User'
     },
     singleMasterClusterData: {
         clusterName: 'SingleMasterCluster-1',
@@ -15,13 +15,13 @@ export const testConfig:Config={
     },
     multiMasterClusterData: {
         clusterName: 'MultiMasterCluster-1',
-        totalNodes: 3,
-        masterNodes: 2,
-        workerNodes: 1,
+        totalNodes: 5,
+        masterNodes: 3,
+        workerNodes: 2,
         virtualIP: '10.128.146.121'  
     },
     oneClickClusterData: {
-        clusterName: 'MultiMasterCluster-1',
+        clusterName: 'OneClickCluster-1',
         totalNodes: 1,   
     }
 }

@@ -2,39 +2,48 @@ import 'cypress-wait-until'
 import { loadConfig } from 'cypress/support/commands'
 import { Config } from 'cypress/support/types'
 
-describe('Single Master Cluster Creation', () => {
+describe('Multi Master Cluster Creation', () => {
   var config: Config
   before(() => {
-    config=loadConfig()
+    config = loadConfig()
     cy.login()
-    cy.minHealthyNodesRequired(config.singleMasterClusterData.totalNodes)
+    cy.minHealthyNodesRequired(config.multiMasterClusterData.totalNodes)
   })
 
-  it('Should be able add cluster of type "SingleMaster"', () => {
+  it('Should be able add cluster of type "MultiMaster"', () => {
     cy.intercept('GET', /\/.*clusters\/supportedRoleVersions$/).as('supportedRoleVersions')
     cy.get("a[href='/ui/kubernetes/infrastructure/clusters/add']", { timeout: 3000 }).click()
     cy.contains('BareOS Virtual Cluster')
-    cy.getByTestId('Single Master Cluster').click()
+    cy.getByTestId('Multi-Master Cluster').click()
     cy.wait('@supportedRoleVersions')
-    cy.get('#name').type(config.singleMasterClusterData.clusterName)
+    cy.get('#name').type(config.multiMasterClusterData.clusterName)
     cy.get('#kubeRoleVersion').click()
     cy.get("li[data-value='1.18.10-pmk.1547']").click()
+    cy.contains('Make Master nodes Master + Worker').click()
+    cy.contains('Network Plugin Operator').click()
     cy.contains('IPv4').parentsUntil('span').find("input[type='radio']").should('be.checked')
     cy.contains('Next').click()
   })
 
+
   it('Should be able to setup Master Node', () => {
-    cy.contains('Select a node to add as a Master Node')
-    cy.selectMasterNodes(config.singleMasterClusterData.masterNodes)
+    cy.contains('Select nodes to add as Master Node')
+    cy.selectMasterNodes(config.multiMasterClusterData.masterNodes)
     cy.contains('Next').click()
   })
+
   it('Should be able to setup Worker Nodes', () => {
     cy.contains('Select nodes to add as Worker Nodes')
-    cy.selectWorkerNodes(config.singleMasterClusterData.workerNodes)
+    cy.selectWorkerNodes(config.multiMasterClusterData.workerNodes)
     cy.contains('Next').click()
   })
   it('Should be able to setup Network', () => {
     cy.contains('Cluster Networking Range & HTTP Proxy')
+    cy.get('#masterVipIpv4').type(config.multiMasterClusterData.virtualIP)
+    cy.get('#masterVipIface').click()
+    cy.get('[data-value="ens3"]').click()
+    cy.get('#masterVipIface').should('contain', 'ens3')
+
     // TODO: Add validations
     cy.contains('Next').click()
   })
@@ -59,6 +68,6 @@ describe('Single Master Cluster Creation', () => {
   })
 
   after(() => {
-    cy.deleteCluster(config.singleMasterClusterData.clusterName)
+    cy.deleteCluster(config.multiMasterClusterData.clusterName)
   })
 })
