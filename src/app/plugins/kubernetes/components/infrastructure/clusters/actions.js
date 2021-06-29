@@ -11,6 +11,8 @@ import {
   getKubernetesVersion,
   getProgressPercent,
   getEtcdBackupPayload,
+  getCoreDnsPayload,
+  getMetalLbCidr,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
   allClustersSelector,
@@ -94,11 +96,22 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     }
   },
   updateFn: async ({ uuid, ...params }) => {
-    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
+    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers kubernetesDashboard metricsServer'.split(
+      ' ',
+    )
 
     const body = pick(updateableParams, params)
     if (params.etcdBackup) {
       body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
+    }
+
+    if (params.coreDns) {
+      body.coreDns = getCoreDnsPayload('coreDns', params)
+    }
+
+    if (params.enableMetallb) {
+      body.enableMetallb = params.enableMetallb
+      body.metallbCidr = getMetalLbCidr(params.metallbCidr)
     }
 
     Bugsnag.leaveBreadcrumb('Attempting to update cluster', { clusterId: uuid, ...body })

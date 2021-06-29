@@ -46,6 +46,17 @@ const TopologyManagerAddonFields = React.lazy(async () =>
   })),
 )
 
+const KubernetesDashboardField = React.lazy(async () => import('./kubernetes-dashboard'))
+
+const MetricsServerField = React.lazy(async () => import('./metrics-server'))
+
+const CoreDnsField = React.lazy(async () => import('./coreDns'))
+const CoreDnsAddonFields = React.lazy(async () =>
+  import('./coreDns').then((module) => ({
+    default: module.CoreDnsAddonFields,
+  })),
+)
+
 const addonMap = {
   networkPluginOperator: {
     toggler: NetworkPluginOperator,
@@ -79,6 +90,18 @@ const addonMap = {
   enableTopologyManager: {
     toggler: TopologyManagerField,
     details: { component: TopologyManagerAddonFields },
+  },
+  kubernetesDashboard: {
+    toggler: KubernetesDashboardField,
+    details: { component: null },
+  },
+  metricsServer: {
+    toggler: MetricsServerField,
+    details: { component: null },
+  },
+  coreDns: {
+    toggler: CoreDnsField,
+    details: { component: CoreDnsAddonFields },
   },
 }
 

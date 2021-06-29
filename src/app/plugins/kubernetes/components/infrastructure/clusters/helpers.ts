@@ -100,7 +100,18 @@ export const getEtcdBackupPayload = (path, data) =>
         isEtcdBackupEnabled: 0,
       }
 
-const getMetalLbCidr = (keyValueArr = []) =>
+export const getCoreDnsPayload = (path, data) =>
+  pathStrOr(0, path, data)
+    ? {
+        coreDns: 1,
+        dnsMemoryLimit: data.dnsMemoryLimit,
+        dnsDomain: data.dnsDomain,
+      }
+    : {
+        coreDns: 0,
+      }
+
+export const getMetalLbCidr = (keyValueArr = []) =>
   keyValueArr.map(({ key, value }) => `${key}-${value}`).join()
 
 const getCalicoDetectionMethod = ({ calicoDetectionMethod, calicoDetectionMethodValue }) => {
@@ -155,7 +166,7 @@ export const createAwsCluster = async (data) => {
   const body = pick(keysToPluck, data)
 
   if (data.enableCAS) {
-    body.numMinWorkers = data.numWorkers
+    body.numMinWorkers = data.numMinWorkers || data.numWorkers
     body.numMaxWorkers = data.numMaxWorkers
   }
 

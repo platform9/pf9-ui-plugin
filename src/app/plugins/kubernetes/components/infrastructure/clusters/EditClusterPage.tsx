@@ -7,12 +7,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { pathJoin } from 'utils/misc'
-import {
-  k8sPrefix,
-  defaultEtcBackupPath,
-  onboardingMonitoringSetup,
-  defaultMonitoringTag,
-} from 'app/constants'
+import { k8sPrefix, defaultEtcBackupPath, defaultMonitoringTag } from 'app/constants'
 import { clusterActions } from './actions'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
@@ -34,10 +29,13 @@ import AllowWorkloadsOnMaster from './form-components/allow-workloads-on-master'
 import NetworkStack from './form-components/network-stack'
 import { CloudProviders } from '../cloudProviders/model'
 import { NetworkStackTypes } from './constants'
+import Theme from 'core/themes/model'
+import { compareVersions } from 'k8s/components/app-catalog/helpers'
+const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
     display: 'grid',
     gridGap: theme.spacing(2),
@@ -55,6 +53,35 @@ const { appbert } = ApiClient.getInstance()
 // so just hide it from view.
 const tagsToOmit = ['pf9-system:monitoring']
 
+const bareOSClusterAddons = [
+  { addon: 'etcdBackup' },
+  { addon: 'enableMetallbLayer2' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'networkPluginOperator', disabled: true },
+  { addon: 'kubevirtPluginOperator', disabled: true },
+  { addon: 'kubernetesDashboard' },
+  { addon: 'metricsServer' },
+  { addon: 'coreDns' },
+]
+
+const awsClusterAddons = [
+  { addon: 'etcdBackup' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'enableCAS' },
+  { addon: 'kubernetesDashboard' },
+  { addon: 'metricsServer' },
+  { addon: 'coreDns' },
+]
+
+const azureClusterAddons = [
+  { addon: 'etcdBackup' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'enableCAS' },
+  { addon: 'kubernetesDashboard' },
+  { addon: 'metricsServer' },
+  { addon: 'coreDns' },
+]
+
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
   const classes = useStyles()
@@ -69,22 +96,21 @@ const EditClusterPage = () => {
     clusterId,
   ])
 
+  const isNewK8sVersion = useMemo(() => compareVersions(cluster.kubeRoleVersion, '1.20') >= 0, [
+    cluster.kubeRoleVersion,
+  ])
+
   const clusterAddOns = useMemo(
     () =>
-      objSwitchCase(
+      objSwitchCaseAny(
         {
-          [CloudProviders.BareOS]: [
-            { addon: 'etcdBackup' },
-            { addon: 'prometheusMonitoringEnabled' },
-            { addon: 'networkPluginOperator', disabled: true },
-            { addon: 'kubevirtPluginOperator', disabled: true },
-          ],
-          [CloudProviders.Aws]: [],
-          [CloudProviders.Azure]: [],
+          [CloudProviders.BareOS]: bareOSClusterAddons,
+          [CloudProviders.Aws]: awsClusterAddons,
+          [CloudProviders.Azure]: azureClusterAddons,
         },
-        'hello',
+        [],
       )(cluster.cloudProviderType),
-    [cluster],
+    [cluster.cloudProviderType],
   )
 
   const initialValues = useMemo(
@@ -109,12 +135,12 @@ const EditClusterPage = () => {
       return
     }
     updateParams({ etcdBackup: !!etcdBackup.isEtcdBackupEnabled })
-  }, [clusters, clusterId])
+  }, [cluster])
 
   const toggleMonitoring = useCallback(
     async (enabled) => {
       try {
-        const pkgs = await appbert.getPackages()
+        const pkgs: any = await appbert.getPackages()
         const monPkg = pkgs.find((pkg) => pkg.name === 'pf9-mon')
 
         if (!monPkg) {
@@ -129,13 +155,7 @@ const EditClusterPage = () => {
         }
 
         const monId = monPkg.ID
-
         await appbert.toggleAddon(cluster.uuid, monId, enabled)
-        if (enabled) {
-          // This code is from the PrometheusAddOnDialog
-          // If monitoring is disabled, then shouldn't we set it to false
-          localStorage.setItem(onboardingMonitoringSetup, 'true')
-        }
       } catch (e) {
         dispatch(
           notificationActions.registerNotification({
@@ -151,7 +171,6 @@ const EditClusterPage = () => {
     [cluster],
   )
 
-  // Need to add etcdBackup stuff to here
   const handleSubmit = useCallback(
     async ({ tags, ...values }) => {
       const monitoringToggled = hasPrometheusTag(cluster) !== values.prometheusMonitoringEnabled
@@ -161,6 +180,8 @@ const EditClusterPage = () => {
       if (monitoringToggled) {
         monitoringSuccessfullyToggled = await toggleMonitoring(values.prometheusMonitoringEnabled)
       }
+
+      console.log('body', { tags, ...values })
 
       await update({
         ...values,
@@ -216,13 +237,17 @@ const EditClusterPage = () => {
             />
             <AllowWorkloadsOnMaster setWizardContext={getParamsUpdater} disabled />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Add-Ons</Text>
-            <AddonTogglers
-              wizardContext={params}
-              setWizardContext={getParamsUpdater}
-              addons={clusterAddOns}
-            />
+            {isNewK8sVersion && (
+              <>
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Add-Ons</Text>
+                <AddonTogglers
+                  wizardContext={params}
+                  setWizardContext={getParamsUpdater}
+                  addons={clusterAddOns}
+                />
+              </>
+            )}
           </FormFieldCard>
 
           <FormFieldCard title="Advanced Configuration">

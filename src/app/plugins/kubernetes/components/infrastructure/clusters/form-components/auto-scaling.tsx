@@ -14,6 +14,12 @@ const AutoScalingField = () => (
 export const AutoScalingAddonFields = () => (
   <FormFieldCard title="Auto Scaling">
     <TextField
+      id="numMinWorkers"
+      type="number"
+      label="Minimum number of worker nodes"
+      info="Minimum number of worker nodes this cluster may be scaled down to."
+    />
+    <TextField
       id="numMaxWorkers"
       type="number"
       label="Maximum number of worker nodes"

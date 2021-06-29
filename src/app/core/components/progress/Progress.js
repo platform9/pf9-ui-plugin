@@ -189,7 +189,7 @@ Progress.propTypes = {
   minHeight: PropTypes.number,
   // eslint-disable-next-line react/no-unused-prop-types
   maxHeight: PropTypes.number,
-  loadingImage: PropTypes.oneOf(Object.keys(LoadingGifs)),
+  loadingImage: PropTypes.oneOf(Object.values(LoadingGifs)),
 }
 
 Progress.defaultProps = {
