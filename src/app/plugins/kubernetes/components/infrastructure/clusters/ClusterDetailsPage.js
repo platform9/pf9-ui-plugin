@@ -133,7 +133,6 @@ const useStyles = makeStyles((theme) => ({
   },
   tabContainer: {
     paddingTop: theme.spacing(2),
-    maxWidth: 1234,
   },
   headerCard: {
     marginTop: theme.spacing(2),
