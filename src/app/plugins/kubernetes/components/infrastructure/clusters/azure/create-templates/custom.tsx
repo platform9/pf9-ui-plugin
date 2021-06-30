@@ -347,6 +347,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
         stepId="network"
         label="Network Info"
         onNext={azureClusterTracking.wZStepTwo(trackingFields)}
+        keepContentMounted={false}
       >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
