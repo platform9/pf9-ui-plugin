@@ -12,7 +12,6 @@ import Theme from 'core/themes/model'
 import { sort } from 'ramda'
 import React, { useCallback, useMemo, useState } from 'react'
 import { objSwitchCase } from 'utils/fp'
-import { compareVersions } from '../app-catalog/helpers'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import { loadSupportedRoleVersions } from '../infrastructure/clusters/actions'
 import AddCoworkerStep from './add-coworker-step'
@@ -26,6 +25,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import AddCloudProviderPage from './add-cloud-provider-page'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 import Progress from 'core/components/progress/Progress'
+import { compareVersions } from 'k8s/util/helpers'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -206,7 +206,6 @@ const OnboardingPage = () => {
                       clusterChoice={clusterChoice}
                       handleBack={handleBack}
                     />
-     
                   </Progress>
                 </WizardStep>
                 <WizardStep

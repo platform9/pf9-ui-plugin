@@ -159,13 +159,16 @@ class Wizard extends PureComponent {
       onCancel,
       showFinishAndReviewButton,
       hideAllButtons,
+      buttonCalloutMargin,
     } = this.props
     const shouldShowFinishAndReview =
       typeof showFinishAndReviewButton === 'function'
         ? showFinishAndReviewButton(wizardContext)
         : showFinishAndReviewButton
     const renderStepsContent = ensureFunction(children)
-
+    const currentStep = steps[activeStep]
+    const nextBtnDisabled =
+      currentStep && currentStep.validateFields && !currentStep.validateFields(wizardContext)
     return (
       <WizardContext.Provider value={this.state}>
         {showSteps && steps.length > 1 && <WizardStepper steps={steps} activeStep={activeStep} />}
@@ -178,11 +181,18 @@ class Wizard extends PureComponent {
           setActiveStep: this.setActiveStep,
         })}
         {!hideAllButtons && (
-          <WizardButtons hasCalloutFields={this.state.calloutFields}>
+          <WizardButtons
+            calloutMargin={buttonCalloutMargin}
+            hasCalloutFields={this.state.calloutFields}
+          >
             {onCancel && <CancelButton onClick={onCancel} />}
             {this.hasBack() && <PrevButton onClick={this.handleBack} />}
             {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
-            {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
+            {this.hasNext() && (
+              <NextButton disabled={nextBtnDisabled} onClick={this.handleNext}>
+                Next
+              </NextButton>
+            )}
             {this.isLastStep() && (
               <NextButton onClick={this.handleNext} showForward={false}>
                 {submitLabel}

@@ -15,6 +15,7 @@ export const resetPasswordApiUrl = '/clemency/reset/password'
 export const forgotPasswordApiUrl = '/clemency/request'
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const ironicWizardUrl = `${appUrlRoot}/metalstack/setup`
+export const profilesHelpUrl = `${appUrlRoot}/help`
 export const allKey = '__all__'
 export const noneKey = '__none__'
 export const listTablePrefs = [
@@ -85,6 +86,9 @@ export const notFoundErr = 'ERR_NOT_FOUND'
 // Documentation
 export const pf9DocOrigin = 'https://docs.platform9.com'
 
+// Ideas
+export const pf9IdeasLink = 'https://ideas.platform9.com'
+
 // Clarity
 export const clarityUrlRoot = '/clarity/index.html#'
 export const clarityDashboardUrl = `${clarityUrlRoot}/dashboard`
@@ -145,4 +149,5 @@ export enum UserPreferences {
 
 export enum GlobalPreferences {
   Theme = 'theme',
+  CustomerExternalId = 'customer_external_uuid',
 }

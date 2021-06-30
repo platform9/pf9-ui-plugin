@@ -22,15 +22,11 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import NamespacePicklist from '../../common/NamespacePicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
-import {
-  compareVersions,
-  filterConnectedClusters,
-  getAppVersionPicklistOptions,
-  getIcon,
-} from '../helpers'
+import { filterConnectedClusters, getAppVersionPicklistOptions, getIcon } from '../helpers'
 import ClusterPicklist from '../../common/ClusterPicklist'
 import { repositoryActions } from '../repositories/actions'
 import { deployedAppActions, deploymentDetailLoader } from './actions'
+import { compareVersions } from 'k8s/util/helpers'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -128,9 +124,9 @@ const EditAppDeploymentPage = () => {
   const { match, history } = useReactRouter()
   const fileInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const name = match.params['name']
-  const clusterId = match.params['clusterId']
-  const namespace = match.params['namespace']
+  const name = match.params.name
+  const clusterId = match.params.clusterId
+  const namespace = match.params.namespace
 
   const [deployedApps, loadingDeployedApps] = useDataLoader(deployedAppActions.list, {
     clusterId,
@@ -246,7 +242,7 @@ const EditAppDeploymentPage = () => {
         renderContentOnMount={!loading}
         message={loading ? 'Loading' : 'Submitting'}
         backUrl={appListPageUrl}
-        isUpdateForm={true}
+        isUpdateForm
       >
         <Wizard context={initialContext} submitLabel="Deploy" onComplete={handleSubmit}>
           {({ wizardContext, setWizardContext, onNext }) => (

@@ -77,4 +77,5 @@ export interface IDataKeys {
   ManagementGroupsMappings: any // no model for this yet
   Tenants: any // is this needed? only in openstack
   Users: any // is this needed? only in openstack
+  RbacProfiles: any
 }

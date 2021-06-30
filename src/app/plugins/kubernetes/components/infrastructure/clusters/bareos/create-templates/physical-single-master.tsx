@@ -64,6 +64,7 @@ export const initialContext = {
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
   useHostname: false,
   nodeRegistrationType: 'ipAddress',
+  enableProfileAgent: false,
 }
 
 interface Props {
@@ -78,6 +79,7 @@ const clusterAddons = [
   'prometheusMonitoringEnabled',
   'networkPluginOperator',
   'kubevirtPluginOperator',
+  'profileAgent',
 ]
 const trackingFields = {
   platform: CloudProviders.PhysicalMachine,
@@ -121,7 +123,10 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
 
               {/* Cluster Settings */}
               <FormFieldCard title="Cluster Settings">
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <Divider className={classes.divider} />
                 <Text variant="caption1">Cluster Network Stack</Text>

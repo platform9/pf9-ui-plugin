@@ -3,7 +3,7 @@ import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clusterActions, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import {
   apiGroupsSelector,
   makeApiGroupsSelector,

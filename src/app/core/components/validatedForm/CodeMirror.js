@@ -15,6 +15,7 @@ import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 
 require('codemirror/mode/yaml/yaml')
+require('codemirror/mode/javascript/javascript')
 require('codemirror/mode/xml/xml')
 require('codemirror/addon/display/autorefresh')
 
@@ -101,6 +102,12 @@ const CodeMirror = ({
 
   return (
     <InfoTooltip open={open} info={info} placement={placement}>
+      {/* <FormControl id={id} error={hasError} className={classes.root}>
+        <FormLabel>
+          <Text className={classes.coderMirrorHeader} variant="body1" component="div">
+            {label}
+          </Text>
+        </FormLabel> */}
       <FormControl id={id} error={hasError} className={clsx(classes.root, className)}>
         {label && (
           <FormLabel>
