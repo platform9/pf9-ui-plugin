@@ -140,6 +140,7 @@ const CreateBareOsClusterPage = ({
             filterFn={allPass([isConnected, isUnassignedNode])}
             onChange={(value) => setWizardContext({ masterNodes: value })}
             validations={[masterNodeLengthValidator]}
+            isSingleNodeCluster
             pollForNodes
             required
           />

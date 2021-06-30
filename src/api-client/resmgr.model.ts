@@ -186,4 +186,5 @@ export interface Info {
   os_info: string
   responding: boolean
   last_response_time: null | string
+  cpu_info?: any
 }
