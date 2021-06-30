@@ -211,7 +211,10 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 disabled={wizardContext.usePf9Domain}
               />
 
-              <KubernetesVersion />
+              <KubernetesVersion
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+              />
             </FormFieldCard>
 
             <FormFieldCard title="Default Settings for New Cluster">

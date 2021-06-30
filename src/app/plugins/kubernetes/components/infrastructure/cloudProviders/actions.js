@@ -57,7 +57,7 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
         nodes,
       })
       const nodeUuids = pluck('uuid', nodes)
-      await qbert.attach(clusterUuid, nodes)
+      await qbert.attachNodes(clusterUuid, nodes)
       trackEvent('Attach node(s) to cluster', { clusterUuid, numNodes: (nodes || []).length })
       // Assign nodes to their clusters in the context as well so the user
       // can't add the same node to another cluster.
@@ -70,7 +70,7 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
         clusterId: clusterUuid,
         nodeUuids,
       })
-      await qbert.detach(clusterUuid, nodeUuids)
+      await qbert.detachNodes(clusterUuid, nodeUuids)
       trackEvent('Detach node(s) from cluster', { clusterUuid, numNodes: (nodeUuids || []).length })
       return currentItems.map((node) =>
         nodeUuids.includes(node.uuid) ? { ...node, clusterUuid: null } : node,

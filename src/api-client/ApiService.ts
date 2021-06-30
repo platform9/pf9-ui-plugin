@@ -1,8 +1,10 @@
 import ApiClient from 'api-client/ApiClient'
 import { clientActions } from 'core/client/clientReducers'
 import store from 'app/store'
+import { MethodMetadata } from './model'
 
 abstract class ApiService {
+  static apiMethodsMetadata: MethodMetadata[]
   protected apiEndpoint: string = ''
   private readonly clsName: string
   public abstract getClassName(): string
