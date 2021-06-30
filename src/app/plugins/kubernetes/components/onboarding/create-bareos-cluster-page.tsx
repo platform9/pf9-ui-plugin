@@ -19,7 +19,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import DownloadOvaWalkthrough from './download-ova-walkthrough'
 import DownloadCliWalkthrough from './download-cli-walkthrough'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { compareVersions } from '../app-catalog/helpers'
+import { compareVersions } from 'k8s/util/helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   connectNodesContainer: {
@@ -141,6 +141,7 @@ const CreateBareOsClusterPage = ({
             filterFn={allPass([isConnected, isUnassignedNode])}
             onChange={(value) => setWizardContext({ masterNodes: value })}
             validations={[masterNodeLengthValidator]}
+            isSingleNodeCluster
             pollForNodes
             required
           />

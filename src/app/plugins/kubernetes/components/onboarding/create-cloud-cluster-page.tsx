@@ -16,8 +16,8 @@ import { awsClusterTracking, azureClusterTracking } from '../infrastructure/clus
 import { ClusterCreateTypes } from '../infrastructure/clusters/model'
 import AwsAvailabilityZoneField from '../infrastructure/clusters/aws/aws-availability-zone'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { compareVersions } from '../app-catalog/helpers'
 import { sort } from 'ramda'
+import { compareVersions } from 'k8s/util/helpers'
 
 const CreateCloudClusterPage = ({
   wizardContext,

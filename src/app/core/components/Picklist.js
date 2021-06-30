@@ -43,8 +43,9 @@ const Picklist = React.forwardRef((props, ref) => {
     showAll,
     showNone,
     noneLabel,
-    label,
+    allLabel = 'All',
     name,
+    label,
     value,
     options,
     onChange,
@@ -58,7 +59,7 @@ const Picklist = React.forwardRef((props, ref) => {
     ...restProps
   } = props
   const classes = useStyles(props)
-  const inputProps = useMemo(() => ({ name: label, id: name }), [label, name])
+  const inputProps = useMemo(() => ({ name: label || name, id: name }), [label, name])
   const items = useMemo(
     () =>
       pipe(
@@ -69,7 +70,7 @@ const Picklist = React.forwardRef((props, ref) => {
           value: option.value === '' ? noneKey : option.value,
         })),
         showNone ? prepend({ label: noneLabel || 'None', value: noneKey }) : identity,
-        showAll ? prepend({ label: 'All', value: allKey }) : identity,
+        showAll ? prepend({ label: allLabel, value: allKey }) : identity,
         map((option) => (
           <MenuItem value={option.value} key={option.label}>
             {option.label}
@@ -156,10 +157,11 @@ const optionPropType = PropTypes.oneOfType([
 
 Picklist.propTypes = {
   formField: PropTypes.bool,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   loading: PropTypes.bool,
   name: PropTypes.string.isRequired,
   noneLabel: PropTypes.string,
+  allLabel: PropTypes.string,
   onChange: PropTypes.func,
   options: PropTypes.arrayOf(optionPropType),
   showAll: PropTypes.bool,

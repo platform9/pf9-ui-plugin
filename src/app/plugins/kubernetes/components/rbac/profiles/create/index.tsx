@@ -1,5 +1,4 @@
 import React, { useMemo, useCallback } from 'react'
-import Text from 'core/elements/text'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Wizard from 'core/components/wizard/Wizard'
 import { BaseClusterStep } from 'k8s/components/rbac/profiles/create/base-cluster-step'
@@ -11,6 +10,7 @@ import ReviewStep from 'k8s/components/rbac/profiles/create/review-step'
 import { rbacProfileActions } from '../actions'
 import useReactRouter from 'use-react-router'
 import { routes } from 'core/utils/routes'
+import FormWrapper from 'core/components/FormWrapper'
 
 const CreateRbacProfile = () => {
   const initialContext = useMemo(
@@ -31,9 +31,11 @@ const CreateRbacProfile = () => {
   }, [])
 
   return (
-    <>
-      <Text variant="subtitle1">Create a new RBAC Profile</Text>
-      <br />
+    <FormWrapper
+      title={'Create a new RBAC Profile'}
+      backUrl={routes.rbac.profiles.list.path()}
+      loading={false}
+    >
       <DocumentMeta title="Create a New RBAC Profile" bodyClasses={['form-view']} />
       <Wizard context={initialContext} submitLabel="Deploy" onComplete={handleSubmit}>
         {({ wizardContext, setWizardContext }) => (
@@ -47,7 +49,7 @@ const CreateRbacProfile = () => {
           </>
         )}
       </Wizard>
-    </>
+    </FormWrapper>
   )
 }
 

@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Theme from 'core/themes/model'
 import FormReviewTable from 'core/components/validatedForm/review-table'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
-import { defaultEtcBackupPath } from 'app/constants'
+import { defaultEtcBackupPath, UserPreferences } from 'app/constants'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
 import SshKeyTextField from '../../form-components/ssh-key-textfield'
@@ -19,7 +19,6 @@ import KubernetesVersion from '../../form-components/kubernetes-version'
 import { azureClusterTracking } from '../../tracking'
 import { ClusterCreateTypes } from '../../model'
 import useScopedPreferences from 'core/session/useScopedPreferences'
-import { UserPreferences } from 'app/constants'
 import { isEmpty } from 'ramda'
 
 export const initialContext = {
@@ -162,7 +161,10 @@ const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
               {/* SSH Key */}
               <SshKeyTextField wizardContext={wizardContext} setWizardContext={setWizardContext} />
 
-              <KubernetesVersion />
+              <KubernetesVersion
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+              />
             </FormFieldCard>
 
             <FormFieldCard title="Default Settings for New Cluster">
