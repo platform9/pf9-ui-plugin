@@ -179,7 +179,7 @@ const NotificationsPopover = ({ className, hideDropdown = false }) => {
     <div className={clsx(className, classes.container)}>
       <Tooltip title={'Notifications'}>
         <FontAwesomeIcon
-          onClick={!hideDropdown && handleOpenDropdown}
+          onClick={hideDropdown ? null : handleOpenDropdown}
           aria-describedby={id}
           ref={inboxEl}
           className={classes.inbox}

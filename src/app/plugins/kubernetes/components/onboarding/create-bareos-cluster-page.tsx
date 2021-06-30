@@ -106,7 +106,7 @@ const CreateBareOsClusterPage = ({
     await createCluster(data)
     setSubmitting(false)
     return true
-  }, [wizardContext, setSubmitting, validatorRef.current, defaultKubernetesVersion])
+  }, [validatorRef.current, setSubmitting, defaultKubernetesVersion, wizardContext])
 
   useEffect(() => {
     onNext(handleSubmit)

@@ -380,9 +380,6 @@ const AuthenticatedContainer = () => {
     updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
   }, [featureFlags, clusters])
 
-  console.log('clusters.length', clusters?.length)
-  console.log('featureFlags', featureFlags, featureFlags.isOnboarded)
-
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
     loadRegionFeatures(setRegionFeatures, setStacks, dispatch, history)

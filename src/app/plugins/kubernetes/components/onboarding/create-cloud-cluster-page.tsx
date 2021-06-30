@@ -72,7 +72,14 @@ const CreateCloudClusterPage = ({
     await createCluster(data)
     setSubmitting(false)
     return true
-  }, [setSubmitting, validatorRef.current, wizardContext, defaultKubernetesVersion, defaultValues])
+  }, [
+    validatorRef.current,
+    setSubmitting,
+    defaultValues,
+    segmentTrackingFields,
+    wizardContext,
+    defaultKubernetesVersion,
+  ])
 
   useEffect(() => {
     onNext(handleSubmit)

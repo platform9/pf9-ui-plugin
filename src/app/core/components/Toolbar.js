@@ -7,14 +7,12 @@ import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import NotificationsPopover from 'core/components/notifications/NotificationsPopover'
-import { CustomerTiers, imageUrls } from 'app/constants'
+import { imageUrls } from 'app/constants'
 import useReactRouter from 'use-react-router'
 import { routes } from 'core/utils/routes'
-import { pathOr, prop } from 'ramda'
+import { prop } from 'ramda'
 import { preferencesStoreKey } from 'core/session/preferencesReducers'
 import { useSelector } from 'react-redux'
-import { sessionStoreKey } from 'core/session/sessionReducers'
-import { determineCurrentStack } from 'core/containers/AuthenticatedContainer'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
