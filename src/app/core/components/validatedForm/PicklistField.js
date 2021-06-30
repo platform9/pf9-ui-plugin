@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import { withInfoTooltip } from 'core/components/InfoTooltip'

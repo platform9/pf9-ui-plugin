@@ -59,6 +59,8 @@ enum DataKeys {
   Tenants = 'Tenants',
   Users = 'Users',
   UserTenants = 'UserTenants',
+  RbacProfiles = 'RbacProfiles',
+  RbacProfileBindings = 'RbacProfileBindings',
 }
 
 export default DataKeys
@@ -125,4 +127,6 @@ export const ActionDataKeys = {
   Tenants: 'Tenants',
   Users: 'Users',
   UserTenants: 'UserTenants',
+  RbacProfiles: 'RbacProfiles',
+  RbacProfileBindings: 'RbacProfileBindings',
 }

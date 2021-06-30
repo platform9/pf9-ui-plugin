@@ -1,5 +1,30 @@
 import { AxiosRequestConfig } from 'axios'
 
+export enum ApiServices {
+  appbert = 'Appbert',
+  cinder = 'Cinder',
+  clemency = 'Clemency',
+  glance = 'Glance',
+  keystone = 'Keystone',
+  murano = 'Murano',
+  neturon = 'Neutron',
+  nova = 'Nova',
+  qbert = 'Qbert',
+  resmgr = 'ResMgr',
+}
+
+export interface DDUHealth {
+  task_state: string
+  desired_services: number
+  ready_services: number
+  service_details: { [key: string]: ServiceDetail }
+}
+
+export interface ServiceDetail {
+  desired: number
+  ready: number
+}
+
 export interface CustomerMetadata {
   [key: string]: any
 }
@@ -7,6 +32,7 @@ export interface CustomerMetadata {
 interface IRequestOptions {
   clsName: string
   mthdName: string
+  config?: any
 }
 export interface IRawRequestGetParams {
   url: string
@@ -35,6 +61,12 @@ export interface IBasicRequestPostParams {
   endpoint?: string
   config?: AxiosRequestConfig
   options: IRequestOptions
+}
+
+export interface MethodMetadata {
+  url: string
+  type: string
+  params?: string[]
 }
 
 export interface IBasicRequestDeleteParams {

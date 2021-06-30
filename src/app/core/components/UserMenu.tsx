@@ -22,6 +22,7 @@ import { preferencesStoreKey } from 'core/session/preferencesReducers'
 const styles = (theme: Theme) => ({
   userMenuContainer: {
     backgroundColor: theme.palette.blue[100],
+    marginTop: 4,
   },
   avatar: {
     position: 'relative',
