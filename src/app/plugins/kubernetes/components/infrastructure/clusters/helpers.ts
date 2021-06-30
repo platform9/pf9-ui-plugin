@@ -288,6 +288,10 @@ const createGenericCluster = async (body, data) => {
     body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
   }
 
+  if (data.enableProfileAgent) {
+    body.enableProfileAgent = data.enableProfileAgent
+  }
+
   if (data.httpProxy) {
     body.httpProxy = data.httpProxy
   }

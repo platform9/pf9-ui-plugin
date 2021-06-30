@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { allPass } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 
@@ -22,6 +22,13 @@ import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { CalicoDetectionTypes } from '../../form-components/calico-network-fields'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { bareOSClusterTracking } from '../../tracking'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
+import {
+  checkNodesForClockDrift,
+  clockDriftErrorMessage,
+} from 'k8s/components/infrastructure/nodes/helper'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -88,6 +95,32 @@ const trackingFields = {
 
 const OneClickPhysicalMachineCluster = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles({})
+  const [errorMessage, setErrorMessage] = useState('')
+  const [allNodes] = useDataLoader(loadNodes)
+  const validatorRef = useRef(null)
+
+  const setupValidator = (validate) => {
+    validatorRef.current = { validate }
+  }
+  const submitStep = useCallback(() => {
+    const isValid = validatorRef.current.validate()
+    if (!isValid) {
+      return false
+    }
+
+    const selectedNodeUuids = wizardContext.masterNodes
+    const hasClockDrift = checkNodesForClockDrift(selectedNodeUuids, allNodes)
+    if (hasClockDrift) {
+      setErrorMessage(clockDriftErrorMessage)
+      return false
+    }
+    return true
+  }, [wizardContext])
+
+  useEffect(() => {
+    onNext(submitStep)
+  }, [submitStep])
+
   return (
     <WizardStep stepId="physical-one-click" onNext={bareOSClusterTracking.oneClick(trackingFields)}>
       <ValidatedForm
@@ -95,7 +128,7 @@ const OneClickPhysicalMachineCluster = ({ wizardContext, setWizardContext, onNex
         fullWidth
         initialValues={wizardContext}
         onSubmit={setWizardContext}
-        triggerSubmit={onNext}
+        triggerSubmit={setupValidator}
         elevated={false}
       >
         {/* <PollingData loading={loading} onReload={reload} hidden /> */}
@@ -109,7 +142,7 @@ const OneClickPhysicalMachineCluster = ({ wizardContext, setWizardContext, onNex
           }
         >
           <ClusterNameField setWizardContext={setWizardContext} />
-          <KubernetesVersion />
+          <KubernetesVersion wizardContext={wizardContext} setWizardContext={setWizardContext} />
         </FormFieldCard>
 
         <FormFieldCard
@@ -126,8 +159,10 @@ const OneClickPhysicalMachineCluster = ({ wizardContext, setWizardContext, onNex
             filterFn={allPass([isConnected, isUnassignedNode])}
             onChange={(value) => setWizardContext({ masterNodes: value })}
             validations={[masterNodeLengthValidator]}
+            isSingleNodeCluster
             required
           />
+          {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         </FormFieldCard>
 
         <FormFieldCard title="Default Settings for New Cluster">

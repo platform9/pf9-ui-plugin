@@ -1,5 +1,5 @@
 import WizardStep from 'core/components/wizard/WizardStep'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import ProfileSummaryBox from 'k8s/components/rbac/profiles/create/profile-summary-box'
 import ListTable from 'core/components/listTable/ListTable'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
@@ -18,16 +18,11 @@ const defaultParams = {
   clusterId: allKey,
   namespace: allKey,
 }
-const columns = [
-  { id: 'id', display: false },
-  { id: 'name', label: 'Name' },
-  { id: 'clusterName', label: 'Cluster' },
-  { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
-]
 const visibleColumns = ['name', 'clusterName', 'created']
 const columnsOrder = ['name', 'clusterName', 'created']
 const orderBy = 'name'
 const orderDirection = 'asc'
+const searchTargets = ['name', 'clusterName']
 
 export const RoleBindingsListTable = ({
   data,
@@ -38,12 +33,22 @@ export const RoleBindingsListTable = ({
   filters = null,
   ...rest
 }) => {
+  const columns = useMemo(
+    () => [
+      { id: 'id', display: false },
+      { id: 'name', label: 'Name' },
+      { id: 'clusterName', label: 'Cluster' },
+      { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
+    ],
+    [],
+  )
+
   return (
     <ListTable
       filters={filters}
       uniqueIdentifier={'id'}
       canEditColumns={false}
-      showPagination={false}
+      searchTargets={searchTargets}
       data={data}
       onReload={onReload}
       loading={loading}

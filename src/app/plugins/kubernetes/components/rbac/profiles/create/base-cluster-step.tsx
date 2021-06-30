@@ -6,12 +6,12 @@ import ListTable from 'core/components/listTable/ListTable'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import SimpleLink from 'core/components/SimpleLink'
 import Input from 'core/elements/input'
-import { appUrlRoot, listTablePrefs } from 'app/constants'
+import { listTablePrefs, profilesHelpUrl } from 'app/constants'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import ProfileSummaryBox from 'k8s/components/rbac/profiles/create/profile-summary-box'
 import useStyles from './useStyles'
+import { isEmpty } from 'ramda'
 
-const profilesHelpUrl = `${appUrlRoot}/help`
 const RbacProfileBox = ({ profileName, setWizardContext }) => {
   const classes = useStyles()
   return (
@@ -47,12 +47,13 @@ export const columns = [
   { id: 'uuid', display: false },
   { id: 'name', label: 'Name' },
   { id: 'version', label: 'Version' },
-  { id: 'cloudProvider', name: 'Cloud Provider' },
+  { id: 'cloudProviderType', label: 'Cloud Provider' },
 ]
-const visibleColumns = ['name', 'version', 'cloudProvider']
-const columnsOrder = ['name', 'version', 'cloudProvider']
+const visibleColumns = ['name', 'version', 'cloudProviderType']
+const columnsOrder = ['name', 'version', 'cloudProviderType']
 const orderBy = 'name'
 const orderDirection = 'asc'
+const searchTargets = ['name', 'version']
 
 export const BaseClusterStep = ({ wizardContext, setWizardContext }) => {
   const classes = useStyles()
@@ -62,9 +63,17 @@ export const BaseClusterStep = ({ wizardContext, setWizardContext }) => {
   const handleSelect = useCallback((row) => {
     setWizardContext({ baseCluster: row.name })
   }, [])
-
+  const validateFields = useCallback(
+    ({ profileName, baseCluster }) => !isEmpty(profileName) && !isEmpty(baseCluster),
+    [],
+  )
   return (
-    <WizardStep className={classes.splitWizardStep} label="Base Cluster" stepId="baseCluster">
+    <WizardStep
+      className={classes.splitWizardStep}
+      label="Base Cluster"
+      stepId="baseCluster"
+      validateFields={validateFields}
+    >
       <ProfileSummaryBox {...wizardContext} />
       <div className={classes.profileContents}>
         <RbacProfileBox
@@ -82,7 +91,7 @@ export const BaseClusterStep = ({ wizardContext, setWizardContext }) => {
             uniqueIdentifier={'uuid'}
             multiSelection={false}
             canEditColumns={false}
-            showPagination={false}
+            searchTargets={searchTargets}
             data={data}
             onReload={refetch}
             loading={loading}
