@@ -402,11 +402,7 @@ class Qbert extends ApiService {
         mthdName: 'upgradeClusterNodes',
       },
     }
-    if (body) {
-      return this.client.basicPost({ ...upgradeClusterNodesOptions, body })
-    } else {
-      return this.client.basicPost({ ...upgradeClusterNodesOptions })
-    }
+    return this.client.basicPost({ ...upgradeClusterNodesOptions, body })
   }
 
   @trackApiMethodMetadata({
