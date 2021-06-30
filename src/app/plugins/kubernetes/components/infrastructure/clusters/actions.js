@@ -177,7 +177,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         clusterId: cluster.uuid,
         numNodes: (nodes || []).length,
       })
-      await qbert.attach(cluster.uuid, nodes)
+      await qbert.attachNodes(cluster.uuid, nodes)
       trackEvent('Cluster Attach Nodes', {
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,
@@ -190,7 +190,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         clusterId: cluster.uuid,
         numNodes: (nodes || []).length,
       })
-      await qbert.detach(cluster.uuid, nodes)
+      await qbert.detachNodes(cluster.uuid, nodes)
       trackEvent('Cluster Detach Nodes', {
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,
@@ -210,7 +210,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 export const parseClusterParams = async (params) => {
   // Maybe todo: change these to use the params selector instead to enable filtering?
   const allClusters = await getAllClusters()
-  const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
+  const { clusterId = pathOr(allKey, [0, 'uuid'], allClusters) } = params
   return [clusterId, allClusters]
 }
 

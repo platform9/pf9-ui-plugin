@@ -10,8 +10,8 @@ import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import Progress from 'core/components/progress/Progress'
-import { isAdmin } from './helpers'
 import RemoteSupportDialog from '../nodes/RemoteSupportDialog'
+import { isAdmin } from './helpers'
 
 const tableColumns = columns.filter(
   (column) => !['clusterName', 'isSpotInstance'].includes(column.id),
