@@ -45,9 +45,12 @@ import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
 import { preferencesActions } from 'core/session/preferencesReducers'
-import { isProductionEnv } from 'core/utils/helpers'
+import { isDecco, isProductionEnv } from 'core/utils/helpers'
 import Watchdog from 'core/watchdog'
 import sessionTimeoutCheck from 'core/watchdog/session-timeout'
+import OnboardingPage from 'k8s/components/onboarding/onboarding-page'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 const toPairs: any = ToPairs
 
@@ -145,6 +148,18 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       },
     },
   },
+  modal: {
+    position: 'fixed',
+    left: 0,
+    top: '55px',
+    width: '100vw',
+    height: 'calc(100vh - 55px)', // 55px is the toolbar height
+    overflow: 'auto',
+    zIndex: 5000,
+    backgroundColor: theme.palette.grey['100'],
+    padding: theme.spacing(2, 4),
+    boxSizing: 'border-box',
+  },
 }))
 
 const renderPluginRoutes = (role) => (id, plugin) => {
@@ -235,7 +250,7 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   }
 }
 
-const determineCurrentStack = (location, features, lastStack) => {
+export const determineCurrentStack = (location, features, lastStack) => {
   const currentRoute = Router.getCurrentRoute()
   const handleReturn = () => {
     if (lastStack) {
@@ -349,6 +364,25 @@ const AuthenticatedContainer = () => {
     showNavBar: showNavBar,
   })
 
+  const [{ featureFlags = {} as any }, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const [clusters] = useDataLoader(clusterActions.list)
+  const isTargetEnv =
+    currentStack === AppPlugins.Kubernetes &&
+    isDecco(features) &&
+    customerTier === CustomerTiers.Freedom
+  const showOnboarding =
+    isTargetEnv &&
+    ((featureFlags.isOnboarded === undefined && clusters?.length === 0) ||
+      (featureFlags.isOnboarded !== undefined && !featureFlags.isOnboarded))
+
+  useEffect(() => {
+    if (!isTargetEnv || (featureFlags.isOnboarded !== undefined && clusters?.length === 0)) return
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
+  }, [featureFlags, clusters])
+
+  console.log('clusters.length', clusters?.length)
+  console.log('featureFlags', featureFlags, featureFlags.isOnboarded)
+
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
     loadRegionFeatures(setRegionFeatures, setStacks, dispatch, history)
@@ -417,7 +451,7 @@ const AuthenticatedContainer = () => {
     <>
       <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
-        <Toolbar />
+        <Toolbar hideNotificationsDropdown={showOnboarding} />
         {SecondaryHeader && <SecondaryHeader className={classes.secondaryHeader} />}
         {showNavBar && (
           <Navbar
@@ -473,6 +507,11 @@ const AuthenticatedContainer = () => {
               currentStack === 'kubernetes' && <ClusterUpgradeBanner />} */}
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}
+              {showOnboarding && (
+                <div id="onboarding" className={classes.modal}>
+                  <OnboardingPage />
+                </div>
+              )}
               <Switch>
                 {renderPlugins(plugins, role)}
                 <Route path={helpUrl} component={HelpPage} />

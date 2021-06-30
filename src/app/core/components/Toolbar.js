@@ -7,12 +7,14 @@ import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import NotificationsPopover from 'core/components/notifications/NotificationsPopover'
-import { imageUrls } from 'app/constants'
+import { CustomerTiers, imageUrls } from 'app/constants'
 import useReactRouter from 'use-react-router'
 import { routes } from 'core/utils/routes'
-import { prop } from 'ramda'
+import { pathOr, prop } from 'ramda'
 import { preferencesStoreKey } from 'core/session/preferencesReducers'
 import { useSelector } from 'react-redux'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { determineCurrentStack } from 'core/containers/AuthenticatedContainer'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -45,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Toolbar = ({ open }) => {
+const Toolbar = ({ open, hideNotificationsDropdown }) => {
   const classes = useStyles({})
   const { history } = useReactRouter()
   const selectPrefsState = prop(preferencesStoreKey)
@@ -65,7 +67,10 @@ const Toolbar = ({ open }) => {
         <div className={classes.rightTools}>
           <RegionChooser className={classes.leftMargin} />
           <TenantChooser className={classes.leftMargin} />
-          <NotificationsPopover className={classes.leftMargin} />
+          <NotificationsPopover
+            className={classes.leftMargin}
+            hideDropdown={hideNotificationsDropdown}
+          />
           <UserMenu className={classes.leftMargin} />
         </div>
       </MaterialToolbar>

@@ -45,12 +45,11 @@ const AddCoworkerStep = ({ wizardContext, setWizardContext, onNext, setSubmittin
   }
 
   const handleSubmit = useCallback(async () => {
-    setSubmitting(true)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
     }
-
+    setSubmitting(true)
     const data = {
       ...wizardContext,
       roleAssignments: { [currentTenant]: defaultRoleId },

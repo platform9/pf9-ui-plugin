@@ -76,12 +76,11 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
   }
 
   const handleSubmit = useCallback(async () => {
-    setSubmitting(true)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
     }
-
+    setSubmitting(true)
     const finalSelectedClusters = getAllSelectedClusters(wizardContext.selectedClusters)
 
     const metadata = {
