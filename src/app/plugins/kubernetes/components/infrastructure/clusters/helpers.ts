@@ -271,7 +271,7 @@ export const createBareOSCluster = async (data) => {
     ...workerNodes.map((uuid) => ({ isMaster: false, uuid })),
   ]
 
-  await qbert.attach(cluster.uuid, nodes)
+  await qbert.attachNodes(cluster.uuid, nodes)
 
   return cluster
 }
@@ -284,6 +284,10 @@ const createGenericCluster = async (body, data) => {
     // There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
     const cloudProviders = await cloudProviderActions.list()
     body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
+  }
+
+  if (data.enableProfileAgent) {
+    body.enableProfileAgent = data.enableProfileAgent
   }
 
   if (data.httpProxy) {

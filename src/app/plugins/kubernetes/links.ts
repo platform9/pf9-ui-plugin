@@ -75,6 +75,7 @@ export const persistVolumesStorageClassesLink = `${k8sDocBaselUrl}/concepts/stor
 // Api Access
 export const kubeconfigFileLink = `${k8sBaseUrl}/kubeconfig-and-clients-introduction-to-kubeconfig`
 export const kubectlOverviewLink = `${k8sDocBaselUrl}/user-guide/kubectl-overview/`
+export const konformGithubLink = `${pf9GitHubRepoUrl}/konform`
 
 // Misc
 export const runtimePrivilegedLink = `${dockerDocBaseUrl}/engine/reference/run/#runtime-privilege-and-linux-capabilities`

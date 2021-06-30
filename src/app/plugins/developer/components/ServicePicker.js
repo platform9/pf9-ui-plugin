@@ -7,7 +7,7 @@ import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 import { prop } from 'ramda'
 import { cacheStoreKey } from 'core/caching/cacheReducers'
 
-@connect(store => ({ cache: store[cacheStoreKey] }))
+@connect((store) => ({ cache: store[cacheStoreKey] }))
 class ServicePicker extends React.PureComponent {
   state = {
     services: [],
@@ -15,7 +15,7 @@ class ServicePicker extends React.PureComponent {
     isMounted: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.setState(
       // For some strange reason the component is being unmounted before
       // loadServiceCatalog completes.  Need this hack to work around it.
