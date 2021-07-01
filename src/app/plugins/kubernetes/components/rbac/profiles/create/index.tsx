@@ -36,7 +36,7 @@ const CreateRbacProfile = () => {
     if (success) {
       history.push(routes.rbac.profiles.list.path())
     } else {
-      setErrorMessage('ERROR: Cannot edit deployed app')
+      setErrorMessage('ERROR: Error saving profile')
     }
   }, [])
 
