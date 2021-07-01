@@ -378,8 +378,8 @@ const AuthenticatedContainer = () => {
     customerTier === CustomerTiers.Freedom
 
   const showOnboarding =
-    isOnboardingTargetEnv &&
-    ((featureFlags.isOnboarded === undefined && clusters?.length === 0) ||
+    isTargetEnv &&
+    ((featureFlags.isOnboarded === undefined && (clusters?.length === 0 || users?.length === 0)) ||
       (featureFlags.isOnboarded !== undefined && !featureFlags.isOnboarded))
 
   let onboardingWizardStep = OnboardingStepNames.WelcomeStep
