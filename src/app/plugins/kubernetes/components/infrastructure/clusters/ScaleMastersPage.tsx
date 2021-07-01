@@ -24,6 +24,9 @@ import { allPass } from 'ramda'
 import { customValidator } from 'core/utils/fieldValidators'
 import Alert from 'core/components/Alert'
 import { clusterIsHealthy, clusterNotBusy, isBareOsMultiMasterCluster } from './helpers'
+import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helper'
+import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
+import { loadNodes } from '../nodes/actions'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -35,6 +38,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   masterCount: {
     margin: theme.spacing(4, 0),
+  },
+  errorMessage: {
+    padding: theme.spacing(1),
   },
 }))
 
@@ -144,8 +150,11 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   onAttach,
   onDetach,
 }) => {
+  const classes = useStyles()
   const [scaleType, setScaleType] = useState(null)
   const [selectedNode, setSelectedNode] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [allNodes] = useDataLoader(loadNodes)
 
   const numMasters = (cluster.nodes || []).filter(isMaster).length
   const numToChange = scaleType === 'add' ? 1 : -1
@@ -159,6 +168,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
 
   useEffect(() => {
     setSelectedNode(null)
+    setErrorMessage(null)
   }, [scaleType])
 
   const clusterAndNodeStatusValidator = useCallback(() => {
@@ -179,6 +189,24 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
       return isBareOsMultiMasterCluster(cluster)
     }, 'No Virtual IP Detected. To scale Masters a Virtual IP is required. Please recreate this cluster and provide a Virtual IP on the Network step')
   }, [cluster, scaleType])()
+
+  const handleSubmit = useCallback(
+    (data: { nodes: string[] }) => {
+      if (scaleType === 'add') {
+        const uuids = data.nodes
+        const hasClockDrift = checkNodesForClockDrift(uuids, allNodes)
+        if (hasClockDrift) {
+          setErrorMessage(clockDriftErrorMessage)
+          return
+        }
+        setErrorMessage(null)
+        onAttach(data)
+      } else {
+        onDetach(data)
+      }
+    },
+    [scaleType, onAttach, onDetach],
+  )
 
   return (
     <div>
@@ -203,10 +231,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
       />
 
       {!!scaleType && (
-        <ValidatedForm
-          onSubmit={scaleType === 'add' ? onAttach : onDetach}
-          title={`Choose nodes to ${scaleType}`}
-        >
+        <ValidatedForm onSubmit={handleSubmit} title={`Choose nodes to ${scaleType}`}>
           <ClusterHostChooser
             // id={scaleType === 'add' ? 'mastersToAdd' : 'mastersToRemove'}
             id="nodes"
@@ -222,9 +247,14 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
               bareOsValidator,
             ]}
             onChange={(value) => setSelectedNode(value)}
+            isSingleNodeCluster={false}
+            showResourceRequirements={scaleType === 'add'}
             required
           />
           {selectedNode && <Alert small variant="warning" message={transitionConstraint.message} />}
+          {errorMessage && (
+            <ErrorMessage className={classes.errorMessage}>{errorMessage}</ErrorMessage>
+          )}
           <SubmitButton>{scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
         </ValidatedForm>
       )}

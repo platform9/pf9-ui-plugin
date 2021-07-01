@@ -7,6 +7,7 @@ import UploadGoogleJson from './UploadGoogleJson'
 import Text from 'core/elements/text'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import TextField from 'core/components/validatedForm/TextField'
+import { customValidator, requiredValidator } from 'core/utils/fieldValidators'
 
 const useStyles = makeStyles((theme: Theme) => ({
   inCardSubmit: {
@@ -23,6 +24,20 @@ const useStyles = makeStyles((theme: Theme) => ({
 const customCodeMirrorOptions = {
   mode: 'json',
 }
+
+const codeMirrorValidations = [
+  requiredValidator,
+  customValidator((json) => {
+    try {
+      const parseableString = json.replace(/[^\S\r\n]/g, ' ')
+      JSON.parse(parseableString)
+      return true
+    } catch (err) {
+      console.log(err)
+      return false
+    }
+  }, 'Provided JSON code is invalid'),
+]
 
 interface Props {
   wizardContext: any
@@ -63,7 +78,7 @@ const GoogleCloudProviderFields = ({
         onChange={(value) => setWizardContext({ json: value })}
         value={wizardContext.json}
         className={fullWidth}
-        required
+        validations={codeMirrorValidations}
       />
       <UploadGoogleJson onChange={(value) => setWizardContext({ json: value })} />
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}

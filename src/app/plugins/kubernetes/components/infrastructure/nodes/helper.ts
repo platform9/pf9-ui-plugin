@@ -1,6 +1,8 @@
 import { partition, pathOr } from 'ramda'
 import { ClusterType, HardwareType, nodeHardwareRequirements } from '../clusters/bareos/constants'
-import { ErrorMessageCodes, errorMessageLevel } from './model'
+import { ErrorMessageCodes, errorMessageLevel, INodesSelector } from './model'
+
+export const clockDriftErrorMessage = 'Cannot attach node(s) with clock drift'
 
 export const getErrorMessage = (node, msgLevel: errorMessageLevel, code: ErrorMessageCodes) => {
   const messages = pathOr(null, ['message', msgLevel], node)
@@ -40,4 +42,21 @@ export const meetsHardwareRequirement = (
  */
 export const clockDriftDetectedInNodes = (nodes) => {
   return nodes && !!nodes.find((node) => hasClockDrift(node))
+}
+
+/**
+ *
+ * @param nodeUuids Array of node uuids
+ * @param allNodes Array of all nodes
+ * @returns True if clock drift is detected in any of the nodes. False if none of the nodes have clock drift
+ */
+export const checkNodesForClockDrift = (nodeUuids: String[], allNodes: INodesSelector[]) => {
+  if (!nodeUuids || !allNodes) return false
+  for (const uuid of nodeUuids) {
+    const node = allNodes.find((node) => node.uuid === uuid)
+    if (hasClockDrift(node)) {
+      return true
+    }
+  }
+  return false
 }

@@ -149,4 +149,5 @@ export enum UserPreferences {
 
 export enum GlobalPreferences {
   Theme = 'theme',
+  CustomerExternalId = 'customer_external_uuid',
 }

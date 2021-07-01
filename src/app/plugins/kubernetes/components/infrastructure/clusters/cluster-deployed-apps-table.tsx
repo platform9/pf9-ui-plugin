@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   headers: {
     display: 'grid',
-    gridTemplateColumns: '150px 1fr 1fr 200px 200px',
+    gridTemplateColumns: '150px 1fr 200px 1fr 100px 150px',
     gridGap: theme.spacing(2),
   },
   nameHeader: {
@@ -55,7 +55,7 @@ const useRowStyles = makeStyles((theme: Theme) => ({
     borderRadius: 4,
     backgroundColor: theme.palette.grey['000'],
     display: 'grid',
-    gridTemplateColumns: '150px 1fr 1fr 200px 200px',
+    gridTemplateColumns: '150px 1fr 200px 1fr 100px 150px',
     marginTop: theme.spacing(1),
     gridGap: theme.spacing(2),
   },
@@ -117,15 +117,16 @@ interface Column {
   className?: string
 }
 
-const columns: Array<Column> = [
+const columns: Column[] = [
   { id: 'icon', label: '', disableSorting: true },
   { id: 'name', label: 'App Deployment Name', className: 'nameHeader' },
+  { id: 'status', label: 'Status', disableSorting: true },
   { id: 'namespace', label: 'Namespace', disableSorting: true },
   { id: 'version', label: 'Version', disableSorting: true },
 ]
 
 const AppRow = ({ app, onEdit, onDelete }) => {
-  const { icon, name, chart, namespace, chart_version } = app
+  const { icon, name, chart, namespace, chart_version, status } = app
 
   const classes = useRowStyles()
   return (
@@ -139,6 +140,11 @@ const AppRow = ({ app, onEdit, onDelete }) => {
           <Text variant="subtitle2">{name}</Text>
           <Text variant="body2">{chart}</Text>
         </div>
+      </div>
+      <div className={classes.cell}>
+        <Text className={classes.text} variant="caption1">
+          {status}
+        </Text>
       </div>
       <div className={classes.cell}>
         <Text className={classes.text} variant="caption1">
@@ -178,7 +184,7 @@ const AppRow = ({ app, onEdit, onDelete }) => {
 
 type Order = 'Asc' | 'Desc'
 
-const sort = (items: Array<any>, target: string, order: Order) => {
+const sort = (items: any[], target: string, order: Order) => {
   const sortedItems = items.sort((a, b) => a[target].localeCompare(b[target]))
   return order === 'Asc' ? sortedItems : sortedItems.reverse()
 }
@@ -224,7 +230,7 @@ const ClusterDeployedAppsTable = ({ apps, clusterId, history }) => {
           <div key={label}>
             <span className={clsx(classes.columnLabel, classes[className])}>{label}</span>
             {!disableSorting && (
-              <IconButton component="span" size="small" disableRipple={true} onClick={handleSort}>
+              <IconButton component="span" size="small" disableRipple onClick={handleSort}>
                 <ArrowDownwardIcon
                   className={clsx(classes.icon, classes[`iconDirection${capitalize(sortOrder)}`])}
                 />
