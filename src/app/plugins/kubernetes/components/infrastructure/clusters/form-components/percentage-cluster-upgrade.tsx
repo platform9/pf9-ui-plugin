@@ -8,24 +8,20 @@ import { IconInfo } from 'core/components/validatedForm/Info'
 import { WizardContext } from 'core/components/wizard/Wizard'
 import { InputAdornment } from '@material-ui/core'
 
-const PercentageClusterUpgradeField = ({ wizardContext, setWizardContext }) => {
-  return (
-    <>
-      <CheckboxField
-        id="percentageClusterUpgrade"
-        label="Percentage"
-        disabled={wizardContext.upgradingTo}
-        infoPlacement="right-end"
-        onChange={(value) =>
-          setWizardContext(handleSetUpgradeStrategy(value, 'percentageClusterUpgrade'))
-        }
-        value={wizardContext?.percentageClusterUpgrade}
-        info="Percentage: The specified percent of Worker node will be upgraded in parallel. 10% would upgrade 10 nodes of 100 node cluster
+const PercentageClusterUpgradeField = ({ wizardContext, setWizardContext }) => (
+  <CheckboxField
+    id="percentageClusterUpgrade"
+    label="Percentage"
+    disabled={wizardContext.upgradingTo}
+    infoPlacement="right-end"
+    onChange={(value) =>
+      setWizardContext(handleSetUpgradeStrategy(value, 'percentageClusterUpgrade'))
+    }
+    value={wizardContext?.percentageClusterUpgrade}
+    info="Percentage: The specified percent of Worker node will be upgraded in parallel. 10% would upgrade 10 nodes of 100 node cluster
        in parallel, then the next 10."
-      />
-    </>
-  )
-}
+  />
+)
 
 export const PercentageClusterUpgradeAddonField = ({ values }) => {
   const {

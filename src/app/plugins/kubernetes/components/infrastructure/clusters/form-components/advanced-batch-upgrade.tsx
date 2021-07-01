@@ -20,22 +20,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const AdvancedBatchUpgradeField = ({ wizardContext, setWizardContext }) => {
-  return (
-    <>
-      <CheckboxField
-        id="advancedBatchUpgrade"
-        label="Advanced: Batch Upgrade"
-        infoPlacement="right-end"
-        onChange={(value) =>
-          setWizardContext(handleSetUpgradeStrategy(value, 'advancedBatchUpgrade'))
-        }
-        value={wizardContext?.advancedBatchUpgrade}
-        info="Advanced Batch Upgrade: The specified worked nodes will be upgraded in parallel. Worker nodes can be manually upgraded in distinct batches."
-      />
-    </>
-  )
-}
+const AdvancedBatchUpgradeField = ({ wizardContext, setWizardContext }) => (
+  <CheckboxField
+    id="advancedBatchUpgrade"
+    label="Advanced: Batch Upgrade"
+    infoPlacement="right-end"
+    onChange={(value) => setWizardContext(handleSetUpgradeStrategy(value, 'advancedBatchUpgrade'))}
+    value={wizardContext?.advancedBatchUpgrade}
+    info="Advanced Batch Upgrade: The specified worked nodes will be upgraded in parallel. Worker nodes can be manually upgraded in distinct batches."
+  />
+)
 
 export const AdvancedBatchUpgradeAddonField = ({ values }) => {
   const {
