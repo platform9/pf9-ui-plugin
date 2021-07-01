@@ -74,7 +74,25 @@ const initialContext = {
   clusterName: 'PF9-single-node-cluster',
 }
 
-const OnboardingPage = () => {
+export enum OnboardingStepNames {
+  WelcomeStep = 'welcomeStep',
+  ConfigureYourInfrastructureStep = 'configureInfrastuctureStep',
+  BuildClusterStep = 'buildClusterStep',
+  InviteCoworkerStep = 'inviteCoworkerStep',
+}
+
+const onboardingStepNumbers = {
+  [OnboardingStepNames.WelcomeStep]: 0,
+  [OnboardingStepNames.ConfigureYourInfrastructureStep]: 1,
+  [OnboardingStepNames.BuildClusterStep]: 2,
+  [OnboardingStepNames.InviteCoworkerStep]: 3,
+}
+
+interface Props {
+  initialStep: OnboardingStepNames
+}
+
+const OnboardingPage = ({ initialStep }: Props) => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const [cloudProviders, loadingCloudProviders] = useDataLoader(cloudProviderActions.list)
@@ -126,7 +144,12 @@ const OnboardingPage = () => {
     <>
       <DocumentMeta title="Onboarding" bodyClasses={['form-view']} />
       <FormWrapper title="" loading={submitting}>
-        <Wizard context={initialContext} onComplete={handleFormCompletion} hideAllButtons>
+        <Wizard
+          context={initialContext}
+          onComplete={handleFormCompletion}
+          startingStep={onboardingStepNumbers[initialStep]}
+          hideAllButtons
+        >
           {({ wizardContext, setWizardContext, onNext, handleNext, handleBack, setActiveStep }) => {
             return (
               <>

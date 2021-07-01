@@ -48,9 +48,10 @@ import { preferencesActions } from 'core/session/preferencesReducers'
 import { isDecco, isProductionEnv } from 'core/utils/helpers'
 import Watchdog from 'core/watchdog'
 import sessionTimeoutCheck from 'core/watchdog/session-timeout'
-import OnboardingPage from 'k8s/components/onboarding/onboarding-page'
+import OnboardingPage, { OnboardingStepNames } from 'k8s/components/onboarding/onboarding-page'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
+import { mngmUserActions } from 'app/plugins/account/components/userManagement/users/actions'
 
 const toPairs: any = ToPairs
 
@@ -364,21 +365,33 @@ const AuthenticatedContainer = () => {
     showNavBar: showNavBar,
   })
 
+  // Onboarding
   const [{ featureFlags = {} as any }, , , updateUserDefaults] = useScopedPreferences('defaults')
   const [clusters] = useDataLoader(clusterActions.list)
-  const isTargetEnv =
+  const [users] = useDataLoader(mngmUserActions.list)
+
+  const isOnboardingTargetEnv =
     currentStack === AppPlugins.Kubernetes &&
     isDecco(features) &&
     customerTier === CustomerTiers.Freedom
+
   const showOnboarding =
-    isTargetEnv &&
+    isOnboardingTargetEnv &&
     ((featureFlags.isOnboarded === undefined && clusters?.length === 0) ||
       (featureFlags.isOnboarded !== undefined && !featureFlags.isOnboarded))
 
+  let onboardingWizardStep = OnboardingStepNames.WelcomeStep
+  if (showOnboarding) {
+    if (clusters?.length > 0 && users?.length === 0) {
+      onboardingWizardStep = OnboardingStepNames.InviteCoworkerStep
+    }
+  }
+
   useEffect(() => {
-    if (!isTargetEnv || (featureFlags.isOnboarded !== undefined && clusters?.length === 0)) return
-    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
-  }, [featureFlags, clusters])
+    if (isOnboardingTargetEnv && clusters?.length > 0 && users?.length > 0) {
+      updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
+    }
+  }, [isOnboardingTargetEnv, clusters, users])
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
@@ -503,19 +516,21 @@ const AuthenticatedContainer = () => {
             {/* {pathStrOr(false, 'experimental.containervisor', features) &&
               currentStack === 'kubernetes' && <ClusterUpgradeBanner />} */}
             <div className={classes.contentMain}>
-              {renderRawComponents(plugins)}
               {showOnboarding && (
                 <div id="onboarding" className={classes.modal}>
-                  <OnboardingPage />
+                  <OnboardingPage initialStep={onboardingWizardStep} />
                 </div>
               )}
-              <Switch>
-                {renderPlugins(plugins, role)}
-                <Route path={helpUrl} component={HelpPage} />
-                <Route path={logoutUrl} component={LogoutPage} />
-                <Redirect to={dashboardUrl} />
-              </Switch>
-              {devEnabled && <DeveloperToolsEmbed />}
+              <>
+                {renderRawComponents(plugins)}
+                <Switch>
+                  {renderPlugins(plugins, role)}
+                  <Route path={helpUrl} component={HelpPage} />
+                  <Route path={logoutUrl} component={LogoutPage} />
+                  <Redirect to={dashboardUrl} />
+                </Switch>
+                {devEnabled && <DeveloperToolsEmbed />}
+              </>
             </div>
           </main>
         </PushEventsProvider>
