@@ -294,6 +294,7 @@ export const columns = [
   },
   { id: 'api_responding', label: 'API Server Health', render: renderApiServerHealth },
   { id: 'logs', label: 'Logs', render: renderLogs },
+  { id: 'actualKubeRoleVersion', label: 'Node Kube Version' },
   { id: 'primaryIp', label: 'Network Interfaces', render: renderNetworkInterfaces },
   { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
   { id: 'os', label: 'Operating System', render: renderOperatingSystem },
