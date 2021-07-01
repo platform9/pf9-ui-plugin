@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { handleSetUpgradeStrategy } from '../UpgradeClusterPage'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -38,12 +38,14 @@ export const AdvancedBatchUpgradeAddonField = ({ values }) => {
   }: { wizardContext: any; setWizardContext: any } = useContext(WizardContext) as any
   const classes = useStyles()
   const nodeVersionToCompare = getNodeVersionToCompare(wizardContext)
-  const [upgradedNodes, toBeUpgradedNodes] = partition(
-    wizardContext.upgradingTo
-      ? filterInProgressUpgrade(nodeVersionToCompare)
-      : filterInInitialUpgrade(nodeVersionToCompare),
-    wizardContext.workerNodes,
-  )
+  const [upgradedNodes, toBeUpgradedNodes] = useMemo(() => {
+    return partition(
+      wizardContext.upgradingTo
+        ? filterInProgressUpgrade(nodeVersionToCompare)
+        : filterInInitialUpgrade(nodeVersionToCompare),
+      wizardContext.workerNodes,
+    )
+  }, [])
 
   return (
     <FormFieldCard title="Batch Upgrade Strategy">

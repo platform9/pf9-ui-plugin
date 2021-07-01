@@ -147,6 +147,7 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
           <List dense component="div" role="list">
             {filteredLeftNodes.map((value) => (
               <NodeItem
+                key={value.uuid}
                 checked={checked}
                 value={value}
                 nodeType={'left'}
@@ -187,6 +188,7 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
           <List dense component="div" role="list">
             {filteredRightNodes.map((value) => (
               <NodeItem
+                key={value.uuid}
                 checked={checked}
                 value={value}
                 nodeType={'right'}

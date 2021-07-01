@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Text from 'core/elements/text'
 import { Button, Dialog, makeStyles, DialogActions, List, ListItem } from '@material-ui/core'
 import Theme from 'core/themes/model'
@@ -59,12 +59,15 @@ const ClusterBatchUpgradeDialog = ({
   const nodeVersionToCompare = getNodeVersionToCompare(cluster)
 
   // partion node list based upgradingTo flag ( in progress / intial )
-  const [upgradedNodes, toBeUpgradedNodes] = partition(
-    cluster.upgradingTo
-      ? filterInProgressUpgrade(nodeVersionToCompare)
-      : filterInInitialUpgrade(nodeVersionToCompare),
-    cluster.workerNodes,
-  )
+  const [upgradedNodes, toBeUpgradedNodes] = useMemo(() => {
+    return partition(
+      cluster.upgradingTo
+        ? filterInProgressUpgrade(nodeVersionToCompare)
+        : filterInInitialUpgrade(nodeVersionToCompare),
+      cluster.workerNodes,
+    )
+  }, [])
+
   return (
     <Dialog open fullWidth maxWidth="md" onClose={handleClose}>
       <div className={classes.dialogContainer}>
