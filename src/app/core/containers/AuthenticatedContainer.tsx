@@ -328,6 +328,26 @@ const loadRegionFeatures = async (setRegionFeatures, setStacks, dispatch, histor
 
 const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
+function isOnboardingEnv(currentStack, features) {
+  const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
+  return (
+    currentStack === AppPlugins.Kubernetes &&
+    isDecco(features) &&
+    customerTier === CustomerTiers.Enterprise
+  )
+  // customerTier === CustomerTiers.Freedom
+}
+
+function needsOnboardingBackfill(currentStack, features, featureFlags, clusters, users) {
+  const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
+  return (
+    isOnboardingTargetEnv &&
+    featureFlags.isOnboarded === undefined &&
+    clusters?.length > 0 &&
+    users?.length > 0
+  )
+}
+
 const AuthenticatedContainer = () => {
   const { history, location } = useReactRouter()
   const [drawerOpen, toggleDrawer] = useToggler(true)
@@ -371,16 +391,17 @@ const AuthenticatedContainer = () => {
   const { featureFlags = {} as any } = defaultPrefs
   const [clusters] = useDataLoader(clusterActions.list)
   const [users] = useDataLoader(mngmUserActions.list)
-
-  const isOnboardingTargetEnv =
-    currentStack === AppPlugins.Kubernetes &&
-    isDecco(features) &&
-    customerTier === CustomerTiers.Freedom
+  const shouldBackfillOnboarding = needsOnboardingBackfill(
+    currentStack,
+    features,
+    featureFlags,
+    clusters,
+    users,
+  )
+  const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
 
   const showOnboarding =
-    isOnboardingTargetEnv &&
-    ((featureFlags.isOnboarded === undefined && (clusters?.length === 0 || users?.length === 0)) ||
-      (featureFlags.isOnboarded !== undefined && !featureFlags.isOnboarded))
+    isOnboardingTargetEnv && !shouldBackfillOnboarding && !featureFlags.isOnboarded
 
   let onboardingWizardStep = OnboardingStepNames.WelcomeStep
   if (showOnboarding) {
@@ -388,12 +409,15 @@ const AuthenticatedContainer = () => {
       onboardingWizardStep = OnboardingStepNames.InviteCoworkerStep
     }
   }
-
+  function setOnboardingFlag(flag = false) {
+    debugger
+    return updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: flag })
+  }
   useEffect(() => {
-    if (isOnboardingTargetEnv && clusters?.length > 0 && users?.length > 0) {
+    if (shouldBackfillOnboarding) {
       updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
     }
-  }, [isOnboardingTargetEnv, clusters, users])
+  }, [shouldBackfillOnboarding])
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
@@ -463,6 +487,18 @@ const AuthenticatedContainer = () => {
     <>
       <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
+        <button
+          style={{ position: 'fixed', top: 0, zIndex: 100000, padding: 20 }}
+          onClick={() => setOnboardingFlag(false)}
+        >
+          remove onboarding (false)
+        </button>
+        <button
+          style={{ position: 'fixed', top: 100, zIndex: 100000, padding: 20 }}
+          onClick={() => setOnboardingFlag(undefined)}
+        >
+          remove onboarding (undefined)
+        </button>
         <Toolbar hideNotificationsDropdown={showOnboarding} />
         {SecondaryHeader && <SecondaryHeader className={classes.secondaryHeader} />}
         {showNavBar && (
