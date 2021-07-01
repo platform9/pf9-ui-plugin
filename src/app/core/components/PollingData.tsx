@@ -36,7 +36,7 @@ function PollingData<T>({
     const ts = new Date().valueOf()
     setLastFetchTs(ts)
     setLastIntervalTs(ts)
-    if (pollingCondition && !pollingCondition()) {
+    if (typeof pollingCondition === 'function' && !pollingCondition()) {
       return
     }
     onReload(true)
