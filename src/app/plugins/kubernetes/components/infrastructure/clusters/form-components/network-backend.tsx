@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import { CalicoDetectionTypes } from './calico-network-fields'
 import { NetworkStackTypes } from '../constants'
@@ -34,31 +34,21 @@ const NetworkBackendField = ({
   options = networkBackendOptions,
   wizardContext,
   setWizardContext,
-}) => {
-  const networkBackendValue = useMemo(
-    () => (wizardContext.deployKubevirt ? NetworkBackendTypes.Calico : null),
-    [wizardContext.deployKubevirt],
-  )
+}) => (
+  <PicklistField
+    id="networkPlugin"
+    label="Network backend"
+    onChange={(value) =>
+      setWizardContext(handleNetworkBackendChange(value, wizardContext.networkStack, wizardContext))
+    }
+    options={options}
+    value={wizardContext.networkPlugin}
+    info={
+      wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
+    }
+    disabled={wizardContext.deployKubevirt || wizardContext.networkStack !== NetworkStackTypes.IPv4}
+    required
+  />
+)
 
-  return (
-    <PicklistField
-      id="networkPlugin"
-      label="Network backend"
-      onChange={(value) =>
-        setWizardContext(
-          handleNetworkBackendChange(value, wizardContext.networkStack, wizardContext),
-        )
-      }
-      options={options}
-      value={networkBackendValue || wizardContext.networkPlugin}
-      info={
-        wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
-      }
-      disabled={
-        wizardContext.deployKubevirt || wizardContext.networkStack !== NetworkStackTypes.IPv4
-      }
-      required
-    />
-  )
-}
 export default NetworkBackendField
