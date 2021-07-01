@@ -37,7 +37,7 @@ const CreateRbacProfile = () => {
       loading={false}
     >
       <DocumentMeta title="Create a New RBAC Profile" bodyClasses={['form-view']} />
-      <Wizard context={initialContext} submitLabel="Deploy" onComplete={handleSubmit}>
+      <Wizard context={initialContext} submitLabel="Done" onComplete={handleSubmit}>
         {({ wizardContext, setWizardContext }) => (
           <>
             <BaseClusterStep {...{ wizardContext, setWizardContext }} />
