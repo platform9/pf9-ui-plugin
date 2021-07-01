@@ -337,7 +337,8 @@ const AuthenticatedContainer = () => {
     intercom?: boolean
     ironic?: boolean
   }>(emptyObj)
-  const [{ currentRegion, lastStack }, updatePrefs] = useScopedPreferences()
+  const { prefs, updatePrefs } = useScopedPreferences()
+  const { currentRegion, lastStack } = prefs
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
   const [currentStack, setStack] = useState(
     determineCurrentStack(history.location, regionFeatures, lastStack),
@@ -366,7 +367,8 @@ const AuthenticatedContainer = () => {
   })
 
   // Onboarding
-  const [{ featureFlags = {} as any }, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const { prefs: defaultPrefs, updateUserDefaults } = useScopedPreferences('defaults')
+  const { featureFlags = {} as any } = defaultPrefs
   const [clusters] = useDataLoader(clusterActions.list)
   const [users] = useDataLoader(mngmUserActions.list)
 

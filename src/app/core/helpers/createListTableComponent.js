@@ -30,7 +30,8 @@ const createListTableComponent = ({
     onSortChange = undefined,
     listTableParams = undefined,
   }) => {
-    const [{ visibleColumns, columnsOrder, rowsPerPage }, updatePrefs] = useScopedPreferences(name)
+    const { prefs, updatePrefs } = useScopedPreferences(name)
+    const { visibleColumns, columnsOrder, rowsPerPage } = prefs
 
     return !data || data.length === 0 ? (
       typeof emptyText === 'string' ? (

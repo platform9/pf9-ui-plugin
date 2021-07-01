@@ -99,7 +99,7 @@ const OnboardingPage = ({ initialStep }: Props) => {
   const [clusterChoice, setClusterChoice] = useState<ClusterChoice>('bareOs')
   const [clusterId, setClusterId] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const { updateUserDefaults } = useScopedPreferences('defaults')
 
   const BuildClusterStep = useMemo(() => {
     return objSwitchCaseAny({
