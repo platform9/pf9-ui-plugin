@@ -15,6 +15,7 @@ interface Props<T> {
   refreshDuration?: number
   textColor?: TypographyProps['color']
   onReload: (ignoreCache?: boolean) => T[]
+  pollingCondition?: () => boolean
 }
 
 const defaultRefreshDuration = 1000 * 60 * 5
@@ -27,6 +28,7 @@ function PollingData<T>({
   pollIntervalMs = 5000,
   refreshDuration = defaultRefreshDuration,
   textColor = 'textSecondary',
+  pollingCondition,
 }: Props<T>) {
   const [lastIntervalTs, setLastIntervalTs] = useState(new Date().valueOf())
   const [lastFetchTs, setLastFetchTs] = useState(new Date().valueOf())
@@ -34,9 +36,14 @@ function PollingData<T>({
     const ts = new Date().valueOf()
     setLastFetchTs(ts)
     setLastIntervalTs(ts)
+    if (typeof pollingCondition === 'function' && !pollingCondition()) {
+      return
+    }
     onReload(true)
-  }, [setLastFetchTs, setLastIntervalTs, onReload])
+  }, [setLastFetchTs, setLastIntervalTs, onReload, pollingCondition])
 
+  // This conditional probably can't be used, hooks should not be
+  // called in conditionals
   if (!pause) {
     useInterval(() => {
       if (!loading) {
