@@ -1,6 +1,5 @@
 import { trackEvent } from 'utils/tracking'
 import ApiClient from 'api-client/ApiClient'
-import Bugsnag from '@bugsnag/js'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { isAdminRole } from 'k8s/util/helpers'
@@ -375,9 +374,6 @@ export const createBatchUpgradeClusterPayload = async (data) => {
 
   if (data.batchUpgradePercent) body.batchUpgradePercent = data.batchUpgradePercent
 
-  Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster on percentage', {
-    clusterId: data.uuid,
-  })
   const upgradedCluster = await qbert.upgradeClusterNodes(data.uuid, data.upgradeType, body)
   trackEvent('Upgrade Cluster', { clusterUuid: data.uuid })
 

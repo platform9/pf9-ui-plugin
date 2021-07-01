@@ -145,6 +145,9 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       )
     },
     upgradeClusterNodes: async (formData, prevItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster', {
+        clusterId: formData.uuid,
+      })
       const updatedCluster = createBatchUpgradeClusterPayload(formData)
       return adjustWith(propEq('uuid', formData.uuid), mergeLeft(updatedCluster), prevItems)
     },

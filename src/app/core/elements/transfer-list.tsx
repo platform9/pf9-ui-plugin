@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -8,7 +8,7 @@ import Checkbox from '@material-ui/core/Checkbox'
 import Button from '@material-ui/core/Button'
 import SearchBar from 'core/components/SearchBar'
 import Text from './text'
-import { intersection } from 'ramda'
+import { intersection, prop, uniqBy } from 'ramda'
 
 const useStyles = makeStyles((theme) => ({
   listWrapper: {
@@ -54,17 +54,6 @@ function comparer(otherArray) {
   }
 }
 
-function uniqueList(list) {
-  let unique = []
-  unique = Object.values(
-    list.reduce((acc, item) => {
-      acc[item.uuid] = item
-      return acc
-    }, {}),
-  )
-  return unique
-}
-
 let leftClusterNodes = []
 let rightClusterNodes = []
 export default function TransferList({ clusterNodes, setWizardContext, wizardContext }) {
@@ -102,46 +91,49 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
     setChecked([])
   }
 
-  const renderList = (items, listName) => (
-    <div className={classes.listContainer}>
-      <List dense component="div" role="list">
-        {items.map((value) => {
-          const labelId = `transfer-list-item-${listName}-${value.uuid}-label`
+  const renderList = useCallback(
+    (items, listName) => (
+      <div className={classes.listContainer}>
+        <List dense component="div" role="list">
+          {items.map((value) => {
+            const labelId = `transfer-list-item-${listName}-${value.uuid}-label`
 
-          return (
-            <ListItem
-              className={classes.listItem}
-              key={value.uuid}
-              role="listitem"
-              button
-              onClick={handleToggle(value)}
-            >
-              <ListItemIcon>
-                <Checkbox
-                  color={'primary'}
-                  checked={checked.indexOf(value) !== -1}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{ 'aria-labelledby': labelId }}
-                />
-              </ListItemIcon>
-              <ListItemText id={labelId} primary={`${value.name}`} />
-            </ListItem>
-          )
-        })}
-        <ListItem />
-      </List>
-    </div>
+            return (
+              <ListItem
+                className={classes.listItem}
+                key={value.uuid}
+                role="listitem"
+                button
+                onClick={handleToggle(value)}
+              >
+                <ListItemIcon>
+                  <Checkbox
+                    color={'primary'}
+                    checked={checked.indexOf(value) !== -1}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{ 'aria-labelledby': labelId }}
+                  />
+                </ListItemIcon>
+                <ListItemText id={labelId} primary={`${value.name}`} />
+              </ListItem>
+            )
+          })}
+          <ListItem />
+        </List>
+      </div>
+    ),
+    [checked],
   )
 
   useEffect(() => {
     if (!searchRight) {
       rightClusterNodes = []
-      rightClusterNodes = uniqueList(rightClusterNodes.concat(right))
+      rightClusterNodes = uniqBy(prop('uuid') as any, rightClusterNodes.concat(right))
     }
     if (!searchLeft) {
       leftClusterNodes = []
-      leftClusterNodes = uniqueList(leftClusterNodes.concat(left))
+      leftClusterNodes = uniqBy(prop('uuid') as any, leftClusterNodes.concat(left))
     }
 
     setWizardContext({ batchUpgradeNodes: right })
@@ -163,9 +155,9 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
     )
   }, [searchRight])
 
-  const handleLeftSearchChange = (search) => setSearchLeft(search)
+  const handleLeftSearchChange = useCallback((search) => setSearchLeft(search), [])
 
-  const handleRightSearchChange = (search) => setSearchRight(search)
+  const handleRightSearchChange = useCallback((search) => setSearchRight(search), [])
 
   return (
     <div className={classes.listWrapper}>

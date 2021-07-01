@@ -128,13 +128,10 @@ const UpgradeClusterPage = () => {
     setWizardContext({ selectedUpgradeVersion })
   }, [])
 
-  const confirmBatchUpgrade = useCallback(
-    (wizardContext) => {
-      upgradeClusterNodes(wizardContext)
-      onComplete()
-    },
-    [upgradeClusterNodes],
-  )
+  const confirmBatchUpgrade = useCallback((wizardContext) => {
+    upgradeClusterNodes(wizardContext)
+    onComplete()
+  }, [])
 
   return (
     <>
@@ -170,48 +167,46 @@ const UpgradeClusterPage = () => {
                       elevated={false}
                       withAddonManager
                     >
-                      {({ setFieldValue, values }) => (
-                        <>
-                          {cluster.upgradingTo ? (
-                            <FormFieldCard title="Batch Upgrade in progress">
-                              <Text className={classes.text} variant={'body2'}>
-                                cluster upgrade in progress. The selected worker nodes will be
-                                upgraded to: {cluster.upgradingTo}
-                              </Text>
-                            </FormFieldCard>
-                          ) : (
-                            <FormFieldCard title="Select the version to Upgrade the Cluster">
-                              <RadioGroup
-                                name="Upgrade Type"
-                                value={upgradeType}
-                                onChange={(event) => handleChange(event, setWizardContext)}
-                              >
-                                {cluster.minorUpgradeRoleVersion && (
-                                  <FormControlLabel
-                                    value={UpgradeTypes.Minor}
-                                    control={<Radio color="primary" />}
-                                    label={`Minor - ${cluster.minorUpgradeRoleVersion}`}
-                                  />
-                                )}
-                                {cluster.patchUpgradeRoleVersion && (
-                                  <FormControlLabel
-                                    value={UpgradeTypes.Patch}
-                                    control={<Radio color="primary" />}
-                                    label={`Patch - ${cluster.patchUpgradeRoleVersion}`}
-                                  />
-                                )}
-                              </RadioGroup>
-                            </FormFieldCard>
-                          )}
-                          <FormFieldCard title="Upgrade Strategy">
-                            <AddonTogglers
-                              addons={clusterAddons}
-                              wizardContext={wizardContext}
-                              setWizardContext={setWizardContext}
-                            />
+                      <>
+                        {cluster.upgradingTo ? (
+                          <FormFieldCard title="Batch Upgrade in progress">
+                            <Text className={classes.text} variant={'body2'}>
+                              cluster upgrade in progress. The selected worker nodes will be
+                              upgraded to: {cluster.upgradingTo}
+                            </Text>
                           </FormFieldCard>
-                        </>
-                      )}
+                        ) : (
+                          <FormFieldCard title="Select the version to Upgrade the Cluster">
+                            <RadioGroup
+                              name="Upgrade Type"
+                              value={upgradeType}
+                              onChange={(event) => handleChange(event, setWizardContext)}
+                            >
+                              {cluster.minorUpgradeRoleVersion && (
+                                <FormControlLabel
+                                  value={UpgradeTypes.Minor}
+                                  control={<Radio color="primary" />}
+                                  label={`Minor - ${cluster.minorUpgradeRoleVersion}`}
+                                />
+                              )}
+                              {cluster.patchUpgradeRoleVersion && (
+                                <FormControlLabel
+                                  value={UpgradeTypes.Patch}
+                                  control={<Radio color="primary" />}
+                                  label={`Patch - ${cluster.patchUpgradeRoleVersion}`}
+                                />
+                              )}
+                            </RadioGroup>
+                          </FormFieldCard>
+                        )}
+                        <FormFieldCard title="Upgrade Strategy">
+                          <AddonTogglers
+                            addons={clusterAddons}
+                            wizardContext={wizardContext}
+                            setWizardContext={setWizardContext}
+                          />
+                        </FormFieldCard>
+                      </>
                     </ValidatedForm>
                     {showModal && (
                       <ClusterBatchUpgradeDialog

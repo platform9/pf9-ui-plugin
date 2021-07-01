@@ -35,6 +35,7 @@ import {
 } from './helpers'
 import { IClusterSelector } from './model'
 import { isTransientStatus } from './ClusterStatusUtils'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -323,9 +324,9 @@ export const options = {
       label: 'Upgrade Clusters',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}/upgrade`,
       disabledInfo: ([cluster]) =>
-        !!cluster && isAzureAutoscalingCluster(cluster)
-          ? 'Scaling Azure autoscaling clusters is not yet supported'
-          : 'Cannot scale workers: cluster is busy',
+        !!cluster && clockDriftDetectedInNodes(cluster.nodes)
+          ? 'Cannot upgrade cluster: clock drift detected in at least one node'
+          : 'Cannot upgrade cluster',
     },
     // Disable logging till all CRUD features for log datastores are implemented.
     /* {
