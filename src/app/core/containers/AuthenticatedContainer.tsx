@@ -378,7 +378,7 @@ const AuthenticatedContainer = () => {
     customerTier === CustomerTiers.Freedom
 
   const showOnboarding =
-    isTargetEnv &&
+    isOnboardingTargetEnv &&
     ((featureFlags.isOnboarded === undefined && (clusters?.length === 0 || users?.length === 0)) ||
       (featureFlags.isOnboarded !== undefined && !featureFlags.isOnboarded))
 
