@@ -18,6 +18,9 @@ import AwsAvailabilityZoneField from '../infrastructure/clusters/aws/aws-availab
 import useDataLoader from 'core/hooks/useDataLoader'
 import { sort } from 'ramda'
 import { compareVersions } from 'k8s/util/helpers'
+import { sessionActions } from 'core/session/sessionReducers'
+import { useDispatch } from 'react-redux'
+import { routes } from 'core/utils/routes'
 
 const CreateCloudClusterPage = ({
   wizardContext,
@@ -26,6 +29,7 @@ const CreateCloudClusterPage = ({
   setSubmitting,
   setClusterId,
 }) => {
+  const dispatch = useDispatch()
   const onComplete = (success, cluster) => success && setClusterId(cluster?.uuid)
   const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)
@@ -69,7 +73,11 @@ const CreateCloudClusterPage = ({
       location: wizardContext.region, // We need to add this in for Azure. Azure takes in a location field
     }
 
-    await createCluster(data)
+    const [success, cluster] = await createCluster(data)
+    if (success) {
+      const clusterNodeUrl = routes.cluster.nodeHealth.path({ id: cluster?.uuid })
+      dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: clusterNodeUrl }))
+    }
     setSubmitting(false)
     return true
   }, [

@@ -52,6 +52,7 @@ import OnboardingPage, { OnboardingStepNames } from 'k8s/components/onboarding/o
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { mngmUserActions } from 'app/plugins/account/components/userManagement/users/actions'
+import Progress from 'core/components/progress/Progress'
 
 const toPairs: any = ToPairs
 
@@ -333,10 +334,18 @@ function isOnboardingEnv(currentStack, features) {
   return (
     currentStack === AppPlugins.Kubernetes &&
     isDecco(features) &&
-    customerTier === CustomerTiers.Enterprise
+    customerTier === CustomerTiers.Freedom
   )
-  // customerTier === CustomerTiers.Freedom
 }
+
+// function isOnboardingEnv(currentStack, features) {
+//   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
+//   return (
+//     currentStack === AppPlugins.Kubernetes &&
+//     !isDecco(features) &&
+//     customerTier === CustomerTiers.Enterprise
+//   )
+// }
 
 function needsOnboardingBackfill(currentStack, features, featureFlags, clusters, users) {
   const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
@@ -347,6 +356,16 @@ function needsOnboardingBackfill(currentStack, features, featureFlags, clusters,
     users?.length > 1
   )
 }
+
+// function needsOnboardingBackfill(currentStack, features, featureFlags, clusters, users) {
+//   const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
+//   return (
+//     isOnboardingTargetEnv &&
+//     featureFlags.isOnboarded === undefined &&
+//     clusters?.length > 4 &&
+//     users?.length > 2
+//   )
+// }
 
 const AuthenticatedContainer = () => {
   const { history, location } = useReactRouter()
@@ -369,28 +388,17 @@ const AuthenticatedContainer = () => {
     username,
     userDetails: { id: userId, name, displayName, role },
     features,
+    onboardingRedirectToUrl,
   } = session
   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
   const plugins = pluginManager.getPlugins()
   const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
 
-  const showNavBar =
-    currentStack !== AppPlugins.MyAccount ||
-    (currentStack === AppPlugins.MyAccount && role === 'admin')
-
-  const dispatch = useDispatch()
-  const showToast = useToast()
-  const classes = useStyles({
-    path: history.location.pathname,
-    hasSecondaryHeader: !!SecondaryHeader,
-    showNavBar: showNavBar,
-  })
-
   // Onboarding
   const { prefs: defaultPrefs, updateUserDefaults } = useScopedPreferences('defaults')
   const { featureFlags = {} as any } = defaultPrefs
-  const [clusters] = useDataLoader(clusterActions.list)
-  const [users] = useDataLoader(mngmUserActions.list)
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
   const shouldBackfillOnboarding = needsOnboardingBackfill(
     currentStack,
     features,
@@ -400,21 +408,60 @@ const AuthenticatedContainer = () => {
   )
   const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
 
+  const isLoadingInitialData =
+    (clusters?.length === 0 && loadingClusters) || (users?.length === 0 && loadingUsers)
+
   const showOnboarding =
     isOnboardingTargetEnv && !shouldBackfillOnboarding && !featureFlags.isOnboarded
 
+  // console.log({
+  //   showOnboarding,
+  //   clusters,
+  //   users,
+  //   shouldBackfillOnboarding,
+  //   featureFlags,
+  // })
+
   let onboardingWizardStep = OnboardingStepNames.WelcomeStep
-  if (showOnboarding && clusters?.length > 0 && users?.length === 1) {
+  if (showOnboarding && clusters?.length >= 1 && users?.length === 1) {
     onboardingWizardStep = OnboardingStepNames.InviteCoworkerStep
   }
-  function setOnboardingFlag(flag = false) {
-    return updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: flag })
-  }
+
+  const shouldShowNavbarForCurrentStack =
+    currentStack !== AppPlugins.MyAccount ||
+    (currentStack === AppPlugins.MyAccount && role === 'admin')
+
+  const showNavBar =
+    shouldShowNavbarForCurrentStack &&
+    !(isOnboardingTargetEnv && !featureFlags.isOnboarded && isLoadingInitialData)
+
+  // const showNavBar =
+  //   currentStack !== AppPlugins.MyAccount ||
+  //   (currentStack === AppPlugins.MyAccount && role === 'admin')
+
+  const dispatch = useDispatch()
+  const showToast = useToast()
+  const classes = useStyles({
+    path: history.location.pathname,
+    hasSecondaryHeader: !!SecondaryHeader,
+    showNavBar: showNavBar,
+  })
+
+  // function setOnboardingFlag(flag) {
+  //   return updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: flag })
+  // }
+
   useEffect(() => {
     if (shouldBackfillOnboarding) {
       updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
     }
   }, [shouldBackfillOnboarding])
+
+  useEffect(() => {
+    if (!onboardingRedirectToUrl || users?.length === 1) return
+    history.push(onboardingRedirectToUrl)
+    dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: null }))
+  }, [users, history, onboardingRedirectToUrl])
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
@@ -480,22 +527,29 @@ const AuthenticatedContainer = () => {
   const sections = getSections(plugins, role, features)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
+  const renderOnboardingWizard = () => (
+    <div id="onboarding" className={classes.modal}>
+      <OnboardingPage initialStep={onboardingWizardStep} />
+    </div>
+  )
+
+  const renderMainContent = () => (
+    <>
+      {renderRawComponents(plugins)}
+      <Switch>
+        {renderPlugins(plugins, role)}
+        <Route path={helpUrl} component={HelpPage} />
+        <Route path={logoutUrl} component={LogoutPage} />
+        <Redirect to={dashboardUrl} />
+      </Switch>
+      {devEnabled && <DeveloperToolsEmbed />}
+    </>
+  )
+
   return (
     <>
       <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
-        <button
-          style={{ position: 'fixed', top: 0, zIndex: 100000, padding: 20 }}
-          onClick={() => setOnboardingFlag(false)}
-        >
-          remove onboarding (false)
-        </button>
-        <button
-          style={{ position: 'fixed', top: 100, zIndex: 100000, padding: 20 }}
-          onClick={() => setOnboardingFlag(undefined)}
-        >
-          remove onboarding (undefined)
-        </button>
         <Toolbar hideNotificationsDropdown={showOnboarding} />
         {SecondaryHeader && <SecondaryHeader className={classes.secondaryHeader} />}
         {showNavBar && (
@@ -548,25 +602,21 @@ const AuthenticatedContainer = () => {
                 </BannerContent>
               </>
             )}
-            {/* {pathStrOr(false, 'experimental.containervisor', features) &&
-              currentStack === 'kubernetes' && <ClusterUpgradeBanner />} */}
             <div className={classes.contentMain}>
-              {showOnboarding && (
-                <div id="onboarding" className={classes.modal}>
-                  <OnboardingPage initialStep={onboardingWizardStep} />
-                </div>
+              {isOnboardingTargetEnv && !featureFlags.isOnboarded && isLoadingInitialData ? (
+                <Progress loading={loadingClusters || loadingUsers} />
+              ) : showOnboarding ? (
+                renderOnboardingWizard()
+              ) : (
+                renderMainContent()
               )}
-              <>
-                {renderRawComponents(plugins)}
-                <Switch>
-                  {renderPlugins(plugins, role)}
-                  <Route path={helpUrl} component={HelpPage} />
-                  <Route path={logoutUrl} component={LogoutPage} />
-                  <Redirect to={dashboardUrl} />
-                </Switch>
-                {devEnabled && <DeveloperToolsEmbed />}
-              </>
             </div>
+            {/* <button
+              style={{ position: 'fixed', top: 50, zIndex: 100000, padding: 20 }}
+              onClick={() => setOnboardingFlag(undefined)}
+            >
+              remove onboarding (undefined)
+            </button> */}
           </main>
         </PushEventsProvider>
       </div>
