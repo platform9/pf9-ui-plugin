@@ -344,7 +344,7 @@ function needsOnboardingBackfill(currentStack, features, featureFlags, clusters,
     isOnboardingTargetEnv &&
     featureFlags.isOnboarded === undefined &&
     clusters?.length > 0 &&
-    users?.length > 0
+    users?.length > 1
   )
 }
 
@@ -404,13 +404,10 @@ const AuthenticatedContainer = () => {
     isOnboardingTargetEnv && !shouldBackfillOnboarding && !featureFlags.isOnboarded
 
   let onboardingWizardStep = OnboardingStepNames.WelcomeStep
-  if (showOnboarding) {
-    if (clusters?.length > 0 && users?.length === 0) {
-      onboardingWizardStep = OnboardingStepNames.InviteCoworkerStep
-    }
+  if (showOnboarding && clusters?.length > 0 && users?.length === 1) {
+    onboardingWizardStep = OnboardingStepNames.InviteCoworkerStep
   }
   function setOnboardingFlag(flag = false) {
-    debugger
     return updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: flag })
   }
   useEffect(() => {
