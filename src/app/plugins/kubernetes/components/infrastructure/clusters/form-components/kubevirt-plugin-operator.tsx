@@ -1,6 +1,5 @@
 import React from 'react'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
-import { handleNetworkBackendChange } from './network-backend'
 
 const KubevirtPluginOperator = ({ wizardContext, setWizardContext }) => (
   <CheckboxField
@@ -13,10 +12,6 @@ const KubevirtPluginOperator = ({ wizardContext, setWizardContext }) => (
       setWizardContext({
         deployKubevirt: value,
       })
-      if (value)
-        setWizardContext(
-          handleNetworkBackendChange('calico', wizardContext.networkStack, wizardContext),
-        )
     }}
   />
 )
