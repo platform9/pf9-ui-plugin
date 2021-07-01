@@ -191,6 +191,7 @@ const DeployRbacProfilePage = () => {
                     onChange={(value) => setWizardContext({ cluster: value })}
                     value={wizardContext.cluster}
                     checkboxCond={profileAgentInstalled}
+                    uniqueIdentifier="uuid"
                     required
                   />
                 </ValidatedForm>

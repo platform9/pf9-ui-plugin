@@ -16,15 +16,31 @@ const determineProfileAction = (profile) => {
 }
 
 export const rbacProfilesSelector = createSelector(
-  [getDataSelector(DataKeys.RbacProfiles)],
-  (rbacProfiles) => {
+  [
+    getDataSelector(DataKeys.RbacProfiles),
+    getDataSelector(DataKeys.RbacProfileBindings),
+    getDataSelector(DataKeys.Clusters),
+  ],
+  (rbacProfiles, profileBindings, clusters) => {
     return rbacProfiles.map((profile) => {
+      const matchingBindings = profileBindings.filter((binding) => {
+        return (
+          binding.spec.profileRef.split('sunpike-profiles/default/')[1] === profile.metadata.name
+        )
+      })
+      const bindingClusters = matchingBindings.map((binding) => {
+        return binding.spec.clusterRef
+      })
+      const matchingClusters = clusters.filter((cluster) => {
+        return bindingClusters.includes(cluster.uuid)
+      })
       const profileResources = determineProfileResources(profile)
       return {
         ...profile,
         action: determineProfileAction(profile),
         id: profile.metadata.uid,
         name: profile.metadata.name,
+        clusters: matchingClusters,
         ...profileResources,
       }
     })

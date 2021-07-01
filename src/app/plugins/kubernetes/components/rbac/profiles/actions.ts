@@ -5,6 +5,7 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import { makeRbacProfilesSelector, rbacProfilesSelector } from './selectors'
 import uuid from 'uuid'
 import { trackEvent } from 'utils/tracking'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -13,8 +14,13 @@ const uniqueIdentifier = 'metadata.name'
 export const rbacProfileActions = createCRUDActions(ActionDataKeys.RbacProfiles, {
   listFn: async () => {
     Bugsnag.leaveBreadcrumb('Attempting to get rbac profiles')
-    const response = await qbert.getRbacProfiles()
-    return response
+    const [profiles] = await Promise.all([
+      qbert.getRbacProfiles(),
+      // Make sure to fetch dependent caches
+      clusterActions.list(),
+      rbacProfileBindingsActions.list(),
+    ])
+    return profiles
   },
   createFn: async (data) => {
     const roles = Object.values(data.roles).map(
@@ -39,8 +45,9 @@ export const rbacProfileActions = createCRUDActions(ActionDataKeys.RbacProfiles,
       },
     }
     Bugsnag.leaveBreadcrumb('Attempting to create a rbac profile', body)
-    await qbert.createRbacProfile(body)
+    const profile = await qbert.createRbacProfile(body)
     trackEvent('Create Rbac Profile', body)
+    return profile
   },
   updateFn: async (data) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile')
@@ -65,7 +72,7 @@ export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacP
     return response
   },
   createFn: async ({ cluster, profileName }) => {
-    const clusterId = cluster[0].name
+    const clusterId = cluster[0].uuid
     const body = {
       apiVersion: 'sunpike.platform9.com/v1alpha2',
       kind: 'ClusterProfileBinding',

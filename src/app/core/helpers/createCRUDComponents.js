@@ -7,6 +7,7 @@ import { getContextUpdater } from 'core/helpers/createContextUpdater'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { pick } from 'ramda'
 import { listTablePrefs } from 'app/constants'
+import PollingData from 'core/components/PollingData'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -68,6 +69,8 @@ const createCRUDComponents = (options) => {
     onSelect,
     extraToolbarContent,
     hideDelete,
+    pollingInterval,
+    pollingCondition,
   } = options
 
   // List
@@ -179,6 +182,15 @@ const createCRUDComponents = (options) => {
       const [data, loading, reload] = useDataLoader(loaderFn, params)
       return (
         <>
+          {!!pollingInterval && (
+            <PollingData
+              loading={loading}
+              onReload={reload}
+              refreshDuration={pollingInterval}
+              pollingCondition={pollingCondition ? () => pollingCondition(data) : undefined}
+              hidden
+            />
+          )}
           <ListContainer
             getParamsUpdater={getParamsUpdater}
             data={data}
