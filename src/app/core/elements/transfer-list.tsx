@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -54,9 +54,32 @@ function comparer(otherArray) {
   }
 }
 
-let leftClusterNodes = []
-let rightClusterNodes = []
-export default function TransferList({ clusterNodes, setWizardContext, wizardContext }) {
+const NodeItem = ({ checked, value, handleToggle, nodeType }) => {
+  const classes = useStyles({})
+  const labelId = `transfer-list-item-${nodeType}-${value.uuid}-label`
+  return (
+    <ListItem
+      className={classes.listItem}
+      key={value.uuid}
+      role="listitem"
+      button
+      onClick={handleToggle(value)}
+    >
+      <ListItemIcon>
+        <Checkbox
+          color={'primary'}
+          checked={checked.indexOf(value) !== -1}
+          tabIndex={-1}
+          disableRipple
+          inputProps={{ 'aria-labelledby': labelId }}
+        />
+      </ListItemIcon>
+      <ListItemText id={labelId} primary={`${value.name}`} />
+    </ListItem>
+  )
+}
+
+export default function TransferList({ clusterNodes, setWizardContext }) {
   const classes = useStyles({})
   const [checked, setChecked] = React.useState([])
   const [searchLeft, setSearchLeft] = React.useState('')
@@ -80,80 +103,32 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
   }
 
   const handleCheckedRight = () => {
-    setRight(right.concat(leftChecked))
+    setRight(uniqBy(prop('uuid') as any, right.concat(leftChecked)))
     setLeft(left.filter(comparer(leftChecked)))
     setChecked([])
   }
 
   const handleCheckedLeft = () => {
-    setLeft(left.concat(rightChecked))
+    setLeft(uniqBy(prop('uuid') as any, left.concat(rightChecked)))
     setRight(right.filter(comparer(rightChecked)))
     setChecked([])
   }
 
-  const renderList = useCallback(
-    (items, listName) => (
-      <div className={classes.listContainer}>
-        <List dense component="div" role="list">
-          {items.map((value) => {
-            const labelId = `transfer-list-item-${listName}-${value.uuid}-label`
+  const filteredRightNodes = useMemo(() => {
+    return searchRight
+      ? right.filter((value) => value.name.toLowerCase().includes(searchRight.toLowerCase()))
+      : right
+  }, [searchRight, right])
 
-            return (
-              <ListItem
-                className={classes.listItem}
-                key={value.uuid}
-                role="listitem"
-                button
-                onClick={handleToggle(value)}
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    color={'primary'}
-                    checked={checked.indexOf(value) !== -1}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ 'aria-labelledby': labelId }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={labelId} primary={`${value.name}`} />
-              </ListItem>
-            )
-          })}
-          <ListItem />
-        </List>
-      </div>
-    ),
-    [checked],
-  )
+  const filteredLeftNodes = useMemo(() => {
+    return left
+      ? left.filter((value) => value.name.toLowerCase().includes(searchLeft.toLowerCase()))
+      : left
+  }, [searchLeft, left])
 
   useEffect(() => {
-    if (!searchRight) {
-      rightClusterNodes = []
-      rightClusterNodes = uniqBy(prop('uuid') as any, rightClusterNodes.concat(right))
-    }
-    if (!searchLeft) {
-      leftClusterNodes = []
-      leftClusterNodes = uniqBy(prop('uuid') as any, leftClusterNodes.concat(left))
-    }
-
     setWizardContext({ batchUpgradeNodes: right })
-  }, [right, left])
-
-  useEffect(() => {
-    setLeft(
-      leftClusterNodes.filter((value) =>
-        value.name.toLowerCase().includes(searchLeft.toLowerCase()),
-      ),
-    )
-  }, [searchLeft])
-
-  useEffect(() => {
-    setRight(
-      rightClusterNodes.filter((value) =>
-        value.name.toLowerCase().includes(searchRight.toLowerCase()),
-      ),
-    )
-  }, [searchRight])
+  }, [right])
 
   const handleLeftSearchChange = useCallback((search) => setSearchLeft(search), [])
 
@@ -168,7 +143,18 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
           onSearchChange={handleLeftSearchChange}
           searchTerm={searchLeft}
         />
-        {renderList(left, 'left')}
+        <div className={classes.listContainer}>
+          <List dense component="div" role="list">
+            {filteredLeftNodes.map((value) => (
+              <NodeItem
+                checked={checked}
+                value={value}
+                nodeType={'left'}
+                handleToggle={handleToggle}
+              />
+            ))}
+          </List>
+        </div>
       </div>
       <div className={classes.listButtons}>
         <Button
@@ -197,7 +183,18 @@ export default function TransferList({ clusterNodes, setWizardContext, wizardCon
           onSearchChange={handleRightSearchChange}
           searchTerm={searchRight}
         />
-        {renderList(right, 'right')}
+        <div className={classes.listContainer}>
+          <List dense component="div" role="list">
+            {filteredRightNodes.map((value) => (
+              <NodeItem
+                checked={checked}
+                value={value}
+                nodeType={'right'}
+                handleToggle={handleToggle}
+              />
+            ))}
+          </List>
+        </div>
       </div>
     </div>
   )

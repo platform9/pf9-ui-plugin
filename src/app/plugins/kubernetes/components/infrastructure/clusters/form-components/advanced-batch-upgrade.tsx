@@ -74,11 +74,7 @@ export const AdvancedBatchUpgradeAddonField = ({ values }) => {
         </Text>
       </IconInfo>
       <Text>Select the nodes to include in this batch</Text>
-      <TransferList
-        clusterNodes={toBeUpgradedNodes}
-        setWizardContext={setWizardContext}
-        wizardContext={wizardContext}
-      />
+      <TransferList clusterNodes={toBeUpgradedNodes} setWizardContext={setWizardContext} />
     </FormFieldCard>
   )
 }
