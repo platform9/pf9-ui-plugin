@@ -54,6 +54,7 @@ export const kubectlInstallationDocumentationLink = `${pf9DocOrigin}/kubernetes/
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
 export const nodePrerequisitesDocumentationLink = `${k8sBaseUrl}/on-premise-kubernetes-pre-requisites#setting-up-the-platform9-free-tier-cluster`
+export const ovaDocumentationLink = `${k8sBaseUrl}/pmk-vm-ova`
 
 // CLI
 export const pmkCliOverviewLink = `${k8sBaseUrl}/PMK-CLI/`
