@@ -17,7 +17,6 @@ import {
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
-import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { both, omit, prop } from 'ramda'
 import React, { useState } from 'react'
@@ -33,7 +32,6 @@ import {
   canScaleMasters,
   canScaleWorkers,
   canUpgradeCluster,
-  notBusy,
   isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
@@ -331,12 +329,6 @@ export const options = {
         !!cluster && clockDriftDetectedInNodes(cluster.nodes)
           ? 'Cannot upgrade cluster: clock drift detected in at least one node'
           : 'Cannot upgrade cluster',
-    },
-    {
-      cond: both(isAdmin, notBusy),
-      icon: 'chart-bar',
-      label: 'Monitoring',
-      dialog: PrometheusAddonDialog,
     },
     // Disable logging till all CRUD features for log datastores are implemented.
     /* {

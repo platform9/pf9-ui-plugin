@@ -23,7 +23,7 @@ const k8sNodeDetailsFields: Array<IDetailFields<INodesSelector>> = [
     id: 'uuid',
     title: 'Unique ID',
     required: true,
-    helpMessage: 'This is the unique ID that PMK as assigned to this node.',
+    helpMessage: 'This is the unique ID that PMK has assigned to this node.',
   },
   {
     id: 'primaryIp',

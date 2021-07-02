@@ -3,7 +3,7 @@ import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { allPass } from 'ramda'
 
-import { pmkCliOverviewLink, bareOSSingleMasterSetupDocsLink } from 'k8s/links'
+import { bareOSSingleMasterSetupDocsLink } from 'k8s/links'
 import { defaultEtcBackupPath } from 'app/constants'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 
@@ -23,11 +23,7 @@ import PrivilegedContainers from '../../form-components/privileged'
 import AllowWorkloadsOnMaster from '../../form-components/allow-workloads-on-master'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
-import ClusterHostChooser, {
-  isConnected,
-  isUnassignedNode,
-  excludeNodes,
-} from '../ClusterHostChooser'
+import { isConnected, isUnassignedNode, excludeNodes } from '../ClusterHostChooser'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import ApiFQDNField from '../../form-components/external-dns-name'
 import ContainerAndServicesCIDRField from '../../form-components/container-and-services-cidr'
@@ -41,6 +37,7 @@ import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { bareOSClusterTracking } from '../../tracking'
+import AddNodeStep from '../../AddNodeStep'
 import CustomApiFlags from '../../form-components/custom-api-flag'
 import NodeRegistrationChooser from '../../form-components/node-registration-chooser'
 
@@ -67,6 +64,7 @@ export const initialContext = {
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
   useHostname: false,
   nodeRegistrationType: 'ipAddress',
+  enableProfileAgent: false,
 }
 
 interface Props {
@@ -81,6 +79,7 @@ const clusterAddons = [
   'prometheusMonitoringEnabled',
   'networkPluginOperator',
   'kubevirtPluginOperator',
+  'profileAgent',
 ]
 const trackingFields = {
   platform: CloudProviders.PhysicalMachine,
@@ -124,7 +123,10 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
 
               {/* Cluster Settings */}
               <FormFieldCard title="Cluster Settings">
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <Divider className={classes.divider} />
                 <Text variant="caption1">Cluster Network Stack</Text>
@@ -159,58 +161,44 @@ const PhysicalSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
         stepId="masters"
         label="Master Node"
         onNext={bareOSClusterTracking.wZStepTwo(trackingFields)}
+        keepContentMounted={false}
       >
-        <ValidatedForm
-          fullWidth
-          initialValues={wizardContext}
-          onSubmit={setWizardContext}
-          triggerSubmit={onNext}
-          title="Select a node to add as a Master Node"
-          link={
-            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
-              Not Seeing Any Nodes?
-            </ExternalLink>
-          }
-        >
-          <ClusterHostChooser
-            selection="single"
-            id="masterNodes"
-            filterFn={allPass([isConnected, isUnassignedNode])}
-            validations={[masterNodeLengthValidator]}
-            pollForNodes
-            required
-          />
-        </ValidatedForm>
+        <AddNodeStep
+          wizardContext={wizardContext}
+          setWizardContext={setWizardContext}
+          onNext={onNext}
+          title={'Select a node to add as a Master Node'}
+          nodeFieldId={'masterNodes'}
+          nodeSelection={'single'}
+          nodeFilterFn={allPass([isConnected, isUnassignedNode])}
+          nodeValidations={[masterNodeLengthValidator]}
+          isSingleNodeCluster={false}
+          pollForNodes={true}
+          required={true}
+        />
       </WizardStep>
       <WizardStep
         stepId="workers"
         label="Worker Nodes"
         onNext={bareOSClusterTracking.wZStepThree(trackingFields)}
+        keepContentMounted={false}
       >
-        <ValidatedForm
-          fullWidth
-          initialValues={wizardContext}
-          onSubmit={setWizardContext}
-          triggerSubmit={onNext}
-          title="Select nodes to add as Worker Nodes"
-          link={
-            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
-              Not Seeing Any Nodes?
-            </ExternalLink>
-          }
-        >
-          <ClusterHostChooser
-            selection="multiple"
-            id="workerNodes"
-            filterFn={allPass([
-              isUnassignedNode,
-              isConnected,
-              excludeNodes(wizardContext.masterNodes),
-            ])}
-            pollForNodes
-            validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
-          />
-        </ValidatedForm>
+        <AddNodeStep
+          wizardContext={wizardContext}
+          setWizardContext={setWizardContext}
+          onNext={onNext}
+          title={'Select nodes to add as Worker Nodes'}
+          nodeFieldId={'workerNodes'}
+          nodeSelection={'multiple'}
+          nodeFilterFn={allPass([
+            isUnassignedNode,
+            isConnected,
+            excludeNodes(wizardContext.masterNodes),
+          ])}
+          nodeValidations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
+          isSingleNodeCluster={false}
+          pollForNodes={true}
+        />
       </WizardStep>
       <WizardStep
         stepId="network"

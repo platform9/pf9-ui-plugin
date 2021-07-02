@@ -63,10 +63,11 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       return
     }
 
-    ;(async () => {
+    const setIps = async () => {
       const ipInfo = await networkIpAvailability(provisioningNetwork.id)
       setAvailableIps(ipInfo.total_ips)
-    })()
+    }
+    setIps()
   }, [provisioningNetwork])
 
   // Get tenant name

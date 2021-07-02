@@ -5,7 +5,10 @@ import {
   ApiServerHealthStatusFields,
   ErrorMessageCodes,
   errorMessageLevel,
+  INodesSelector,
 } from './model'
+
+export const clockDriftErrorMessage = 'Cannot attach node(s) with clock drift'
 
 export const getErrorMessage = (node, msgLevel: errorMessageLevel, code: ErrorMessageCodes) => {
   const messages = pathOr(null, ['message', msgLevel], node)
@@ -60,4 +63,21 @@ export const nodeApiServerHealthStatusFields: {
     message: 'API server is not responding on this node',
     clusterStatus: 'fail',
   },
+}
+
+/**
+ *
+ * @param nodeUuids Array of node uuids
+ * @param allNodes Array of all nodes
+ * @returns True if clock drift is detected in any of the nodes. False if none of the nodes have clock drift
+ */
+export const checkNodesForClockDrift = (nodeUuids: String[], allNodes: INodesSelector[]) => {
+  if (!nodeUuids || !allNodes) return false
+  for (const uuid of nodeUuids) {
+    const node = allNodes.find((node) => node.uuid === uuid)
+    if (hasClockDrift(node)) {
+      return true
+    }
+  }
+  return false
 }

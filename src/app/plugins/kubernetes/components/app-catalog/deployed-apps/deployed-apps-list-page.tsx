@@ -87,6 +87,7 @@ const options = {
   editCond: ([selectedRow]) => selectedRow.status !== 'pending-install',
   columns: [
     { id: 'name', label: 'App Name' },
+    { id: 'status', label: 'Status' },
     { id: 'chart', label: 'App' },
     { id: 'chart_version', label: 'Version' },
   ],
