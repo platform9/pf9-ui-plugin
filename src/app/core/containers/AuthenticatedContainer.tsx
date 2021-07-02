@@ -32,7 +32,7 @@ import { pathJoin } from 'utils/misc'
 import PushEventsProvider from 'core/providers/PushEventsProvider'
 import { useToast } from 'core/providers/ToastProvider'
 import { RootState } from 'app/store'
-import { apply, Dictionary, keys, mergeAll, pathOr, prop, toPairs as ToPairs } from 'ramda'
+import { apply, Dictionary, keys, mergeAll, path, pathOr, prop, toPairs as ToPairs } from 'ramda'
 import pluginManager from 'core/utils/pluginManager'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import BannerContainer from 'core/components/notifications/BannerContainer'
@@ -53,6 +53,8 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { mngmUserActions } from 'app/plugins/account/components/userManagement/users/actions'
 import Progress from 'core/components/progress/Progress'
+import DataKeys from 'k8s/DataKeys'
+import { cacheStoreKey, updatingStoreKey } from 'core/caching/cacheReducers'
 
 const toPairs: any = ToPairs
 
@@ -338,38 +340,29 @@ function isOnboardingEnv(currentStack, features) {
   )
 }
 
-// function isOnboardingEnv(currentStack, features) {
-//   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
-//   return (
-//     currentStack === AppPlugins.Kubernetes &&
-//     !isDecco(features) &&
-//     customerTier === CustomerTiers.Enterprise
-//   )
-// }
-
-function needsOnboardingBackfill(currentStack, features, featureFlags, clusters, users) {
+function needsOnboardingBackfill(
+  currentStack,
+  features,
+  featureFlags,
+  clusters,
+  clustersUpdating,
+  users,
+) {
   const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
   return (
     isOnboardingTargetEnv &&
     featureFlags.isOnboarded === undefined &&
+    !clustersUpdating &&
     clusters?.length > 0 &&
     users?.length > 1
   )
 }
 
-// function needsOnboardingBackfill(currentStack, features, featureFlags, clusters, users) {
-//   const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
-//   return (
-//     isOnboardingTargetEnv &&
-//     featureFlags.isOnboarded === undefined &&
-//     clusters?.length > 4 &&
-//     users?.length > 2
-//   )
-// }
-
 const AuthenticatedContainer = () => {
   const { history, location } = useReactRouter()
   const [drawerOpen, toggleDrawer] = useToggler(true)
+  const dispatch = useDispatch()
+  const showToast = useToast()
   const [regionFeatures, setRegionFeatures] = useState<{
     openstack?: boolean
     kubernetes?: boolean
@@ -395,6 +388,8 @@ const AuthenticatedContainer = () => {
   const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
 
   // Onboarding
+  const clustersUpdating = useSelector(path([cacheStoreKey, updatingStoreKey, DataKeys.Clusters]))
+
   const { prefs: defaultPrefs, updateUserDefaults } = useScopedPreferences('defaults')
   const { featureFlags = {} as any } = defaultPrefs
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
@@ -404,6 +399,7 @@ const AuthenticatedContainer = () => {
     features,
     featureFlags,
     clusters,
+    clustersUpdating,
     users,
   )
   const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
@@ -413,14 +409,6 @@ const AuthenticatedContainer = () => {
 
   const showOnboarding =
     isOnboardingTargetEnv && !shouldBackfillOnboarding && !featureFlags.isOnboarded
-
-  // console.log({
-  //   showOnboarding,
-  //   clusters,
-  //   users,
-  //   shouldBackfillOnboarding,
-  //   featureFlags,
-  // })
 
   let onboardingWizardStep = OnboardingStepNames.WelcomeStep
   if (showOnboarding && clusters?.length >= 1 && users?.length === 1) {
@@ -435,33 +423,22 @@ const AuthenticatedContainer = () => {
     shouldShowNavbarForCurrentStack &&
     !(isOnboardingTargetEnv && !featureFlags.isOnboarded && isLoadingInitialData)
 
-  // const showNavBar =
-  //   currentStack !== AppPlugins.MyAccount ||
-  //   (currentStack === AppPlugins.MyAccount && role === 'admin')
-
-  const dispatch = useDispatch()
-  const showToast = useToast()
   const classes = useStyles({
     path: history.location.pathname,
     hasSecondaryHeader: !!SecondaryHeader,
     showNavBar: showNavBar,
   })
 
-  // function setOnboardingFlag(flag) {
-  //   return updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: flag })
-  // }
-
+  // onboarding
   useEffect(() => {
     if (shouldBackfillOnboarding) {
       updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
     }
-  }, [shouldBackfillOnboarding])
-
-  useEffect(() => {
-    if (!onboardingRedirectToUrl || users?.length === 1) return
-    history.push(onboardingRedirectToUrl)
-    dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: null }))
-  }, [users, history, onboardingRedirectToUrl])
+    if (onboardingRedirectToUrl) {
+      history.push(onboardingRedirectToUrl)
+      dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: null }))
+    }
+  }, [shouldBackfillOnboarding, onboardingRedirectToUrl, history])
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
@@ -611,12 +588,6 @@ const AuthenticatedContainer = () => {
                 renderMainContent()
               )}
             </div>
-            {/* <button
-              style={{ position: 'fixed', top: 50, zIndex: 100000, padding: 20 }}
-              onClick={() => setOnboardingFlag(undefined)}
-            >
-              remove onboarding (undefined)
-            </button> */}
           </main>
         </PushEventsProvider>
       </div>

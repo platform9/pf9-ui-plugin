@@ -73,7 +73,12 @@ const CreateBareOsClusterPage = ({
   const classes = useStyles()
   const [option, setOption] = useState<Option>('ova')
   const dispatch = useDispatch()
-  const onComplete = (success, cluster) => success && setClusterId(cluster?.uuid)
+  const onComplete = (success, cluster) => {
+    if (!success) return
+    const clusterNodeUrl = routes.cluster.nodeHealth.path({ id: cluster?.uuid })
+    dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: clusterNodeUrl }))
+    setClusterId(cluster?.uuid)
+  }
   const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)
 
@@ -107,11 +112,7 @@ const CreateBareOsClusterPage = ({
       name: wizardContext.clusterName,
       masterNodes: wizardContext.masterNodes,
     }
-    const [success, cluster] = await createCluster(data)
-    if (success) {
-      const clusterNodeUrl = routes.cluster.nodeHealth.path({ id: cluster?.uuid })
-      dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: clusterNodeUrl }))
-    }
+    await createCluster(data)
     setSubmitting(false)
     return true
   }, [validatorRef.current, setSubmitting, defaultKubernetesVersion, wizardContext])

@@ -30,7 +30,12 @@ const CreateCloudClusterPage = ({
   setClusterId,
 }) => {
   const dispatch = useDispatch()
-  const onComplete = (success, cluster) => success && setClusterId(cluster?.uuid)
+  const onComplete = (success, cluster) => {
+    if (!success) return
+    const clusterNodeUrl = routes.cluster.nodeHealth.path({ id: cluster?.uuid })
+    dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: clusterNodeUrl }))
+    setClusterId(cluster?.uuid)
+  }
   const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)
   const defaultValues = useMemo(
@@ -73,11 +78,7 @@ const CreateCloudClusterPage = ({
       location: wizardContext.region, // We need to add this in for Azure. Azure takes in a location field
     }
 
-    const [success, cluster] = await createCluster(data)
-    if (success) {
-      const clusterNodeUrl = routes.cluster.nodeHealth.path({ id: cluster?.uuid })
-      dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: clusterNodeUrl }))
-    }
+    await createCluster(data)
     setSubmitting(false)
     return true
   }, [
