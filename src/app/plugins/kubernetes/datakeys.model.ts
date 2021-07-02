@@ -78,4 +78,5 @@ export interface IDataKeys {
   Tenants: any // is this needed? only in openstack
   Users: any // is this needed? only in openstack
   RbacProfiles: any
+  RbacProfileBindings: any
 }
