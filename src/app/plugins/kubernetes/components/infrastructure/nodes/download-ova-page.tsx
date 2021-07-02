@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/styles'
 import DownloadOvaWalkthrough from './download-ova-walkthrough'
 import Info from 'core/components/validatedForm/Info'
 import ExternalLink from 'core/components/ExternalLink'
+import { ovaDocumentationLink } from 'k8s/links'
 
 const useStyles = makeStyles((theme: Theme) => ({
   downloadOvaContainer: {
@@ -48,7 +49,11 @@ const DownloadOvaPage = () => {
       <Info title="Customize the OVA Image" expanded={false}>
         <div className={classes.collapsedContainer}>
           <div className={classes.infoCardHeader}>
-            <ExternalLink className={classes.externalLink} url={''} icon="file-alt">
+            <ExternalLink
+              className={classes.externalLink}
+              url={ovaDocumentationLink}
+              icon="file-alt"
+            >
               OVA Help
             </ExternalLink>
           </div>
