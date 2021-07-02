@@ -58,7 +58,7 @@ const DownloadOvaWalkthrough = () => {
   const classes = useStyles()
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const [, , getUserPrefs] = useScopedPreferences()
+  const { getUserPrefs } = useScopedPreferences()
   const { currentTenant, currentRegion } = getUserPrefs(session.username)
 
   const StepOne = useMemo(

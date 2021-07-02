@@ -199,7 +199,7 @@ interface Props {
 
 const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
-  const [prefs] = useScopedPreferences('defaults')
+  const { prefs } = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Aws] || {}, [prefs])
 
   const updateFqdns = (values) => (value, label) => {

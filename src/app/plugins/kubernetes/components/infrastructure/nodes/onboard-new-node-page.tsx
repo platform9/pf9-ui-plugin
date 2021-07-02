@@ -6,6 +6,8 @@ import DownloadHostAgentPage from './download-host-agent-page'
 import SimpleLink from 'core/components/SimpleLink'
 import { routes } from 'core/utils/routes'
 import { makeStyles, Theme } from '@material-ui/core'
+import DownloadOvaPage from './download-ova-page'
+
 
 const useStyles = makeStyles((theme: Theme) => ({
   onBoardNodeContainer: {
@@ -22,6 +24,9 @@ const OnboardNewNodePage = () => {
   return (
     <div className={classes.onBoardNodeContainer}>
       <Tabs>
+        <Tab value="vmTemplate" label="VM Template">
+          <DownloadOvaPage/>
+        </Tab>
         <Tab value="pf9CLI" label="PF9 CLI">
           <DownloadCliPage />
         </Tab>

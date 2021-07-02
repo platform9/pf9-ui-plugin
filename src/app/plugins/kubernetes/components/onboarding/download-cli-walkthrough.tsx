@@ -71,7 +71,7 @@ const DownloadCliWalkthrough = () => {
   const classes = useStyles()
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const [, , getUserPrefs] = useScopedPreferences()
+  const { getUserPrefs } = useScopedPreferences()
   const { currentTenant, currentRegion } = getUserPrefs(session.username)
   return (
     <Info title="Use the PF9 CLI to connect nodes to the Platform9 Management Plane">
