@@ -45,7 +45,7 @@ interface Props {
 // This step requires the cloud provider to have been created & have its ID
 const AddCloudProviderVerificationStep = ({ history, wizardContext, setWizardContext }: Props) => {
   const classes = useStyles({})
-  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const { prefs, updateUserDefaults } = useScopedPreferences('defaults')
 
   const cloudDefaults = useMemo(() => {
     return (

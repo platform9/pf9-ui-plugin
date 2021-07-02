@@ -31,7 +31,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const AddCloudProviderPage = ({
   cloudProviders,
-  loadingCloudProviders,
   wizardContext,
   setWizardContext,
   onNext,
@@ -43,20 +42,10 @@ const AddCloudProviderPage = ({
   const classes = useStyles()
   const [activeCloudProvider, setActiveCloudProvider] = useState(null)
   const [deleteCloudProvider] = useDataUpdater(cloudProviderActions.delete)
-  const [showExistingCloudProviders, setShowExistingCloudProviders] = useState(false)
-  const [creatingCluster, setCreatingCluster] = useState(false)
+  const [showExistingCloudProviders, setShowExistingCloudProviders] = useState(
+    cloudProviders.length !== 0,
+  )
   const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (loadingCloudProviders || creatingCluster) {
-      return
-    }
-    if (cloudProviders.length === 0) {
-      setShowExistingCloudProviders(false)
-    } else if (cloudProviders.length > 0) {
-      setShowExistingCloudProviders(true)
-    }
-  }, [cloudProviders, creatingCluster])
 
   const handleOnClick = (cloudProvider) => () => {
     setActiveCloudProvider(cloudProvider)
@@ -70,7 +59,6 @@ const AddCloudProviderPage = ({
   }
 
   const toggleForms = () => {
-    setCreatingCluster(true)
     setActiveCloudProvider({ cloudProviderId: null })
     setShowExistingCloudProviders(false)
   }
@@ -92,7 +80,7 @@ const AddCloudProviderPage = ({
 
   return (
     <>
-      {!loadingCloudProviders && !showExistingCloudProviders && (
+      {!showExistingCloudProviders && (
         <AddCloudProviderCredentialStep
           wizardContext={wizardContext}
           setWizardContext={setWizardContext}
@@ -106,14 +94,14 @@ const AddCloudProviderPage = ({
           headerClass={classes.header}
         />
       )}
-      {!loadingCloudProviders && showExistingCloudProviders && (
+      {showExistingCloudProviders && (
         <>
           <FormFieldCard
             className={classes.form}
             title="Select an existing cloud provider or create a new one"
           >
             <div className={classes.cloudProviders}>
-              {cloudProviders.map((cp) => (
+              {cloudProviders?.map((cp) => (
                 <Card
                   key={cp.name}
                   label={cp.name}

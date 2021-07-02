@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Toolbar = ({ open }) => {
+const Toolbar = ({ open, hideNotificationsDropdown }) => {
   const classes = useStyles({})
   const { history } = useReactRouter()
   const selectPrefsState = prop(preferencesStoreKey)
@@ -65,8 +65,11 @@ const Toolbar = ({ open }) => {
         <div className={classes.rightTools}>
           <RegionChooser className={classes.leftMargin} />
           <TenantChooser className={classes.leftMargin} />
+          <NotificationsPopover
+            className={classes.leftMargin}
+            hideDropdown={hideNotificationsDropdown}
+          />
           <UserMenu className={classes.leftMargin} />
-          <NotificationsPopover className={classes.leftMargin} />
         </div>
       </MaterialToolbar>
     </AppBar>

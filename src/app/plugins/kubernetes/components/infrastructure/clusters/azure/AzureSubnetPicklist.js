@@ -8,14 +8,15 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const AzureSubnetPicklist = forwardRef(
-  ({ cloudProviderId, cloudProviderRegionId, resourceGroup, ...rest }, ref) => {
+  ({ cloudProviderId, cloudProviderRegionId, resourceGroup, vnetName, ...rest }, ref) => {
     const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,
     })
 
     const networks = pathStrOr([], '0.virtualNetworks', details)
-    const group = networks.find(propEq('resourceGroup', resourceGroup))
+    const groups = networks.filter(propEq('resourceGroup', resourceGroup))
+    const group = groups.find((group) => group.name === vnetName)
     const subnets = pathStrOr([], 'properties.subnets', group)
     const options = subnets.map((x) => ({ label: x.name, value: x.name }))
 

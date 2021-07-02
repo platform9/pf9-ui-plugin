@@ -312,13 +312,36 @@ export const routes = {
       plugin: AppPlugins.Kubernetes,
     },
   }),
-  apiAccess: Route.register({
-    url: `${pluginRoutePrefix}/api_access`,
-    name: 'APIAccess',
-    defaultParams: {
-      plugin: AppPlugins.Kubernetes,
-    },
-  }),
+  apiAccess: {
+    api: Route.register({
+      url: `${pluginRoutePrefix}/api-access`,
+      name: 'ApiAccess:API',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    apiServices: Route.register({
+      url: `${pluginRoutePrefix}/api-access#api-services`,
+      name: 'ApiAccess:APIServices',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    kubeConfig: Route.register({
+      url: `${pluginRoutePrefix}/api-access#kubeconfig`,
+      name: 'ApiAccess:KubeConfig',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    terraform: Route.register({
+      url: `${pluginRoutePrefix}/api-access#terraform`,
+      name: 'ApiAccess:Terraform',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+  },
   notifications: Route.register({
     url: `${pluginRoutePrefix}/notifications`,
     name: 'Notifications',
@@ -603,6 +626,15 @@ export const routes = {
       },
     }),
   },
+  accountStatus: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/status`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'AccountStatus:Root',
+    }),
+  },
   userSettings: {
     root: Route.register({
       url: `${pluginRoutePrefix}/user_settings`,
@@ -873,6 +905,50 @@ export const routes = {
       },
       name: 'RBAC:ClusterRoleBindings:Edit',
     }),
+    profiles: {
+      list: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      add: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/add`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Add',
+      }),
+      deploy: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/deploy/:name`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Deploy',
+      }),
+      profiles: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles#profiles`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      drift: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles#drift`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      edit: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/edit/:id`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Edit',
+      }),
+    },
   },
   password: {
     reset: Route.register({ url: `${appUrlRoot}/reset/password`, name: 'Password:Reset' }),

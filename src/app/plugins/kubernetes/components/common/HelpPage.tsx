@@ -124,7 +124,8 @@ const HelpPage = () => {
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { features } = session
   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
-  const [{ lastStack }] = useScopedPreferences()
+  const { prefs } = useScopedPreferences()
+  const { lastStack } = prefs
   const showSupportRequestOption =
     customerTier === CustomerTiers.Growth || customerTier === CustomerTiers.Enterprise
 

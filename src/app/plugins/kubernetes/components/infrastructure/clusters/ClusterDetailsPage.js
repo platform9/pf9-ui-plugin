@@ -16,6 +16,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import {
+  ClusterApiServerHealthStatus,
   ClusterConnectionStatus,
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
@@ -86,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
   },
   headerCardBody: {
     display: 'block',
-    margin: theme.spacing(0, 4),
+    margin: theme.spacing(0, 4, 1, 4),
   },
   headerCardHeader: {
     margin: theme.spacing(0.5, 3, 0, 3),
@@ -134,6 +135,9 @@ const useStyles = makeStyles((theme) => ({
   tabContainer: {
     paddingTop: theme.spacing(2),
     maxWidth: 1234,
+  },
+  nodesContainer: {
+    maxWidth: 'none',
   },
   headerCard: {
     marginTop: theme.spacing(2),
@@ -236,7 +240,7 @@ const ClusterDetailsPage = () => {
       </SimpleLink>
       <Tabs>
         <Tab value="nodes" label="Nodes">
-          <div className={classes.tabContainer}>
+          <div className={`${classes.tabContainer} ${classes.nodesContainer}`}>
             {clusterHeader}
             <ClusterNodes />
           </div>
@@ -303,6 +307,15 @@ const ClusterStatus = ({ cluster, loading, className }) => {
       />
       <ClusterHealthStatus
         iconStatus
+        label="Platform9 Components"
+        className={classes.statusColor}
+        variant="header"
+        cluster={cluster}
+        message={loading ? 'loading' : undefined}
+      />
+      <ClusterApiServerHealthStatus
+        iconStatus
+        label="API Responding"
         className={classes.statusColor}
         variant="header"
         cluster={cluster}

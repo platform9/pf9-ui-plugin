@@ -10,6 +10,7 @@ const WorkerNodeSubnetField = ({ dropdownComponent, values }) => (
     cloudProviderId={values.cloudProviderId}
     cloudProviderRegionId={values.region}
     resourceGroup={values.vnetResourceGroup}
+    vnetName={values.vnetName}
     info="Select the subnet for your worker nodes. Can be the same as master node subnet."
     required
   />
