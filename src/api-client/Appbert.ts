@@ -50,7 +50,7 @@ class Appbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/{packageId}',
+    url: '/clusters/:clusterUuid/:packageId',
     type: 'PUT',
     params: ['clusterUuid', 'packageId'],
   })
@@ -67,7 +67,7 @@ class Appbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/{packageId}',
+    url: '/clusters/:clusterUuid/:packageId',
     type: 'DELETE',
     params: ['clusterUuid', 'packageId'],
   })
