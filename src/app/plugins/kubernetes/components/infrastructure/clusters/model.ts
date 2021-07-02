@@ -35,6 +35,8 @@ export type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading'
 
 export type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
+export type ApiServerStatus = 'online' | 'offline' | 'degraded'
+
 // progressPercent,
 //         version,
 //         baseUrl

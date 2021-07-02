@@ -5,7 +5,11 @@ import {
   IClusterStatus,
   TransientStatus,
 } from './model'
-import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
+import {
+  ApiServerHealthStatus,
+  ApiServerHealthStatusFields,
+  INodesSelector,
+} from 'k8s/components/infrastructure/nodes/model'
 import { routes } from 'core/utils/routes'
 
 interface INodeCount {
@@ -357,6 +361,52 @@ export const getClusterConnectionStatus = (cluster: IClusterSelector) => {
   }
   const fields: ConnectionStatusFields & { nodesDetailsUrl: string } =
     connectionStatusFieldsTable[cluster.connectionStatus]
+  fields.nodesDetailsUrl = routes.cluster.nodeHealth.path({ id: cluster.uuid })
+  return fields
+}
+
+export const clusterApiServerHealthStatusFields: {
+  [status in ApiServerHealthStatus | 'degraded']: ApiServerHealthStatusFields
+} = {
+  online: {
+    message: 'API server is responding for all nodes',
+    clusterStatus: 'ok',
+    label: 'Online',
+  },
+  degraded: {
+    message: 'API server is not responding for 1 or more nodes',
+    clusterStatus: 'degraded',
+    label: 'Degraded',
+  },
+  offline: {
+    message: 'API server is not responding for any nodes',
+    clusterStatus: 'fail',
+    label: 'Offline',
+  },
+}
+
+export const getClusterApiServerHealthStatus = (cluster: IClusterSelector) => {
+  const nodes = cluster.nodes || []
+  let numRespondingNodes = 0
+  let numMasterNodes = 0
+  nodes.forEach((node) => {
+    if (node.isMaster) {
+      if (node.api_responding) {
+        numRespondingNodes += 1
+      }
+      numMasterNodes += 1
+    }
+  })
+
+  let fields = null
+  if (nodes.length > 0 && numRespondingNodes === numMasterNodes) {
+    fields = clusterApiServerHealthStatusFields.online
+  } else if (numRespondingNodes === 0) {
+    fields = clusterApiServerHealthStatusFields.offline
+  } else {
+    fields = clusterApiServerHealthStatusFields.degraded
+  }
+
   fields.nodesDetailsUrl = routes.cluster.nodeHealth.path({ id: cluster.uuid })
   return fields
 }
