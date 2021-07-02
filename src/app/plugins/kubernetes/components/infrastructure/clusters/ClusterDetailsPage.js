@@ -135,6 +135,9 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(2),
     maxWidth: 1234,
   },
+  nodesContainer: {
+    maxWidth: 'none',
+  },
   headerCard: {
     marginTop: theme.spacing(2),
   },
@@ -236,7 +239,7 @@ const ClusterDetailsPage = () => {
       </SimpleLink>
       <Tabs>
         <Tab value="nodes" label="Nodes">
-          <div className={classes.tabContainer}>
+          <div className={`${classes.tabContainer} ${classes.nodesContainer}`}>
             {clusterHeader}
             <ClusterNodes />
           </div>
