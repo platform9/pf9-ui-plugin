@@ -75,7 +75,8 @@ const useParams = <T extends Dictionary<any>>(defaultParams?: T): UseParamsRetur
     })
   }, [])
 
-  const [{ currentTenant, currentRegion }] = useScopedPreferences()
+  const { prefs } = useScopedPreferences()
+  const { currentTenant, currentRegion } = prefs
   // Reset the params when the tenant or the region are changed
   useEffect(() => {
     dispatch({ type: 'replace', payload: defaultParams || {} })
@@ -95,7 +96,7 @@ export const createUsePrefParamsHook = <T extends Dictionary<any>>(
 ) => {
   return (defaultParams?: T): UseParamsReturnType<T> => {
     const defaultPrefs = pick(userPrefKeys, defaultParams)
-    const [prefs, updatePrefs] = useScopedPreferences(storeKey, defaultPrefs)
+    const { prefs, updatePrefs } = useScopedPreferences(storeKey, defaultPrefs)
     const { params, setParams: setParamsBase, updateParams: updateParamsBase } = useParams<
       Partial<T>
       // @ts-ignore

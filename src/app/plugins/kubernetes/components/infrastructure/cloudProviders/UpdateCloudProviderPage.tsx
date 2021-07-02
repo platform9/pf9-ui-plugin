@@ -68,7 +68,7 @@ const formCpBody = (data) => {
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
-  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const { prefs, updateUserDefaults } = useScopedPreferences('defaults')
 
   const cloudDefaults = useMemo(() => {
     return (

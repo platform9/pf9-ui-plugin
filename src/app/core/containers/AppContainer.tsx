@@ -160,7 +160,7 @@ const AppContainer = () => {
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const { features, isSsoToken } = session
-  const [, , getUserPrefs] = useScopedPreferences()
+  const { getUserPrefs } = useScopedPreferences()
   const dispatch = useDispatch()
   const [loginFeatures, setLoginFeatures] = useState({ loaded: false, sso: false })
   const [customerTier, setCustomerTier] = useState(null)

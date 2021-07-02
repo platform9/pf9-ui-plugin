@@ -195,7 +195,7 @@ interface Props {
 
 const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
-  const [prefs] = useScopedPreferences('defaults')
+  const { prefs } = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Azure] || {}, [prefs])
 
   const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {

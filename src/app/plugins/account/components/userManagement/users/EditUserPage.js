@@ -96,7 +96,7 @@ const EditUserPage = () => {
   const session = useSelector(prop(sessionStoreKey))
   const { userDetails } = session
   const { id: activeUserId, email: activeUserEmail } = userDetails
-  const [prefs, updatePrefs] = useScopedPreferences()
+  const { prefs, updatePrefs } = useScopedPreferences()
   const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
   const [activeUserUpdated, setActiveUserUpdated] = useState(false)
 
