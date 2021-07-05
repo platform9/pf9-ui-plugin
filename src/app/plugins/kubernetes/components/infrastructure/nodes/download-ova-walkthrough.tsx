@@ -44,11 +44,7 @@ const DownloadOvaWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-<<<<<<< HEAD
-  const [, , getUserPrefs] = useScopedPreferences()
-=======
   const { getUserPrefs } = useScopedPreferences()
->>>>>>> origin
   const { currentTenant, currentRegion } = getUserPrefs(session.username)
 
   return (
