@@ -24,9 +24,7 @@ export const rbacProfilesSelector = createSelector(
   (rbacProfiles, profileBindings, clusters) => {
     return rbacProfiles.map((profile) => {
       const matchingBindings = profileBindings.filter((binding) => {
-        return (
-          binding.spec.profileRef.split('sunpike-profiles/default/')[1] === profile.metadata.name
-        )
+        return binding.spec.profileRef.split('default/')[1] === profile.metadata.name
       })
       const bindingClusters = matchingBindings.map((binding) => {
         return binding.spec.clusterRef
@@ -41,6 +39,7 @@ export const rbacProfilesSelector = createSelector(
         id: profile.metadata.uid,
         name: profile.metadata.name,
         clusters: matchingClusters,
+        bindings: matchingBindings,
         ...profileResources,
       }
     })

@@ -81,7 +81,7 @@ export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacP
       },
       spec: {
         clusterRef: clusterId,
-        profileRef: `sunpike-profiles/default/${profileName}`,
+        profileRef: `default/${profileName}`,
         dryRun: false,
       },
     }

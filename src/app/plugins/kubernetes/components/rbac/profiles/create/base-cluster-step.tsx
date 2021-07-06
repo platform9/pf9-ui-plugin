@@ -61,7 +61,7 @@ export const BaseClusterStep = ({ wizardContext, setWizardContext }) => {
   const [data, loading, reload] = useDataLoader(clusterActions.list, params)
   const refetch = useCallback(() => reload(true), [reload])
   const handleSelect = useCallback((row) => {
-    setWizardContext({ baseCluster: row.name })
+    setWizardContext({ baseCluster: row.uuid })
   }, [])
   const validateFields = useCallback(
     ({ profileName, baseCluster }) => !isEmpty(profileName) && !isEmpty(baseCluster),
