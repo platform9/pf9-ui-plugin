@@ -12,7 +12,7 @@ import ListPageHeader from 'k8s/components/common/ListPageHeader'
 import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 
 // Types
-import { cloudStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
+import { cloudStatusCardProps } from 'k8s/components/dashboard/card-templates'
 import { ICloudProvidersSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
 

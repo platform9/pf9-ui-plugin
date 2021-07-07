@@ -11,7 +11,7 @@ import ListPageHeader from 'k8s/components/common/ListPageHeader'
 import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 
 // Types
-import { clusterStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
+import { clusterStatusCardProps } from 'k8s/components/dashboard/card-templates'
 import { IClusterSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
 

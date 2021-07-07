@@ -7,9 +7,13 @@ import { HostByService, HostType } from './model'
 import { Host } from 'api-client/resmgr.model'
 import { emptyArr } from 'utils/fp'
 
-const getIpPreview = (ips: string[] | Readonly<string[]> = emptyArr) =>
+const getIpPreview = (ips: string[] | Readonly<string[]> = emptyArr) => {
+  if (!Array.isArray(ips)) {
+    return emptyArr
+  }
   // Get first IP that does not start with 192
-  ips.find((ip) => ip.substring(0, 3) !== '192') || ips[0]
+  return ips.find((ip) => ip.substring(0, 3) !== '192') || ips[0]
+}
 
 const getNetworkInterfaces = (node: Host) => {
   const extensions = node?.extensions
@@ -37,9 +41,7 @@ export const resMgrHostsSelector = createSelector(
       const extensions = item?.extensions
       return {
         ...item,
-        ipPreview: getIpPreview(
-          Array.isArray(extensions?.ip_address?.data) ? extensions.ip_address.data : emptyArr,
-        ),
+        ipPreview: getIpPreview(extensions?.ip_address?.data),
         networkInterfaces: getNetworkInterfaces(item),
         ovsBridges: extensions?.interfaces?.data.ovs_bridges || emptyArr,
       }

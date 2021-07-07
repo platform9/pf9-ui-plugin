@@ -145,6 +145,7 @@ export enum UserPreferences {
   Aws = 'aws',
   Azure = 'azure',
   FeatureFlags = 'featureFlags',
+  Dashboard = 'dashboard',
 }
 
 export enum GlobalPreferences {

@@ -75,7 +75,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const DashboardPage = () => {
   const { history } = useReactRouter()
-  const { prefs, updateUserDefaults } = useScopedPreferences('defaults')
+  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
   const { cardOrder = emptyArr, isInitialized = false } = prefs?.dashboard || {}
 
   const reportCards =
@@ -83,7 +83,6 @@ const DashboardPage = () => {
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const {
-    username,
     userDetails: { displayName, role },
     features,
   } = session
@@ -108,10 +107,10 @@ const DashboardPage = () => {
   ])
   const cards = useMemo(
     () =>
-      filterReportsWithUserRole(reports, cardOrder, session.userDetails.role).map((report) => (
+      filterReportsWithUserRole(reports, cardOrder, role).map((report) => (
         <StatusCard key={report.route} {...report} className={classes[report.entity]} />
       )),
-    [reports, cardOrder, session.userDetails.role],
+    [reports, cardOrder, role],
   )
   const [top, bottom] = generateDashboardMosaicGrid(reports, cardOrder)
   const mosaicStyle = {
