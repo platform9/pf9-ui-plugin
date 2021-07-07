@@ -32,7 +32,8 @@ export const loadingStyles: CSS.Properties = {
 
 const ThemeManager = ({ children }) => {
   const dispatch = useDispatch()
-  const [{ themeName = 'default' }] = useScopedPreferences()
+  const { prefs } = useScopedPreferences()
+  const { themeName = 'default' } = prefs
   useEffect(() => {
     dispatch(themeActions.updateTheme(defaultTheme))
   }, [])

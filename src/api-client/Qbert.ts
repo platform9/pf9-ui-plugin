@@ -141,7 +141,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/cloudProviders/{cloudProviderUuid}',
+    url: '/cloudProviders/:cloudProviderUuid',
     type: 'GET',
     params: ['cloudProviderUuid'],
   })
@@ -157,7 +157,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/cloudProviders/{cloudProviderUuid}/region/{regionName}',
+    url: '/cloudProviders/:cloudProviderUuid/region/:regionName',
     type: 'GET',
     params: ['cloudProviderUuid', 'regionName'],
   })
@@ -173,7 +173,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/cloudProviders/{cloudProviderUuid}',
+    url: '/cloudProviders/:cloudProviderUuid',
     type: 'PUT',
     params: ['cloudProviderUuid'],
   })
@@ -190,7 +190,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/cloudProviders/{cloudProviderUuid}',
+    url: '/cloudProviders/:cloudProviderUuid',
     type: 'DELETE',
     params: ['cloudProviderUuid'],
   })
@@ -259,7 +259,7 @@ class Qbert extends ApiService {
 
   /* SSH Keys */
   @trackApiMethodMetadata({
-    url: '/cloudProviders/{cloudProviderUuid}/region/{regionName}',
+    url: '/cloudProviders/:cloudProviderUuid/region/:regionName',
     type: 'PUT',
     params: ['cloudProviderUuid', 'regionName'],
   })
@@ -315,7 +315,7 @@ class Qbert extends ApiService {
     return normalizeImportedClusters(response)
   }
 
-  @trackApiMethodMetadata({ url: '/clusters/{clusterUuid}', type: 'GET', params: ['clusterUuid'] })
+  @trackApiMethodMetadata({ url: '/clusters/:clusterUuid', type: 'GET', params: ['clusterUuid'] })
   getClusterDetails = async (clusterId) => {
     const url = `/clusters/${clusterId}`
     const cluster = await this.client.basicGet({
@@ -332,7 +332,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -379,7 +379,7 @@ class Qbert extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({ url: '/clusters/{clusterUuid}', type: 'PUT', params: ['clusterUuid'] })
+  @trackApiMethodMetadata({ url: '/clusters/:clusterUuid', type: 'PUT', params: ['clusterUuid'] })
   updateCluster = async (clusterId, body) => {
     const url = `/clusters/${clusterId}`
     return this.client.basicPut({
@@ -406,7 +406,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}',
+    url: '/clusters/:clusterUuid',
     type: 'DELETE',
     params: ['clusterUuid'],
   })
@@ -428,7 +428,7 @@ class Qbert extends ApiService {
   // @param clusterId = cluster.uuid
   // @param nodes = [{ uuid: node.uuid, isMaster: (true|false) }]
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/attach',
+    url: '/clusters/:clusterUuid/attach',
     type: 'POST',
     params: ['clusterUuid'],
   })
@@ -447,7 +447,7 @@ class Qbert extends ApiService {
   // @param clusterId = cluster.uuid
   // @param nodes = [node1Uuid, node2Uuid, ...]
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/detach',
+    url: '/clusters/:clusterUuid/detach',
     type: 'POST',
     params: ['clusterUuid'],
   })
@@ -464,7 +464,7 @@ class Qbert extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({ url: '/webcli/{clusterUuid}', type: 'POST', params: ['clusterUuid'] })
+  @trackApiMethodMetadata({ url: '/webcli/:clusterUuid', type: 'POST', params: ['clusterUuid'] })
   getCliToken = async (clusterId, namespace) => {
     const url = `/webcli/${clusterId}`
     const response = await this.client.basicPost<any>({
@@ -481,7 +481,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/kubeconfig/{clusterUuid}',
+    url: '/kubeconfig/:clusterUuid',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -543,7 +543,7 @@ class Qbert extends ApiService {
 
   /* k8s API */
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/version',
+    url: '/clusters/:clusterUuid/k8sapi/version',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -570,7 +570,7 @@ class Qbert extends ApiService {
   })
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -587,7 +587,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces',
     type: 'POST',
     params: ['clusterUuid'],
   })
@@ -605,7 +605,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/:namespace',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace'],
   })
@@ -621,7 +621,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/pods',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/pods',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -638,7 +638,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/apps/v1/deployments',
+    url: '/clusters/:clusterUuid/k8sapi/apis/apps/v1/deployments',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -655,7 +655,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/k8sapi/apis/apps/v1/namespaces/{namespace}/deployments/{deployment}',
+    url: '/k8sapi/apis/apps/v1/namespaces/:namespace/deployments/:deployment',
     type: 'DELETE',
     params: ['namespace', 'deployment'],
   })
@@ -671,7 +671,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: 'clusters/{clusterUuid}/k8sapi/api/v1/services',
+    url: 'clusters/:clusterUuid/k8sapi/api/v1/services',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -688,7 +688,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/storage.k8s.io/v1/storageclasses',
+    url: '/clusters/:clusterUuid/k8sapi/apis/storage.k8s.io/v1/storageclasses',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -705,7 +705,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/storage.k8s.io/v1/storageclasses',
+    url: '/clusters/:clusterUuid/k8sapi/apis/storage.k8s.io/v1/storageclasses',
     type: 'POST',
     params: ['clusterUuid'],
   })
@@ -722,7 +722,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/storage.k8s.io/v1/storageclasses/{storageClass}',
+    url: '/clusters/:clusterUuid/k8sapi/apis/storage.k8s.io/v1/storageclasses/:storageClass',
     type: 'DELETE',
     params: ['clusterUuid', 'storageClass'],
   })
@@ -738,7 +738,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/apps/v1/replicasets',
+    url: '/clusters/:clusterUuid/k8sapi/apis/apps/v1/replicasets',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -754,7 +754,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/virtualmachineinstances',
+    url: '/clusters/:clusterUuid/k8sapi/apis/kubevirt.io/v1/virtualmachineinstances',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -771,7 +771,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/virtualmachines',
+    url: '/clusters/:clusterUuid/k8sapi/apis/kubevirt.io/v1/virtualmachines',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -789,7 +789,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/virtualmachineinstances/{name}',
+      '/clusters/:clusterUuid/k8sapi/apis/kubevirt.io/v1/namespaces/:namespace/virtualmachineinstances/:name',
     type: 'GET',
     params: ['clusterUuid', 'namespace', 'name'],
   })
@@ -822,7 +822,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/{virtualMachineType}',
+      '/clusters/:clusterUuid/k8sapi/apis/kubevirt.io/v1/namespaces/:namespace/:virtualMachineType',
     type: 'POST',
     params: ['clusterUuid', 'namespace', 'virtualMachineType'],
   })
@@ -841,7 +841,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/virtualmachineinstances/{name}',
+      '/clusters/:clusterUuid/k8sapi/apis/kubevirt.io/v1/namespaces/:namespace/virtualmachineinstances/:name',
     type: 'PUT',
     params: ['clusterUuid', 'namespace', 'name'],
   })
@@ -858,7 +858,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/kubevirt.io/v1/namespaces/{namespace}/virtualmachineinstances/{name}',
+      '/clusters/:clusterUuid/k8sapi/apis/kubevirt.io/v1/namespaces/:namespace/virtualmachineinstances/:name',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'name'],
   })
@@ -875,7 +875,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/subresources.kubevirt.io/v1/namespaces/{namespace}/virtualmachines/{name}/{powerOn}',
+      '/clusters/:clusterUuid/k8sapi/apis/subresources.kubevirt.io/v1/namespaces/:namespace/virtualmachines/:name/:powerOn',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'name', 'powerOn'],
   })
@@ -893,7 +893,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/pods',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/:namespace/pods',
     type: 'POST',
     params: ['clusterUuid', 'namespace'],
   })
@@ -910,7 +910,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/pods/{podName}',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/:namespace/pods/:podName',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'podName'],
   })
@@ -932,7 +932,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/apps/v1/namespaces/{namespace}/deployments',
+    url: '/clusters/:clusterUuid/k8sapi/apis/apps/v1/namespaces/:namespace/deployments',
     type: 'POST',
     params: ['clusterUuid', 'namespace'],
   })
@@ -955,7 +955,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/services',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/:namespace/services',
     type: 'POST',
     params: ['clusterUuid', 'namespace'],
   })
@@ -972,7 +972,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/services/{service}',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/:namespace/services/:service',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'service'],
   })
@@ -994,7 +994,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/serviceaccounts',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/:namespace/serviceaccounts',
     type: 'POST',
     params: ['clusterUuid', 'namespace'],
   })
@@ -1011,7 +1011,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/serviceaccounts',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/:namespace/serviceaccounts',
     type: 'GET',
     params: ['clusterUuid', 'namespace'],
   })
@@ -1029,7 +1029,7 @@ class Qbert extends ApiService {
 
   /* RBAC */
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles',
+    url: '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/roles',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1047,7 +1047,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/roles',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/:namespace/roles',
     type: 'POST',
     params: ['clusterUuid', 'namespace'],
   })
@@ -1066,7 +1066,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/roles/{role}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/:namespace/roles/:role',
     type: 'PUT',
     params: ['clusterUuid', 'namespace', 'role'],
   })
@@ -1085,7 +1085,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/roles/{role}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/:namespace/roles/:role',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'role'],
   })
@@ -1101,7 +1101,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
+    url: '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1118,7 +1118,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
+    url: '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
     type: 'POST',
     params: ['clusterUuid'],
   })
@@ -1137,7 +1137,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/{clusterRole}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/:clusterRole',
     type: 'PUT',
     params: ['clusterUuid', 'clusterRole'],
   })
@@ -1156,7 +1156,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/{clusterRole}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/:clusterRole',
     type: 'DELETE',
     params: ['clusterUuid', 'clusterRole'],
   })
@@ -1172,7 +1172,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings',
+    url: '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1190,7 +1190,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/rolebindings',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/:namespace/rolebindings',
     type: 'POST',
     params: ['clusterUuid', 'namespace'],
   })
@@ -1209,7 +1209,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/rolebindings/{roleBinding}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/:namespace/rolebindings/:roleBinding',
     type: 'PUT',
     params: ['clusterUuid', 'namespace', 'roleBinding'],
   })
@@ -1228,7 +1228,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/rolebindings/{roleBinding}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/:namespace/rolebindings/:roleBinding',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'roleBinding'],
   })
@@ -1244,7 +1244,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
+    url: '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1261,7 +1261,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
+    url: '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
     type: 'POST',
     params: ['clusterUuid'],
   })
@@ -1280,7 +1280,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/{clusterRoleBinding}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/:clusterRoleBinding',
     type: 'PUT',
     params: ['clusterUuid', 'clusterRoleBinding'],
   })
@@ -1299,7 +1299,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/{clusterRoleBinding}',
+      '/clusters/:clusterUuid/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/:clusterRoleBinding',
     type: 'DELETE',
     params: ['clusterUuid', 'clusterRoleBinding'],
   })
@@ -1316,7 +1316,7 @@ class Qbert extends ApiService {
 
   /* RBAC Profiles */
   getRbacProfiles = async () => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofiles`
     const response = await this.client.basicGet<any>({
       url,
       version: 'v4',
@@ -1329,7 +1329,7 @@ class Qbert extends ApiService {
   }
 
   createRbacProfile = async (body) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofiles`
     const response = await this.client.basicPost({
       url,
       body,
@@ -1343,7 +1343,7 @@ class Qbert extends ApiService {
   }
 
   patchRbacProfile = async (name, body) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles/${name}`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofiles/${name}`
     const response = await this.client.basicPatch<any>({
       url,
       body,
@@ -1362,7 +1362,7 @@ class Qbert extends ApiService {
   }
 
   deleteRbacProfile = async (name) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofiles/${name}`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofiles/${name}`
     await this.client.basicDelete({
       url,
       version: 'v4',
@@ -1374,7 +1374,7 @@ class Qbert extends ApiService {
   }
 
   getRbacProfileBindings = async () => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebindings`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings`
     const response = await this.client.basicGet<any>({
       url,
       version: 'v4',
@@ -1387,7 +1387,7 @@ class Qbert extends ApiService {
   }
 
   createRbacProfileBinding = async (body) => {
-    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/sunpike-profiles/clusterprofilebindings`
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings`
     const response = await this.client.basicPost({
       url,
       body,
@@ -1402,7 +1402,7 @@ class Qbert extends ApiService {
 
   /* Managed Apps */
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses',
+    url: '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/prometheuses',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1420,7 +1420,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheuses/{prometheusInstance}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/prometheuses/:prometheusInstance',
     type: 'PATCH',
     params: ['clusterUuid', 'namespace', 'prometheusInstance'],
   })
@@ -1446,7 +1446,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheuses/{prometheusInstance}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/prometheuses/:prometheusInstance',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'prometheusInstance'],
   })
@@ -1575,7 +1575,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1597,7 +1597,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1618,7 +1618,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silences',
     type: 'POST',
     params: ['clusterUuid'],
   })
@@ -1640,7 +1640,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silence/{silenceId}',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/silence/:silenceId',
     type: 'DELETE',
     params: ['clusterUuid', 'silenceId'],
   })
@@ -1657,7 +1657,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1679,7 +1679,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1707,9 +1707,9 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start={startTime}&end={endTime}&step={step}',
+      '/clusters/:clusterUuid/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range',
     type: 'GET',
-    params: ['clusterUuid', 'startTime', 'endTime', 'step'],
+    params: ['clusterUuid', 'query', 'start', 'end', 'step'],
   })
   getPrometheusAlertsOverTime = async (
     clusterUuid,
@@ -1734,7 +1734,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors',
+    url: '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1752,7 +1752,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/servicemonitors/{serviceMonitor}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/servicemonitors/:serviceMonitor',
     type: 'PATCH',
     params: ['clusterUuid', 'namespace', 'serviceMonitor'],
   })
@@ -1779,7 +1779,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/servicemonitors/{serviceMonitor}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/servicemonitors/:serviceMonitor',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'serviceMonitor'],
   })
@@ -1795,7 +1795,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules',
+    url: '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1813,7 +1813,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheusrules/{prometheusRule}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/prometheusrules/:prometheusRule',
     type: 'PATCH',
     params: ['clusterUuid', 'namespace', 'prometheusRule'],
   })
@@ -1840,7 +1840,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheusrules/{prometheusRule}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/prometheusrules/:prometheusRule',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'prometheusRule'],
   })
@@ -1856,7 +1856,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers',
+    url: '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1874,7 +1874,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/alertmanagers/{alertManager}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/alertmanagers/:alertManager',
     type: 'PATCH',
     params: ['clusterUuid', 'namespace', 'alertManager'],
   })
@@ -1895,7 +1895,7 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/alertmanagers/{alertManager}',
+      '/clusters/:clusterUuid/k8sapi/apis/monitoring.coreos.com/v1/namespaces/:namespace/alertmanagers/:alertManager',
     type: 'DELETE',
     params: ['clusterUuid', 'namespace', 'alertManager'],
   })
@@ -1918,7 +1918,7 @@ class Qbert extends ApiService {
     `/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs`
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs',
+    url: '/clusters/:clusterUuid/k8sapi/apis/logging.pf9.io/v1alpha1/outputs',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1972,7 +1972,7 @@ class Qbert extends ApiService {
 
   // API Resources
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis',
+    url: '/clusters/:clusterUuid/k8sapi/apis',
     type: 'GET',
     params: ['clusterUuid'],
   })
@@ -1988,7 +1988,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/apis/{apiGroup}',
+    url: '/clusters/:clusterUuid/k8sapi/apis/:apiGroup',
     type: 'GET',
     params: ['clusterUuid', 'apiGroup'],
   })
@@ -2005,7 +2005,7 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterUuid}/k8sapi/api/v1',
+    url: '/clusters/:clusterUuid/k8sapi/api/v1',
     type: 'GET',
     params: ['clusterUuid'],
   })

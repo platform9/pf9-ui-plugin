@@ -14,6 +14,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import NumberedSteps from 'core/components/numbered-steps'
 import SimpleLink from 'core/components/SimpleLink'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -43,6 +44,8 @@ const DownloadOvaWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
+  const { getUserPrefs } = useScopedPreferences()
+  const { currentTenant, currentRegion } = getUserPrefs(session.username)
 
   return (
     <Paper className={classes.paper} elevation={0}>
@@ -93,6 +96,18 @@ const DownloadOvaWalkthrough = (): JSX.Element => {
                 Username:{' '}
                 <CopyToClipboard copyText={session.username} codeBlock={false}>
                   <span className={classes.linkText}>{session.username}</span>
+                </CopyToClipboard>
+              </Text>
+              <Text component="div" variant="body1">
+                Tenant:{' '}
+                <CopyToClipboard copyText={currentTenant} codeBlock={false}>
+                  <span className={classes.linkText}>{currentTenant}</span>
+                </CopyToClipboard>
+              </Text>
+              <Text component="div" variant="body1">
+                Region:{' '}
+                <CopyToClipboard copyText={currentRegion} codeBlock={false}>
+                  <span className={classes.linkText}>{currentRegion}</span>
                 </CopyToClipboard>
               </Text>
             </div>

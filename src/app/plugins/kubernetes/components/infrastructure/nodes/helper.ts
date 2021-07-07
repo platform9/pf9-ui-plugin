@@ -1,6 +1,12 @@
 import { partition, pathOr } from 'ramda'
 import { ClusterType, HardwareType, nodeHardwareRequirements } from '../clusters/bareos/constants'
-import { ErrorMessageCodes, errorMessageLevel, INodesSelector } from './model'
+import {
+  ApiServerHealthStatus,
+  ApiServerHealthStatusFields,
+  ErrorMessageCodes,
+  errorMessageLevel,
+  INodesSelector,
+} from './model'
 
 export const clockDriftErrorMessage = 'Cannot attach node(s) with clock drift'
 
@@ -42,6 +48,21 @@ export const meetsHardwareRequirement = (
  */
 export const clockDriftDetectedInNodes = (nodes) => {
   return nodes && !!nodes.find((node) => hasClockDrift(node))
+}
+
+export const nodeApiServerHealthStatusFields: {
+  [status in ApiServerHealthStatus]: ApiServerHealthStatusFields
+} = {
+  online: {
+    label: 'Online',
+    message: 'API server is responding on this node',
+    clusterStatus: 'ok',
+  },
+  offline: {
+    label: 'Offline',
+    message: 'API server is not responding on this node',
+    clusterStatus: 'fail',
+  },
 }
 
 /**
