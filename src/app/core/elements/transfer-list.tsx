@@ -18,7 +18,9 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '300px',
   },
   search: {
-    marginBottom: '10px !important',
+    '& .MuiOutlinedInput-adornedEnd': {
+      marginBottom: '10px !important',
+    },
   },
   listContainer: {
     maxHeight: 260,
@@ -103,26 +105,26 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
   }
 
   const handleCheckedRight = () => {
-    setRight(uniqBy(prop('uuid') as any, right.concat(leftChecked)))
+    setRight(uniqBy(prop('uuid'), right.concat(leftChecked)))
     setLeft(left.filter(comparer(leftChecked)))
     setChecked([])
   }
 
   const handleCheckedLeft = () => {
-    setLeft(uniqBy(prop('uuid') as any, left.concat(rightChecked)))
+    setLeft(uniqBy(prop('uuid'), left.concat(rightChecked)))
     setRight(right.filter(comparer(rightChecked)))
     setChecked([])
   }
 
   const filteredRightNodes = useMemo(() => {
     return searchRight
-      ? right.filter((value) => value.name.toLowerCase().includes(searchRight.toLowerCase()))
+      ? right.filter((value) => value?.name?.toLowerCase()?.includes(searchRight.toLowerCase()))
       : right
   }, [searchRight, right])
 
   const filteredLeftNodes = useMemo(() => {
     return left
-      ? left.filter((value) => value.name.toLowerCase().includes(searchLeft.toLowerCase()))
+      ? left.filter((value) => value?.name?.toLowerCase()?.includes(searchLeft.toLowerCase()))
       : left
   }, [searchLeft, left])
 
@@ -136,13 +138,9 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
 
   return (
     <div className={classes.listWrapper}>
-      <div>
+      <div className={classes.search}>
         <Text className={classes.text}> Cluster nodes</Text>
-        <SearchBar
-          className={classes.search}
-          onSearchChange={handleLeftSearchChange}
-          searchTerm={searchLeft}
-        />
+        <SearchBar onSearchChange={handleLeftSearchChange} searchTerm={searchLeft} />
         <div className={classes.listContainer}>
           <List dense component="div" role="list">
             {filteredLeftNodes.map((value) => (
