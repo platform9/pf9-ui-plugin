@@ -11,11 +11,19 @@ import {
   reject,
   whereEq,
 } from 'ramda'
-import { arrayIfEmpty, arrayIfNil, emptyArr, ensureArray, isNilOrEmpty } from 'app/utils/fp'
+import {
+  arrayIfEmpty,
+  arrayIfNil,
+  emptyArr,
+  ensureArray,
+  isNilOrEmpty,
+  emptyObj,
+} from 'app/utils/fp'
 import { allKey } from 'app/constants'
 import { cacheStoreKey, dataStoreKey, paramsStoreKey } from 'core/caching/cacheReducers'
 import { GlobalState, IDataKeys } from 'k8s/datakeys.model'
 import { createSelector } from 'reselect'
+import { memoizedDep } from 'utils/misc'
 
 const getDataSelector = <T extends keyof IDataKeys>(
   dataKey: T,
@@ -32,7 +40,7 @@ const getDataSelector = <T extends keyof IDataKeys>(
     [
       pathOr(emptyArr, [cacheStoreKey, dataStoreKey, dataKey]),
       pathOr(emptyArr, [cacheStoreKey, paramsStoreKey, dataKey]),
-      (_, params): Dictionary<any> => params,
+      (_, params): Dictionary<any> => memoizedDep(params),
     ],
     (storeData, storeParams, params) => {
       const providedIndexedParams = pipe<
@@ -42,7 +50,7 @@ const getDataSelector = <T extends keyof IDataKeys>(
       >(
         pickAll(ensureArray(indexBy)),
         reject(either(isNil, equals(allKey))),
-      )(params || {})
+      )(params || emptyObj)
 
       // If the provided params are already cached
       if (isNilOrEmpty(indexBy) || find(whereEq(providedIndexedParams), storeParams)) {

@@ -49,6 +49,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     },
     [memoizedParams],
   )
+  const defaultSelector = useMemo(() => selectorCreator(defaultParams), [defaultParams])
 
   const selector = useCallback(
     (state) => {
@@ -57,7 +58,6 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         return emptyArr
       }
       try {
-        const defaultSelector = selectorCreator(defaultParams)
         const output = defaultSelector(state, memoizedParams)
 
         // Reset the flag value after a successful data selection
@@ -79,7 +79,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         return emptyArr
       }
     },
-    [refetching, memoizedParams],
+    [refetching, memoizedParams, defaultSelector],
   )
 
   // Try to retrieve the data from the store with the provided parameters

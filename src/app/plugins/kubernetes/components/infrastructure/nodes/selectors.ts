@@ -16,12 +16,14 @@ export const nodesSelector = createSelector(
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawNodes, combinedHosts, qbertEndpoint) => {
-    const combinedHostsObj = combinedHosts.reduce((accum, host) => {
-      const id = host?.resmgr?.id || host?.qbert?.uuid || null
-      accum[id] = host
-      return accum
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    }, {} as { [key: string]: ICombinedHost })
+    const combinedHostsObj = combinedHosts.reduce<{ [key: string]: ICombinedHost }>(
+      (accum, host) => {
+        const id = host?.resmgr?.id || host?.qbert?.uuid || null
+        accum[id] = host
+        return accum
+      },
+      {},
+    )
 
     // associate nodes with the combinedHost entry
     return rawNodes

@@ -290,22 +290,23 @@ const reports = [
       pieData: [
         {
           name: 'running',
-          value: pods.filter((pod) => pod.status.phase === 'Running').length,
+          value: pods.filter((pod) => pod?.status?.phase === 'Running').length,
           color: 'green.main',
         },
         {
           name: 'pending',
-          value: pods.filter((pod) => pod.status.phase === 'Pending').length,
+          value: pods.filter((pod) => pod?.status?.phase === 'Pending').length,
           color: 'orange.main',
         },
         {
           name: 'unknown',
-          value: pods.filter((pod) => pod.status.phase === 'Unknown').length,
+          value: pods.filter((pod) => pod?.status?.phase === 'Unknown' || !pod?.status?.phase)
+            .length,
           color: 'yellow.main',
         },
         {
           name: 'failed',
-          value: pods.filter((pod) => pod.status.phase === 'Failed').length,
+          value: pods.filter((pod) => pod?.status?.phase === 'Failed').length,
           color: 'red.main',
         },
       ],
@@ -316,7 +317,7 @@ const reports = [
   nodeStatusCardProps,
 ]
 
-const reportsWithPerms = (reports, role) => {
+const getReportsWithPerms = (reports, role) => {
   const mappedReports = reports.map((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) {
@@ -348,7 +349,7 @@ const DashboardPage = () => {
   const session = useSelector(selectSessionState)
   const {
     username,
-    userDetails: { displayName },
+    userDetails: { displayName, role },
     features,
   } = session
   // To avoid missing API errors for ironic region UX-751
@@ -372,6 +373,8 @@ const DashboardPage = () => {
     updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: !showOnboarding })
   }, [username, showOnboarding])
 
+  const reportsWithPerms = useMemo(() => getReportsWithPerms(reports, role), [reports, role])
+
   return (
     <>
       {showOnboarding && (
@@ -386,7 +389,7 @@ const DashboardPage = () => {
           </Text>
           {kubeRegion && (
             <div className={classes.dashboardMosaic}>
-              {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+              {reportsWithPerms.map((report) => (
                 <StatusCard key={report.route} {...report} className={classes[report.entity]} />
               ))}
             </div>
