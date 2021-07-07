@@ -74,6 +74,7 @@ export const initialContext = {
   useRoute53: false,
   domainId: '',
   azs: [],
+  enableProfileAgent: false,
 }
 
 const columns = [
@@ -188,6 +189,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
+const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileAgent']
+
 interface Props {
   wizardContext: any
   setWizardContext: any
@@ -196,7 +199,7 @@ interface Props {
 
 const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
-  const [prefs] = useScopedPreferences('defaults')
+  const { prefs } = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Aws] || {}, [prefs])
 
   const updateFqdns = (values) => (value, label) => {
@@ -349,7 +352,10 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
               <FormFieldCard title="Cluster Settings">
                 {/* Kubernetes Version */}
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <CheckboxField
                   id="useRoute53"
@@ -377,9 +383,9 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 {/* Managed Add-Ons */}
                 <Text variant="caption1">Managed Add-Ons</Text>
                 <AddonTogglers
+                  addons={configStepAddOns}
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
                 />
               </FormFieldCard>
             </>

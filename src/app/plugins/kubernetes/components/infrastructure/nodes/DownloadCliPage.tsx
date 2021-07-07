@@ -36,9 +36,9 @@ const DownloadCliPage: FunctionComponent = () => {
         CLI
       </Text> */}
       <DownloadCliWalkthrough />
-      <p className={classes.spacer}></p>
+      <p className={classes.spacer} />
       <OsRequirements />
-      <p className={classes.spacer}></p>
+      <p className={classes.spacer} />
       <CliAdvancedOptions />
     </PageContainer>
   )

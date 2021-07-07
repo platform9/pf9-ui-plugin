@@ -5,6 +5,7 @@ import {
   activateUserUrl,
   CustomerTiers,
   forgotPasswordUrl,
+  GlobalPreferences,
   loginUrl,
   loginWithCookieUrl,
   loginWithSsoUrl,
@@ -47,7 +48,7 @@ import systemHealthCheck from 'core/watchdog/system-health'
 import { isDecco } from 'core/utils/helpers'
 import config from '../../../../config'
 
-const { setActiveRegion } = ApiClient.getInstance()
+const { setActiveRegion, preferenceStore } = ApiClient.getInstance()
 
 const urlBase = process.env.NODE_ENV !== 'production' ? config.apiHost : ''
 
@@ -112,22 +113,38 @@ const restoreSession = async (
 }
 
 const getUserDetails = async (user) => {
+  if (typeof window.analytics === 'undefined') return
+
   // Need this here again bc not able to use AppContainer state and ensure
   // that sandbox state would be set on time for both users logging in for
   // first time and for users who are already logged in
   const features = await axios.get(`${urlBase}/clarity/features.json`).catch(() => null)
   const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
+  const customerTier = pathStrOr(CustomerTiers.Freedom, 'customer_tier', features)
 
   // Identify the user in Segment using Keystone ID
-  if (typeof window.analytics !== 'undefined') {
-    if (sandbox) {
-      window.analytics.identify()
-    } else {
-      window.analytics.identify(user.id, {
-        email: user.email,
-      })
-    }
+  if (sandbox) {
+    return window.analytics.identify()
   }
+
+  const payload: any = {
+    email: user.email,
+  }
+  if (
+    isDecco(features) &&
+    (customerTier === CustomerTiers.Growth || customerTier === CustomerTiers.Enterprise)
+  ) {
+    try {
+      const externalId = await preferenceStore.getGlobalPreference(
+        GlobalPreferences.CustomerExternalId,
+      )
+      if (externalId) {
+        payload.accountExternalId = externalId
+        payload.contactExternalId = user.email
+      }
+    } catch (err) {}
+  }
+  window.analytics.identify(user.id, payload)
 }
 
 /**
@@ -143,7 +160,7 @@ const AppContainer = () => {
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const { features, isSsoToken } = session
-  const [, , getUserPrefs] = useScopedPreferences()
+  const { getUserPrefs } = useScopedPreferences()
   const dispatch = useDispatch()
   const [loginFeatures, setLoginFeatures] = useState({ loaded: false, sso: false })
   const [customerTier, setCustomerTier] = useState(null)
@@ -206,7 +223,7 @@ const AppContainer = () => {
           (!initialFeatures?.data?.experimental?.kplane &&
             pathStrOr(false, 'data.experimental.sso', initialFeatures)),
       })
-      if (isDecco(initialFeatures.data)) {
+      if (isDecco(initialFeatures?.data)) {
         Watchdog.register({ handler: systemHealthCheck, frequency: 1000 * 60 * 10 })
       }
     }

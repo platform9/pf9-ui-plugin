@@ -11,19 +11,22 @@ interface Props extends Omit<ButtonProps, 'variant'> {
   textVariant?: TextVariant
   children: string | React.ReactNode
   disabled?: boolean
+  stupid?: string
 }
 
 const Button = ({
   color = 'primary',
   variant = 'light',
   textVariant = undefined,
+  stupid = undefined,
   className = undefined,
   children,
   disabled = false,
   ...rest
 }: Props) => {
   const { button, centerText } = useStyles({ variant, color })
-  const spanTextVariant = textVariant || color === 'primary' ? 'buttonPrimary' : 'buttonSecondary'
+  const spanTextVariant =
+    textVariant || (!textVariant && color === 'primary' ? 'buttonPrimary' : 'buttonSecondary')
   return (
     <button className={clsx(button, className, { disabled })} disabled={disabled} {...rest}>
       <Text className={centerText} component="span" variant={spanTextVariant}>

@@ -598,6 +598,7 @@ class ListTable extends PureComponent {
       hideDelete,
       alternativeTableContent,
       listTableParams,
+      showPagination,
     } = this.props
 
     if (!data) {
@@ -676,13 +677,12 @@ class ListTable extends PureComponent {
                   listTableParams={listTableParams}
                 />
               )}
-              {alternativeTableContent ? (
-                alternativeTableContent
-              ) : (
+              {alternativeTableContent || (
                 <div className={classes.tableWrapper}>{tableContent}</div>
               )}
               {!alternativeTableContent &&
                 !compactTable &&
+                showPagination &&
                 this.renderPaginationControls(filteredData.length)}
             </div>
           </Grid>
@@ -720,6 +720,7 @@ ListTable.propTypes = {
   onRefresh: PropTypes.func,
   onActionComplete: PropTypes.func,
   paginate: PropTypes.bool,
+  showPagination: PropTypes.bool,
   orderBy: PropTypes.string,
   orderDirection: PropTypes.oneOf(['asc', 'desc']),
   onSortChange: PropTypes.func,
@@ -784,6 +785,7 @@ ListTable.propTypes = {
 
 ListTable.defaultProps = {
   paginate: true,
+  showPagination: true,
   showCheckboxes: true,
   multiSelection: true,
   uniqueIdentifier: 'id',

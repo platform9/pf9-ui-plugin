@@ -12,11 +12,11 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { routes } from 'core/utils/routes'
 import {
+  ClusterApiServerHealthStatus,
   ClusterConnectionStatus,
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
-import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { both, omit, prop } from 'ramda'
 import React, { useState } from 'react'
@@ -32,7 +32,6 @@ import {
   canScaleMasters,
   canScaleWorkers,
   canUpgradeCluster,
-  notBusy,
   isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
@@ -71,9 +70,13 @@ const renderConnectionStatus = (_, cluster) => (
     cluster={cluster}
   />
 )
-const renderHealthStatus = (_, cluster) => (
-  <ClusterHealthStatus iconStatus={cluster.connectionStatus === 'converging'} cluster={cluster} />
-)
+const renderPlatform9ComponentsStatus = (_, cluster) => {
+  const showIconStatus = cluster.connectionStatus === 'converging' || cluster.status === 'pending'
+  return <ClusterHealthStatus iconStatus={showIconStatus} cluster={cluster} />
+}
+
+const renderApiServerHealth = (_, cluster) => <ClusterApiServerHealthStatus cluster={cluster} />
+
 const renderClusterLink = (links, { usage }) => <ClusterLinks links={links} usage={usage} />
 
 const ClusterLinks = ({
@@ -213,10 +216,15 @@ export const options = {
       tooltip: 'Whether the cluster is connected to the PMK management plane',
     },
     {
-      id: 'healthStatus',
-      label: 'Health status',
-      render: renderHealthStatus,
-      tooltip: 'Cluster health',
+      id: 'platform9Components',
+      label: 'Platform9 Components',
+      render: renderPlatform9ComponentsStatus,
+      tooltip: 'Platform9 Components  Status',
+    },
+    {
+      id: 'apiServerHealth',
+      label: 'API Server Health',
+      render: renderApiServerHealth,
     },
     {
       id: 'links',
@@ -321,12 +329,6 @@ export const options = {
         !!cluster && clockDriftDetectedInNodes(cluster.nodes)
           ? 'Cannot upgrade cluster: clock drift detected in at least one node'
           : 'Cannot upgrade cluster',
-    },
-    {
-      cond: both(isAdmin, notBusy),
-      icon: 'chart-bar',
-      label: 'Monitoring',
-      dialog: PrometheusAddonDialog,
     },
     // Disable logging till all CRUD features for log datastores are implemented.
     /* {

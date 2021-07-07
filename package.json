@@ -161,7 +161,7 @@
   "scripts": {
     "build": "rm -rf ./build && cross-env NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 ./node_modules/.bin/webpack",
     "build-storybook": "build-storybook",
-    "dev": "cross-env NODE_ENV=development yarn start",
+    "dev": "cross-env NODE_ENV=development yarn start --max_old_space_size=4096",
     "lint": "./node_modules/.bin/eslint --ext .jsx,.js,.tsx,.ts src",
     "fix-lint": "./node_modules/.bin/eslint --ext .jsx,.js,.tsx,.ts --fix src",
     "start": "webpack-dev-server --progress --colors --hot --inline --env.development --host 0.0.0.0",

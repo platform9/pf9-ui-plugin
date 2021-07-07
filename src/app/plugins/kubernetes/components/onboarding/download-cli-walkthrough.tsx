@@ -14,7 +14,7 @@ import { prop } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import BulletList from 'core/components/BulletList'
-
+import useScopedPreferences from '../../../../core/session/useScopedPreferences'
 const useStyles = makeStyles((theme: Theme) => ({
   linkText: {
     textDecoration: 'underline',
@@ -71,7 +71,8 @@ const DownloadCliWalkthrough = () => {
   const classes = useStyles()
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-
+  const { getUserPrefs } = useScopedPreferences()
+  const { currentTenant, currentRegion } = getUserPrefs(session.username)
   return (
     <Info title="Use the PF9 CLI to connect nodes to the Platform9 Management Plane">
       <BulletList type="decimal" items={downloadSteps} />
@@ -86,6 +87,18 @@ const DownloadCliWalkthrough = () => {
           <b>Username: </b>
           <CopyToClipboard copyText={session.username} codeBlock={false}>
             <span className={classes.linkText}>{session.username}</span>
+          </CopyToClipboard>
+        </Text>
+        <Text component="div" variant="body1">
+          <b>Tenant: </b>
+          <CopyToClipboard copyText={currentTenant} codeBlock={false}>
+            <span className={classes.linkText}>{currentTenant}</span>
+          </CopyToClipboard>
+        </Text>
+        <Text component="div" variant="body1">
+          <b>Region: </b>
+          <CopyToClipboard copyText={currentRegion} codeBlock={false}>
+            <span className={classes.linkText}>{currentRegion}</span>
           </CopyToClipboard>
         </Text>
       </div>

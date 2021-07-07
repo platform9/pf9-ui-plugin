@@ -60,7 +60,7 @@ const { setActiveRegion } = ApiClient.getInstance()
 const MyProfilePage = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const [prefs, updatePrefs] = useScopedPreferences()
+  const { prefs, updatePrefs } = useScopedPreferences()
   const [errorMessage, setErrorMessage] = useState('')
   const [oldUserPrefs, setOldUserPrefs] = useState(prefs)
   const [userUpdated, setUserUpdated] = useState(false)
