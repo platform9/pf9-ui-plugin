@@ -6,4 +6,6 @@ export interface Config{
     singleMasterClusterData: ClusterDetails
     multiMasterClusterData: ClusterDetails
     oneClickClusterData: ClusterDetails
+    namespaceName: string
+    
 }

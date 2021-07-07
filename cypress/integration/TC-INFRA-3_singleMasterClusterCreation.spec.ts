@@ -58,7 +58,4 @@ describe('Single Master Cluster Creation', () => {
     })
   })
 
-  after(() => {
-    cy.deleteCluster(config.singleMasterClusterData.clusterName)
-  })
 })

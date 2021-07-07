@@ -21,6 +21,7 @@ export const developmentConfig:Config={
     oneClickClusterData: {
         clusterName: 'OneClickCluster-1',
         totalNodes: 1,   
-    }
+    },
+    namespaceName: 'test-mabl'
 }
 

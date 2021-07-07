@@ -104,7 +104,6 @@
     "cypress-pipe": "^2.0.0",
     "cypress-plugin-snapshots": "^1.4.4",
     "cypress-recurse": "^1.8.1",
-    "cypress-select-tests": "^1.7.0",
     "cypress-wait-until": "^1.7.1",
     "cypress-xpath": "^1.6.2",
     "enzyme": "^3.10.0",
@@ -186,9 +185,7 @@
     "test:ci:windows": "cross-env NODE_ENV=test bin-up cypress run",
     "test:ci:windows:record": "cross-env NODE_ENV=test bin-up cypress run --record --group",
     "test:unit": "cross-env NODE_ENV=test jest --coverage src/app src/server",
-    "test:unit:watch": "cross-env NODE_ENV=test jest --watch --coverage src/app src/server",
-    "test:loginOther": "cross-env NODE_ENV=test cypress run --spec ./cypress/integration/test.spec.ts",
-     "cypress:openWindows": "./node_modules/.bin/cypress open"
+    "test:unit:watch": "cross-env NODE_ENV=test jest --watch --coverage src/app src/server"
   },
   "keywords": [
     "Platform9",

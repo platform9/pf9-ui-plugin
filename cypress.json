@@ -10,5 +10,16 @@
     "html": true,
     "json": true
   },
-  "video": true
+  "video": true,
+  "testFiles":[
+    "TC-GENERAL-1_login.spec.ts",
+    "TC-INFRA-3_singleMasterClusterCreation.spec.ts",
+    "TC-WORKLOADS-1_namespace.spec.ts",
+    "TC-WORKLOADS-2_deployment.spec.ts",
+    "TC-WORKLOADS-3_service.spec.ts",
+    "TC-INFRA-8_clusterUpgradation.spec.ts",
+    "TC-INFRA-7_deleteCluster.spec.ts",
+    "TC-INFRA-2_oneClickClusterCreation.spec.ts",
+    "TC-INFRA-1_multiMasterClusterCreation.spec.ts"
+  ]
 }
