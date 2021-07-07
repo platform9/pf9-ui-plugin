@@ -305,13 +305,22 @@ export const routes = {
       name: 'Infrastructure:Clusters:ScaleWorkers',
     }),
   },
-  dashboard: Route.register({
-    url: `${pluginRoutePrefix}/dashboard`,
-    name: 'Dashboard',
-    defaultParams: {
-      plugin: AppPlugins.Kubernetes,
-    },
-  }),
+  dashboard: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/dashboard`,
+      name: 'Dashboard',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    edit: Route.register({
+      url: `${pluginRoutePrefix}/dashboard/edit`,
+      name: 'Dashboard:Edit',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+  },
   apiAccess: {
     api: Route.register({
       url: `${pluginRoutePrefix}/api-access`,

@@ -26,12 +26,15 @@ const { name: sessionStoreKey, reducer: sessionReducers, actions: sessionActions
   initialState,
   reducers: {
     initSession: (state, { payload }: PayloadAction<Partial<SessionState>>) => {
+      console.count('sessionReducers/initSession')
       return mergeLeft(payload, initialState)
     },
     updateSession: (state, { payload }: PayloadAction<Partial<SessionState>>) => {
+      console.count('sessionReducers/updateSession')
       return mergeLeft(payload, state)
     },
     destroySession: () => {
+      console.count('sessionReducers/destroySession')
       return initialState
     },
   },

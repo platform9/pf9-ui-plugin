@@ -36,6 +36,7 @@ import { isEqual } from 'lodash'
 export const paramsStoreKey = 'cachedParams'
 export const dataStoreKey = 'cachedData'
 export const loadingStoreKey = 'loadingData'
+export const updatingStoreKey = 'updatingData'
 
 type ParamsType = Array<{ [key: string]: number | string }>
 type Optional<T> = T extends null ? void : T
@@ -44,12 +45,14 @@ export interface CacheState {
   [dataStoreKey]: any[]
   [paramsStoreKey]: ParamsType
   [loadingStoreKey]: Dictionary<boolean>
+  [updatingStoreKey]: Dictionary<boolean>
 }
 
 export const initialState: CacheState = {
   [dataStoreKey]: [],
   [paramsStoreKey]: [],
   [loadingStoreKey]: {},
+  [updatingStoreKey]: {},
 }
 
 const getIdentifiersMatcher = (uniqueIdentifier: string | string[], params: ParamsType) => {
@@ -69,7 +72,22 @@ const reducers = {
       cacheKey: DataKeys
       loading: boolean
     }>,
-  ) => assocPath([loadingStoreKey, cacheKey], loading, state),
+  ) => {
+    console.count(`cacheReducers/setLoading/${cacheKey}`)
+    return assocPath([loadingStoreKey, cacheKey], loading, state)
+  },
+  setUpdating: (
+    state,
+    {
+      payload: { cacheKey, updating },
+    }: PayloadAction<{
+      cacheKey: DataKeys
+      updating: boolean
+    }>,
+  ) => {
+    console.count(`cacheReducers/setUpdating/${cacheKey}`)
+    return assocPath([updatingStoreKey, cacheKey], updating, state)
+  },
   addItem: <T extends Dictionary<any>>(
     state,
     {
@@ -81,6 +99,7 @@ const reducers = {
       item: T
     }>,
   ) => {
+    console.count(`cacheReducers/addItem/${cacheKey}`)
     const dataLens = lensPath([dataStoreKey, cacheKey])
 
     return over(dataLens, append(mergeLeft(params, item)))(state)
@@ -96,6 +115,7 @@ const reducers = {
       item: T
     }>,
   ) => {
+    console.count(`cacheReducers/updateItem/${cacheKey}`)
     const dataLens = lensPath([dataStoreKey, cacheKey])
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
@@ -112,6 +132,7 @@ const reducers = {
       payload: { uniqueIdentifier, cacheKey, params },
     }: PayloadAction<{ uniqueIdentifier: string | string[]; params: ParamsType; cacheKey: string }>,
   ) => {
+    console.count(`cacheReducers/removeItem/${cacheKey}`)
     const dataLens = lensPath([dataStoreKey, cacheKey])
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
@@ -133,6 +154,7 @@ const reducers = {
       items: T[]
     }>,
   ) => {
+    console.count(`cacheReducers/upsertAll/${cacheKey}`)
     const dataLens = lensPath([dataStoreKey, cacheKey])
     const paramsLens = lensPath([paramsStoreKey, cacheKey])
     const uniqueIdentifierStrPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier) : emptyArr
@@ -170,6 +192,7 @@ const reducers = {
       payload: { cacheKey, params, items },
     }: PayloadAction<{ cacheKey: string; params?: ParamsType; items: T[] }>,
   ) => {
+    console.count(`cacheReducers/replaceAll/${cacheKey}`)
     const dataPath = [dataStoreKey, cacheKey]
     const paramsPath = [paramsStoreKey, cacheKey]
 
@@ -181,6 +204,7 @@ const reducers = {
   },
   clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKeys }>>) => {
     const cacheKey = action?.payload?.cacheKey
+    console.count(`cacheReducers/clearCache/${cacheKey}`)
     return cacheKey
       ? pipe<CacheState, CacheState, CacheState, CacheState>(
           dissocPath([dataStoreKey, cacheKey]),

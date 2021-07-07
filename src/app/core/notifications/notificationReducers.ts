@@ -49,6 +49,7 @@ const {
         silent?: boolean
       }>,
     ) => {
+      console.count('notificationReducers/registerNotification')
       const { notifications, unreadCount } = state
       const addNotification = pipe<Notification[], Notification[], Notification[]>(
         take(maxNotifications - 1),
@@ -67,12 +68,14 @@ const {
       }
     },
     markAsRead: (state) => {
+      console.count('notificationReducers/markAsRead')
       return {
         ...state,
         unreadCount: 0,
       }
     },
     clearNotifications: () => {
+      console.count('notificationReducers/clearNotifications')
       return initialState
     },
   },

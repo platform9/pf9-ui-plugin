@@ -42,7 +42,9 @@ export const podsSelector = createSelector(
   ],
   (rawPods, clusters, importedClusters, qbertEndpoint) => {
     // associate nodes with the combinedHost entry
-    return pipe<IDataKeys[DataKeys.Pods], IPodSelector[], IPodSelector[]>(
+    console.count('podsSelector')
+    const start = performance.now()
+    const pipedResult = pipe<IDataKeys[DataKeys.Pods], IPodSelector[], IPodSelector[]>(
       // Filter by namespace
       map((pod) => {
         const { clusterId } = pod
@@ -89,10 +91,13 @@ export const podsSelector = createSelector(
       }),
       filter(complement(isNil)),
     )(rawPods)
+    const end = performance.now()
+    console.log(`podsSelector: ${end - start}`)
+    return pipedResult
   },
 )
 
-export const makePodsSelector = (defaultParams = {}) => {
+export const makePodsSelector = (defaultParams = emptyObj) => {
   return createSelector(
     [podsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (pods, params) => {
@@ -114,7 +119,9 @@ export const deploymentsSelector = createSelector(
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawDeployments, pods, clusters, importedClusters, qbertEndpoint) => {
-    return rawDeployments
+    console.count('deploymentsSelector')
+    const start = performance.now()
+    const pipedResult = rawDeployments
       .map((rawDeployment) => {
         const { clusterId } = rawDeployment
         const allClusters = [...clusters, ...importedClusters]
@@ -159,6 +166,9 @@ export const deploymentsSelector = createSelector(
         }
       })
       .filter(complement(isNil))
+    const end = performance.now()
+    console.log(`deploymentsSelector: ${end - start}`)
+    return pipedResult
   },
 )
 
@@ -183,7 +193,9 @@ export const serviceSelectors = createSelector(
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawServices, clusters, importedClusters, qbertEndpoint) => {
-    return rawServices
+    console.count('serviceSelectors')
+    const start = performance.now()
+    const pipedResult = rawServices
       .map((service) => {
         const { clusterId } = service
         const allClusters = [...clusters, ...importedClusters]
@@ -235,6 +247,9 @@ export const serviceSelectors = createSelector(
         }
       })
       .filter(complement(isNil))
+    const end = performance.now()
+    console.log(`deploymentsSelector: ${end - start}`)
+    return pipedResult
   },
 )
 
