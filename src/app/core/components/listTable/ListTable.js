@@ -61,6 +61,9 @@ const styles = (theme) => ({
     '&.Mui-selected': {
       backgroundColor: theme.palette.blue[100],
     },
+    '& .MuiTableCell-body': {
+      whiteSpace: 'nowrap',
+    },
     '&.Mui-selected:hover': {
       backgroundColor: [theme.palette.blue[100], '!important'],
     },
