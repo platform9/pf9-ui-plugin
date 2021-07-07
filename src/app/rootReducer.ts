@@ -11,7 +11,7 @@ import themeReducers, { customThemeKey } from 'core/session/themeReducers'
 const persistCacheConfig = {
   key: cacheStoreKey,
   storage,
-  blacklist: ['loadingData'],
+  blacklist: ['loadingData', 'cachedData'],
 }
 
 const rootReducer = combineReducers({
