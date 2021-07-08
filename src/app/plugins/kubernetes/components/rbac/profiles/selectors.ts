@@ -5,6 +5,34 @@ import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { determineProfileResources } from './helpers'
 
+export const rbacProfileBindingsSelector = createSelector(
+  [getDataSelector(DataKeys.RbacProfileBindings)],
+  (profileBindings) => {
+    return profileBindings.map((binding) => {
+      return {
+        ...binding,
+        id: binding.metadata.uid,
+        name: binding.metadata.name,
+      }
+    })
+  },
+)
+
+export const makeRbacProfileBindingsSelector = (
+  defaultParams = {
+    orderBy: 'name',
+    orderDirection: 'asc',
+  },
+) => {
+  return createSelector(
+    [rbacProfileBindingsSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (rbacProfileBindings, params) => {
+      const { orderBy, orderDirection } = params
+      return pipe(createSorter({ orderBy, orderDirection }))(rbacProfileBindings)
+    },
+  )
+}
+
 const determineProfileAction = (profile) => {
   const status = profile.status.phase
   if (status === 'published') {
@@ -18,12 +46,15 @@ const determineProfileAction = (profile) => {
 export const rbacProfilesSelector = createSelector(
   [
     getDataSelector(DataKeys.RbacProfiles),
-    getDataSelector(DataKeys.RbacProfileBindings),
+    rbacProfileBindingsSelector,
     getDataSelector(DataKeys.Clusters),
   ],
   (rbacProfiles, profileBindings, clusters) => {
     return rbacProfiles.map((profile) => {
-      const matchingBindings = profileBindings.filter((binding) => {
+      const nonDryrunBindings = profileBindings.filter((binding) => {
+        return !binding.spec.dryRun
+      })
+      const matchingBindings = nonDryrunBindings.filter((binding) => {
         return binding.spec.profileRef.split('default/')[1] === profile.metadata.name
       })
       const bindingClusters = matchingBindings.map((binding) => {
@@ -49,8 +80,8 @@ export const rbacProfilesSelector = createSelector(
 
 export const makeRbacProfilesSelector = (
   defaultParams = {
-    orderBy: 'created_at',
-    orderDirection: 'desc',
+    orderBy: 'name',
+    orderDirection: 'asc',
   },
 ) => {
   return createSelector(

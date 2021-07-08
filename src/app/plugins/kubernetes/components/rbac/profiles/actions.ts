@@ -2,7 +2,12 @@ import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { makeRbacProfilesSelector, rbacProfilesSelector } from './selectors'
+import {
+  makeRbacProfileBindingsSelector,
+  makeRbacProfilesSelector,
+  rbacProfileBindingsSelector,
+  rbacProfilesSelector,
+} from './selectors'
 import uuid from 'uuid'
 import { trackEvent } from 'utils/tracking'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -18,7 +23,8 @@ export const rbacProfileActions = createCRUDActions(ActionDataKeys.RbacProfiles,
       qbert.getRbacProfiles(),
       // Make sure to fetch dependent caches
       clusterActions.list(),
-      rbacProfileBindingsActions.list(),
+      // profile bindings need to be refreshed alongside profiles
+      rbacProfileBindingsActions.list({}, true),
     ])
     return profiles
   },
@@ -68,8 +74,7 @@ export const rbacProfileActions = createCRUDActions(ActionDataKeys.RbacProfiles,
 export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacProfileBindings, {
   listFn: async () => {
     Bugsnag.leaveBreadcrumb('Attempting to get rbac profile bindings')
-    const response = await qbert.getRbacProfileBindings()
-    return response
+    return await qbert.getRbacProfileBindings()
   },
   createFn: async ({ cluster, profileName }) => {
     const clusterId = cluster[0].uuid
@@ -98,9 +103,12 @@ export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacP
   },
   deleteFn: async ({ name }, currentItems) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile binding')
+    return await qbert.deleteRbacProfileBinding(name)
   },
   uniqueIdentifier,
   entityName: 'RbacProfileBinding',
+  selector: rbacProfileBindingsSelector,
+  selectorCreator: makeRbacProfileBindingsSelector,
 })
 
 export const patchRbacProfile = async (name, body) => {

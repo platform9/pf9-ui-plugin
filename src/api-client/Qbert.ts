@@ -1362,7 +1362,7 @@ class Qbert extends ApiService {
 
   deleteRbacProfile = async (name) => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofiles/${name}`
-    await this.client.basicDelete({
+    return await this.client.basicDelete({
       url,
       version: 'v4',
       options: {
@@ -1397,6 +1397,18 @@ class Qbert extends ApiService {
       },
     })
     return response
+  }
+
+  deleteRbacProfileBinding = async (name) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings/${name}`
+    return await this.client.basicDelete({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteRbacProfileBinding',
+      },
+    })
   }
 
   /* Managed Apps */

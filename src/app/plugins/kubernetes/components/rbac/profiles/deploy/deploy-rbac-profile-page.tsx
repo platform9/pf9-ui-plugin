@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'core/utils/routes'
@@ -19,6 +19,7 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { cloudProviderTypes } from 'k8s/components/infrastructure/cloudProviders/selectors'
 import { capitalizeString } from 'utils/misc'
 import useDataUpdater from 'core/hooks/useDataUpdater'
+import { customValidator, requiredValidator } from 'core/utils/fieldValidators'
 
 const useStyles = makeStyles((theme: Theme) => ({
   wizardMeta: {
@@ -65,6 +66,8 @@ const profileCalloutFields = [
   'clusterRoleBindings',
 ]
 
+const renderActiveProfile = (hasBinding) => <span>{hasBinding ? 'Yes' : 'No'}</span>
+
 const columns = [
   { id: 'name', label: 'Name' },
   { id: 'kubeRoleVersion', label: 'Version' },
@@ -72,6 +75,11 @@ const columns = [
     id: 'cloudProviderType',
     label: 'Cloud Provider',
     render: (type) => cloudProviderTypes[type] || capitalizeString(type),
+  },
+  {
+    id: 'hasBinding',
+    label: 'Active Profile',
+    render: renderActiveProfile,
   },
   {
     id: 'enableProfileAgent',
@@ -113,6 +121,17 @@ const renderProfileCalloutFields = () => (fields) => {
   )
 }
 
+const clusterValidations = [
+  requiredValidator,
+  customValidator((clusters) => {
+    if (!clusters.length) {
+      return false
+    }
+    const cluster = clusters[0]
+    return !cluster.hasBinding
+  }, 'Selected cluster may not have an active profile binding. You can delete the profile binding by managing bindings on the RBAC profiles view.'),
+]
+
 const DeployRbacProfilePage = () => {
   const classes = useStyles({})
   const { history, match } = useReactRouter()
@@ -120,8 +139,21 @@ const DeployRbacProfilePage = () => {
   const [profiles, profilesLoading] = useDataLoader(rbacProfileActions.list)
   // When wireframes are finalized for how to manage active profiles,
   // add below back in and display that info in the clusters list
-  const [, , refreshProfileBindings] = useDataLoader(rbacProfileBindingsActions.list)
   const [clusters, clustersLoading] = useDataLoader(clusterActions.list)
+  const mappedClusters = useMemo(() => {
+    if (clusters.length && profiles.length) {
+      return clusters.map((cluster) => {
+        const clusterProfile = profiles.find((profile) =>
+          profile.bindings.find((binding) => binding.spec.clusterRef === cluster.uuid),
+        )
+        return {
+          ...cluster,
+          hasBinding: !!clusterProfile,
+        }
+      })
+    }
+    return clusters
+  }, [clusters, profiles])
   const profile = useMemo(() => profiles.find(propEq('name', profileName)), [profiles, profileName])
 
   const initialContext = useMemo(() => {
@@ -140,10 +172,6 @@ const DeployRbacProfilePage = () => {
     rbacProfileBindingsActions.create,
     onComplete,
   )
-
-  useEffect(() => {
-    refreshProfileBindings(true)
-  }, [])
 
   return (
     <FormWrapper
@@ -185,14 +213,14 @@ const DeployRbacProfilePage = () => {
                   </Text>
                   <ListTableField
                     id="cluster"
-                    data={clusters}
+                    data={mappedClusters}
                     loading={clustersLoading}
                     columns={columns}
                     onChange={(value) => setWizardContext({ cluster: value })}
                     value={wizardContext.cluster}
                     checkboxCond={profileAgentInstalled}
                     uniqueIdentifier="uuid"
-                    required
+                    validations={clusterValidations}
                   />
                 </ValidatedForm>
               </WizardStep>
