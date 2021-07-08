@@ -106,7 +106,10 @@ const RolesStep = ({ wizardContext, setWizardContext }) => {
   const classes = useStyles()
   const [selectedRows, setSelectedRows] = useState(emptyArr)
   const { params, getParamsUpdater } = useParams(defaultParams)
-  const [data, loading, reload] = useDataLoader(roleActions.list, params)
+  const [data, loading, reload] = useDataLoader(roleActions.list, {
+    ...params,
+    clusterId: wizardContext.baseCluster,
+  })
   const refetch = useCallback(() => reload(true), [reload])
   const handleSelect = useCallback((rows) => {
     setSelectedRows(rows)
