@@ -73,8 +73,12 @@ const reducers = {
       loading: boolean
     }>,
   ) => {
-    console.count(`cacheReducers/setLoading/${cacheKey}`)
-    return assocPath([loadingStoreKey, cacheKey], loading, state)
+    const name = `cacheReducers/setLoading/${cacheKey}`
+    console.time(name)
+    console.count(name)
+    const result = assocPath([loadingStoreKey, cacheKey], loading, state)
+    console.timeEnd(name)
+    return result
   },
   setUpdating: (
     state,
@@ -85,8 +89,12 @@ const reducers = {
       updating: boolean
     }>,
   ) => {
-    console.count(`cacheReducers/setUpdating/${cacheKey}`)
-    return assocPath([updatingStoreKey, cacheKey], updating, state)
+    const name = `cacheReducers/setUpdating/${cacheKey}`
+    console.time(name)
+    console.count(name)
+    const result = assocPath([updatingStoreKey, cacheKey], updating, state)
+    console.timeEnd(name)
+    return result
   },
   addItem: <T extends Dictionary<any>>(
     state,
@@ -99,10 +107,13 @@ const reducers = {
       item: T
     }>,
   ) => {
-    console.count(`cacheReducers/addItem/${cacheKey}`)
+    const name = `cacheReducers/addItem/${cacheKey}`
+    console.time(name)
+    console.count(name)
     const dataLens = lensPath([dataStoreKey, cacheKey])
-
-    return over(dataLens, append(mergeLeft(params, item)))(state)
+    const result = over(dataLens, append(mergeLeft(params, item)))(state)
+    console.timeEnd(name)
+    return result
   },
   updateItem: <T extends Dictionary<any>>(
     state,
@@ -115,16 +126,20 @@ const reducers = {
       item: T
     }>,
   ) => {
-    console.count(`cacheReducers/updateItem/${cacheKey}`)
+    const name = `cacheReducers/updateItem/${cacheKey}`
+    console.time(name)
+    console.count(name)
     const dataLens = lensPath([dataStoreKey, cacheKey])
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
     // TODO: fix adjustWith typings
-    return over(
+    const result = over(
       dataLens,
       // @ts-ignore
       adjustWith(matchIdentifiers, mergeLeft(item)),
     )(state)
+    console.timeEnd(name)
+    return result
   },
   removeItem: (
     state,
@@ -132,16 +147,21 @@ const reducers = {
       payload: { uniqueIdentifier, cacheKey, params },
     }: PayloadAction<{ uniqueIdentifier: string | string[]; params: ParamsType; cacheKey: string }>,
   ) => {
-    console.count(`cacheReducers/removeItem/${cacheKey}`)
+    const name = `cacheReducers/removeItem/${cacheKey}`
+    console.time(name)
+    console.count(name)
+
     const dataLens = lensPath([dataStoreKey, cacheKey])
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
     // TODO: fix removeWith typings
-    return over(
+    const result = over(
       dataLens,
       // @ts-ignore
       removeWith(matchIdentifiers),
     )(state)
+    console.timeEnd(name)
+    return result
   },
   upsertAll: <T extends Dictionary<any>>(
     state,
@@ -154,7 +174,10 @@ const reducers = {
       items: T[]
     }>,
   ) => {
-    console.count(`cacheReducers/upsertAll/${cacheKey}`)
+    const name = `cacheReducers/upsertAll/${cacheKey}`
+    console.time(name)
+    console.count(name)
+
     const dataLens = lensPath([dataStoreKey, cacheKey])
     const paramsLens = lensPath([paramsStoreKey, cacheKey])
     const uniqueIdentifierStrPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier) : emptyArr
@@ -165,7 +188,7 @@ const reducers = {
     // @ts-ignore
     const upsertNewItems = pipe(arrayIfNil, upsertAllBy(matchUniqueIdentifiers, items))
 
-    return pipe(
+    const result = pipe(
       over(dataLens, upsertNewItems),
       // I params are provided, add them to cachedParams so that
       // we know this query has already been resolved
@@ -185,6 +208,8 @@ const reducers = {
           : identity,
       ),
     )(state)
+    console.timeEnd(name)
+    return result
   },
   replaceAll: <T extends Dictionary<any>>(
     state,
@@ -192,26 +217,35 @@ const reducers = {
       payload: { cacheKey, params, items },
     }: PayloadAction<{ cacheKey: string; params?: ParamsType; items: T[] }>,
   ) => {
-    console.count(`cacheReducers/replaceAll/${cacheKey}`)
+    const name = `cacheReducers/replaceAll/${cacheKey}`
+    console.time(name)
+    console.count(name)
+
     const dataPath = [dataStoreKey, cacheKey]
     const paramsPath = [paramsStoreKey, cacheKey]
 
-    return pipe<CacheState, CacheState, CacheState>(
+    const result = pipe<CacheState, CacheState, CacheState>(
       assocPath(dataPath, items),
       // If params are provided, replace the cached params array with the new params
       params ? assocPath(paramsPath, of(params)) : identity,
     )(state)
+    console.timeEnd(name)
+    return result
   },
   clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKeys }>>) => {
     const cacheKey = action?.payload?.cacheKey
-    console.count(`cacheReducers/clearCache/${cacheKey}`)
-    return cacheKey
-      ? pipe<CacheState, CacheState, CacheState, CacheState>(
-          dissocPath([dataStoreKey, cacheKey]),
-          dissocPath([paramsStoreKey, cacheKey]),
-          dissocPath([loadingStoreKey, cacheKey]),
-        )(state)
-      : initialState
+    if (!cacheKey) return initialState
+    const name = `cacheReducers/clearCache/${cacheKey}`
+    console.time(name)
+    console.count(name)
+
+    const result = pipe<CacheState, CacheState, CacheState, CacheState>(
+      dissocPath([dataStoreKey, cacheKey]),
+      dissocPath([paramsStoreKey, cacheKey]),
+      dissocPath([loadingStoreKey, cacheKey]),
+    )(state)
+    console.timeEnd(name)
+    return result
   },
 }
 

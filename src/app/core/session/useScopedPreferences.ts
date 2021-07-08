@@ -25,8 +25,8 @@ const useScopedPreferences = <T extends Dictionary<any>>(
   const selectPrefsState = prop<string, PreferencesState>(preferencesStoreKey)
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const allPrefs = useSelector(selectPrefsState)
-  const { username, userDetails = emptyObj } = useSelector(selectSessionState)
-  const { id } = userDetails
+  const { username, userDetails } = useSelector(selectSessionState)
+  const { id } = userDetails || emptyObj
   const prefs = useMemo<Partial<T>>(
     () => ({
       ...(defaultPrefs || {}),

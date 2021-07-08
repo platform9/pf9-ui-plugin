@@ -87,8 +87,8 @@ const DashboardPage = () => {
     features,
   } = session
   const classes = useStyles()
+  const isDeccoEnv = isDecco(features)
   useEffect(() => {
-    const isDeccoEnv = isDecco(features)
     if (isDeccoEnv && !isInitialized && !cardOrder.length) {
       updateUserDefaults(UserPreferences.Dashboard, {
         isInitialized: true,
@@ -96,7 +96,7 @@ const DashboardPage = () => {
         addedCards: baseCards,
       })
     }
-  }, [features, isInitialized, cardOrder])
+  }, [isDeccoEnv, isInitialized, cardOrder])
   // To avoid missing API errors for ironic region UX-751
   const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
   const handleEditDashboard = useCallback(() => {
@@ -122,7 +122,7 @@ const DashboardPage = () => {
         <Text id="dashboard-title" variant="h5">
           Welcome{displayName ? ` ${displayName}` : ''}!
         </Text>
-        <IconButton icon="pencil" onClick={handleEditDashboard} />
+        {false && isDeccoEnv && <IconButton icon="pencil" onClick={handleEditDashboard} />}
         {kubeRegion && (
           <div className={classes.dashboardMosaic} style={mosaicStyle}>
             {cards}

@@ -2,8 +2,8 @@ import {
   Dictionary,
   either,
   equals,
-  filter,
   find,
+  isEmpty,
   isNil,
   pathOr,
   pickAll,
@@ -18,6 +18,7 @@ import {
   ensureArray,
   isNilOrEmpty,
   emptyObj,
+  filterIf,
 } from 'app/utils/fp'
 import { allKey } from 'app/constants'
 import { cacheStoreKey, dataStoreKey, paramsStoreKey } from 'core/caching/cacheReducers'
@@ -59,7 +60,7 @@ const getDataSelector = <T extends keyof IDataKeys>(
           arrayIfNil,
           // Filter the data by the provided params
           // @ts-ignore
-          filter(whereEq(providedIndexedParams)),
+          filterIf(!isEmpty(providedIndexedParams), whereEq(providedIndexedParams)),
           // Return the constant emptyArr to avoid unnecessary re-renderings
           arrayIfEmpty,
         )(storeData)

@@ -1,6 +1,11 @@
 import { combineReducers } from 'redux'
 import sessionReducers, { sessionStoreKey } from 'core/session/sessionReducers'
-import cacheReducers, { cacheStoreKey } from 'core/caching/cacheReducers'
+import cacheReducers, {
+  cacheStoreKey,
+  loadingStoreKey,
+  dataStoreKey,
+  updatingStoreKey,
+} from 'core/caching/cacheReducers'
 import notificationReducers, { notificationStoreKey } from 'core/notifications/notificationReducers'
 import preferencesReducers, { preferencesStoreKey } from 'core/session/preferencesReducers'
 import clientReducers, { clientStoreKey } from 'core/client/clientReducers'
@@ -11,7 +16,7 @@ import themeReducers, { customThemeKey } from 'core/session/themeReducers'
 const persistCacheConfig = {
   key: cacheStoreKey,
   storage,
-  blacklist: ['loadingData', 'cachedData'],
+  blacklist: [loadingStoreKey, dataStoreKey, updatingStoreKey],
 }
 
 const rootReducer = combineReducers({

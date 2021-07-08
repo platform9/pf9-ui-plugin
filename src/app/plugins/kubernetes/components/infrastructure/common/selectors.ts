@@ -6,6 +6,7 @@ import getDataSelector from 'core/utils/getDataSelector'
 import { HostByService, HostType } from './model'
 import { Host } from 'api-client/resmgr.model'
 import { emptyArr } from 'utils/fp'
+import logger from 'core/utils/logger'
 
 const getIpPreview = (ips: string[] | Readonly<string[]> = emptyArr) => {
   if (!Array.isArray(ips)) {
@@ -36,7 +37,7 @@ const getNetworkInterfaces = (node: Host) => {
 
 export const resMgrHostsSelector = createSelector(
   [getDataSelector<DataKeys.ResMgrHosts>(DataKeys.ResMgrHosts)],
-  (hosts) => {
+  logger('combinedHostsSelector', (hosts) => {
     return hosts.map((item) => {
       const extensions = item?.extensions
       return {
@@ -46,13 +47,13 @@ export const resMgrHostsSelector = createSelector(
         ovsBridges: extensions?.interfaces?.data.ovs_bridges || emptyArr,
       }
     })
-  },
+  }),
 )
 
 export const combinedHostsSelector = createSelector(
   getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
   resMgrHostsSelector,
-  (rawNodes, resMgrHosts) => {
+  logger('combinedHostsSelector', (rawNodes, resMgrHosts) => {
     const hostsById: {
       [key: string]: HostByService
     } = {}
@@ -67,5 +68,5 @@ export const combinedHostsSelector = createSelector(
 
     // Convert it back to array form
     return Object.values(hostsById).map(combineHost)
-  },
+  }),
 )
