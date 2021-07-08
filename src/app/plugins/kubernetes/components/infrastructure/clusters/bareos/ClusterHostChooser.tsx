@@ -210,7 +210,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
       hasError,
       errorMessage,
       pollForNodes = false,
-      selection = 'single',
+      selection,
       isSingleNodeCluster,
       showResourceRequirements = true,
     } = props
