@@ -26,10 +26,10 @@ import {
 import TextField from 'core/components/validatedForm/TextField'
 import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { loginUrl, imageUrlRoot } from 'app/constants'
+import { loginUrl } from 'app/constants'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { pathJoin } from 'utils/misc'
 import clsx from 'clsx'
+import FormPageContainer from 'core/containers/form-page-container'
 
 const styles = (theme) => ({
   page: {
@@ -286,80 +286,62 @@ const ResetPasswordPage: React.FC<Props> = (props) => {
 
   return (
     <>
-      <section id={`reset-password-page`} className={clsx('reset-password-page', classes.page)}>
-        <img
-          alt="Platform9"
-          src={pathJoin(imageUrlRoot, 'primary-logo.svg')}
-          className={classes.logo}
-        />
-        <article className={classes.container}>
-          <div className={clsx('left-pane', classes.managementPlane)}>
-            <img
-              alt="Platform9 Management Plane"
-              src={pathJoin(imageUrlRoot, 'management-plane.svg')}
-              className={classes.img}
-            />
-          </div>
-          <div className={clsx('right-pane', classes.formPane)}>
-            <ValidatedForm elevated={false} onSubmit={handleFormSubmit}>
-              {({ values }) => (
+      <FormPageContainer>
+        <ValidatedForm elevated={false} onSubmit={handleFormSubmit}>
+          {({ values }) => (
+            <>
+              <Text variant="h3" className={classes.formTitle} align="center">
+                Reset Password
+              </Text>
+              {!params.isResetPasswordSuccessful ? (
+                <div className={classes.fields}>
+                  <TextField
+                    disabled
+                    id="email"
+                    label="Email"
+                    type="email"
+                    placeholder="Email"
+                    value={params.emailId}
+                    className={clsx(classes.textField, classes.emailInput)}
+                  />
+                  <TextField
+                    required
+                    id="newPassword"
+                    label="New Password"
+                    type={params.isNewPasswordMasked ? 'text' : 'password'}
+                    validations={passwordValidators}
+                    onChange={getParamsUpdater('newPassword')}
+                    InputProps={renderPasswordMask('isNewPasswordMasked')}
+                    className={classes.textField}
+                  />
+                  <TextField
+                    required
+                    id="confirmPassword"
+                    label="Confirm Password"
+                    type={params.isConfirmPasswordMasked ? 'text' : 'password'}
+                    validations={confirmPasswordValidator}
+                    onChange={getParamsUpdater('confirmPassword')}
+                    InputProps={renderPasswordMask('isConfirmPasswordMasked')}
+                    className={classes.textField}
+                  />
+                  <div className={classes.passwordValidation}>
+                    {renderPasswordValidationCheck(values)}
+                  </div>
+                  {params.isError && <Alert small variant="error" message={params.errorMessage} />}
+                  <SubmitButton label="Reset my password" />
+                </div>
+              ) : (
                 <>
-                  <Text variant="h3" className={classes.formTitle} align="center">
-                    Reset Password
+                  <Text className={classes.paragraph} component="p">
+                    Your password has been reset successfully.
                   </Text>
-                  {!params.isResetPasswordSuccessful ? (
-                    <div className={classes.fields}>
-                      <TextField
-                        disabled
-                        id="email"
-                        label="Email"
-                        type="email"
-                        placeholder="Email"
-                        value={params.emailId}
-                        className={clsx(classes.textField, classes.emailInput)}
-                      />
-                      <TextField
-                        required
-                        id="newPassword"
-                        label="New Password"
-                        type={params.isNewPasswordMasked ? 'text' : 'password'}
-                        validations={passwordValidators}
-                        onChange={getParamsUpdater('newPassword')}
-                        InputProps={renderPasswordMask('isNewPasswordMasked')}
-                        className={classes.textField}
-                      />
-                      <TextField
-                        required
-                        id="confirmPassword"
-                        label="Confirm Password"
-                        type={params.isConfirmPasswordMasked ? 'text' : 'password'}
-                        validations={confirmPasswordValidator}
-                        onChange={getParamsUpdater('confirmPassword')}
-                        InputProps={renderPasswordMask('isConfirmPasswordMasked')}
-                        className={classes.textField}
-                      />
-                      <div className={classes.passwordValidation}>
-                        {renderPasswordValidationCheck(values)}
-                      </div>
-                      {params.isError && (
-                        <Alert small variant="error" message={params.errorMessage} />
-                      )}
-                      <SubmitButton label="Reset my password" />
-                    </div>
-                  ) : (
-                    <>
-                      <Text className={classes.paragraph} component="p">
-                        Your password has been reset successfully.
-                      </Text>
-                      <SubmitButton label="Return to login screen" />
-                    </>
-                  )}
+                  <SubmitButton label="Return to login screen" />
                 </>
               )}
-            </ValidatedForm>
-          </div>
-        </article>
-      </section>
+            </>
+          )}
+        </ValidatedForm>
+      </FormPageContainer>
     </>
   )
 }
