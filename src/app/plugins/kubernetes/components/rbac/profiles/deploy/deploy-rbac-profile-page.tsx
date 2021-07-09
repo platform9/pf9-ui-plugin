@@ -4,7 +4,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'core/utils/routes'
 import useReactRouter from 'use-react-router'
 import { rbacProfileBindingsActions, rbacProfileActions } from '../actions'
-import { propEq } from 'ramda'
+import { indexBy, path, propEq } from 'ramda'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardMeta from 'core/components/wizard/WizardMeta'
@@ -142,13 +142,17 @@ const DeployRbacProfilePage = () => {
   const [clusters, clustersLoading] = useDataLoader(clusterActions.list)
   const mappedClusters = useMemo(() => {
     if (clusters.length && profiles.length) {
+      const allBindings = profiles
+        .map((profile) => {
+          return profile.bindings
+        })
+        .flat()
+      // @ts-ignore path complaining about typing, remove ignore after models attached
+      const bindingsByClusterId = indexBy(path(['spec', 'clusterRef']), allBindings)
       return clusters.map((cluster) => {
-        const clusterProfile = profiles.find((profile) =>
-          profile.bindings.find((binding) => binding.spec.clusterRef === cluster.uuid),
-        )
         return {
           ...cluster,
-          hasBinding: !!clusterProfile,
+          hasBinding: !!bindingsByClusterId[cluster.uuid],
         }
       })
     }
