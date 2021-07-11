@@ -63,6 +63,9 @@ const styles = (theme) => ({
     },
     '& .MuiTableCell-body': {
       whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      maxWidth: '120px',
+      overflow: 'hidden',
     },
     '&.Mui-selected:hover': {
       backgroundColor: [theme.palette.blue[100], '!important'],

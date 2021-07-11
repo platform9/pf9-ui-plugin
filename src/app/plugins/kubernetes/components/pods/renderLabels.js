@@ -15,7 +15,10 @@ const useStyles = makeStyles((theme) => ({
     gridTemplateColumns: 'max-content 1fr',
     gridGap: theme.spacing(2),
     '& > span': {
-      justifySelf: 'flex-start',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      maxWidth: '120px',
+      overflow: 'hidden',
       margin: 0,
     },
     '& b': {
