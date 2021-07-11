@@ -1,6 +1,5 @@
 import React from 'react'
 import useReactRouter from 'use-react-router'
-import { withStyles } from '@material-ui/styles'
 import { Button, List, InputAdornment } from '@material-ui/core'
 import Text from 'core/elements/text'
 import ListItem from '@material-ui/core/ListItem'
@@ -30,49 +29,10 @@ import { loginUrl } from 'app/constants'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
 import FormPageContainer from 'core/containers/form-page-container'
+import { makeStyles } from '@material-ui/styles'
+import Theme from 'core/themes/model'
 
-const styles = (theme) => ({
-  page: {
-    position: 'fixed',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.palette.grey[900],
-    display: 'flex',
-    flexFlow: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  container: {
-    width: 1120,
-    height: 600,
-    borderRadius: 16,
-    border: `solid 1px ${theme.palette.grey[500]}`,
-    display: 'grid',
-    gridTemplateColumns: '50% 50%',
-    overflow: 'hidden',
-  },
-  managementPlane: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 80px',
-  },
-  formPane: {
-    padding: '48px 24px 20px',
-    backgroundColor: theme.palette.grey[800],
-    display: 'grid',
-    gridTemplateRows: '1fr 45px',
-    alignItems: 'center',
-    justifyItems: 'center',
-    gridGap: theme.spacing(2),
-  },
-  '.MuiInputLabel-outlined.MuiInputLabel-shrink': {
-    label: {
-      color: theme.palette.blue[200],
-    },
-  },
+const useStyles = makeStyles((theme: Theme) => ({
   textField: {
     width: '280px !important',
     '& input': {
@@ -102,13 +62,6 @@ const styles = (theme) => ({
     color: theme.palette.grey[300],
     textAlign: 'center',
   },
-  img: {
-    maxWidth: '100%',
-  },
-  logo: {
-    width: 200,
-    marginBottom: theme.spacing(6),
-  },
   formTitle: {
     color: theme.palette.blue[200],
     fontWeight: 600,
@@ -131,11 +84,7 @@ const styles = (theme) => ({
   iconColor: {
     color: '#e6e6ea',
   },
-})
-
-interface Props {
-  classes: any
-}
+}))
 interface IState {
   loading: boolean
   isError: boolean
@@ -223,8 +172,8 @@ const renderPasswordValidationCheck: IPasswordValidationCheck = (passwordValue) 
   </Text>
 )
 
-const ResetPasswordPage: React.FC<Props> = (props) => {
-  const { classes } = props
+const ResetPasswordPage = () => {
+  const classes = useStyles({})
   const { history, location } = useReactRouter()
   const searchParams = new URLSearchParams(location.search)
   const emailId = searchParams.get('username')
@@ -251,7 +200,7 @@ const ResetPasswordPage: React.FC<Props> = (props) => {
   })
 
   const SubmitButton: React.FC<{ label: string }> = ({ label }) => (
-    <Button type="submit" className={classes.resetPwdButton} variant="contained" color="primary">
+    <Button type="submit" variant="contained" color="primary">
       {label}
     </Button>
   )
@@ -285,65 +234,63 @@ const ResetPasswordPage: React.FC<Props> = (props) => {
   }
 
   return (
-    <>
-      <FormPageContainer>
-        <ValidatedForm elevated={false} onSubmit={handleFormSubmit}>
-          {({ values }) => (
-            <>
-              <Text variant="h3" className={classes.formTitle} align="center">
-                Reset Password
-              </Text>
-              {!params.isResetPasswordSuccessful ? (
-                <div className={classes.fields}>
-                  <TextField
-                    disabled
-                    id="email"
-                    label="Email"
-                    type="email"
-                    placeholder="Email"
-                    value={params.emailId}
-                    className={clsx(classes.textField, classes.emailInput)}
-                  />
-                  <TextField
-                    required
-                    id="newPassword"
-                    label="New Password"
-                    type={params.isNewPasswordMasked ? 'text' : 'password'}
-                    validations={passwordValidators}
-                    onChange={getParamsUpdater('newPassword')}
-                    InputProps={renderPasswordMask('isNewPasswordMasked')}
-                    className={classes.textField}
-                  />
-                  <TextField
-                    required
-                    id="confirmPassword"
-                    label="Confirm Password"
-                    type={params.isConfirmPasswordMasked ? 'text' : 'password'}
-                    validations={confirmPasswordValidator}
-                    onChange={getParamsUpdater('confirmPassword')}
-                    InputProps={renderPasswordMask('isConfirmPasswordMasked')}
-                    className={classes.textField}
-                  />
-                  <div className={classes.passwordValidation}>
-                    {renderPasswordValidationCheck(values)}
-                  </div>
-                  {params.isError && <Alert small variant="error" message={params.errorMessage} />}
-                  <SubmitButton label="Reset my password" />
+    <FormPageContainer>
+      <ValidatedForm elevated={false} onSubmit={handleFormSubmit}>
+        {({ values }) => (
+          <>
+            <Text variant="h3" className={classes.formTitle} align="center">
+              Reset Password
+            </Text>
+            {!params.isResetPasswordSuccessful ? (
+              <div className={classes.fields}>
+                <TextField
+                  disabled
+                  id="email"
+                  label="Email"
+                  type="email"
+                  placeholder="Email"
+                  value={params.emailId}
+                  className={clsx(classes.textField, classes.emailInput)}
+                />
+                <TextField
+                  required
+                  id="newPassword"
+                  label="New Password"
+                  type={params.isNewPasswordMasked ? 'text' : 'password'}
+                  validations={passwordValidators}
+                  onChange={getParamsUpdater('newPassword')}
+                  InputProps={renderPasswordMask('isNewPasswordMasked')}
+                  className={classes.textField}
+                />
+                <TextField
+                  required
+                  id="confirmPassword"
+                  label="Confirm Password"
+                  type={params.isConfirmPasswordMasked ? 'text' : 'password'}
+                  validations={confirmPasswordValidator}
+                  onChange={getParamsUpdater('confirmPassword')}
+                  InputProps={renderPasswordMask('isConfirmPasswordMasked')}
+                  className={classes.textField}
+                />
+                <div className={classes.passwordValidation}>
+                  {renderPasswordValidationCheck(values)}
                 </div>
-              ) : (
-                <>
-                  <Text className={classes.paragraph} component="p">
-                    Your password has been reset successfully.
-                  </Text>
-                  <SubmitButton label="Return to login screen" />
-                </>
-              )}
-            </>
-          )}
-        </ValidatedForm>
-      </FormPageContainer>
-    </>
+                {params.isError && <Alert small variant="error" message={params.errorMessage} />}
+                <SubmitButton label="Reset my password" />
+              </div>
+            ) : (
+              <>
+                <Text className={classes.paragraph} component="p">
+                  Your password has been reset successfully.
+                </Text>
+                <SubmitButton label="Return to login screen" />
+              </>
+            )}
+          </>
+        )}
+      </ValidatedForm>
+    </FormPageContainer>
   )
 }
 
-export default withStyles(styles as any)(ResetPasswordPage)
+export default ResetPasswordPage
