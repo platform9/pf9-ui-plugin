@@ -75,12 +75,12 @@ interface Props {
 }
 
 const clusterAddons = [
-  'etcdBackup',
-  'enableMetallbLayer2',
-  'prometheusMonitoringEnabled',
-  'networkPluginOperator',
-  'kubevirtPluginOperator',
-  'profileAgent',
+  { addon: 'etcdBackup' },
+  { addon: 'enableMetallbLayer2' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'networkPluginOperator' },
+  { addon: 'kubevirtPluginOperator' },
+  { addon: 'profileAgent' },
 ]
 
 const advancedClusterAddons = [{ addon: 'enableTopologyManager' }]

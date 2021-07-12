@@ -175,7 +175,12 @@ const handleTemplateChoice = ({ setFieldValue }) => (option) => {
   })
 }
 
-const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileAgent']
+const configStepAddOns = [
+  { addon: 'etcdBackup' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'enableCAS' },
+  { addon: 'profileAgent' },
+]
 const advancedClusterAddons = [{ addon: 'enableTopologyManager' }]
 
 const useStyles = makeStyles<Theme>((theme) => ({
