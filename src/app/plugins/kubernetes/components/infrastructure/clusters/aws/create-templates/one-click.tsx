@@ -103,7 +103,7 @@ interface Props {
 
 const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles({})
-  const [prefs] = useScopedPreferences('defaults')
+  const { prefs } = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Aws] || {}, [prefs])
 
   const updateFqdns = (values) => (value, label) => {
@@ -211,7 +211,10 @@ const OneClickAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 disabled={wizardContext.usePf9Domain}
               />
 
-              <KubernetesVersion />
+              <KubernetesVersion
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+              />
             </FormFieldCard>
 
             <FormFieldCard title="Default Settings for New Cluster">

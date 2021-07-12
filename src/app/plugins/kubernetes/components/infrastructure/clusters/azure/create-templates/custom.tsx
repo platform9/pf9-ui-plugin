@@ -72,6 +72,7 @@ export const initialContext = {
   networkStack: 'ipv4',
   privileged: true,
   allowWorkloadsOnMaster: false,
+  enableProfileAgent: false,
 }
 
 const columns = [
@@ -174,12 +175,7 @@ const handleTemplateChoice = ({ setFieldValue }) => (option) => {
   })
 }
 
-const clusterAddons = [
-  { addon: 'etcdBackup' },
-  { addon: 'prometheusMonitoringEnabled' },
-  { addon: 'enableCAS' },
-]
-
+const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileAgent']
 const advancedClusterAddons = [{ addon: 'enableTopologyManager' }]
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -200,7 +196,7 @@ interface Props {
 
 const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
-  const [prefs] = useScopedPreferences('defaults')
+  const { prefs } = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Azure] || {}, [prefs])
 
   const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
@@ -314,7 +310,10 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
 
               <FormFieldCard title="Cluster Settings">
                 {/* Kubernetes Version */}
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <Divider className={classes.divider} />
 
@@ -336,7 +335,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <AddonTogglers
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={clusterAddons}
+                  addons={configStepAddOns}
                 />
               </FormFieldCard>
             </>
@@ -349,6 +348,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
         stepId="network"
         label="Network Info"
         onNext={azureClusterTracking.wZStepTwo(trackingFields)}
+        keepContentMounted={false}
       >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}

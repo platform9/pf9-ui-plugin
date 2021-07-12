@@ -62,7 +62,7 @@ class ResMgr extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/hosts/{hostId}/roles/{role}',
+    url: '/hosts/:hostId/roles/:role',
     type: 'PUT',
     params: ['hostId', 'role'],
   })
@@ -79,7 +79,7 @@ class ResMgr extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/hosts/{hostId}/roles/{role}',
+    url: '/hosts/:hostId/roles/:role',
     type: 'DELETE',
     params: ['hostId', 'role'],
   })
@@ -95,7 +95,7 @@ class ResMgr extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/hosts/{hostId}/roles/{role}',
+    url: '/hosts/:hostId/roles/:role',
     type: 'GET',
     params: ['hostId', 'role'],
   })
@@ -111,7 +111,7 @@ class ResMgr extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/hosts/{hostId}',
+    url: '/hosts/:hostId',
     type: 'DELETE',
     params: ['hostId'],
   })
@@ -126,7 +126,7 @@ class ResMgr extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({ url: '/services/{service}', type: 'GET', params: ['service'] })
+  @trackApiMethodMetadata({ url: '/services/:service', type: 'GET', params: ['service'] })
   async getService(service) {
     const url = `/services/${service}`
     return this.client.basicGet({
@@ -139,7 +139,7 @@ class ResMgr extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/services/{service}',
+    url: '/services/:service',
     type: 'PUT',
     params: ['service'],
   })

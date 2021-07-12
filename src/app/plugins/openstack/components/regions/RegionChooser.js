@@ -19,7 +19,8 @@ const RegionChooser = (props) => {
   const { history, location } = useReactRouter()
   const { pathname, hash = '' } = location
   const [tooltipOpen, setTooltipOpen] = useState(false)
-  const [{ currentTenant, currentRegion }, updatePrefs] = useScopedPreferences()
+  const { prefs, updatePrefs } = useScopedPreferences()
+  const { currentTenant, currentRegion } = prefs
   const [loading, setLoading] = useState(false)
   const [regionSearch, setSearchText] = useState('')
   const [regions, loadingRegions, reloadRegions] = useDataLoader(regionActions.list)

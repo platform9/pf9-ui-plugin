@@ -4,11 +4,12 @@ import { routes } from 'core/utils/routes'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { rbacProfileActions } from './actions'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { makeStyles } from '@material-ui/core'
+import { makeStyles, Tooltip } from '@material-ui/core'
 import Theme from 'core/themes/model'
 import Button from 'core/elements/button'
 import ProfilePublishDialog from './profile-publish-dialog'
 import SimpleLink from 'core/components/SimpleLink'
+import Text from 'core/elements/text'
 
 interface Params {
   status?: string
@@ -49,6 +50,97 @@ const renderStatus = (status) => {
   )
 }
 
+const TypesTableCell = ({ profile }) => {
+  return (
+    <>
+      {!!profile.roles.length && (
+        <div>
+          <Tooltip
+            title={
+              <>
+                {profile.roles.map((role) => (
+                  <Text variant="body2">{role}</Text>
+                ))}
+              </>
+            }
+          >
+            <SimpleLink src="">Role</SimpleLink>
+          </Tooltip>
+        </div>
+      )}
+      {!!profile.clusterRoles.length && (
+        <div>
+          <Tooltip
+            title={
+              <>
+                {profile.clusterRoles.map((clusterRole) => (
+                  <Text variant="body2">{clusterRole}</Text>
+                ))}
+              </>
+            }
+          >
+            <SimpleLink src="">Cluster Role</SimpleLink>
+          </Tooltip>
+        </div>
+      )}
+      {!!profile.roleBindings.length && (
+        <div>
+          <Tooltip
+            title={
+              <>
+                {profile.roleBindings.map((roleBinding) => (
+                  <Text variant="body2">{roleBinding}</Text>
+                ))}
+              </>
+            }
+          >
+            <SimpleLink src="">Role Binding</SimpleLink>
+          </Tooltip>
+        </div>
+      )}
+      {!!profile.clusterRoleBindings.length && (
+        <div>
+          <Tooltip
+            title={
+              <>
+                {profile.clusterRoleBindings.map((clusterRoleBinding) => (
+                  <Text variant="body2">{clusterRoleBinding}</Text>
+                ))}
+              </>
+            }
+          >
+            <SimpleLink src="">Cluster Role Binding</SimpleLink>
+          </Tooltip>
+        </div>
+      )}
+    </>
+  )
+}
+
+const renderTypes = (_, profile) => <TypesTableCell profile={profile} />
+
+const renderClusters = (clusters) => {
+  return (
+    <>
+      {clusters.length ? (
+        <Tooltip
+          title={
+            <>
+              {clusters.map((cluster) => (
+                <Text variant="body2">{cluster.name}</Text>
+              ))}
+            </>
+          }
+        >
+          <SimpleLink src="">{clusters.length}</SimpleLink>
+        </Tooltip>
+      ) : (
+        '-'
+      )}
+    </>
+  )
+}
+
 const ProfileActionButton = ({ profile }) => {
   const classes = useStyles({})
   if (profile.action === 'deploy') {
@@ -77,7 +169,8 @@ export const options = {
   columns: [
     { id: 'metadata.name', label: 'Name' },
     { id: 'status.phase', label: 'Status', render: renderStatus },
-    { id: 'metadata.uid', label: 'Unique ID' },
+    { id: 'clusters', label: 'Active Clusters', render: renderClusters },
+    { id: 'roles', label: 'Types', render: renderTypes },
     { id: 'action', label: 'Action', render: renderActionButton },
   ],
   cacheKey: ActionDataKeys.RbacProfiles,
@@ -90,7 +183,24 @@ export const options = {
   uniqueIdentifier: 'name',
   searchTargets: ['metadata.name'],
   multiSelection: false,
+  pollingInterval: 1000 * 30,
+  pollingCondition: (data) => {
+    return !!data.find((profile) => {
+      return profile.status.phase === 'creating'
+    })
+  },
+  batchActions: [
+    {
+      icon: 'tasks',
+      label: 'Manage Bindings',
+      routeTo: (rows) => routes.rbac.profiles.deleteBindings.path({ name: rows[0].name }),
+    },
+  ],
 }
+
+// Try to: Add polling to createCRUDComponents
+// Add conditional polling to PollingData
+// Pass through conditional polling conditions through createCRUDComponents
 
 const components = createCRUDComponents(options)
 export default components.ListPage

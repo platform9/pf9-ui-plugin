@@ -1,5 +1,5 @@
 import WizardStep from 'core/components/wizard/WizardStep'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import ProfileSummaryBox from 'k8s/components/rbac/profiles/create/profile-summary-box'
 import ListTable from 'core/components/listTable/ListTable'
 import useParams from 'core/hooks/useParams'
@@ -17,16 +17,11 @@ const defaultParams = {
   masterNodeClusters: true,
   clusterId: allKey,
 }
-const columns = [
-  { id: 'id', display: false },
-  { id: 'name', label: 'Name' },
-  { id: 'clusterName', label: 'Cluster' },
-  { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
-]
-const visibleColumns = ['name', 'clusterName', 'created']
-const columnsOrder = ['name', 'clusterName', 'created']
+const visibleColumns = ['name', 'created']
+const columnsOrder = ['name', 'created']
 const orderBy = 'name'
 const orderDirection = 'asc'
+const searchTargets = ['name']
 
 export const ClusterRoleBindingsListTable = ({
   data,
@@ -36,11 +31,20 @@ export const ClusterRoleBindingsListTable = ({
   selectedRows = emptyArr,
   ...rest
 }) => {
+  const columns = useMemo(
+    () => [
+      { id: 'id', display: false },
+      { id: 'name', label: 'Name' },
+      { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
+    ],
+    [],
+  )
+
   return (
     <ListTable
       uniqueIdentifier={'id'}
       canEditColumns={false}
-      showPagination={false}
+      searchTargets={searchTargets}
       data={data}
       onReload={onReload}
       loading={loading}
@@ -61,7 +65,10 @@ const ClusterRoleBindingsStep = ({ wizardContext, setWizardContext }) => {
   const classes = useStyles()
   const [selectedRows, setSelectedRows] = useState(emptyArr)
   const { params } = useParams(defaultParams)
-  const [data, loading, reload] = useDataLoader(clusterRoleBindingActions.list, params)
+  const [data, loading, reload] = useDataLoader(clusterRoleBindingActions.list, {
+    ...params,
+    clusterId: wizardContext.baseCluster,
+  })
   const refetch = useCallback(() => reload(true), [reload])
   const handleSelect = useCallback((rows) => {
     setSelectedRows(rows)

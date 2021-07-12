@@ -36,6 +36,7 @@ import { isEqual } from 'lodash'
 export const paramsStoreKey = 'cachedParams'
 export const dataStoreKey = 'cachedData'
 export const loadingStoreKey = 'loadingData'
+export const updatingStoreKey = 'updatingData'
 
 type ParamsType = Array<{ [key: string]: number | string }>
 type Optional<T> = T extends null ? void : T
@@ -44,12 +45,14 @@ export interface CacheState {
   [dataStoreKey]: any[]
   [paramsStoreKey]: ParamsType
   [loadingStoreKey]: Dictionary<boolean>
+  [updatingStoreKey]: Dictionary<boolean>
 }
 
 export const initialState: CacheState = {
   [dataStoreKey]: [],
   [paramsStoreKey]: [],
   [loadingStoreKey]: {},
+  [updatingStoreKey]: {},
 }
 
 const getIdentifiersMatcher = (uniqueIdentifier: string | string[], params: ParamsType) => {
@@ -70,6 +73,15 @@ const reducers = {
       loading: boolean
     }>,
   ) => assocPath([loadingStoreKey, cacheKey], loading, state),
+  setUpdating: (
+    state,
+    {
+      payload: { cacheKey, updating },
+    }: PayloadAction<{
+      cacheKey: DataKeys
+      updating: boolean
+    }>,
+  ) => assocPath([updatingStoreKey, cacheKey], updating, state),
   addItem: <T extends Dictionary<any>>(
     state,
     {

@@ -17,10 +17,12 @@ const toggleReducer: TogglerReducer = (state: boolean, { type, payload }) => {
   }
 }
 
-const useToggler = (initialValue = false) => {
+const useToggler: (boolean?) => [boolean, () => void, (boolean) => void] = (
+  initialValue = false,
+) => {
   const [active, dispatch] = useReducer<TogglerReducer>(toggleReducer, initialValue)
   const toggle = useCallback(
-    (prevValue) =>
+    () =>
       dispatch({
         type: 'toggle',
       }),

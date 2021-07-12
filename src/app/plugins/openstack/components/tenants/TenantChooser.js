@@ -15,7 +15,8 @@ const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
   const [tenantSearch, setTenantSearch] = useState('')
   const [loading, setLoading] = useState(false)
-  const [{ currentTenant, currentRegion }, updatePrefs] = useScopedPreferences()
+  const { prefs, updatePrefs } = useScopedPreferences()
+  const { currentTenant, currentRegion } = prefs
   const [selectedTenantName, setSelectedTenantName] = useState()
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants, reloadTenants] = useDataLoader(loadUserTenants)

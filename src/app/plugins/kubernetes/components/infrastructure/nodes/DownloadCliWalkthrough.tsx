@@ -17,6 +17,7 @@ import {
   runPf9CliCommand,
 } from '../clusters/constants'
 import Info from 'core/components/validatedForm/Info'
+import useScopedPreferences from '../../../../../core/session/useScopedPreferences'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -129,6 +130,9 @@ const DownloadCliWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
+  const { getUserPrefs } = useScopedPreferences()
+  const { currentTenant, currentRegion } = getUserPrefs(session.username)
+
   return (
     <Paper className={classes.paper} elevation={0}>
       <Text variant="h6">Use the PF9 CLI to connect nodes to the Platform9 Management Plane</Text>
@@ -161,6 +165,18 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         Username:{' '}
         <CopyToClipboard copyText={session.username} codeBlock={false}>
           <span className={classes.linkText}>{session.username}</span>
+        </CopyToClipboard>
+      </Text>
+      <Text component="div" variant="body1">
+        Tenant:{' '}
+        <CopyToClipboard copyText={currentTenant} codeBlock={false}>
+          <span className={classes.linkText}>{currentTenant}</span>
+        </CopyToClipboard>
+      </Text>
+      <Text component="div" variant="body1">
+        Region:{' '}
+        <CopyToClipboard copyText={currentRegion} codeBlock={false}>
+          <span className={classes.linkText}>{currentRegion}</span>
         </CopyToClipboard>
       </Text>
       <NumberedSteps

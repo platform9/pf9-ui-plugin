@@ -9,6 +9,13 @@ export enum NodeState {
   Unauthorized = 'Unauthorized',
 }
 
+export type ApiServerHealthStatus = 'online' | 'offline'
+export interface ApiServerHealthStatusFields {
+  label: string
+  message: string
+  clusterStatus: string
+}
+
 export type errorMessageLevel = 'warn'
 
 export enum ErrorMessageCodes {

@@ -164,7 +164,7 @@ const AddCloudProviderCredentialStep = ({
       setWizardContext({ cloudProviderId: newCp.uuid })
     } catch (err) {
       setSubmitting(false)
-      setErrorMessage(err)
+      setErrorMessage(err.message)
       updateTestStatus(0, TestStatus.Fail)
       return false
     }

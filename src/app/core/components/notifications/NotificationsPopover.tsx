@@ -132,7 +132,7 @@ const usePopoverStyles = makeStyles<Theme>((theme) => ({
 const errorTimeout = 5000
 let lastTimeout
 
-const NotificationsPopover = ({ className }) => {
+const NotificationsPopover = ({ className, hideDropdown = false }) => {
   const { notifications, unreadCount } = useSelector(
     prop<string, NotificationState>(notificationStoreKey),
   )
@@ -179,7 +179,7 @@ const NotificationsPopover = ({ className }) => {
     <div className={clsx(className, classes.container)}>
       <Tooltip title={'Notifications'}>
         <FontAwesomeIcon
-          onClick={handleOpenDropdown}
+          onClick={hideDropdown ? null : handleOpenDropdown}
           aria-describedby={id}
           ref={inboxEl}
           className={classes.inbox}

@@ -29,4 +29,12 @@ export default makeStyles<Theme>((theme) => ({
     display: 'flex',
     flexFlow: 'column nowrap',
   },
+  accordionTitle: {
+    color: theme.palette.blue['700'],
+    fontWeight: 'bold',
+    '& >  span': {
+      color: theme.palette.grey['700'],
+      fontWeight: 'normal',
+    },
+  },
 }))

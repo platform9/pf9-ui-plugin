@@ -28,7 +28,7 @@ const initialValues = {
 const defaultRoleName = 'admin'
 
 const AddCoworkerStep = ({ wizardContext, setWizardContext, onNext, setSubmitting }) => {
-  const [, , getUserPrefs] = useScopedPreferences()
+  const { getUserPrefs } = useScopedPreferences()
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const { username } = session
   const { currentTenant } = getUserPrefs(username)
@@ -45,12 +45,11 @@ const AddCoworkerStep = ({ wizardContext, setWizardContext, onNext, setSubmittin
   }
 
   const handleSubmit = useCallback(async () => {
-    setSubmitting(true)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
     }
-
+    setSubmitting(true)
     const data = {
       ...wizardContext,
       roleAssignments: { [currentTenant]: defaultRoleId },

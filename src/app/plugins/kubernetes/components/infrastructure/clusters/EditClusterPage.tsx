@@ -30,7 +30,7 @@ import NetworkStack from './form-components/network-stack'
 import { CloudProviders } from '../cloudProviders/model'
 import { NetworkStackTypes } from './constants'
 import Theme from 'core/themes/model'
-import { compareVersions } from 'k8s/components/app-catalog/helpers'
+import { compareVersions } from 'k8s/util/helpers'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
@@ -219,7 +219,11 @@ const EditClusterPage = () => {
             <Name setWizardContext={getParamsUpdater} />
           </FormFieldCard>
           <FormFieldCard title="Cluster Settings">
-            <KubernetesVersion disabled />
+            <KubernetesVersion
+              wizardContext={params}
+              setWizardContext={getParamsUpdater}
+              disabled
+            />
             {cluster?.cloudProviderType === CloudProviders.BareOS && (
               <>
                 <Divider className={classes.divider} />
