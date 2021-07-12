@@ -18,9 +18,9 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '300px',
   },
   search: {
-    '& .MuiOutlinedInput-adornedEnd': {
-      marginBottom: '10px !important',
-    },
+    display: 'grid',
+    gridGap: '15px',
+    alignContent: 'flex-start',
   },
   listContainer: {
     maxHeight: 260,
@@ -40,9 +40,6 @@ const useStyles = makeStyles((theme) => ({
   },
   listItem: {
     borderBottom: '1px solid #ddd',
-  },
-  text: {
-    marginBottom: theme.spacing(1),
   },
 }))
 
@@ -139,7 +136,7 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
   return (
     <div className={classes.listWrapper}>
       <div className={classes.search}>
-        <Text className={classes.text}> Cluster nodes</Text>
+        <Text> Cluster nodes</Text>
         <SearchBar onSearchChange={handleLeftSearchChange} searchTerm={searchLeft} />
         <div className={classes.listContainer}>
           <List dense component="div" role="list">
@@ -175,8 +172,8 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
           &lt;
         </Button>
       </div>
-      <div>
-        <Text className={classes.text}> Selected nodes</Text>
+      <div className={classes.search}>
+        <Text> Selected nodes</Text>
         <SearchBar
           className={classes.search}
           onSearchChange={handleRightSearchChange}
