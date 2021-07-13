@@ -15,6 +15,7 @@ import { IClusterSelector } from './model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import {
   getK8sDashboardLinkFromVersion,
+  getScopedClusterProxyEndpoint,
   hasAppCatalogEnabled,
   hasHealthyMasterNodes,
   hasMasterNode,
@@ -48,10 +49,11 @@ export const clustersSelector = createSelector(
       const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x?.resmgr?.id))
-      const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
-      const grafanaLink =
-        `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/` +
-        `namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+      const proxyEndpoint = getScopedClusterProxyEndpoint(
+        qbertEndpoint.replace(/\/qbert\//, '/k8s/'),
+        cluster,
+      )
+      const grafanaLink = `${proxyEndpoint}/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
       const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
       const _usage = calculateNodeUsages(combinedNodes)
       const usage = {
