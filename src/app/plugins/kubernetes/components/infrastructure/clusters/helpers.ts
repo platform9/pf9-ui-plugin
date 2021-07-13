@@ -37,8 +37,6 @@ export const canUpgradeCluster = ([cluster]) =>
 export const canDeleteCluster = ([cluster]) =>
   !['creating', 'deleting'].includes(cluster.taskStatus)
 
-export const notBusy = ([cluster]) => cluster.taskStatus !== 'updating'
-
 export const isAdmin = (selected, store) => isAdminRole(prop('session', store))
 
 const { qbert } = ApiClient.getInstance()

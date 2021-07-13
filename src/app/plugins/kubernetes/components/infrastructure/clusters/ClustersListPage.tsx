@@ -33,6 +33,7 @@ import {
   canScaleWorkers,
   canUpgradeCluster,
   isAzureAutoscalingCluster,
+  clusterNotBusy,
 } from './helpers'
 import { IClusterSelector } from './model'
 import { clockDriftDetectedInNodes } from '../nodes/helper'
@@ -291,6 +292,7 @@ export const options = {
   ],
   cacheKey: ActionDataKeys.Clusters,
   editUrl: (_, id) => routes.cluster.edit.path({ id }),
+  editCond: ([cluster]) => clusterNotBusy(cluster),
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
