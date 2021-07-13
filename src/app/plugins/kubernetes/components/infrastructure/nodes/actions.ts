@@ -8,7 +8,7 @@ import { nodesSelector, makeParamsNodesSelector } from './selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { Resmgr } from './model'
 import { Node } from 'api-client/qbert.model'
-import { isUnauthorizedHost } from './helper'
+import { isUnauthorizedHost } from './helpers'
 import Bugsnag from '@bugsnag/js'
 
 const { qbert, resMgr } = ApiClient.getInstance()

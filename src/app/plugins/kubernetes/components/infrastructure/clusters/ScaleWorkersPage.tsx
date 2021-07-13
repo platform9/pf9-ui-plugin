@@ -26,7 +26,7 @@ import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import { loadNodes } from '../nodes/actions'
-import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helper'
+import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helpers'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15

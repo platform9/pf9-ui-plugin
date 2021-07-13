@@ -1,6 +1,5 @@
 import { emptyArr, pathStrOrNull } from 'utils/fp'
 import { pipe } from 'ramda'
-// import { localizeRoles } from 'api-client/ResMgr'
 import moment from 'moment'
 import {
   HostByService,
@@ -78,7 +77,7 @@ export const annotateCloudStack = (host: IAnnotateUiState) => {
     normalRoles.add('Network Node')
     cloudStack.add(CloudStack.Openstack)
   }
-  return { ...host, cloudStack: getCloudStack(cloudStack) }
+  return { ...host, cloudStack: getCloudStack(cloudStack), localizedRoles: Array.from(normalRoles) }
 }
 
 export const annotateResmgrFields = (host: HostByService) => {
@@ -145,15 +144,6 @@ export const annotateUiState = (hosts: IAnnotateResmgrFields) => {
     uiState = 'offline'
     const lastResponseTime = pathStrOrNull('info.last_response_time', resmgr)
     lastResponse = moment.utc(lastResponseTime).fromNow(true)
-    // host.lastResponseData =
-    //   lastResponseTime &&
-    //   lastResponseTime
-    //     .split(' ')
-    //     .join('T')
-    //     .concat('Z')
-    // // Even though the host is offline we may or may not have stats for it
-    // // depending on if the roles were authorized successfully in the past.
-    // host.hasStats = roleStatus === 'ok'
   }
 
   const credentials = pathStrOrNull('extensions.hypervisor_details.data.credentials', resmgr)

@@ -24,7 +24,7 @@ import { allPass } from 'ramda'
 import { customValidator } from 'core/utils/fieldValidators'
 import Alert from 'core/components/Alert'
 import { clusterIsHealthy, clusterNotBusy, isBareOsMultiMasterCluster } from './helpers'
-import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helper'
+import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helpers'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import { loadNodes } from '../nodes/actions'
 

@@ -28,7 +28,7 @@ import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import {
   checkNodesForClockDrift,
   clockDriftErrorMessage,
-} from 'k8s/components/infrastructure/nodes/helper'
+} from 'k8s/components/infrastructure/nodes/helpers'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',

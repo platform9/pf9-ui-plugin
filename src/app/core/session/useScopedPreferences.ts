@@ -9,7 +9,6 @@ import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { pathOr, Dictionary, prop, mergeRight } from 'ramda'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { emptyObj } from 'utils/fp'
 
 const { preferenceStore } = ApiClient.getInstance()
 
@@ -26,7 +25,7 @@ const useScopedPreferences = <T extends Dictionary<any>>(
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const allPrefs = useSelector(selectPrefsState)
   const { username, userDetails } = useSelector(selectSessionState)
-  const { id } = userDetails || emptyObj
+  const { id } = userDetails || {}
   const prefs = useMemo<Partial<T>>(
     () => ({
       ...(defaultPrefs || {}),

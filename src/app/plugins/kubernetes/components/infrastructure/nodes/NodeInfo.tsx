@@ -7,7 +7,7 @@ import React from 'react'
 import useReactRouter from 'use-react-router'
 import { castBoolToStr } from 'utils/misc'
 import { loadNodes } from './actions'
-import { orderInterfaces } from './helper'
+import { orderInterfaces } from './helpers'
 import { INodesSelector } from './model'
 import { DetailRow } from './NodeDetailsPage'
 
