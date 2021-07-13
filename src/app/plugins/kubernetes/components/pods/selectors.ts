@@ -31,7 +31,6 @@ import {
 } from '../infrastructure/clusters/helpers'
 import { clientStoreKey } from 'core/client/clientReducers'
 import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
-import logger from 'core/utils/logger'
 
 const toPairs: any = ToPairs
 
@@ -42,7 +41,7 @@ export const podsSelector = createSelector(
     importedClustersSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  logger('podsSelector', (rawPods, clusters, importedClusters, qbertEndpoint) => {
+  (rawPods, clusters, importedClusters, qbertEndpoint) => {
     // associate nodes with the combinedHost entry
     return pipe<IDataKeys[DataKeys.Pods], IPodSelector[], IPodSelector[], IPodSelector[]>(
       // Filter by namespace
@@ -92,7 +91,7 @@ export const podsSelector = createSelector(
       filter(complement(isNil)),
       arrayIfEmpty,
     )(rawPods)
-  }),
+  },
 )
 
 export const makePodsSelector = (defaultParams = emptyObj) => {
@@ -131,53 +130,50 @@ export const deploymentsSelector = createSelector(
     importedClustersSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  logger(
-    'deploymentsSelector',
-    (rawDeployments, podsByClusterIdAndNamespace, clusters, importedClusters, qbertEndpoint) => {
-      return arrayIfEmpty(
-        rawDeployments
-          .map((rawDeployment) => {
-            const { clusterId } = rawDeployment
-            const allClusters = [...clusters, ...importedClusters]
-            const cluster = allClusters.find(propEq('uuid', clusterId))
-            if (!cluster) {
-              // If no cluster if found, this item is invalid because the parent cluster has been deleted
-              return null
-            }
-            const selectors =
-              rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
-            const name = rawDeployment?.metadata?.name
-            const namespace = rawDeployment?.metadata?.namespace
-            const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
+  (rawDeployments, podsByClusterIdAndNamespace, clusters, importedClusters, qbertEndpoint) => {
+    return arrayIfEmpty(
+      rawDeployments
+        .map((rawDeployment) => {
+          const { clusterId } = rawDeployment
+          const allClusters = [...clusters, ...importedClusters]
+          const cluster = allClusters.find(propEq('uuid', clusterId))
+          if (!cluster) {
+            // If no cluster if found, this item is invalid because the parent cluster has been deleted
+            return null
+          }
+          const selectors =
+            rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
+          const name = rawDeployment?.metadata?.name
+          const namespace = rawDeployment?.metadata?.namespace
+          const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
 
-            const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
-              cluster?.version,
-              qbertEndpoint,
-              cluster,
-            )
-            const dashboardUrl = `${k8sDashboardUrl}#/deployment/${namespace}/${name}?namespace=${namespace}`
+          const k8sDashboardUrl = getK8sDashboardLinkFromVersion(
+            cluster?.version,
+            qbertEndpoint,
+            cluster,
+          )
+          const dashboardUrl = `${k8sDashboardUrl}#/deployment/${namespace}/${name}?namespace=${namespace}`
 
-            // Check if any pod label matches the first deployment match label key
-            // Note: this logic should probably be revised (copied from Clarity UI)
-            const associatedPods = podsByClusterIdAndNamespace?.[clusterId]?.[namespace] || emptyArr
-            const deploymentPods = getDeploymentPods(associatedPods, labelKey, labelValue)
-            return {
-              ...rawDeployment,
-              dashboardUrl,
-              id: rawDeployment?.metadata?.uid,
-              name,
-              created: rawDeployment?.metadata?.creationTimestamp,
-              labels: rawDeployment?.metadata?.labels,
-              selectors,
-              pods: deploymentPods.length,
-              namespace,
-              clusterName: cluster?.name,
-            }
-          })
-          .filter(complement(isNil)),
-      )
-    },
-  ),
+          // Check if any pod label matches the first deployment match label key
+          // Note: this logic should probably be revised (copied from Clarity UI)
+          const associatedPods = podsByClusterIdAndNamespace?.[clusterId]?.[namespace] || emptyArr
+          const deploymentPods = getDeploymentPods(associatedPods, labelKey, labelValue)
+          return {
+            ...rawDeployment,
+            dashboardUrl,
+            id: rawDeployment?.metadata?.uid,
+            name,
+            created: rawDeployment?.metadata?.creationTimestamp,
+            labels: rawDeployment?.metadata?.labels,
+            selectors,
+            pods: deploymentPods.length,
+            namespace,
+            clusterName: cluster?.name,
+          }
+        })
+        .filter(complement(isNil)),
+    )
+  },
 )
 
 const getDeploymentPods = (pods, labelKey, labelValue) => {
@@ -213,7 +209,7 @@ export const serviceSelectors = createSelector(
     importedClustersSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  logger('serviceSelectors', (rawServices, clusters, importedClusters, qbertEndpoint) => {
+  (rawServices, clusters, importedClusters, qbertEndpoint) => {
     return arrayIfEmpty(
       rawServices
         .map((service) => {
@@ -270,7 +266,7 @@ export const serviceSelectors = createSelector(
         })
         .filter(complement(isNil)),
     )
-  }),
+  },
 )
 
 export const makeServiceSelector = (defaultParams = {}) => {

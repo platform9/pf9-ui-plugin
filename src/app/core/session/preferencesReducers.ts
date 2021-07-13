@@ -16,21 +16,18 @@ const {
   initialState: {},
   reducers: {
     updateLogo: (state, { payload }) => {
-      console.count('preferencesReducers/updateLogo')
       return {
         ...state,
         logoUrl: payload.logoUrl,
       }
     },
     resetGlobalPrefs: (state) => {
-      console.count('preferencesReducers/resetGlobalPrefs')
       return {
         ...state,
         logoUrl: '',
       }
     },
     updatePrefs: (state, { payload }: PayloadAction<PreferencesState>) => {
-      console.count('preferencesReducers/updatePrefs')
       const path = Array.isArray(payload.key)
         ? [payload.username].concat(payload.key)
         : [payload.username, payload.key]

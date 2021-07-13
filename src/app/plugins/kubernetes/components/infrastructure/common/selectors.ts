@@ -3,7 +3,7 @@ import { toPairs } from 'ramda'
 import { combineHost } from 'k8s/components/infrastructure/common/combineHosts'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { HostByService, HostType } from './model'
+import { HostByService, HostTypes } from './model'
 import { Host } from 'api-client/resmgr.model'
 import { emptyArr } from 'utils/fp'
 import logger from 'core/utils/logger'
@@ -37,36 +37,47 @@ const getNetworkInterfaces = (node: Host) => {
 
 export const resMgrHostsSelector = createSelector(
   [getDataSelector<DataKeys.ResMgrHosts>(DataKeys.ResMgrHosts)],
-  logger('combinedHostsSelector', (hosts) => {
-    return hosts.map((item) => {
+  logger('resMgrHostsSelector', (hosts) => {
+    const hostsById = {}
+    hosts.forEach((item) => {
       const extensions = item?.extensions
-      return {
-        ...item,
-        ipPreview: getIpPreview(extensions?.ip_address?.data),
-        networkInterfaces: getNetworkInterfaces(item),
-        ovsBridges: extensions?.interfaces?.data.ovs_bridges || emptyArr,
+
+      // combineHosts expects resmgr to be a key on the host object
+      // so we can start with that structure here
+      const host = {
+        [HostTypes.Resmgr]: {
+          ...item,
+          resourceType: HostTypes.Resmgr,
+          ipPreview: getIpPreview(extensions?.ip_address?.data),
+          networkInterfaces: getNetworkInterfaces(item),
+          ovsBridges: extensions?.interfaces?.data.ovs_bridges || emptyArr,
+        },
       }
+      // all of the combined host annotation is based on resmgr
+      // so we can do the combineHost call here
+      const combined = combineHost(host)
+      hostsById[item.id] = { ...host, ...combined }
     })
+    return hostsById
   }),
 )
 
 export const combinedHostsSelector = createSelector(
   getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
   resMgrHostsSelector,
-  logger('combinedHostsSelector', (rawNodes, resMgrHosts) => {
+  logger('combinedHostsSelector', (rawNodes, resMgrHostsById) => {
     const hostsById: {
       [key: string]: HostByService
-    } = {}
-    // We don't want to perform a check to see if the object exists yet for each type of host
-    // so make a utility to make it cleaner.
-    const setHost = (type: HostType, id: string, value) => {
-      hostsById[id] = hostsById[id] || ({} as any)
-      hostsById[id][type] = value
+    } = {
+      ...resMgrHostsById,
     }
-    rawNodes.forEach((node) => setHost('qbert', node.uuid, node))
-    resMgrHosts.forEach((resMgrHost) => setHost('resmgr', resMgrHost.id, resMgrHost))
+
+    rawNodes.forEach((node) => {
+      hostsById[node.uuid] = hostsById[node.uuid] || ({} as any)
+      hostsById[node.uuid][HostTypes.Qbert] = node
+    })
 
     // Convert it back to array form
-    return Object.values(hostsById).map(combineHost)
+    return hostsById
   }),
 )

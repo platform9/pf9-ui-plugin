@@ -4,11 +4,9 @@ import { combinedHostsSelector } from 'k8s/components/infrastructure/common/sele
 import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { ICombinedHost } from 'k8s/components/infrastructure/common/model'
 import { calculateNodeUsages } from '../common/helpers'
 import { getScopedQbertEndpoint } from '../clusters/helpers'
 import { clientStoreKey } from 'core/client/clientReducers'
-import logger from 'core/utils/logger'
 import { arrayIfEmpty } from 'utils/fp'
 
 export const nodesSelector = createSelector(
@@ -17,15 +15,7 @@ export const nodesSelector = createSelector(
     combinedHostsSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  logger('podsSelector', (rawNodes, combinedHosts, qbertEndpoint) => {
-    const combinedHostsObj = (combinedHosts as ICombinedHost[]).reduce<{
-      [key: string]: ICombinedHost
-    }>((accum, host) => {
-      const id = host?.resmgr?.id || host?.qbert?.uuid || null
-      accum[id] = host
-      return accum
-    }, {})
-
+  (rawNodes, combinedHostsObj, qbertEndpoint) => {
     // associate nodes with the combinedHost entry
     return arrayIfEmpty(
       rawNodes
@@ -51,7 +41,7 @@ export const nodesSelector = createSelector(
         })
         .filter((node) => path(['combined', 'cloudStack'], node) !== 'openstack'),
     )
-  }),
+  },
 )
 
 export const makeParamsNodesSelector = (

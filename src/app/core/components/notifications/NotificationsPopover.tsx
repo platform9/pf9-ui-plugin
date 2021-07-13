@@ -16,6 +16,7 @@ import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterSta
 import { convertTaskStateToStatus } from 'app/plugins/account/components/system-status/helpers'
 import { isDecco } from 'core/utils/helpers'
 import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { RootState } from 'app/store'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   title: {
@@ -136,8 +137,8 @@ const NotificationsPopover = ({ className }) => {
   const { notifications, unreadCount } = useSelector(
     prop<string, NotificationState>(notificationStoreKey),
   )
-  const { systemStatus } = useSelector(prop<string, ClientState>(clientStoreKey))
-  const { features } = useSelector(prop<string, SessionState>(sessionStoreKey))
+  const { systemStatus } = useSelector<RootState, ClientState>(prop(clientStoreKey))
+  const { features } = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const [lastNotification] = notifications || []
   const inboxEl = useRef<HTMLElement>(null)
 

@@ -23,16 +23,13 @@ const { name: customThemeKey, reducer: themeReducers, actions: themeActions } = 
   initialState: defaultThemeState,
   reducers: {
     updateThemeComponent: (state, { payload }: PayloadAction<UpdateComponentAction>) => {
-      console.count('themeReducers/updateThemeComponent')
       return { ...state, components: generateComponentColors(payload, state.components) }
     },
     // @ts-ignore
     updateTheme: (state, { payload }: PayloadAction<Partial<ThemeReducer>>) => {
-      console.count('themeReducers/updateTheme')
       return mergeLeft(payload, state)
     },
     clearTheme: () => {
-      console.count('themeReducers/clearTheme')
       return defaultTheme
     },
   },

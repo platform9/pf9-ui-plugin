@@ -40,7 +40,7 @@ export const clustersSelector = createSelector(
     rawClusters,
     clustersWithTasks,
     nodes: INodesSelector[],
-    combinedHosts,
+    combinedHostsById,
     qbertEndpoint: string,
   ) => {
     return pipe<IClusterAction[], IClusterAction[], IClusterSelector[]>(
@@ -48,7 +48,7 @@ export const clustersSelector = createSelector(
         const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
         const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
         const nodeIds = pluck('uuid', nodesInCluster)
-        const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x?.resmgr?.id))
+        const combinedNodes = nodeIds.map((id) => combinedHostsById[id])
         const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
         const grafanaLink =
           `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/` +
