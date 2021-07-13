@@ -103,7 +103,7 @@ export const clustersSelector = createSelector(
           // Rendering happens in <DownloadKubeConfigLink />
           kubeconfig: clusterOk ? { cluster } : null,
           // Rendering happens in <ClusterCLI />
-          cli: clusterOk ? { host, cluster } : null,
+          cli: clusterOk ? { host: qbertEndpoint.match(/(.*?)\/qbert/)[1], cluster } : null,
         },
         ...fuzzyBools,
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
