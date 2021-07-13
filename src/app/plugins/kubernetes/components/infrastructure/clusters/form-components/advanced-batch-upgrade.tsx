@@ -32,20 +32,23 @@ const AdvancedBatchUpgradeField = ({ wizardContext, setWizardContext }) => (
 )
 
 export const AdvancedBatchUpgradeAddonField = ({ values }) => {
-  const {
-    wizardContext,
-    setWizardContext,
-  }: { wizardContext: any; setWizardContext: any } = useContext(WizardContext) as any
+  const { setWizardContext }: { wizardContext: any; setWizardContext: any } = useContext(
+    WizardContext,
+  ) as any
   const classes = useStyles()
-  const nodeVersionToCompare = getNodeVersionToCompare(wizardContext)
+  const nodeVersionToCompare = getNodeVersionToCompare(values)
   const [upgradedNodes, toBeUpgradedNodes] = useMemo(() => {
     return partition(
-      wizardContext.upgradingTo
-        ? filterInProgressUpgrade(nodeVersionToCompare)
+      values.upgradingTo
+        ? filterInProgressUpgrade(values.upgradingTo)
         : filterInInitialUpgrade(nodeVersionToCompare),
-      wizardContext.workerNodes,
+      values.workerNodes,
     )
   }, [])
+
+  const updateBatchUpgradeNodes = (selectedNodes) => {
+    if (selectedNodes.length > 0) setWizardContext({ batchUpgradeNodes: selectedNodes })
+  }
 
   return (
     <FormFieldCard title="Batch Upgrade Strategy">
@@ -57,7 +60,7 @@ export const AdvancedBatchUpgradeAddonField = ({ values }) => {
       >
         <Text className={classes.text} variant="body2">
           <b>Total Worker Nodes :</b>
-          {wizardContext?.workerNodes?.length}
+          {values?.workerNodes?.length}
         </Text>
         <Text className={classes.text} variant="body2">
           <b>Upgraded Worker Nodes :</b>
@@ -70,7 +73,10 @@ export const AdvancedBatchUpgradeAddonField = ({ values }) => {
         </Text>
       </IconInfo>
       <Text>Select the nodes to include in this batch</Text>
-      <TransferList clusterNodes={toBeUpgradedNodes} setWizardContext={setWizardContext} />
+      <TransferList
+        clusterNodes={toBeUpgradedNodes}
+        updateBatchUpgradeNodes={updateBatchUpgradeNodes}
+      />
     </FormFieldCard>
   )
 }

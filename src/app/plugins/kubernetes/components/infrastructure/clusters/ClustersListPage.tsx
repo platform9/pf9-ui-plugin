@@ -332,7 +332,7 @@ export const options = {
       cond: both(isAdmin, canUpgradeCluster),
       icon: 'level-up',
       label: 'Upgrade Clusters',
-      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}/upgrade`,
+      routeTo: (rows) => routes.cluster.upgrade.path({ id: rows[0].uuid }),
       disabledInfo: ([cluster]) =>
         !!cluster && clockDriftDetectedInNodes(cluster.nodes)
           ? 'Cannot upgrade cluster: clock drift detected in at least one node'

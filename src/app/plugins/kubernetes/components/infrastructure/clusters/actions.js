@@ -11,7 +11,7 @@ import {
   getKubernetesVersion,
   getProgressPercent,
   getEtcdBackupPayload,
-  createBatchUpgradeClusterPayload,
+  upgradeNodesCluster,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
   allClustersSelector,
@@ -148,7 +148,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster', {
         clusterId: formData.uuid,
       })
-      const updatedCluster = createBatchUpgradeClusterPayload(formData)
+      const updatedCluster = await upgradeNodesCluster(formData)
       return adjustWith(propEq('uuid', formData.uuid), mergeLeft(updatedCluster), prevItems)
     },
     updateTag: async ({ cluster, key, val }, prevItems) => {

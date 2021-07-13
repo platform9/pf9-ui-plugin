@@ -19,6 +19,7 @@ import Text from 'core/elements/text'
 import ClusterBatchUpgradeDialog from './ClusterBatchUpgradeDialog'
 import DocumentMeta from 'core/components/DocumentMeta'
 import SubmitButton from 'core/components/buttons/SubmitButton'
+import { CloudProviders } from '../cloudProviders/model'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -60,9 +61,18 @@ export const handleSetUpgradeStrategy = (field: any, id: any) => {
   return {
     ...togglersMapping,
     [id]: field,
-    field,
   }
 }
+
+const wizardMetaFormattedNames = {
+  name: 'Cluster',
+  version: 'Version',
+  masterNodes: 'Master Nodes',
+  workerNodes: 'Worker Nodes',
+  networkPlugin: 'CNI',
+}
+
+const wizardMetaCalloutFields = Object.keys(wizardMetaFormattedNames)
 
 const UpgradeClusterPage = () => {
   const [clusters] = useDataLoader(clusterActions.list)
@@ -70,9 +80,7 @@ const UpgradeClusterPage = () => {
   const classes = useStyles({})
   const cluster = clusters.find((x) => x.uuid === match.params.id)
   const defaultState = getUpgradeTarget(cluster)
-  cluster.selectedUpgradeVersion =
-    defaultState === 'minor' ? cluster.minorUpgradeRoleVersion : cluster.patchUpgradeRoleVersion
-
+  const clusterType = cluster.nodes[0]?.combined?.resmgr?.info?.cpu_info['virtual/physical']
   cluster.upgradeType = defaultState
   const [upgradeType, setUpgradeType] = useState(defaultState)
   const [showModal, setModal] = useState(false)
@@ -91,24 +99,9 @@ const UpgradeClusterPage = () => {
     onComplete,
   )
 
-  const wizardMetaFormattedNames = {
-    name: 'Cluster',
-    version: 'Version',
-    masterNodes: 'Master Nodes',
-    workerNodes: 'Worker Nodes',
-    networkPlugin: 'CNI',
-  }
-
-  const wizardMetaCalloutFields = ['name', 'version', 'masterNodes', 'workerNodes', 'networkPlugin']
-
   const handleSubmit = useCallback(
     (wizardContext) => {
-      if (wizardContext.percentageClusterUpgrade) {
-        upgradeClusterNodes(wizardContext)
-        onComplete()
-      }
-
-      if (wizardContext.sequentialClusterUpgrade) {
+      if (wizardContext.percentageClusterUpgrade || wizardContext.sequentialClusterUpgrade) {
         upgradeClusterNodes(wizardContext)
         onComplete()
       }
@@ -123,9 +116,6 @@ const UpgradeClusterPage = () => {
   const handleChange = useCallback((event, setWizardContext) => {
     const upgradeChoice = event.target.value
     setUpgradeType(upgradeChoice)
-    const selectedUpgradeVersion =
-      upgradeChoice === 'minor' ? cluster.minorUpgradeRoleVersion : cluster.patchUpgradeRoleVersion
-    setWizardContext({ selectedUpgradeVersion })
   }, [])
 
   const confirmBatchUpgrade = useCallback((wizardContext) => {
@@ -149,7 +139,18 @@ const UpgradeClusterPage = () => {
               <>
                 <WizardMeta
                   fields={wizardContext}
-                  icon={<CloudProviderCard active type={cluster.cloudProviderType} />}
+                  icon={
+                    <CloudProviderCard
+                      active
+                      type={
+                        clusterType.includes('virtual')
+                          ? CloudProviders.VirtualMachine
+                          : clusterType.includes('physical')
+                          ? CloudProviders.PhysicalMachine
+                          : cluster.cloudProviderType
+                      }
+                    />
+                  }
                   keyOverrides={wizardMetaFormattedNames}
                   calloutFields={wizardMetaCalloutFields}
                 >

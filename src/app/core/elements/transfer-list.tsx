@@ -43,11 +43,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-function comparer(otherArray) {
-  return function(current) {
+const removeShiftedNodes = (oldNodesList) => {
+  return (oldNode) => {
     return (
-      otherArray.filter(function(other) {
-        return other.name === current.name
+      oldNodesList.filter(function(currentNode) {
+        return currentNode.uuid === oldNode.uuid
       }).length === 0
     )
   }
@@ -78,7 +78,7 @@ const NodeItem = ({ checked, value, handleToggle, nodeType }) => {
   )
 }
 
-export default function TransferList({ clusterNodes, setWizardContext }) {
+export default function TransferList({ clusterNodes, updateBatchUpgradeNodes }) {
   const classes = useStyles({})
   const [checked, setChecked] = React.useState([])
   const [searchLeft, setSearchLeft] = React.useState('')
@@ -103,13 +103,13 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
 
   const handleCheckedRight = () => {
     setRight(uniqBy(prop('uuid'), right.concat(leftChecked)))
-    setLeft(left.filter(comparer(leftChecked)))
+    setLeft(left.filter(removeShiftedNodes(leftChecked)))
     setChecked([])
   }
 
   const handleCheckedLeft = () => {
     setLeft(uniqBy(prop('uuid'), left.concat(rightChecked)))
-    setRight(right.filter(comparer(rightChecked)))
+    setRight(right.filter(removeShiftedNodes(rightChecked)))
     setChecked([])
   }
 
@@ -126,7 +126,7 @@ export default function TransferList({ clusterNodes, setWizardContext }) {
   }, [searchLeft, left])
 
   useEffect(() => {
-    setWizardContext({ batchUpgradeNodes: right })
+    updateBatchUpgradeNodes(right)
   }, [right])
 
   const handleLeftSearchChange = useCallback((search) => setSearchLeft(search), [])

@@ -12,7 +12,7 @@ const PercentageClusterUpgradeField = ({ wizardContext, setWizardContext }) => (
   <CheckboxField
     id="percentageClusterUpgrade"
     label="Percentage"
-    disabled={wizardContext.upgradingTo}
+    disabled={!!wizardContext.upgradingTo}
     infoPlacement="right-end"
     onChange={(value) =>
       setWizardContext(handleSetUpgradeStrategy(value, 'percentageClusterUpgrade'))

@@ -62,7 +62,7 @@ const ClusterBatchUpgradeDialog = ({
   const [upgradedNodes, toBeUpgradedNodes] = useMemo(() => {
     return partition(
       cluster.upgradingTo
-        ? filterInProgressUpgrade(nodeVersionToCompare)
+        ? filterInProgressUpgrade(cluster.upgradingTo)
         : filterInInitialUpgrade(nodeVersionToCompare),
       cluster.workerNodes,
     )

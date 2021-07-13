@@ -46,12 +46,6 @@ const AdvancedBatchUpgradeAddonField = React.lazy(async () =>
 
 const SequentialClusterUpgradeField = React.lazy(async () => import('./sequential-cluster-upgrade'))
 
-const SequentialClusterUpgradeAddonField = React.lazy(async () =>
-  import('./sequential-cluster-upgrade').then((module) => ({
-    default: module.SequentialClusterUpgradeAddonField,
-  })),
-)
-
 const PercentageClusterUpgradeField = React.lazy(async () => import('./percentage-cluster-upgrade'))
 const PercentageClusterUpgradeAddonField = React.lazy(async () =>
   import('./percentage-cluster-upgrade').then((module) => ({
@@ -91,7 +85,7 @@ const addonMap = {
   },
   sequentialClusterUpgrade: {
     toggler: SequentialClusterUpgradeField,
-    details: { component: SequentialClusterUpgradeAddonField },
+    details: { component: null },
   },
   percentageClusterUpgrade: {
     toggler: PercentageClusterUpgradeField,

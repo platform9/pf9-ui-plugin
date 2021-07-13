@@ -366,7 +366,7 @@ const createGenericCluster = async (body, data) => {
   return qbert.getClusterDetails(uuid)
 }
 
-export const createBatchUpgradeClusterPayload = async (data) => {
+export const upgradeNodesCluster = async (data) => {
   const keysToPluck = ['batchUpgradeNodes', 'batchUpgradePercent']
   const body = pick(keysToPluck, data)
   if (data?.batchUpgradeNodes)

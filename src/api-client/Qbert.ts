@@ -394,15 +394,15 @@ class Qbert extends ApiService {
 
   upgradeClusterNodes = async (clusterId, type, body = null) => {
     const url = createUrlWithQueryString(`/clusters/${clusterId}/upgrade?type=${type}`)
-    const upgradeClusterNodesOptions = {
+    return this.client.basicPost({
       url,
       version: 'v4',
+      body,
       options: {
         clsName: this.getClassName(),
         mthdName: 'upgradeClusterNodes',
       },
-    }
-    return this.client.basicPost({ ...upgradeClusterNodesOptions, body })
+    })
   }
 
   @trackApiMethodMetadata({

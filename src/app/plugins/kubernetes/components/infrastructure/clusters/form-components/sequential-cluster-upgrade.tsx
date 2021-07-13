@@ -6,7 +6,7 @@ const SequentialClusterUpgradeField = ({ wizardContext, setWizardContext }) => (
   <CheckboxField
     id="sequentialClusterUpgrade"
     label="Sequential"
-    disabled={wizardContext.upgradingTo}
+    disabled={!!wizardContext.upgradingTo}
     infoPlacement="right-end"
     onChange={(value) =>
       setWizardContext(handleSetUpgradeStrategy(value, 'sequentialClusterUpgrade'))
@@ -15,9 +15,5 @@ const SequentialClusterUpgradeField = ({ wizardContext, setWizardContext }) => (
     info="List: The specified worker nodes will be upgraded in parallel."
   />
 )
-
-export const SequentialClusterUpgradeAddonField = () => {
-  return null
-}
 
 export default SequentialClusterUpgradeField
