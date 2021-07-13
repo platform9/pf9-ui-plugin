@@ -2,5 +2,24 @@
   "baseUrl": "http://localhost:3000",
   "viewportWidth": 1920,
   "viewportHeight": 1080,
-  "projectId": "k5ua2x"
+  "projectId": "k5ua2x",
+  "reporter": "mochawesome",
+  "reporterOptions": {
+    "reportDir": "cypress/reports/mocha",
+    "overwrite": false,
+    "html": true,
+    "json": true
+  },
+  "video": true,
+  "testFiles":[
+    "TC-GENERAL-1_login.spec.ts",
+    "TC-INFRA-3_singleMasterClusterCreation.spec.ts",
+    "TC-WORKLOADS-1_namespace.spec.ts",
+    "TC-WORKLOADS-2_deployment.spec.ts",
+    "TC-WORKLOADS-3_service.spec.ts",
+    "TC-INFRA-8_clusterUpgradation.spec.ts",
+    "TC-INFRA-7_deleteCluster.spec.ts",
+    "TC-INFRA-2_oneClickClusterCreation.spec.ts",
+    "TC-INFRA-1_multiMasterClusterCreation.spec.ts"
+  ]
 }

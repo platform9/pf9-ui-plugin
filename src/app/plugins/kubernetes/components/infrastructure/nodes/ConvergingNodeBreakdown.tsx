@@ -305,7 +305,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
                     </Tooltip>
                   </article>
                   <div>
-                    <Text className={classes.nodeProgressLabel} variant="caption3" component="p">
+                    <Text data-testid='progress-bar-status' className={classes.nodeProgressLabel} variant="caption3" component="p">
                       {progressLabel}
                     </Text>
                     <ProgressBar

@@ -211,6 +211,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
       errorMessage,
       pollForNodes = false,
       selection = 'single',
+      id,
       isSingleNodeCluster,
       showResourceRequirements = true,
     } = props
@@ -325,7 +326,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
                 </TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody data-testid={`thody-${id}`}>
               {selectableNodes.map((node = emptyNode) => (
                 <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
                   <TableCell>
