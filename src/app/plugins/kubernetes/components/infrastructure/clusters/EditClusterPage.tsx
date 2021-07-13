@@ -90,14 +90,17 @@ const EditClusterPage = () => {
   const classes = useStyles()
   const clusterId = match.params.id
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  const onComplete = useCallback((success) => success && history.push(listUrl), [history])
-  const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
+  // const onComplete = useCallback((success) => success && history.push(listUrl), [history])
+  const [update, updatingCluster] = useDataUpdater(clusterActions.update)
   const { params, updateParams, getParamsUpdater } = useParams({})
   const dispatch = useDispatch()
   const cluster = useMemo(() => clusters.find(propEq('uuid', clusterId)) || {}, [
     clusters,
     clusterId,
   ])
+  const [createAddon, creatingAddon] = useDataUpdater(clusterAddonActions.create)
+  const [updateAddon, updatingAddon] = useDataUpdater(clusterAddonActions.update)
+  const [deleteAddon, deletingAddon] = useDataUpdater(clusterAddonActions.delete)
   const [existingClusterAddons, loadingClusterAddons] = useDataLoader(clusterAddonActions.list, {
     clusterId: cluster?.uuid,
   })
@@ -212,6 +215,7 @@ const EditClusterPage = () => {
       // })
 
       await updateClusterAddons(values)
+      history.push(listUrl)
     },
     [update, initialValues, toggleMonitoring],
   )
@@ -233,11 +237,11 @@ const EditClusterPage = () => {
         const addonIsCurrentlyEnabled = !!existingAddon
         const name = existingAddon?.name
         if (addonIsCurrentlyEnabled && enableAddon) {
-          return clusterAddonActions.update()
+          return updateAddon()
         } else if (addonIsCurrentlyEnabled && !enableAddon) {
-          return clusterAddonActions.delete({ addonName: name })
+          return deleteAddon({ addonName: name })
         } else if (!addonIsCurrentlyEnabled && enableAddon) {
-          return clusterAddonActions.create({
+          return createAddon({
             clusterId: clusterId,
             addonType: addonType,
             params: values,
@@ -247,13 +251,17 @@ const EditClusterPage = () => {
     )
   }
 
+  const updatingAddons = creatingAddon || updatingAddon || deletingAddon
+  const loadingSomething =
+    loadingClusters || loadingClusterAddons || updatingCluster || updatingAddons
+
   return (
     <>
       <DocumentMeta title="Edit Cluster" bodyClasses={['form-view']} />
       <FormWrapper
         title={`Edit Cluster ${initialValues.name || ''}`}
-        loading={loadingClusters || loadingClusterAddons || updating}
-        message={updating ? 'Submitting form...' : 'Loading Cluster...'}
+        loading={loadingSomething}
+        message={updatingCluster || updatingAddons ? 'Submitting form...' : 'Loading Cluster...'}
         backUrl={listUrl}
       >
         <ValidatedForm

@@ -2057,9 +2057,10 @@ class Qbert extends ApiService {
   }
 
   getClusterAddons = async (clusterId) => {
+    const clusterLabel = `sunpike.pf9.io/cluster=${clusterId}`
     const url = createUrlWithQueryString(
       `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusteraddons`,
-      { clusterId },
+      { labelSelector: clusterLabel },
     )
     const result = await this.client.basicGet<ClusterAddons>({
       url,
