@@ -32,7 +32,7 @@ import { NetworkStackTypes } from './constants'
 import Theme from 'core/themes/model'
 import { compareVersions } from 'k8s/util/helpers'
 import { clusterAddonActions } from './clusterAddons/actions'
-import { addonManagerAddons, clusterAddonFieldId, ClusterAddonName } from './clusterAddons/helpers'
+import { addonManagerAddons, clusterAddonFieldId, ClusterAddonType } from './clusterAddons/helpers'
 
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
@@ -90,7 +90,6 @@ const EditClusterPage = () => {
   const classes = useStyles()
   const clusterId = match.params.id
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  // const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [update, updatingCluster] = useDataUpdater(clusterActions.update)
   const { params, updateParams, getParamsUpdater } = useParams({})
   const dispatch = useDispatch()
@@ -98,16 +97,17 @@ const EditClusterPage = () => {
     clusters,
     clusterId,
   ])
+  const isNewK8sVersion = useMemo(() => compareVersions(cluster.kubeRoleVersion, '1.20') >= 0, [
+    cluster.kubeRoleVersion,
+  ])
+
+  // Cluster Addons
   const [createAddon, creatingAddon] = useDataUpdater(clusterAddonActions.create)
   const [updateAddon, updatingAddon] = useDataUpdater(clusterAddonActions.update)
   const [deleteAddon, deletingAddon] = useDataUpdater(clusterAddonActions.delete)
   const [existingClusterAddons, loadingClusterAddons] = useDataLoader(clusterAddonActions.list, {
     clusterId: cluster?.uuid,
   })
-
-  const isNewK8sVersion = useMemo(() => compareVersions(cluster.kubeRoleVersion, '1.20') >= 0, [
-    cluster.kubeRoleVersion,
-  ])
 
   const clusterAddOns = useMemo(
     () =>
@@ -149,10 +149,9 @@ const EditClusterPage = () => {
   useEffect(() => {
     const addons = pipe(
       when(isNil, always(emptyArr)),
-      (addons) => addons.filter((addon) => addon.clusterId === clusterId),
       map((addon: any) => {
         const fieldId = clusterAddonFieldId[addon.type]
-        return fieldId ? { [fieldId]: true } : null
+        return fieldId ? { [fieldId]: true } : {}
       }),
       reduce((acc, item) => ({ ...acc, ...item }), {}),
     )(existingClusterAddons)
@@ -224,7 +223,7 @@ const EditClusterPage = () => {
     await Promise.all(
       // Loop through all the available cluster addons that are managed by
       // the addon manager
-      addonManagerAddons.map((addonType: ClusterAddonName) => {
+      addonManagerAddons.map((addonType: ClusterAddonType) => {
         const fieldId = clusterAddonFieldId[addonType]
         const enableAddon = values[fieldId]
         // If values[fieldId] === undefined, meaning that the addon was not an option
@@ -235,15 +234,16 @@ const EditClusterPage = () => {
           (addon) => addon.clusterId === clusterId && addon.type === addonType,
         )
         const addonIsCurrentlyEnabled = !!existingAddon
-        const name = existingAddon?.name
+        const addonName = existingAddon?.name
+ 
         if (addonIsCurrentlyEnabled && enableAddon) {
-          return updateAddon()
+          return updateAddon({ clusterId, addonType, addonName, params })
         } else if (addonIsCurrentlyEnabled && !enableAddon) {
-          return deleteAddon({ addonName: name })
+          return deleteAddon({ addonName })
         } else if (!addonIsCurrentlyEnabled && enableAddon) {
           return createAddon({
-            clusterId: clusterId,
-            addonType: addonType,
+            clusterId,
+            addonType,
             params: values,
           })
         }

@@ -5,7 +5,7 @@ import { objSwitchCase as objSwitchCaseAny } from 'utils/fp'
 
 const objSwitchCase: any = objSwitchCaseAny
 
-export enum ClusterAddonName {
+export enum ClusterAddonType {
   CoreDns = 'coredns',
   KubernetesDashboard = 'kubernetes-dashboard',
   MetricsServer = 'metrics-server',
@@ -13,22 +13,22 @@ export enum ClusterAddonName {
 }
 
 export const clusterAddonFieldId = {
-  [ClusterAddonName.CoreDns]: coreDnsFieldId,
-  [ClusterAddonName.KubernetesDashboard]: kubernetesDashboardFieldId,
-  [ClusterAddonName.MetricsServer]: metricsServerFieldId,
-  [ClusterAddonName.Metallb]: 'enableMetalb',
+  [ClusterAddonType.CoreDns]: coreDnsFieldId,
+  [ClusterAddonType.KubernetesDashboard]: kubernetesDashboardFieldId,
+  [ClusterAddonType.MetricsServer]: metricsServerFieldId,
+  [ClusterAddonType.Metallb]: 'enableMetalb',
 }
 
 export const clusterAddonTypeName = {
-  coreDns: ClusterAddonName.CoreDns,
-  kubernetesDashboard: ClusterAddonName.KubernetesDashboard,
-  metricsServer: ClusterAddonName.MetricsServer,
+  coreDns: ClusterAddonType.CoreDns,
+  kubernetesDashboard: ClusterAddonType.KubernetesDashboard,
+  metricsServer: ClusterAddonType.MetricsServer,
 }
 
 export const addonManagerAddons = [
-  ClusterAddonName.CoreDns,
-  ClusterAddonName.MetricsServer,
-  ClusterAddonName.KubernetesDashboard,
+  // ClusterAddonName.CoreDns,
+  ClusterAddonType.MetricsServer,
+  ClusterAddonType.KubernetesDashboard,
 ]
 
 export const defaultDnsMemoryLimit = '170Mi'
@@ -172,8 +172,8 @@ export const getAzureAutoScalerRequestBody = (clusterId, minNumWorkers, maxNumWo
 export const getClusterAddonBody = (clusterId, addonType, params) =>
   objSwitchCase(
     {
-      [ClusterAddonName.KubernetesDashboard]: getKubernetesDashboardRequestBody(clusterId),
-      [ClusterAddonName.MetricsServer]: getMetricsServerRequestBody(clusterId),
+      [ClusterAddonType.KubernetesDashboard]: getKubernetesDashboardRequestBody(clusterId),
+      [ClusterAddonType.MetricsServer]: getMetricsServerRequestBody(clusterId),
     },
     {},
   )(addonType)

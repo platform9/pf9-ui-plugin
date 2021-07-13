@@ -16,12 +16,12 @@ export const clusterAddonActions = createCRUDActions(DataKeys.ClusterAddons, {
     return clusterId === allKey ? qbert.getAllClusterAddons() : qbert.getClusterAddons(clusterId)
   },
   createFn: async ({ clusterId, addonType, params }) => {
-    console.log(addonType, clusterId)
     const body = getClusterAddonBody(clusterId, addonType, params)
     return qbert.addClusterAddon(body)
   },
-  updateFn: async (addonName, body) => {
-    await qbert.editClusterAddon(addonName, body)
+  updateFn: async ({clusterId, addonType, addonName, params}) => {
+    const body = getClusterAddonBody(clusterId, addonType, params)
+    return qbert.editClusterAddon(addonName, body)
   },
   deleteFn: async ({ addonName }) => {
     Bugsnag.leaveBreadcrumb('Attempting to delete cluster addon', { addon: addonName })
