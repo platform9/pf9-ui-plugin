@@ -1153,3 +1153,97 @@ export interface Role {
   addonsDetails: string
   metadata: string
 }
+
+export interface ClusterAddons {
+  kind: string
+  apiVersion: string
+  metadata: ClusterAddonsMetadata
+  items: ClusterAddon[]
+}
+
+export interface ClusterAddon {
+  metadata: ItemMetadata
+  spec: Spec
+  status: ItemStatus
+}
+
+export interface ItemMetadata {
+  name: string
+  namespace: string
+  selfLink: string
+  uid: string
+  resourceVersion: string
+  creationTimestamp: string
+  labels: Labels
+  managedFields: ManagedField[]
+}
+
+export interface Labels {
+  'sunpike.pf9.io/cluster': string
+  type: string
+}
+
+export interface ManagedField {
+  manager: string
+  operation: string
+  apiVersion: string
+  time: string
+  fieldsType: string
+  fieldsV1: FieldsV1
+}
+
+export interface FieldsV1 {
+  'f:metadata': FMetadata
+  'f:spec': FSpec
+}
+
+export interface FMetadata {
+  'f:labels': FLabels
+}
+
+export interface FLabels {
+  '.': FClusterID
+  'f:sunpike.pf9.io/cluster': FClusterID
+  'f:type': {}
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface FClusterID {}
+
+export interface FSpec {
+  'f:clusterID': FClusterID
+  'f:override'?: FOverride
+  'f:type': FClusterID
+  'f:version': FClusterID
+  'f:watch': FClusterID
+}
+
+export interface FOverride {
+  'f:params': FClusterID
+}
+
+export interface Spec {
+  clusterID: string
+  version: string
+  type: string
+  override: Override
+  watch: boolean
+}
+
+export interface Override {
+  params?: Param[]
+}
+
+export interface Param {
+  name: string
+  value: string
+}
+
+export interface ItemStatus {
+  lastChecked: null
+}
+
+export interface ClusterAddonsMetadata {
+  selfLink: string
+  resourceVersion: string
+}

@@ -1,14 +1,16 @@
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import React from 'react'
 
+export const metricsServerFieldId = 'enableMetricsServer'
+
 const MetricsServer = ({ wizardContext, setWizardContext }) => (
   <CheckboxField
-    id="metricsServer"
+    id={metricsServerFieldId}
     label="Metrics Server"
     info="Kubernetes Metrics Server "
     infoPlacement="right-end"
-    value={wizardContext.metricsServer}
-    onChange={(value) => setWizardContext({ metricsServer: value })}
+    value={wizardContext[metricsServerFieldId]}
+    onChange={(value) => setWizardContext({ [metricsServerFieldId]: value })}
   />
 )
 

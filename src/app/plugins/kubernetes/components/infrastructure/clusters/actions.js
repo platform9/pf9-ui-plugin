@@ -11,7 +11,6 @@ import {
   getKubernetesVersion,
   getProgressPercent,
   getEtcdBackupPayload,
-  getCoreDnsPayload,
   getMetalLbCidr,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
@@ -103,10 +102,6 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     const body = pick(updateableParams, params)
     if (params.etcdBackup) {
       body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
-    }
-
-    if (params.coreDns) {
-      body.coreDns = getCoreDnsPayload('coreDns', params)
     }
 
     if (params.enableMetallb) {

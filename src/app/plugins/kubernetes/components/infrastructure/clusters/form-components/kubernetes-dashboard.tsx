@@ -1,14 +1,16 @@
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import React from 'react'
 
+export const kubernetesDashboardFieldId = 'enableKubernetesDashboard'
+
 const KubernetesDashboard = ({ wizardContext, setWizardContext }) => (
   <CheckboxField
-    id="kubernetesDashboard"
+    id={kubernetesDashboardFieldId}
     label="Kubernetes Dashboard"
     info="Opensource Kubernetes Dashboard"
     infoPlacement="right-end"
-    value={wizardContext.kubernetesDashboard}
-    onChange={(value) => setWizardContext({ kubernetesDashboard: value })}
+    value={wizardContext[kubernetesDashboardFieldId]}
+    onChange={(value) => setWizardContext({ [kubernetesDashboardFieldId]: value })}
   />
 )
 

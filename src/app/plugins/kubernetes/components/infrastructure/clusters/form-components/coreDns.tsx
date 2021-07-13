@@ -3,13 +3,15 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import React from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 
+export const coreDnsFieldId = 'enableCoreDns'
+
 const CoreDns = ({ wizardContext, setWizardContext }) => (
   <CheckboxField
-    id="coreDns"
+    id={coreDnsFieldId}
     label="CoreDNS"
     infoPlacement="right-end"
-    value={wizardContext.coreDns}
-    onChange={(value) => setWizardContext({ coreDns: value })}
+    value={wizardContext[coreDnsFieldId]}
+    onChange={(value) => setWizardContext({ [coreDnsFieldId]: value })}
     info="CoreDNS"
   />
 )

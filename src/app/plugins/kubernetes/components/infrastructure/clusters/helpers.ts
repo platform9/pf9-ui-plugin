@@ -100,17 +100,6 @@ export const getEtcdBackupPayload = (path, data) =>
         isEtcdBackupEnabled: 0,
       }
 
-export const getCoreDnsPayload = (path, data) =>
-  pathStrOr(0, path, data)
-    ? {
-        coreDns: 1,
-        dnsMemoryLimit: data.dnsMemoryLimit,
-        dnsDomain: data.dnsDomain,
-      }
-    : {
-        coreDns: 0,
-      }
-
 export const getMetalLbCidr = (keyValueArr = []) =>
   keyValueArr.map(({ key, value }) => `${key}-${value}`).join()
 
