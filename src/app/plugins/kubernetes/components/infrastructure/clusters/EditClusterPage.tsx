@@ -32,7 +32,12 @@ import { NetworkStackTypes } from './constants'
 import Theme from 'core/themes/model'
 import { compareVersions } from 'k8s/util/helpers'
 import { clusterAddonActions } from './clusterAddons/actions'
-import { addonManagerAddons, clusterAddonFieldId, ClusterAddonType } from './clusterAddons/helpers'
+import {
+  addonParamsApiNameMap,
+  clusterAddonFieldId,
+  ClusterAddonType,
+  getAddonParams,
+} from './clusterAddons/helpers'
 
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
@@ -72,7 +77,7 @@ const bareOSClusterAddons = [
 const awsClusterAddons = [
   { addon: 'etcdBackup' },
   { addon: 'prometheusMonitoringEnabled' },
-  { addon: 'enableCAS' },
+  { addon: 'awsEnableCAS' },
   { addon: 'kubernetesDashboard' },
   { addon: 'metricsServer' },
   { addon: 'coreDns' },
@@ -86,6 +91,36 @@ const azureClusterAddons = [
   { addon: 'metricsServer' },
   { addon: 'coreDns' },
 ]
+
+const bareOsAddonManagerAddons = [
+  ClusterAddonType.CoreDns,
+  ClusterAddonType.KubernetesDashboard,
+  ClusterAddonType.MetricsServer,
+  ClusterAddonType.MetalLb,
+]
+const awsAddonManagerAddons = [
+  ClusterAddonType.CoreDns,
+  ClusterAddonType.KubernetesDashboard,
+  ClusterAddonType.MetricsServer,
+  ClusterAddonType.AwsAutoScaler,
+]
+const azureAddonManagerAddons = [
+  ClusterAddonType.CoreDns,
+  ClusterAddonType.KubernetesDashboard,
+  ClusterAddonType.MetricsServer,
+  ClusterAddonType.AzureAutoScaler,
+]
+
+const addonParamsAreUpdated = (addonType, currParams, newParams) => {
+  const addonParams = getAddonParams(addonType)
+  if (addonParams.length === 0) return false
+  for (const param of addonParams) {
+    const currValue = currParams[param]
+    const newValue = newParams[addonParamsApiNameMap[param]]
+    if (currValue !== newValue) return true
+  }
+  return false
+}
 
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
@@ -102,7 +137,6 @@ const EditClusterPage = () => {
   const isNewK8sVersion = useMemo(() => compareVersions(cluster.kubeRoleVersion, '1.20') >= 0, [
     cluster.kubeRoleVersion,
   ])
-
 
   // Cluster Addons
   const [createAddon, creatingAddon] = useDataUpdater(clusterAddonActions.create)
@@ -122,6 +156,16 @@ const EditClusterPage = () => {
         },
         [],
       )(cluster.cloudProviderType),
+    [cluster.cloudProviderType],
+  )
+
+  const clusterAddonManagerAddons = useMemo(
+    () =>
+      objSwitchCaseAny({
+        [CloudProviders.BareOS]: bareOsAddonManagerAddons,
+        [CloudProviders.Aws]: awsAddonManagerAddons,
+        [CloudProviders.Azure]: azureAddonManagerAddons,
+      })(cluster.cloudProviderType),
     [cluster.cloudProviderType],
   )
 
@@ -158,6 +202,10 @@ const EditClusterPage = () => {
       }),
       reduce((acc, item) => ({ ...acc, ...item }), {}),
     )(existingClusterAddons)
+    if (addons?.MetallbIpRange) {
+      const range = addons.MetallbIpRange.split('-')
+      addons.metallbCidr = [{ key: range[0], value: range[1] }]
+    }
     updateParams(addons)
   }, [existingClusterAddons])
 
@@ -226,7 +274,7 @@ const EditClusterPage = () => {
     await Promise.all(
       // Loop through all the available cluster addons that are managed by
       // the addon manager
-      addonManagerAddons.map((addonType: ClusterAddonType) => {
+      clusterAddonManagerAddons.map((addonType: ClusterAddonType) => {
         const fieldId = clusterAddonFieldId[addonType]
         const enableAddon = values[fieldId]
         // If values[fieldId] === undefined, meaning that the addon was not an option
@@ -238,18 +286,18 @@ const EditClusterPage = () => {
         )
         const addonIsCurrentlyEnabled = !!existingAddon
         const addonName = existingAddon?.name
-        if (addonIsCurrentlyEnabled && enableAddon) {
-          console.log('update', addonType, { clusterId, addonType, addonName, params: values })
+        if (
+          addonIsCurrentlyEnabled &&
+          enableAddon &&
+          addonParamsAreUpdated(addonType, existingAddon.params, values)
+        ) {
+          console.log('update', addonType)
           return updateAddon({ clusterId, addonType, addonName, params: values })
         } else if (addonIsCurrentlyEnabled && !enableAddon) {
-          console.log('delete', addonType, {addonName})
+          console.log('delete', addonType)
           return deleteAddon({ addonName })
         } else if (!addonIsCurrentlyEnabled && enableAddon) {
-          console.log('create', addonType, {
-            clusterId,
-            addonType,
-            params: values,
-          })
+          console.log('create', addonType)
           return createAddon({
             clusterId,
             addonType,
@@ -259,6 +307,8 @@ const EditClusterPage = () => {
       }),
     )
   }
+
+  console.log('params', params)
 
   const updatingAddons = creatingAddon || updatingAddon || deletingAddon
   const loadingSomething =

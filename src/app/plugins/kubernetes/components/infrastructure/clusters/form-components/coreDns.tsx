@@ -21,7 +21,7 @@ const CoreDns = ({ wizardContext, setWizardContext }) => (
 
 export const CoreDnsAddonFields = () => {
   const {
-    wizardContext,
+    wizardContext = {},
     setWizardContext,
   }: { wizardContext: any; setWizardContext: any } = useContext(EditClusterContext) as any
 

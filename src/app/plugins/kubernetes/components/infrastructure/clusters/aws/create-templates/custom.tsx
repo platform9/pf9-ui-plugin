@@ -181,7 +181,7 @@ const handleTemplateChoice = ({ setFieldValue, setWizardContext }) => (option) =
 const configStepAddOns = [
   { addon: 'etcdBackup' },
   { addon: 'prometheusMonitoringEnabled' },
-  { addon: 'enableCAS' },
+  { addon: 'awsEnableCAS' },
   { addon: 'profileAgent' },
 ]
 const advancedClusterAddons = [{ addon: 'enableTopologyManager' }]

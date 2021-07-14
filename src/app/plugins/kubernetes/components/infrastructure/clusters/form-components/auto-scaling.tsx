@@ -5,10 +5,12 @@ import React from 'react'
 
 export const azureAutoscalingFieldId = 'enableCAS'
 
-const AutoScalingField = () => (
+const AutoScalingField = ({wizardContext, setWizardContext}) => (
   <CheckboxField
     id={azureAutoscalingFieldId}
     label="Enable Auto Scaling"
+    value={wizardContext[azureAutoscalingFieldId]}
+    onChange={(value) => setWizardContext({ [azureAutoscalingFieldId]: value })}
     info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
   />
 )
