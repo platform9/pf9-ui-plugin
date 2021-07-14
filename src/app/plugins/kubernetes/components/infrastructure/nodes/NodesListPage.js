@@ -29,7 +29,7 @@ import ResourceUsageTables from '../common/ResourceUsageTables'
 import NodesStatePicklist from './nodes-state-picklist'
 import NodeAuthDialog from './NodeAuthDialog'
 import { NodeState } from './model'
-import { orderInterfaces, hasClockDrift } from './helpers'
+import { orderInterfaces, hasClockDrift, nodeApiServerHealthStatusFields } from './helpers'
 import { renderErrorStatus } from '../clusters/ClusterStatus'
 import NodeRolesPicklist from './node-roles-picklist'
 
