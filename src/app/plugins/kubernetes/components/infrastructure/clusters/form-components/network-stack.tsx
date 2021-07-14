@@ -27,7 +27,7 @@ export const handleNetworkStackChange = (changeValue, wizardContext) => {
   }
 }
 
-export default function NetworkStackChooser({ wizardContext, setWizardContext }) {
+export default function NetworkStackChooser({ wizardContext, setWizardContext, disabled = false }) {
   return (
     <RadioFields
       id={formKey}
@@ -36,6 +36,7 @@ export default function NetworkStackChooser({ wizardContext, setWizardContext })
       onChange={(changeValue) =>
         setWizardContext(handleNetworkStackChange(changeValue, wizardContext))
       }
+      disabled={disabled}
     />
   )
 }

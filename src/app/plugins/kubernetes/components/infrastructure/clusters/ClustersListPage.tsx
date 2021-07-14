@@ -290,7 +290,7 @@ export const options = {
     { id: 'tags', label: 'Metadata', render: renderMetaData },
   ],
   cacheKey: ActionDataKeys.Clusters,
-  editUrl: (_, id) => routes.cluster.edit.path({ id }),
+  // editUrl: (_, id) => routes.cluster.edit.path({ id }),
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
@@ -303,6 +303,21 @@ export const options = {
       icon: 'info-circle',
       label: 'Details',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
+    },
+    {
+      icon: 'edit',
+      label: 'Edit',
+      routeTo: (rows) => routes.cluster.edit.path({ id: rows[0].uuid }),
+    },
+    {
+      cond: both(isAdmin, canUpgradeCluster),
+      icon: 'level-up',
+      label: 'Upgrade Cluster',
+      dialog: ClusterUpgradeDialog,
+      disabledInfo: ([cluster]) =>
+        !!cluster && clockDriftDetectedInNodes(cluster.nodes)
+          ? 'Cannot upgrade cluster: clock drift detected in at least one node'
+          : 'Cannot upgrade cluster',
     },
     {
       cond: both(isAdmin, canScaleMasters),
@@ -319,17 +334,14 @@ export const options = {
         !!cluster && isAzureAutoscalingCluster(cluster)
           ? 'Scaling Azure autoscaling clusters is not yet supported'
           : 'Cannot scale workers: cluster is busy',
+      showDivider: true,
     },
-    {
-      cond: both(isAdmin, canUpgradeCluster),
-      icon: 'level-up',
-      label: 'Upgrade Cluster',
-      dialog: ClusterUpgradeDialog,
-      disabledInfo: ([cluster]) =>
-        !!cluster && clockDriftDetectedInNodes(cluster.nodes)
-          ? 'Cannot upgrade cluster: clock drift detected in at least one node'
-          : 'Cannot upgrade cluster',
-    },
+    // {
+    //   cond: both(isAdmin, notBusy),
+    //   icon: 'chart-bar',
+    //   label: 'Monitoring',
+    //   dialog: PrometheusAddonDialog,
+    // },
     // Disable logging till all CRUD features for log datastores are implemented.
     /* {
       cond: false,

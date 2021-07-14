@@ -79,4 +79,5 @@ export interface IDataKeys {
   Users: any // is this needed? only in openstack
   RbacProfiles: any
   RbacProfileBindings: any
+  ClusterAddons: any
 }

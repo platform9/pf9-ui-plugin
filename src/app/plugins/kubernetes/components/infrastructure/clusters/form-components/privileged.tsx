@@ -3,11 +3,15 @@ import ExternalLink from 'core/components/ExternalLink'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import { runtimePrivilegedLink } from 'k8s/links'
 
-const PrivilegedContainers = ({ wizardContext, setWizardContext }) => (
+const PrivilegedContainers = ({ wizardContext, setWizardContext, disabled = undefined }) => (
   <CheckboxField
     id="privileged"
     label="Privileged Containers"
-    disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
+    disabled={
+      disabled === undefined
+        ? ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)
+        : disabled
+    }
     onChange={(value) => setWizardContext({ privileged: value })} // other fields need to set this field, so it also needs to be controlled
     value={wizardContext.privileged}
     info={

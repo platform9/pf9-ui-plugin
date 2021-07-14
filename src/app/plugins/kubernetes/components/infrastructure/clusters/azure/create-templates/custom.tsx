@@ -175,6 +175,14 @@ const handleTemplateChoice = ({ setFieldValue }) => (option) => {
   })
 }
 
+const configStepAddOns = [
+  { addon: 'etcdBackup' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'enableCAS' },
+  { addon: 'profileAgent' },
+]
+const advancedClusterAddons = [{ addon: 'enableTopologyManager' }]
+
 const useStyles = makeStyles<Theme>((theme) => ({
   validatedFormContainer: {
     display: 'grid',
@@ -184,8 +192,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     margin: theme.spacing(3, 0),
   },
 }))
-
-const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileAgent']
 
 interface Props {
   wizardContext: any
@@ -451,7 +457,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <AddonTogglers
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['enableTopologyManager']}
+                  addons={advancedClusterAddons}
                 />
               </FormFieldCard>
             </>

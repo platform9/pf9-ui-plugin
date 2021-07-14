@@ -79,13 +79,16 @@ interface Props {
 }
 
 const clusterAddons = [
-  'etcdBackup',
-  'enableMetallbLayer2',
-  'prometheusMonitoringEnabled',
-  'networkPluginOperator',
-  'kubevirtPluginOperator',
-  'profileAgent',
+  { addon: 'etcdBackup' },
+  { addon: 'enableMetallbLayer2' },
+  { addon: 'prometheusMonitoringEnabled' },
+  { addon: 'networkPluginOperator' },
+  { addon: 'kubevirtPluginOperator' },
+  { addon: 'profileAgent' },
 ]
+
+const advancedClusterAddons = [{ addon: 'enableTopologyManager' }]
+
 const trackingFields = {
   platform: CloudProviders.VirtualMachine,
   target: ClusterCreateTypes.SingleMaster,
@@ -180,8 +183,8 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           nodeFilterFn={allPass([isConnected, isUnassignedNode])}
           nodeValidations={[masterNodeLengthValidator]}
           isSingleNodeCluster={false}
-          pollForNodes={true}
-          required={true}
+          pollForNodes
+          required
         />
       </WizardStep>
       <WizardStep
@@ -204,7 +207,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
           ])}
           nodeValidations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
           isSingleNodeCluster={false}
-          pollForNodes={true}
+          pollForNodes
         />
       </WizardStep>
       <WizardStep
@@ -273,7 +276,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
                 <AddonTogglers
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['enableTopologyManager']}
+                  addons={advancedClusterAddons}
                 />
               </FormFieldCard>
             </>

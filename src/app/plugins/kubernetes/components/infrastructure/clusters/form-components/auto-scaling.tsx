@@ -3,16 +3,26 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import TextField from 'core/components/validatedForm/TextField'
 import React from 'react'
 
-const AutoScalingField = () => (
+export const azureAutoscalingFieldId = 'enableCAS'
+
+const AutoScalingField = ({wizardContext, setWizardContext}) => (
   <CheckboxField
-    id="enableCAS"
+    id={azureAutoscalingFieldId}
     label="Enable Auto Scaling"
+    value={wizardContext[azureAutoscalingFieldId]}
+    onChange={(value) => setWizardContext({ [azureAutoscalingFieldId]: value })}
     info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
   />
 )
 
 export const AutoScalingAddonFields = () => (
   <FormFieldCard title="Auto Scaling">
+    <TextField
+      id="numMinWorkers"
+      type="number"
+      label="Minimum number of worker nodes"
+      info="Minimum number of worker nodes this cluster may be scaled down to."
+    />
     <TextField
       id="numMaxWorkers"
       type="number"

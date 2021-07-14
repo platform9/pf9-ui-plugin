@@ -29,6 +29,8 @@ import {
   GetPrometheusAlertRules,
   AlertManagerAlert,
   SupportedRoleVersions,
+  ClusterAddon,
+  ClusterAddons,
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
@@ -71,6 +73,15 @@ const normalizeImportedClusters = (apiResponse: GCluster<ImportedCluster>) => {
     uuid: cluster.metadata.name,
   }))
   return normalizedClusters
+}
+
+const normalizeClusterAddons = (apiResponse: GCluster<ClusterAddon>) => {
+  const addons = apiResponse.items
+  const normalizeClusterAddons = addons.map((addon) => ({
+    ...addon,
+    clusterId: addon.spec?.clusterID,
+  }))
+  return normalizeClusterAddons
 }
 
 /* eslint-disable camelcase */
@@ -1362,7 +1373,7 @@ class Qbert extends ApiService {
 
   deleteRbacProfile = async (name) => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofiles/${name}`
-    return await this.client.basicDelete({
+    return this.client.basicDelete({
       url,
       version: 'v4',
       options: {
@@ -1401,7 +1412,7 @@ class Qbert extends ApiService {
 
   deleteRbacProfileBinding = async (name) => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings/${name}`
-    return await this.client.basicDelete({
+    return this.client.basicDelete({
       url,
       version: 'v4',
       options: {
@@ -2027,6 +2038,80 @@ class Qbert extends ApiService {
       options: {
         clsName: this.getClassName(),
         mthdName: 'getCoreApiResourcesList',
+      },
+    })
+  }
+
+  // Get addons for ALL clusters
+  getAllClusterAddons = async () => {
+    const url = '/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusteraddons'
+    const result = await this.client.basicGet<ClusterAddons>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterAddons',
+      },
+    })
+    return normalizeClusterAddons(result)
+  }
+
+  getClusterAddons = async (clusterId) => {
+    const clusterLabel = `sunpike.pf9.io/cluster=${clusterId}`
+    const url = createUrlWithQueryString(
+      `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusteraddons`,
+      { labelSelector: clusterLabel },
+    )
+    const result = await this.client.basicGet<ClusterAddons>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterAddons',
+      },
+    })
+    return normalizeClusterAddons(result)
+  }
+
+  deleteClusterAddon = async (addonName) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusteraddons/${addonName}`
+    return this.client.basicDelete({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteClusterAddon',
+      },
+    })
+  }
+
+  addClusterAddon = async (body) => {
+    const url = '/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusteraddons'
+    return this.client.basicPost({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteClusterAddon',
+      },
+    })
+  }
+
+  editClusterAddon = async (addonName, body) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusteraddons/${addonName}`
+    return this.client.basicPatch({
+      url,
+      version: 'v4',
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteClusterAddon',
+        config: {
+          headers: {
+            'Content-Type': 'application/merge-patch+json',
+          },
+        },
       },
     })
   }

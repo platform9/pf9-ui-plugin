@@ -41,10 +41,24 @@ const AutoScalingAddonFields = React.lazy(async () =>
     default: module.AutoScalingAddonFields,
   })),
 )
+
+const AwsAutoScalingField = React.lazy(async () => import('../aws/AwsAutoScaling'))
+
 const TopologyManagerField = React.lazy(async () => import('./topology-manager'))
 const TopologyManagerAddonFields = React.lazy(async () =>
   import('./topology-manager').then((module) => ({
     default: module.TopologyManagerAddonFields,
+  })),
+)
+
+const KubernetesDashboardField = React.lazy(async () => import('./kubernetes-dashboard'))
+
+const MetricsServerField = React.lazy(async () => import('./metrics-server'))
+
+const CoreDnsField = React.lazy(async () => import('./coreDns'))
+const CoreDnsAddonFields = React.lazy(async () =>
+  import('./coreDns').then((module) => ({
+    default: module.CoreDnsAddonFields,
   })),
 )
 
@@ -82,15 +96,36 @@ const addonMap = {
     toggler: AutoScalingField,
     details: { component: AutoScalingAddonFields },
   },
+  awsEnableCAS: {
+    toggler: AwsAutoScalingField,
+    details: { component: null }
+  },
   enableTopologyManager: {
     toggler: TopologyManagerField,
     details: { component: TopologyManagerAddonFields },
   },
+  kubernetesDashboard: {
+    toggler: KubernetesDashboardField,
+    details: { component: null },
+  },
+  metricsServer: {
+    toggler: MetricsServerField,
+    details: { component: null },
+  },
+  coreDns: {
+    toggler: CoreDnsField,
+    details: { component: CoreDnsAddonFields },
+  },
 }
 
 interface WizardAddonContext {
-  addons: string[]
-  setAddonContext: (addons: string[]) => void
+  addons: Addon[]
+  setAddonContext: (addons: Addon[]) => void
+}
+
+interface Addon {
+  addon: string
+  disabled?: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -104,11 +139,16 @@ export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
   }, [memoizedDep(addons)])
   return (
     <Suspense fallback="loading...">
-      {addons.map((addon) => {
+      {addons?.map(({ addon, disabled = false }) => {
         const Addon = getAddonComponent(addon, 'toggler')
         return (
           Addon && (
-            <Addon key={addon} wizardContext={wizardContext} setWizardContext={setWizardContext} />
+            <Addon
+              key={addon}
+              wizardContext={wizardContext}
+              setWizardContext={setWizardContext}
+              disabled={disabled}
+            />
           )
         )
       })}
@@ -116,19 +156,19 @@ export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
   )
 }
 
-export const AddonDetailCards = ({ wizardContext, setWizardContext, values }) => {
+export const AddonDetailCards = ({ values }) => {
   const { addons } = useContext(AddonContext)
 
   return (
     <Suspense fallback="loading...">
-      {addons.map((addon) => {
+      {addons?.map(({ addon, disabled = false }) => {
         const addonId = getAddonComponent(addon, 'formId') || addon
         const { component: Addon, reverse = false } = getAddonComponent(addon, 'details')
         if (!values[addonId]) {
-          return reverse ? <Addon key={addon} values={values} /> : null
+          return reverse ? <Addon key={addon} values={values}/> : null
         }
 
-        return Addon && !reverse ? <Addon key={addon} values={values} /> : null
+        return Addon && !reverse ? <Addon key={addon} values={values}/> : null
       })}
     </Suspense>
   )
