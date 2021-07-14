@@ -23,7 +23,8 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // @ts-ignore
   const { loadOnDemand = false, defaultParams = emptyObj, loadingFeedback = true } = options
   const { cacheKey, fetchErrorMessage, selectorCreator, indexBy, cache } = loaderFn
-  const [{ currentTenant, currentRegion }] = useScopedPreferences()
+  const { prefs } = useScopedPreferences()
+  const { currentTenant, currentRegion } = prefs
   const [refetching, setRefetching] = useState(null)
   const dispatch = useDispatch()
 

@@ -21,7 +21,6 @@ import { listTablePrefs, allKey } from 'app/constants'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
-import { orderInterfaces } from './helpers'
 import { makeStyles } from '@material-ui/styles'
 import { routes } from 'core/utils/routes'
 import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
@@ -30,8 +29,9 @@ import ResourceUsageTables from '../common/ResourceUsageTables'
 import NodesStatePicklist from './nodes-state-picklist'
 import NodeAuthDialog from './NodeAuthDialog'
 import { NodeState } from './model'
-import { clockDriftDetectedInNodes, hasClockDrift } from './helpers'
+import { orderInterfaces, hasClockDrift } from './helpers'
 import { renderErrorStatus } from '../clusters/ClusterStatus'
+import NodeRolesPicklist from './node-roles-picklist'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
 const defaultParams = {
   clusterId: allKey,
   state: allKey,
+  role: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Nodes', listTablePrefs)
 
@@ -75,8 +76,16 @@ const ListPage = ({ ListContainer }) => {
       }
     }
 
+    const filterByNodeRole = (node) => {
+      if (params.role === allKey) {
+        return true
+      } else {
+        return params.role === 'master' ? node.isMaster : !node.isMaster
+      }
+    }
+
     const filteredNodes = nodes.filter((node) => {
-      return filterByCluster(node) && filterByNodeState(node)
+      return filterByCluster(node) && filterByNodeState(node) && filterByNodeRole(node)
     })
 
     return (
@@ -95,6 +104,7 @@ const ListPage = ({ ListContainer }) => {
               showNone
             />
             <NodesStatePicklist onChange={getParamsUpdater('state')} value={params.state} />
+            <NodeRolesPicklist onChange={getParamsUpdater('role')} value={params.role} />
           </>
         }
         {...pick(listTablePrefs, params)}
@@ -226,8 +236,19 @@ export const renderNodeHealthStatus = (_, node, onClick = undefined) => {
 
 const renderRole = (_, { isMaster }) => (isMaster ? 'Master' : 'Worker')
 
-const renderApiServer = (_, { isMaster, api_responding: apiResponding }) =>
-  castBoolToStr()(!!isMaster && !!apiResponding)
+const renderApiServerHealth = (_, node) => {
+  if (!node.isMaster) return
+  const status = node.api_responding ? 'online' : 'offline'
+  const fields = nodeApiServerHealthStatusFields[status]
+
+  return (
+    <>
+      <ClusterStatusSpan title={fields.message} status={fields.clusterStatus}>
+        {fields.label}
+      </ClusterStatusSpan>
+    </>
+  )
+}
 
 export const renderNetworkInterfaces = (_, node, options = {}) => {
   const { wrapText = false } = options
@@ -262,15 +283,20 @@ const renderUUID = (_, { uuid }) => {
 
 export const columns = [
   { id: 'name', label: 'Name', render: renderNodeDetailLink },
+  { id: 'isMaster', label: 'Role', render: renderRole },
   { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus },
-  { id: 'healthStatus', label: 'Health status', render: renderNodeHealthStatus },
-  { id: 'api_responding', label: 'API server', render: renderApiServer },
+  {
+    id: 'platform9ComponentsStatus',
+    label: 'Platform9 Components',
+    render: renderNodeHealthStatus,
+  },
+  { id: 'api_responding', label: 'API Server Health', render: renderApiServerHealth },
   { id: 'logs', label: 'Logs', render: renderLogs },
+  { id: 'actualKubeRoleVersion', label: 'Node Kube Version' },
   { id: 'primaryIp', label: 'Network Interfaces', render: renderNetworkInterfaces },
   { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
   { id: 'os', label: 'Operating System', render: renderOperatingSystem },
   { id: 'clusterName', label: 'Cluster', render: renderClusterLink },
-  { id: 'isMaster', label: 'Role', render: renderRole },
   { id: 'uuid', label: 'UUID', render: renderUUID, display: false },
   { id: 'isSpotInstance', label: 'Spot Instance?', display: false, render: getSpotInstance },
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },

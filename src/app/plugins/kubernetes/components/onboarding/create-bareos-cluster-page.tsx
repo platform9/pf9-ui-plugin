@@ -2,8 +2,8 @@ import { makeStyles } from '@material-ui/styles'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Theme from 'core/themes/model'
 import { masterNodeLengthValidator } from 'core/utils/fieldValidators'
-import { allPass } from 'ramda'
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { allPass, sort } from 'ramda'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import CloudProviderCard from '../common/CloudProviderCard'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import ClusterHostChooser, {
@@ -12,14 +12,17 @@ import ClusterHostChooser, {
 } from '../infrastructure/clusters/bareos/ClusterHostChooser'
 import { initialContext } from '../infrastructure/clusters/bareos/create-templates/physical-one-click'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { clusterActions } from '../infrastructure/clusters/actions'
+import { clusterActions, loadSupportedRoleVersions } from '../infrastructure/clusters/actions'
 import { ClusterCreateTypes } from '../infrastructure/clusters/model'
 import { bareOSClusterTracking } from '../infrastructure/clusters/tracking'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import DownloadOvaWalkthrough from './download-ova-walkthrough'
 import DownloadCliWalkthrough from './download-cli-walkthrough'
-import useScopedPreferences from 'core/session/useScopedPreferences'
-import { UserPreferences } from 'app/constants'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { compareVersions } from 'k8s/util/helpers'
+import { sessionActions } from 'core/session/sessionReducers'
+import { useDispatch } from 'react-redux'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   connectNodesContainer: {
@@ -69,11 +72,12 @@ const CreateBareOsClusterPage = ({
 }) => {
   const classes = useStyles()
   const [option, setOption] = useState<Option>('ova')
-  const [, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const dispatch = useDispatch()
   const onComplete = (success, cluster) => {
     if (!success) return
-    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true }) // Should we only update the user default if it's a success? What if it's not a success?
-    setClusterId(cluster.uuid)
+    const clusterNodeUrl = routes.cluster.nodeHealth.path({ id: cluster?.uuid })
+    dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: clusterNodeUrl }))
+    setClusterId(cluster?.uuid)
   }
   const [createCluster] = useDataUpdater(clusterActions.create, onComplete)
   const validatorRef = useRef(null)
@@ -82,30 +86,36 @@ const CreateBareOsClusterPage = ({
     validatorRef.current = { validate }
   }
 
+  const [kubernetesVersions] = useDataLoader(loadSupportedRoleVersions)
+  const defaultKubernetesVersion = useMemo(() => {
+    const versionsList = kubernetesVersions?.map((obj) => obj.roleVersion) || []
+    const sortedVersions = sort(compareVersions, versionsList) // this sorts the versions from low-high
+    return sortedVersions[sortedVersions.length - 1]
+  }, [kubernetesVersions])
+
   useEffect(() => {
     bareOSClusterTracking.createStarted(segmentTrackingFields)()
     bareOSClusterTracking.oneClick(segmentTrackingFields)()
   }, [])
 
   const handleSubmit = useCallback(async () => {
-    setSubmitting(true)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
     }
-
+    setSubmitting(true)
     const data = {
       ...initialContext,
       segmentTrackingFields,
       clusterType: 'local',
+      kubeRoleVersion: defaultKubernetesVersion,
       name: wizardContext.clusterName,
-      kubeRoleVersion: wizardContext.kubeRoleVersion,
       masterNodes: wizardContext.masterNodes,
     }
     await createCluster(data)
     setSubmitting(false)
     return true
-  }, [wizardContext])
+  }, [validatorRef.current, setSubmitting, defaultKubernetesVersion, wizardContext])
 
   useEffect(() => {
     onNext(handleSubmit)

@@ -32,7 +32,7 @@ import { pathJoin } from 'utils/misc'
 import PushEventsProvider from 'core/providers/PushEventsProvider'
 import { useToast } from 'core/providers/ToastProvider'
 import { RootState } from 'app/store'
-import { apply, Dictionary, keys, mergeAll, pathOr, prop, toPairs as ToPairs } from 'ramda'
+import { apply, Dictionary, keys, mergeAll, path, pathOr, prop, toPairs as ToPairs } from 'ramda'
 import pluginManager from 'core/utils/pluginManager'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import BannerContainer from 'core/components/notifications/BannerContainer'
@@ -45,9 +45,16 @@ import Bugsnag from '@bugsnag/js'
 import { Route as Router } from 'core/utils/routes'
 import { addZendeskWidgetScriptToDomBody, hideZendeskWidget } from 'utils/zendesk-widget'
 import { preferencesActions } from 'core/session/preferencesReducers'
-import { isProductionEnv } from 'core/utils/helpers'
+import { isDecco, isProductionEnv } from 'core/utils/helpers'
 import Watchdog from 'core/watchdog'
 import sessionTimeoutCheck from 'core/watchdog/session-timeout'
+import OnboardingPage, { OnboardingStepNames } from 'k8s/components/onboarding/onboarding-page'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { mngmUserActions } from 'app/plugins/account/components/userManagement/users/actions'
+import Progress from 'core/components/progress/Progress'
+import DataKeys from 'k8s/DataKeys'
+import { cacheStoreKey, updatingStoreKey } from 'core/caching/cacheReducers'
 
 const toPairs: any = ToPairs
 
@@ -146,6 +153,18 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       },
     },
   },
+  modal: {
+    position: 'fixed',
+    left: 0,
+    top: '55px',
+    width: '100vw',
+    height: 'calc(100vh - 55px)', // 55px is the toolbar height
+    overflow: 'auto',
+    zIndex: 5000,
+    backgroundColor: theme.palette.grey['100'],
+    padding: theme.spacing(2, 4),
+    boxSizing: 'border-box',
+  },
 }))
 
 const renderPluginRoutes = (role) => (id, plugin) => {
@@ -236,7 +255,7 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   }
 }
 
-const determineCurrentStack = (location, features, lastStack) => {
+export const determineCurrentStack = (location, features, lastStack) => {
   const currentRoute = Router.getCurrentRoute()
   const handleReturn = () => {
     if (lastStack) {
@@ -313,16 +332,46 @@ const loadRegionFeatures = async (setRegionFeatures, setStacks, dispatch, histor
 
 const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
+function isOnboardingEnv(currentStack, features) {
+  const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
+  return (
+    currentStack === AppPlugins.Kubernetes &&
+    isDecco(features) &&
+    customerTier === CustomerTiers.Freedom
+  )
+}
+
+function needsOnboardingBackfill(
+  currentStack,
+  features,
+  featureFlags,
+  clusters,
+  clustersUpdating,
+  users,
+) {
+  const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
+  return (
+    isOnboardingTargetEnv &&
+    featureFlags.isOnboarded === undefined &&
+    !clustersUpdating &&
+    clusters?.length > 0 &&
+    users?.length > 1
+  )
+}
+
 const AuthenticatedContainer = () => {
   const { history, location } = useReactRouter()
   const [drawerOpen, toggleDrawer] = useToggler(true)
+  const dispatch = useDispatch()
+  const showToast = useToast()
   const [regionFeatures, setRegionFeatures] = useState<{
     openstack?: boolean
     kubernetes?: boolean
     intercom?: boolean
     ironic?: boolean
   }>(emptyObj)
-  const [{ currentRegion, lastStack }, updatePrefs] = useScopedPreferences()
+  const { prefs, updatePrefs } = useScopedPreferences()
+  const { currentRegion, lastStack } = prefs
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
   const [currentStack, setStack] = useState(
     determineCurrentStack(history.location, regionFeatures, lastStack),
@@ -333,22 +382,64 @@ const AuthenticatedContainer = () => {
     username,
     userDetails: { id: userId, name, displayName, role },
     features,
+    onboardingRedirectToUrl,
   } = session
   const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
   const plugins = pluginManager.getPlugins()
   const SecondaryHeader = plugins[currentStack]?.getSecondaryHeader()
 
-  const showNavBar =
+  // Onboarding
+  const clustersUpdating = useSelector(path([cacheStoreKey, updatingStoreKey, DataKeys.Clusters]))
+
+  const { prefs: defaultPrefs, updateUserDefaults } = useScopedPreferences('defaults')
+  const { featureFlags = {} as any } = defaultPrefs
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
+  const shouldBackfillOnboarding = needsOnboardingBackfill(
+    currentStack,
+    features,
+    featureFlags,
+    clusters,
+    clustersUpdating,
+    users,
+  )
+  const isOnboardingTargetEnv = isOnboardingEnv(currentStack, features)
+
+  const isLoadingInitialData =
+    (clusters?.length === 0 && loadingClusters) || (users?.length === 0 && loadingUsers)
+
+  const showOnboarding =
+    isOnboardingTargetEnv && !shouldBackfillOnboarding && !featureFlags.isOnboarded
+
+  let onboardingWizardStep = OnboardingStepNames.WelcomeStep
+  if (showOnboarding && clusters?.length >= 1 && users?.length === 1) {
+    onboardingWizardStep = OnboardingStepNames.InviteCoworkerStep
+  }
+
+  const shouldShowNavbarForCurrentStack =
     currentStack !== AppPlugins.MyAccount ||
     (currentStack === AppPlugins.MyAccount && role === 'admin')
 
-  const dispatch = useDispatch()
-  const showToast = useToast()
+  const showNavBar =
+    shouldShowNavbarForCurrentStack &&
+    !(isOnboardingTargetEnv && !featureFlags.isOnboarded && isLoadingInitialData)
+
   const classes = useStyles({
     path: history.location.pathname,
     hasSecondaryHeader: !!SecondaryHeader,
     showNavBar: showNavBar,
   })
+
+  // onboarding
+  useEffect(() => {
+    if (shouldBackfillOnboarding) {
+      updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
+    }
+    if (onboardingRedirectToUrl) {
+      history.push(onboardingRedirectToUrl)
+      dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: null }))
+    }
+  }, [shouldBackfillOnboarding, onboardingRedirectToUrl, history])
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
@@ -414,11 +505,30 @@ const AuthenticatedContainer = () => {
   const sections = getSections(plugins, role, features)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
+  const renderOnboardingWizard = () => (
+    <div id="onboarding" className={classes.modal}>
+      <OnboardingPage initialStep={onboardingWizardStep} />
+    </div>
+  )
+
+  const renderMainContent = () => (
+    <>
+      {renderRawComponents(plugins)}
+      <Switch>
+        {renderPlugins(plugins, role)}
+        <Route path={helpUrl} component={HelpPage} />
+        <Route path={logoutUrl} component={LogoutPage} />
+        <Redirect to={dashboardUrl} />
+      </Switch>
+      {devEnabled && <DeveloperToolsEmbed />}
+    </>
+  )
+
   return (
     <>
       <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
-        <Toolbar />
+        <Toolbar hideNotificationsDropdown={showOnboarding} />
         {SecondaryHeader && <SecondaryHeader className={classes.secondaryHeader} />}
         {showNavBar && (
           <Navbar
@@ -470,17 +580,14 @@ const AuthenticatedContainer = () => {
                 </BannerContent>
               </>
             )}
-            {/* {pathStrOr(false, 'experimental.containervisor', features) &&
-              currentStack === 'kubernetes' && <ClusterUpgradeBanner />} */}
             <div className={classes.contentMain}>
-              {renderRawComponents(plugins)}
-              <Switch>
-                {renderPlugins(plugins, role)}
-                <Route path={helpUrl} component={HelpPage} />
-                <Route path={logoutUrl} component={LogoutPage} />
-                <Redirect to={dashboardUrl} />
-              </Switch>
-              {devEnabled && <DeveloperToolsEmbed />}
+              {isOnboardingTargetEnv && !featureFlags.isOnboarded && isLoadingInitialData ? (
+                <Progress loading={loadingClusters || loadingUsers} />
+              ) : showOnboarding ? (
+                renderOnboardingWizard()
+              ) : (
+                renderMainContent()
+              )}
             </div>
           </main>
         </PushEventsProvider>

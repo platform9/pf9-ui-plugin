@@ -15,6 +15,7 @@ import { IClusterSelector, IClusterAction } from './model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import {
   getK8sDashboardLinkFromVersion,
+  getScopedClusterProxyEndpoint,
   hasAppCatalogEnabled,
   hasHealthyMasterNodes,
   hasMasterNode,
@@ -49,10 +50,11 @@ export const clustersSelector = createSelector(
         const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
         const nodeIds = pluck('uuid', nodesInCluster)
         const combinedNodes = nodeIds.map((id) => combinedHostsById[id])
-        const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
-        const grafanaLink =
-          `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/` +
-          `namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+        const proxyEndpoint = getScopedClusterProxyEndpoint(
+          qbertEndpoint.replace(/\/qbert\//, '/k8s/'),
+          cluster,
+        )
+        const grafanaLink = `${proxyEndpoint}/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
         const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
         const _usage = calculateNodeUsages(combinedNodes)
         const usage = {
@@ -106,7 +108,7 @@ export const clustersSelector = createSelector(
             // Rendering happens in <DownloadKubeConfigLink />
             kubeconfig: clusterOk ? { cluster } : null,
             // Rendering happens in <ClusterCLI />
-            cli: clusterOk ? { host, cluster } : null,
+            cli: clusterOk ? { host: qbertEndpoint.match(/(.*?)\/qbert/)[1], cluster } : null,
           },
           ...fuzzyBools,
           hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
@@ -124,13 +126,11 @@ export const clustersSelector = createSelector(
     )(rawClusters)
   },
 )
-
-export const makeParamsClustersSelector = (
-  defaultParams: SortConfig = {
-    orderBy: 'created_at',
-    orderDirection: 'desc',
-  },
-) => {
+const clusterSelectorDefaultParams: SortConfig = {
+  orderBy: 'created_at',
+  orderDirection: 'desc',
+}
+export const makeParamsClustersSelector = (defaultParams = clusterSelectorDefaultParams) => {
   return createSelector(
     [clustersSelector, (_, params) => mergeLeft(params, defaultParams)],
     (clusters, params) => {
@@ -165,13 +165,11 @@ export const makeParamsClustersSelector = (
     },
   )
 }
-
-export const allClustersSelector = (
-  defaultParams: SortConfig = {
-    orderBy: 'name',
-    orderDirection: 'asc',
-  },
-) => {
+const allClustersSelectorDefaultParams: SortConfig = {
+  orderBy: 'name',
+  orderDirection: 'asc',
+}
+export const allClustersSelector = (defaultParams = allClustersSelectorDefaultParams) => {
   return createSelector(
     [clustersSelector, importedClustersSelector, (_, params) => mergeLeft(params, defaultParams)],
     (clusters, importedClusters, params) => {

@@ -61,6 +61,7 @@ import CreateRbacProfile from 'k8s/components/rbac/profiles/create'
 import RbacProfilesIndexPage from './components/rbac/profiles/rbac-profiles-index-page'
 import { isDecco } from 'core/utils/helpers'
 import DeployRbacProfilePage from './components/rbac/profiles/deploy/deploy-rbac-profile-page'
+import DeleteProfileBindingsPage from './components/rbac/profiles/delete-profile-bindings'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -417,6 +418,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac_profiles/deploy/:name', exact: true },
       component: DeployRbacProfilePage,
+    },
+    {
+      name: 'Delete RBAC Profile Bindings',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/delete_bindings/:name', exact: true },
+      component: DeleteProfileBindingsPage,
     },
   ])
 

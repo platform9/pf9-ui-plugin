@@ -1,10 +1,9 @@
-import { MessageTypes } from 'core/components/notifications/model'
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { useToast } from 'core/providers/ToastProvider'
 import { emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
 import { useDispatch } from 'react-redux'
 import { notificationActions } from 'core/notifications/notificationReducers'
+import { cacheActions } from 'core/caching/cacheReducers'
 
 /**
  * Hook to update data using the specified updater function
@@ -45,6 +44,7 @@ const useDataUpdater = (updaterFn, onComplete) => {
     async (params = emptyObj) => {
       // No need to update loading state if a request is already in progress
       if (isEmpty(updaterPromisesBuffer.current)) {
+        dispatch(cacheActions.setUpdating({ cacheKey, updating: true }))
         setLoading(true)
       }
 
@@ -60,11 +60,13 @@ const useDataUpdater = (updaterFn, onComplete) => {
 
       // With this condition, we ensure that all promises except the last one will be ignored
       if (isEmpty(updaterPromisesBuffer.current) && !unmounted.current) {
+        dispatch(cacheActions.setUpdating({ cacheKey, updating: false }))
         setLoading(false)
         if (onComplete) {
           await onComplete(successful, result)
         }
       }
+
       return [successful, result]
     },
     [updaterFn, onComplete],

@@ -3,22 +3,22 @@ import Theme from 'core/themes/model'
 import React, { useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import PicklistDefault from 'core/components/Picklist'
-const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 import SearchBar from './SearchBar'
 import { allKey } from 'app/constants'
 import { Route } from 'core/utils/routes'
+const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 interface Props {
-  data: Array<String>
+  data: String[]
   setFilteredData: Function
-  filters: Array<Filter>
+  filters: Filter[]
   searchTarget: string
 }
 
 interface Filter {
   name: string
   label: string
-  options: Array<String>
+  options: String[]
   target: string
 }
 
@@ -73,7 +73,7 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
   }
 
   const updateUrlWithParams = () => {
-    const params = {}
+    const params = {} as any
     // Add in all other params in the URL
     const hasFilterProperties = Object.entries(filterProperties).length > 0
     urlParams.forEach((value, key) => {
@@ -83,8 +83,8 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
     })
 
     Object.assign(params, filterProperties)
-    if (!!searchTerm) {
-      params['search'] = searchTerm
+    if (searchTerm) {
+      params.search = searchTerm
     }
 
     const urlWithQueryParams = route.path(params)

@@ -18,11 +18,11 @@ const defaultParams = {
   clusterId: allKey,
   namespace: allKey,
 }
-const visibleColumns = ['name', 'clusterName', 'created']
-const columnsOrder = ['name', 'clusterName', 'created']
+const visibleColumns = ['name', 'namespace', 'created']
+const columnsOrder = ['name', 'namespace', 'created']
 const orderBy = 'name'
 const orderDirection = 'asc'
-const searchTargets = ['name', 'clusterName']
+const searchTargets = ['name', 'namespace']
 
 export const RoleBindingsListTable = ({
   data,
@@ -37,7 +37,7 @@ export const RoleBindingsListTable = ({
     () => [
       { id: 'id', display: false },
       { id: 'name', label: 'Name' },
-      { id: 'clusterName', label: 'Cluster' },
+      { id: 'namespace', label: 'Namespace' },
       { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
     ],
     [],
@@ -69,7 +69,10 @@ const RoleBindingsStep = ({ wizardContext, setWizardContext }) => {
   const classes = useStyles()
   const [selectedRows, setSelectedRows] = useState(emptyArr)
   const { params, getParamsUpdater } = useParams(defaultParams)
-  const [data, loading, reload] = useDataLoader(roleBindingActions.list, params)
+  const [data, loading, reload] = useDataLoader(roleBindingActions.list, {
+    ...params,
+    clusterId: wizardContext.baseCluster,
+  })
   const refetch = useCallback(() => reload(true), [reload])
   const handleSelect = useCallback((rows) => {
     setSelectedRows(rows)

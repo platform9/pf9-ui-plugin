@@ -72,11 +72,7 @@ const reducers = {
       cacheKey: DataKeys
       loading: boolean
     }>,
-  ) => {
-    const result = assocPath([loadingStoreKey, cacheKey], loading, state)
-
-    return result
-  },
+  ) => assocPath([loadingStoreKey, cacheKey], loading, state),
   setUpdating: (
     state,
     {
@@ -85,11 +81,7 @@ const reducers = {
       cacheKey: DataKeys
       updating: boolean
     }>,
-  ) => {
-    const result = assocPath([updatingStoreKey, cacheKey], updating, state)
-
-    return result
-  },
+  ) => assocPath([updatingStoreKey, cacheKey], updating, state),
   addItem: <T extends Dictionary<any>>(
     state,
     {

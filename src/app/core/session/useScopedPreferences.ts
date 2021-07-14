@@ -12,15 +12,17 @@ import { useDispatch, useSelector } from 'react-redux'
 
 const { preferenceStore } = ApiClient.getInstance()
 
+interface ScopedPreferences<T> {
+  prefs: Partial<T>
+  updatePrefs: (prefs: Partial<T>) => void
+  getUserPrefs: (username: string) => Partial<T>
+  updateUserDefaults: (defaultsKey: string, defaults: any) => void
+}
+
 const useScopedPreferences = <T extends Dictionary<any>>(
   key: string = 'root',
   defaultPrefs?: T,
-): [
-  Partial<T>,
-  (prefs: Partial<T>) => void,
-  (username: string) => Partial<T>,
-  (defaultsKey: string, defaults: any) => void,
-] => {
+): ScopedPreferences<T> => {
   const selectPrefsState = prop<string, PreferencesState>(preferencesStoreKey)
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const allPrefs = useSelector(selectPrefsState)
@@ -79,7 +81,7 @@ const useScopedPreferences = <T extends Dictionary<any>>(
     [username, id, prefs],
   )
 
-  return [prefs, updatePrefs, getUserPrefs, updateUserDefaults]
+  return { prefs, updatePrefs, getUserPrefs, updateUserDefaults }
 }
 
 export default useScopedPreferences

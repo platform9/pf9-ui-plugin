@@ -42,6 +42,7 @@ const NetworkBackendField = ({
       setWizardContext(handleNetworkBackendChange(value, wizardContext.networkStack, wizardContext))
     }
     options={options}
+    value={wizardContext.networkPlugin}
     info={
       wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
     }

@@ -9,11 +9,9 @@ import Text from 'core/elements/text'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import Theme from 'core/themes/model'
-import { sort } from 'ramda'
 import React, { useCallback, useMemo, useState } from 'react'
 import { objSwitchCase } from 'utils/fp'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
-import { loadSupportedRoleVersions } from '../infrastructure/clusters/actions'
 import AddCoworkerStep from './add-coworker-step'
 import CreateBareOsClusterPage from './create-bareos-cluster-page'
 import CreateCloudClusterPage from './create-cloud-cluster-page'
@@ -25,7 +23,8 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import AddCloudProviderPage from './add-cloud-provider-page'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 import Progress from 'core/components/progress/Progress'
-import { compareVersions } from 'k8s/util/helpers'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { UserPreferences } from 'app/constants'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -71,25 +70,36 @@ export type ClusterChoice = 'bareOs' | 'cloud' | 'import'
 
 const managementPlaneImagePath = '/ui/images/light-management-plane.svg'
 
-const OnboardingPage = () => {
+const initialContext = {
+  clusterName: 'PF9-single-node-cluster',
+}
+
+export enum OnboardingStepNames {
+  WelcomeStep = 'welcomeStep',
+  ConfigureYourInfrastructureStep = 'configureInfrastuctureStep',
+  BuildClusterStep = 'buildClusterStep',
+  InviteCoworkerStep = 'inviteCoworkerStep',
+}
+
+const onboardingStepNumbers = {
+  [OnboardingStepNames.WelcomeStep]: 0,
+  [OnboardingStepNames.ConfigureYourInfrastructureStep]: 1,
+  [OnboardingStepNames.BuildClusterStep]: 2,
+  [OnboardingStepNames.InviteCoworkerStep]: 3,
+}
+
+interface Props {
+  initialStep: OnboardingStepNames
+}
+
+const OnboardingPage = ({ initialStep }: Props) => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
+  const [cloudProviders, loadingCloudProviders] = useDataLoader(cloudProviderActions.list)
   const [clusterChoice, setClusterChoice] = useState<ClusterChoice>('bareOs')
   const [clusterId, setClusterId] = useState(null)
-  const [kubernetesVersions] = useDataLoader(loadSupportedRoleVersions)
   const [submitting, setSubmitting] = useState(false)
-
-  const defaultKubernetesVersion = useMemo(() => {
-    const versionsList = kubernetesVersions?.map((obj) => obj.roleVersion) || []
-    const sortedVersions = sort(compareVersions, versionsList) // this sorts the versions from low-high
-    return sortedVersions[sortedVersions.length - 1]
-  }, [kubernetesVersions])
-
-  const initialContext = {
-    clusterName: 'PF9-single-node-cluster',
-    kubeRoleVersion: defaultKubernetesVersion,
-  }
+  const { updateUserDefaults } = useScopedPreferences('defaults')
 
   const BuildClusterStep = useMemo(() => {
     return objSwitchCaseAny({
@@ -100,6 +110,7 @@ const OnboardingPage = () => {
   }, [clusterChoice])
 
   const handleFormCompletion = useCallback(() => {
+    updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
     if (clusterChoice === 'import') {
       history.push(routes.cluster.imported.list.path())
     } else {
@@ -133,7 +144,12 @@ const OnboardingPage = () => {
     <>
       <DocumentMeta title="Onboarding" bodyClasses={['form-view']} />
       <FormWrapper title="" loading={submitting}>
-        <Wizard context={initialContext} onComplete={handleFormCompletion} hideAllButtons>
+        <Wizard
+          context={initialContext}
+          onComplete={handleFormCompletion}
+          startingStep={onboardingStepNumbers[initialStep]}
+          hideAllButtons
+        >
           {({ wizardContext, setWizardContext, onNext, handleNext, handleBack, setActiveStep }) => {
             return (
               <>
@@ -194,18 +210,19 @@ const OnboardingPage = () => {
                   label="Configure Your Infrastructure"
                   keepContentMounted={false}
                 >
-                  <Progress loading={loading}>
-                    <AddCloudProviderPage
-                      cloudProviders={cloudProviders}
-                      loadingCloudProviders={loading}
-                      wizardContext={wizardContext}
-                      setWizardContext={setWizardContext}
-                      onNext={onNext}
-                      handleNext={handleNext}
-                      setSubmitting={setSubmitting}
-                      clusterChoice={clusterChoice}
-                      handleBack={handleBack}
-                    />
+                  <Progress loading={loadingCloudProviders}>
+                    {!loadingCloudProviders && (
+                      <AddCloudProviderPage
+                        cloudProviders={cloudProviders}
+                        wizardContext={wizardContext}
+                        setWizardContext={setWizardContext}
+                        onNext={onNext}
+                        handleNext={handleNext}
+                        setSubmitting={setSubmitting}
+                        clusterChoice={clusterChoice}
+                        handleBack={handleBack}
+                      />
+                    )}
                   </Progress>
                 </WizardStep>
                 <WizardStep
@@ -222,7 +239,9 @@ const OnboardingPage = () => {
                     setClusterId={setClusterId}
                   />
                   <PrevButton onClick={handleStepThreeBackButtonClick(handleBack, setActiveStep)} />
-                  <SubmitButton onClick={handleNext}>+ Create Cluster</SubmitButton>
+                  <SubmitButton onClick={handleNext}>
+                    {clusterChoice === 'import' ? '+ Import Cluster' : '+ Create Cluster'}
+                  </SubmitButton>
                 </WizardStep>
                 <WizardStep
                   stepId="inviteCoworkerStep"

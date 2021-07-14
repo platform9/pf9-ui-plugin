@@ -75,7 +75,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const DashboardPage = () => {
   const { history } = useReactRouter()
-  const [prefs, , , updateUserDefaults] = useScopedPreferences('defaults')
+  const { prefs, updateUserDefaults } = useScopedPreferences('defaults')
   const { cardOrder = emptyArr, isInitialized = false } = prefs?.dashboard || {}
 
   const reportCards =

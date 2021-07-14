@@ -189,6 +189,13 @@ export const options = {
       return profile.status.phase === 'creating'
     })
   },
+  batchActions: [
+    {
+      icon: 'tasks',
+      label: 'Manage Bindings',
+      routeTo: (rows) => routes.rbac.profiles.deleteBindings.path({ name: rows[0].name }),
+    },
+  ],
 }
 
 // Try to: Add polling to createCRUDComponents

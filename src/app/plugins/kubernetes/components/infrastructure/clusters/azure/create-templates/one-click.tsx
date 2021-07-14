@@ -96,7 +96,7 @@ interface Props {
 
 const OneClickAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
-  const [prefs] = useScopedPreferences('defaults')
+  const { prefs } = useScopedPreferences('defaults')
   const cloudDefaults = useMemo(() => prefs[UserPreferences.Azure] || {}, [prefs])
 
   const handleRegionChange = (regionName) =>

@@ -18,6 +18,7 @@ import useParams from 'core/hooks/useParams'
 import CloudProviderPicklist from '../common/CloudProviderPicklist'
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import { createUrlWithQueryString } from 'core/utils/routes'
+import { omit } from 'ramda'
 
 const methodsWithBody = ['POST', 'PUT', 'PATCH']
 
@@ -206,8 +207,9 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
 
   const handleSubmit = async ({ body, ...inputValues }) => {
     let url = metadata.url
+    const values = omit(['jsonResponse'], inputValues)
     if (metadata.params.length > 0) {
-      url = createUrlWithQueryString(url, inputValues)
+      url = createUrlWithQueryString(url, values)
     }
 
     const response = await makeApiRequest(url, body)

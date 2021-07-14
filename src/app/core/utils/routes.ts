@@ -957,6 +957,13 @@ export const routes = {
         },
         name: 'RBAC:RbacProfiles:Edit',
       }),
+      deleteBindings: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/delete_bindings/:name`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:DeleteBindings',
+      }),
     },
   },
   password: {

@@ -14,6 +14,9 @@ import { map, keys, flatten } from 'ramda'
 import { ClusterCloudPlatforms } from 'app/constants'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import { toggleRegion } from '../infrastructure/clusters/import/ImportEKSClusterPage'
+import { useDispatch } from 'react-redux'
+import { routes } from 'core/utils/routes'
+import { sessionActions } from 'core/session/sessionReducers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -49,6 +52,7 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
   const [, , reloadImportedClusters] = useDataLoader(importedClusterActions.list)
   const clusterType = cloudClusterMap[wizardContext.provider]
   const detailsKey = detailsKeyMap[wizardContext.provider]
+  const dispatch = useDispatch()
 
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
@@ -76,12 +80,11 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
   }
 
   const handleSubmit = useCallback(async () => {
-    setSubmitting(true)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
     }
-
+    setSubmitting(true)
     const finalSelectedClusters = getAllSelectedClusters(wizardContext.selectedClusters)
 
     const metadata = {
@@ -99,6 +102,10 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
       stack: clusterType,
       detailsKey: detailsKey,
     })
+
+    const importedClustersListUrl = routes.cluster.imported.list.path()
+    dispatch(sessionActions.updateSession({ onboardingRedirectToUrl: importedClustersListUrl }))
+
     setSubmitting(false)
     // do this here bc invalidateCache in the actions doesn't seem to work
     reloadImportedClusters(true)
