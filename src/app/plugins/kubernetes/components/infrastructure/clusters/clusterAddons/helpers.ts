@@ -2,6 +2,10 @@ import { coreDnsFieldId } from '../form-components/coreDns'
 import { kubernetesDashboardFieldId } from '../form-components/kubernetes-dashboard'
 import { metricsServerFieldId } from '../form-components/metrics-server'
 import { objSwitchCase as objSwitchCaseAny } from 'utils/fp'
+import { metalLbFieldId } from '../form-components/metal-lb'
+import { azureAutoscalingFieldId } from '../form-components/auto-scaling'
+import { getMetalLbCidr } from '../helpers'
+import { awsAutoScalingFieldId } from '../aws/AwsAutoScaling'
 
 const objSwitchCase: any = objSwitchCaseAny
 
@@ -10,37 +14,35 @@ export enum ClusterAddonType {
   KubernetesDashboard = 'kubernetes-dashboard',
   MetricsServer = 'metrics-server',
   Metallb = 'metallb',
+  AzureAutoScaler = 'cluster-auto-scaler-azure',
+  AwsAutoScaler = 'cluster-auto-scaler-aws'
 }
 
 export const clusterAddonFieldId = {
   [ClusterAddonType.CoreDns]: coreDnsFieldId,
   [ClusterAddonType.KubernetesDashboard]: kubernetesDashboardFieldId,
   [ClusterAddonType.MetricsServer]: metricsServerFieldId,
-  [ClusterAddonType.Metallb]: 'enableMetalb',
-}
-
-export const clusterAddonTypeName = {
-  coreDns: ClusterAddonType.CoreDns,
-  kubernetesDashboard: ClusterAddonType.KubernetesDashboard,
-  metricsServer: ClusterAddonType.MetricsServer,
+  [ClusterAddonType.Metallb]: metalLbFieldId,
+  [ClusterAddonType.AzureAutoScaler]: azureAutoscalingFieldId,
+  [ClusterAddonType.AwsAutoScaler]: awsAutoScalingFieldId,
 }
 
 export const addonManagerAddons = [
-  // ClusterAddonName.CoreDns,
   ClusterAddonType.MetricsServer,
   ClusterAddonType.KubernetesDashboard,
+  ClusterAddonType.CoreDns,
+  ClusterAddonType.Metallb,
+  ClusterAddonType.AzureAutoScaler,
+  ClusterAddonType.AwsAutoScaler,
 ]
 
-export const defaultDnsMemoryLimit = '170Mi'
-export const defaultDnsDomain = 'cluster.local'
-export const defaultAdditionalDnsConfig = ''
-
-export const getCoreDnsRequestBody = (
+export const getCoreDnsRequestBody = ({
   clusterId,
-  dnsMemoryLimit = defaultDnsMemoryLimit,
-  dnsDomain = defaultDnsDomain,
-  additionalDnsConfig = defaultAdditionalDnsConfig,
-) => ({
+  dnsMemoryLimit,
+  dnsDomain,
+  additionalDnsConfig,
+}) => {
+  return {
   apiVersion: 'sunpike.platform9.com/v1alpha2',
   kind: 'ClusterAddon',
   metadata: {
@@ -61,9 +63,9 @@ export const getCoreDnsRequestBody = (
     version: '1.7.0',
     watch: true,
   },
-})
+}}
 
-export const getMetallbRequestbody = (clusterId, metallbIpRange = '') => ({
+export const getMetallbRequestbody = ({ clusterId, metallbCidr }) => ({
   apiVersion: 'sunpike.platform9.com/v1alpha2',
   kind: 'ClusterAddon',
   metadata: {
@@ -74,7 +76,7 @@ export const getMetallbRequestbody = (clusterId, metallbIpRange = '') => ({
   spec: {
     clusterID: clusterId,
     override: {
-      params: [{ name: 'MetallbIpRange', value: metallbIpRange }],
+      params: [{ name: 'MetallbIpRange', value: getMetalLbCidr(metallbCidr) }],
     },
     type: 'metallb',
     version: '0.9.5',
@@ -121,7 +123,7 @@ const awsAutoScaleDefaultCpuLimit = '200m'
 const awsAutoScaleDefaultMemRequest = '300Mi'
 const awsAutoScaleDefaultMemLimit = '600Mi'
 
-export const getAwsAutoScalerRequestBody = (clusterId, clusterRegion) => ({
+export const getAwsAutoScalerRequestBody = ({clusterId, region}) => ({
   apiVersion: 'sunpike.platform9.com/v1alpha2',
   kind: 'ClusterAddon',
   metadata: {
@@ -134,7 +136,7 @@ export const getAwsAutoScalerRequestBody = (clusterId, clusterRegion) => ({
     override: {
       params: [
         { name: 'clusterUUID', value: '' },
-        { name: 'clusterRegion', value: clusterRegion },
+        { name: 'clusterRegion', value: region },
         { name: 'cpuRequest', value: awsAutoScaleDefaultCpuRequest },
         { name: 'cpuLimit', value: awsAutoScaleDefaultCpuLimit },
         { name: 'memRequest', value: awsAutoScaleDefaultMemRequest },
@@ -147,7 +149,7 @@ export const getAwsAutoScalerRequestBody = (clusterId, clusterRegion) => ({
   },
 })
 
-export const getAzureAutoScalerRequestBody = (clusterId, minNumWorkers, maxNumWorkers) => ({
+export const getAzureAutoScalerRequestBody = ({clusterId, numMinWorkers, numMaxWorkers}) => ({
   apiVersion: 'sunpike.platform9.com/v1alpha2',
   kind: 'ClusterAddon',
   metadata: {
@@ -159,8 +161,8 @@ export const getAzureAutoScalerRequestBody = (clusterId, minNumWorkers, maxNumWo
     clusterID: clusterId,
     override: {
       params: [
-        { name: 'minNumWorkers', value: minNumWorkers },
-        { name: 'maxNumWorkers', value: maxNumWorkers },
+        { name: 'minNumWorkers', value: numMinWorkers?.toString() },
+        { name: 'maxNumWorkers', value: numMaxWorkers?.toString() },
       ],
     },
     type: 'cluster-auto-scaler-azure',
@@ -169,11 +171,15 @@ export const getAzureAutoScalerRequestBody = (clusterId, minNumWorkers, maxNumWo
   },
 })
 
-export const getClusterAddonBody = (clusterId, addonType, params) =>
+export const getClusterAddonBody = (clusterId, addonType, params) => 
   objSwitchCase(
     {
       [ClusterAddonType.KubernetesDashboard]: getKubernetesDashboardRequestBody(clusterId),
       [ClusterAddonType.MetricsServer]: getMetricsServerRequestBody(clusterId),
+      [ClusterAddonType.CoreDns]: getCoreDnsRequestBody({ clusterId, ...params }),
+      [ClusterAddonType.Metallb]: getMetallbRequestbody({ clusterId, ...params }),
+      [ClusterAddonType.AzureAutoScaler]: getAzureAutoScalerRequestBody({clusterId, ...params}),
+      [ClusterAddonType.AwsAutoScaler]: getAwsAutoScalerRequestBody({ clusterId, ...params })
     },
     {},
   )(addonType)

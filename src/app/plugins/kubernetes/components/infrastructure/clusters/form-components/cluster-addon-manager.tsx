@@ -41,6 +41,9 @@ const AutoScalingAddonFields = React.lazy(async () =>
     default: module.AutoScalingAddonFields,
   })),
 )
+
+const AwsAutoScalingField = React.lazy(async () => import('../aws/AwsAutoScaling'))
+
 const TopologyManagerField = React.lazy(async () => import('./topology-manager'))
 const TopologyManagerAddonFields = React.lazy(async () =>
   import('./topology-manager').then((module) => ({
@@ -92,6 +95,10 @@ const addonMap = {
   enableCAS: {
     toggler: AutoScalingField,
     details: { component: AutoScalingAddonFields },
+  },
+  awsEnableCAS: {
+    toggler: AwsAutoScalingField,
+    details: { component: null }
   },
   enableTopologyManager: {
     toggler: TopologyManagerField,
@@ -149,7 +156,7 @@ export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
   )
 }
 
-export const AddonDetailCards = ({ wizardContext, setWizardContext, values }) => {
+export const AddonDetailCards = ({ values }) => {
   const { addons } = useContext(AddonContext)
 
   return (
@@ -158,10 +165,10 @@ export const AddonDetailCards = ({ wizardContext, setWizardContext, values }) =>
         const addonId = getAddonComponent(addon, 'formId') || addon
         const { component: Addon, reverse = false } = getAddonComponent(addon, 'details')
         if (!values[addonId]) {
-          return reverse ? <Addon key={addon} values={values} /> : null
+          return reverse ? <Addon key={addon} values={values}/> : null
         }
 
-        return Addon && !reverse ? <Addon key={addon} values={values} /> : null
+        return Addon && !reverse ? <Addon key={addon} values={values}/> : null
       })}
     </Suspense>
   )

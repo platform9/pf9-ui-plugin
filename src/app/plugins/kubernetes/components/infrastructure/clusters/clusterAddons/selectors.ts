@@ -1,8 +1,13 @@
+import { Param } from 'api-client/qbert.model'
 import createSorter from 'core/helpers/createSorter'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
 import { mergeLeft, pipe } from 'ramda'
 import { createSelector } from 'reselect'
+
+const parseClusterAddonParams = (params: Param[]) => {
+  if (!params) return {}
+  return params.reduce((acc, item) => ({...acc, [item.name]: item.value}), {})}
 
 export const clusterAddonsSelector = createSelector(
   [getDataSelector<DataKeys.ClusterAddons>(DataKeys.ClusterAddons, ['clusterId'])],
@@ -11,7 +16,7 @@ export const clusterAddonsSelector = createSelector(
       ...addon,
       name: addon.metadata?.name,
       type: addon.spec?.type,
-      params: addon.spec?.override?.params,
+      params: parseClusterAddonParams(addon.spec?.override?.params),
       clusterId: addon.spec?.clusterID,
     }))
   },

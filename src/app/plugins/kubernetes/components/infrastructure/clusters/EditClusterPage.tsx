@@ -38,6 +38,8 @@ const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file don
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
+export const EditClusterContext = React.createContext({})
+
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
     display: 'grid',
@@ -101,6 +103,7 @@ const EditClusterPage = () => {
     cluster.kubeRoleVersion,
   ])
 
+
   // Cluster Addons
   const [createAddon, creatingAddon] = useDataUpdater(clusterAddonActions.create)
   const [updateAddon, updatingAddon] = useDataUpdater(clusterAddonActions.update)
@@ -151,7 +154,7 @@ const EditClusterPage = () => {
       when(isNil, always(emptyArr)),
       map((addon: any) => {
         const fieldId = clusterAddonFieldId[addon.type]
-        return fieldId ? { [fieldId]: true } : {}
+        return fieldId ? { [fieldId]: true, ...addon.params } : {}
       }),
       reduce((acc, item) => ({ ...acc, ...item }), {}),
     )(existingClusterAddons)
@@ -235,12 +238,18 @@ const EditClusterPage = () => {
         )
         const addonIsCurrentlyEnabled = !!existingAddon
         const addonName = existingAddon?.name
- 
         if (addonIsCurrentlyEnabled && enableAddon) {
-          return updateAddon({ clusterId, addonType, addonName, params })
+          console.log('update', addonType, { clusterId, addonType, addonName, params: values })
+          return updateAddon({ clusterId, addonType, addonName, params: values })
         } else if (addonIsCurrentlyEnabled && !enableAddon) {
+          console.log('delete', addonType, {addonName})
           return deleteAddon({ addonName })
         } else if (!addonIsCurrentlyEnabled && enableAddon) {
+          console.log('create', addonType, {
+            clusterId,
+            addonType,
+            params: values,
+          })
           return createAddon({
             clusterId,
             addonType,
@@ -256,7 +265,7 @@ const EditClusterPage = () => {
     loadingClusters || loadingClusterAddons || updatingCluster || updatingAddons
 
   return (
-    <>
+    <EditClusterContext.Provider value={{ wizardContext: params, setWizardContext: updateParams }}>
       <DocumentMeta title="Edit Cluster" bodyClasses={['form-view']} />
       <FormWrapper
         title={`Edit Cluster ${initialValues.name || ''}`}
@@ -306,7 +315,7 @@ const EditClusterPage = () => {
           </FormFieldCard>
         </ValidatedForm>
       </FormWrapper>
-    </>
+    </EditClusterContext.Provider>
   )
 }
 
