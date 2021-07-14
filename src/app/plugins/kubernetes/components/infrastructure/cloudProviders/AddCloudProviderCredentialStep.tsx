@@ -17,6 +17,7 @@ import { clone } from 'ramda'
 import clsx from 'clsx'
 import useReactRouter from 'use-react-router'
 import { routes } from 'core/utils/routes'
+import { onboardClusterTracking } from '../../onboarding/tracking'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -211,6 +212,10 @@ const AddCloudProviderCredentialStep = ({
     })(wizardContext.provider)
   }, [wizardContext.provider])
 
+  const handleClick = (value) => {
+    setWizardContext({ provider: value })
+    onboardClusterTracking.wZSelectingCloudProviderType(value)
+  }
   return (
     <>
       <Text className={clsx(classes.title, headerClass)} variant="body1">
@@ -219,17 +224,17 @@ const AddCloudProviderCredentialStep = ({
       <div className={classes.cloudProviderCards}>
         <CloudProviderCard
           active={wizardContext.provider === CloudProviders.Aws}
-          onClick={(value) => setWizardContext({ provider: value })}
+          onClick={handleClick}
           type={CloudProviders.Aws}
         />
         <CloudProviderCard
           active={wizardContext.provider === CloudProviders.Azure}
-          onClick={(value) => setWizardContext({ provider: value })}
+          onClick={handleClick}
           type={CloudProviders.Azure}
         />
         <CloudProviderCard
           active={wizardContext.provider === CloudProviders.Gcp}
-          onClick={(value) => setWizardContext({ provider: value })}
+          onClick={handleClick}
           type={CloudProviders.Gcp}
         />
       </div>

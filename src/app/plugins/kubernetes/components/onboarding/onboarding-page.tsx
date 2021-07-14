@@ -24,7 +24,9 @@ import AddCloudProviderPage from './add-cloud-provider-page'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 import Progress from 'core/components/progress/Progress'
 import useScopedPreferences from 'core/session/useScopedPreferences'
+import { onboardClusterTracking } from './tracking'
 import { UserPreferences } from 'app/constants'
+
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -110,6 +112,7 @@ const OnboardingPage = ({ initialStep }: Props) => {
   }, [clusterChoice])
 
   const handleFormCompletion = useCallback(() => {
+    onboardClusterTracking.wzSkipUser()
     updateUserDefaults(UserPreferences.FeatureFlags, { isOnboarded: true })
     if (clusterChoice === 'import') {
       history.push(routes.cluster.imported.list.path())
@@ -121,6 +124,7 @@ const OnboardingPage = ({ initialStep }: Props) => {
   const handleDeploymentCardClick = (setWizardContext, handleNext, setActiveStep) => (
     type: ClusterChoice,
   ) => {
+    onboardClusterTracking.wZWelcome(clusterChoice)
     setClusterChoice(type)
     setWizardContext({ clusterChoice: type })
     if (type === 'bareOs') {

@@ -18,7 +18,7 @@ import { mngmRoleActions } from 'app/plugins/account/components/userManagement/r
 import { mngmUserActions } from 'app/plugins/account/components/userManagement/users/actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-
+import { onboardClusterTracking } from './tracking'
 const initialValues = {
   username: '',
   displayname: '',
@@ -45,11 +45,13 @@ const AddCoworkerStep = ({ wizardContext, setWizardContext, onNext, setSubmittin
   }
 
   const handleSubmit = useCallback(async () => {
+    onboardClusterTracking.wzAddCoworker()
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
     }
     setSubmitting(true)
+
     const data = {
       ...wizardContext,
       roleAssignments: { [currentTenant]: defaultRoleId },

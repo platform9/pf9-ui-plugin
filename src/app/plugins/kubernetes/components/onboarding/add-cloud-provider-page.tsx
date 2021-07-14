@@ -10,7 +10,7 @@ import { formTitle } from '../infrastructure/cloudProviders/AddCloudProviderPage
 import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 import PrevButton from 'core/components/buttons/PrevButton'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-
+import { onboardClusterTracking } from './tracking'
 const useStyles = makeStyles<Theme>((theme) => ({
   cloudProviders: {
     display: 'grid',
@@ -64,6 +64,10 @@ const AddCloudProviderPage = ({
   }
 
   const submitStep = useCallback(() => {
+    onboardClusterTracking.wZSelectedCloudProvider(
+      activeCloudProvider.name,
+      activeCloudProvider.type,
+    )
     if (!wizardContext.cloudProviderId) {
       setError('Must select an existing cloud provider or create a new one')
       return false

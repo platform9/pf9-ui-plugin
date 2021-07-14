@@ -17,7 +17,7 @@ import { toggleRegion } from '../infrastructure/clusters/import/ImportEKSCluster
 import { useDispatch } from 'react-redux'
 import { routes } from 'core/utils/routes'
 import { sessionActions } from 'core/session/sessionReducers'
-
+import { onboardClusterTracking } from './tracking'
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
     display: 'grid',
@@ -80,6 +80,7 @@ const ImportClusterPage = ({ wizardContext, setWizardContext, onNext, setSubmitt
   }
 
   const handleSubmit = useCallback(async () => {
+    onboardClusterTracking.wzCreateClusterImported(wizardContext.name, wizardContext.provider)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false

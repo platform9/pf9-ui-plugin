@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import Text from 'core/elements/text'
 import SimpleLink from 'core/components/SimpleLink'
-import SubmitButton from 'core/components/SubmitButton'
+import SubmitButton from 'core/components/buttons/SubmitButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
@@ -14,6 +14,7 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import BulletList from 'core/components/BulletList'
 import useScopedPreferences from '../../../../core/session/useScopedPreferences'
+import { onboardClusterTracking } from './tracking'
 const useStyles = makeStyles((theme: Theme) => ({
   linkText: {
     textDecoration: 'underline',
@@ -60,13 +61,15 @@ const DownloadOvaWalkthrough = () => {
   const session = useSelector(selectSessionState)
   const { getUserPrefs } = useScopedPreferences()
   const { currentTenant, currentRegion } = getUserPrefs(session.username)
-
+  const handleOvaDownload = () => {
+    onboardClusterTracking.wZOvaDownload()
+  }
   const StepOne = useMemo(
     () => (
       <>
         <Text>Download the OVA</Text>
         <SimpleLink src={downloadLink}>
-          <SubmitButton className={classes.downloadButton}>
+          <SubmitButton className={classes.downloadButton} onClick={handleOvaDownload}>
             Download
             <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
               download
