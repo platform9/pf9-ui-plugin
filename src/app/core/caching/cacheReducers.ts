@@ -94,8 +94,9 @@ const reducers = {
     }>,
   ) => {
     const dataLens = lensPath([dataStoreKey, cacheKey])
+    const result = over(dataLens, append(mergeLeft(params, item)))(state)
 
-    return over(dataLens, append(mergeLeft(params, item)))(state)
+    return result
   },
   updateItem: <T extends Dictionary<any>>(
     state,
@@ -112,11 +113,13 @@ const reducers = {
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
     // TODO: fix adjustWith typings
-    return over(
+    const result = over(
       dataLens,
       // @ts-ignore
       adjustWith(matchIdentifiers, mergeLeft(item)),
     )(state)
+
+    return result
   },
   removeItem: (
     state,
@@ -128,11 +131,13 @@ const reducers = {
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
     // TODO: fix removeWith typings
-    return over(
+    const result = over(
       dataLens,
       // @ts-ignore
       removeWith(matchIdentifiers),
     )(state)
+
+    return result
   },
   upsertAll: <T extends Dictionary<any>>(
     state,
@@ -155,7 +160,7 @@ const reducers = {
     // @ts-ignore
     const upsertNewItems = pipe(arrayIfNil, upsertAllBy(matchUniqueIdentifiers, items))
 
-    return pipe(
+    const result = pipe(
       over(dataLens, upsertNewItems),
       // I params are provided, add them to cachedParams so that
       // we know this query has already been resolved
@@ -175,6 +180,7 @@ const reducers = {
           : identity,
       ),
     )(state)
+    return result
   },
   replaceAll: <T extends Dictionary<any>>(
     state,
@@ -185,21 +191,24 @@ const reducers = {
     const dataPath = [dataStoreKey, cacheKey]
     const paramsPath = [paramsStoreKey, cacheKey]
 
-    return pipe<CacheState, CacheState, CacheState>(
+    const result = pipe<CacheState, CacheState, CacheState>(
       assocPath(dataPath, items),
       // If params are provided, replace the cached params array with the new params
       params ? assocPath(paramsPath, of(params)) : identity,
     )(state)
+    return result
   },
   clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKeys }>>) => {
     const cacheKey = action?.payload?.cacheKey
-    return cacheKey
-      ? pipe<CacheState, CacheState, CacheState, CacheState>(
-          dissocPath([dataStoreKey, cacheKey]),
-          dissocPath([paramsStoreKey, cacheKey]),
-          dissocPath([loadingStoreKey, cacheKey]),
-        )(state)
-      : initialState
+    if (!cacheKey) return initialState
+
+    const result = pipe<CacheState, CacheState, CacheState, CacheState>(
+      dissocPath([dataStoreKey, cacheKey]),
+      dissocPath([paramsStoreKey, cacheKey]),
+      dissocPath([loadingStoreKey, cacheKey]),
+    )(state)
+
+    return result
   },
 }
 

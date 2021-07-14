@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
-import { either, mergeLeft, partition, pathOr, pipe, pluck } from 'ramda'
-import { filterIf } from 'utils/fp'
+import { either, mergeLeft, partition, pathOr, pipe, pluck, map } from 'ramda'
+import { arrayIfEmpty, filterIf } from 'utils/fp'
 import createSorter, { SortConfig } from 'core/helpers/createSorter'
 import {
   getConnectionStatus,
@@ -11,7 +11,7 @@ import {
 import { castFuzzyBool } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { IClusterSelector } from './model'
+import { IClusterSelector, IClusterAction } from './model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import {
   getK8sDashboardLinkFromVersion,
@@ -41,91 +41,96 @@ export const clustersSelector = createSelector(
     rawClusters,
     clustersWithTasks,
     nodes: INodesSelector[],
-    combinedHosts,
+    combinedHostsById,
     qbertEndpoint: string,
   ) => {
-    return rawClusters.map((cluster) => {
-      const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
-      const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
-      const nodeIds = pluck('uuid', nodesInCluster)
-      const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x?.resmgr?.id))
-      const proxyEndpoint = getScopedClusterProxyEndpoint(
-        qbertEndpoint.replace(/\/qbert\//, '/k8s/'),
-        cluster,
-      )
-      const grafanaLink = `${proxyEndpoint}/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
-      const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
-      const _usage = calculateNodeUsages(combinedNodes)
-      const usage = {
-        ..._usage,
-        grafanaLink: isPrometheusEnabled ? grafanaLink : null,
-      }
-      const isMasterNode = (node) => node.isMaster === 1
-      const [masterNodes, workerNodes] = partition(isMasterNode, nodesInCluster)
-      const healthyMasterNodes = masterNodes.filter((node) => node.status === 'ok')
-      const healthyWorkerNodes = workerNodes.filter((node) => node.status === 'ok')
-      const masterNodesHealthStatus = getMasterNodesHealthStatus(masterNodes, healthyMasterNodes)
-      const workerNodesHealthStatus = getWorkerNodesHealthStatus(workerNodes, healthyWorkerNodes)
-      const connectionStatus = getConnectionStatus(cluster.taskStatus, nodesInCluster)
-      const healthStatus = getHealthStatus(
-        connectionStatus,
-        masterNodesHealthStatus,
-        workerNodesHealthStatus,
-      )
-      const hasMasterNode = healthyMasterNodes.length > 0
-      const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
-      const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
-        (accum, key) => {
-          accum[key] = castFuzzyBool(cluster[key])
-          return accum
-        },
-        {},
-      )
-      const dashboardLink = getK8sDashboardLinkFromVersion(cluster.version, qbertEndpoint, cluster)
-      return {
-        ...cluster,
-        tasks: clusterWithTasks ? clusterWithTasks.pkgs : [],
-        version: (hasMasterNode && cluster.version) || 'N/A',
-        usage,
-        nodes: nodesInCluster,
-        masterNodes,
-        workerNodes,
-        healthyMasterNodes,
-        healthyWorkerNodes,
-        masterNodesHealthStatus,
-        workerNodesHealthStatus,
-        connectionStatus,
-        healthStatus,
-        hasMasterNode,
-        highlyAvailable: healthyMasterNodes.length > 2,
-        links: {
-          dashboard: clusterOk ? dashboardLink : null,
-          // Rendering happens in <DownloadKubeConfigLink />
-          kubeconfig: clusterOk ? { cluster } : null,
-          // Rendering happens in <ClusterCLI />
-          cli: clusterOk ? { host: qbertEndpoint.match(/(.*?)\/qbert/)[1], cluster } : null,
-        },
-        ...fuzzyBools,
-        hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
-        hasLoadBalancer: castFuzzyBool(
-          cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster),
-        ),
-        etcdBackupEnabled: castFuzzyBool(
-          pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster),
-        ),
-        hasPrometheus: isPrometheusEnabled,
-        clusterType: 'normal',
-      }
-    })
+    return pipe<IClusterAction[], IClusterAction[], IClusterSelector[]>(
+      map((cluster) => {
+        const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
+        const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
+        const nodeIds = pluck('uuid', nodesInCluster)
+        const combinedNodes = nodeIds.map((id) => combinedHostsById[id])
+        const proxyEndpoint = getScopedClusterProxyEndpoint(
+          qbertEndpoint.replace(/\/qbert\//, '/k8s/'),
+          cluster,
+        )
+        const grafanaLink = `${proxyEndpoint}/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+        const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
+        const _usage = calculateNodeUsages(combinedNodes)
+        const usage = {
+          ..._usage,
+          grafanaLink: isPrometheusEnabled ? grafanaLink : null,
+        }
+        const isMasterNode = (node) => node.isMaster === 1
+        const [masterNodes, workerNodes] = partition(isMasterNode, nodesInCluster)
+        const healthyMasterNodes = masterNodes.filter((node) => node.status === 'ok')
+        const healthyWorkerNodes = workerNodes.filter((node) => node.status === 'ok')
+        const masterNodesHealthStatus = getMasterNodesHealthStatus(masterNodes, healthyMasterNodes)
+        const workerNodesHealthStatus = getWorkerNodesHealthStatus(workerNodes, healthyWorkerNodes)
+        const connectionStatus = getConnectionStatus(cluster.taskStatus, nodesInCluster)
+        const healthStatus = getHealthStatus(
+          connectionStatus,
+          masterNodesHealthStatus,
+          workerNodesHealthStatus,
+        )
+        const hasMasterNode = healthyMasterNodes.length > 0
+        const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
+        const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
+          (accum, key) => {
+            accum[key] = castFuzzyBool(cluster[key])
+            return accum
+          },
+          {},
+        )
+        const dashboardLink = getK8sDashboardLinkFromVersion(
+          cluster.version,
+          qbertEndpoint,
+          cluster,
+        )
+        return {
+          ...cluster,
+          tasks: clusterWithTasks ? clusterWithTasks.pkgs : [],
+          version: (hasMasterNode && cluster.version) || 'N/A',
+          usage,
+          nodes: nodesInCluster,
+          masterNodes,
+          workerNodes,
+          healthyMasterNodes,
+          healthyWorkerNodes,
+          masterNodesHealthStatus,
+          workerNodesHealthStatus,
+          connectionStatus,
+          healthStatus,
+          hasMasterNode,
+          highlyAvailable: healthyMasterNodes.length > 2,
+          links: {
+            dashboard: clusterOk ? dashboardLink : null,
+            // Rendering happens in <DownloadKubeConfigLink />
+            kubeconfig: clusterOk ? { cluster } : null,
+            // Rendering happens in <ClusterCLI />
+            cli: clusterOk ? { host: qbertEndpoint.match(/(.*?)\/qbert/)[1], cluster } : null,
+          },
+          ...fuzzyBools,
+          hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
+          hasLoadBalancer: castFuzzyBool(
+            cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster),
+          ),
+          etcdBackupEnabled: castFuzzyBool(
+            pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster),
+          ),
+          hasPrometheus: isPrometheusEnabled,
+          clusterType: 'normal',
+        }
+      }),
+      arrayIfEmpty,
+    )(rawClusters)
   },
 )
-
-export const makeParamsClustersSelector = (
-  defaultParams: SortConfig = {
-    orderBy: 'created_at',
-    orderDirection: 'desc',
-  },
-) => {
+const clusterSelectorDefaultParams: SortConfig = {
+  orderBy: 'created_at',
+  orderDirection: 'desc',
+}
+export const makeParamsClustersSelector = (defaultParams = clusterSelectorDefaultParams) => {
   return createSelector(
     [clustersSelector, (_, params) => mergeLeft(params, defaultParams)],
     (clusters, params) => {
@@ -160,13 +165,11 @@ export const makeParamsClustersSelector = (
     },
   )
 }
-
-export const allClustersSelector = (
-  defaultParams: SortConfig = {
-    orderBy: 'name',
-    orderDirection: 'asc',
-  },
-) => {
+const allClustersSelectorDefaultParams: SortConfig = {
+  orderBy: 'name',
+  orderDirection: 'asc',
+}
+export const allClustersSelector = (defaultParams = allClustersSelectorDefaultParams) => {
   return createSelector(
     [clustersSelector, importedClustersSelector, (_, params) => mergeLeft(params, defaultParams)],
     (clusters, importedClusters, params) => {

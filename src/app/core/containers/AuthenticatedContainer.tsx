@@ -63,6 +63,7 @@ declare let window: CustomWindow
 const { keystone, preferenceStore } = ApiClient.getInstance()
 
 const userPreferenceKeys = [
+  UserPreferences.Dashboard,
   UserPreferences.FeatureFlags,
   UserPreferences.Aws,
   UserPreferences.Azure,

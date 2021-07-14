@@ -11,7 +11,7 @@ import ListPageHeader from 'k8s/components/common/ListPageHeader'
 import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 
 // Types
-import { nodeStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
+import { nodeStatusCardProps } from 'k8s/components/dashboard/card-templates'
 import { INodesSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
 

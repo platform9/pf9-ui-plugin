@@ -28,6 +28,7 @@ import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
 import DashboardPage from './components/dashboard/DashboardPage'
+import EditDashboardPage from './components/dashboard/edit'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
 import RbacIndexPage from './components/rbac/RbacIndexPage'
 import AddRolePage from './components/rbac/AddRolePage'
@@ -79,6 +80,11 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Dashboard',
       link: { path: '/dashboard', exact: true, default: true },
       component: DashboardPage,
+    },
+    {
+      name: 'Edit Dashboard',
+      link: { path: '/dashboard/edit', exact: true, default: true },
+      component: EditDashboardPage,
     },
     {
       name: 'Notifications',

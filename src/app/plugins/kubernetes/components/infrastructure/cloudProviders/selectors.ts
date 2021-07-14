@@ -3,7 +3,6 @@ import { filter, map, mergeLeft, pipe, pluck, propEq } from 'ramda'
 import { capitalizeString } from 'utils/misc'
 import createSorter from 'core/helpers/createSorter'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
-import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { GetCloudProvider } from 'api-client/qbert.model'
@@ -25,9 +24,8 @@ export const cloudProvidersSelector = createSelector(
     getDataSelector<DataKeys.CloudProviders>(DataKeys.CloudProviders),
     clustersSelector,
     importedClustersSelector,
-    combinedHostsSelector,
   ],
-  (cloudProviders, clusters, importedClusters, combinedHosts) => {
+  (cloudProviders, clusters, importedClusters) => {
     return pipe<GetCloudProvider[], GetCloudProvider[], ICloudProvidersSelector[]>(
       filter<GetCloudProvider>(({ type }) => type !== 'local'),
       map((cloudProvider) => {

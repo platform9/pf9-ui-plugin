@@ -52,7 +52,12 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterDeployments)).then(flatten)
     }
-    return qbert.getClusterDeployments(clusterId)
+    const [deployments] = Promise.all([
+      qbert.getClusterDeployments(clusterId),
+      // Fetch dependent caches
+      podActions.list({ clusterId }),
+    ])
+    return deployments
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
     Bugsnag.leaveBreadcrumb('Attempting to create new cluster deployment', {

@@ -5,7 +5,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { pmkCliOverviewLink } from 'k8s/links'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { loadNodes } from '../nodes/actions'
-import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helper'
+import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helpers'
 import { INodesSelector } from '../nodes/model'
 import ClusterHostChooser from './bareos/ClusterHostChooser'
 

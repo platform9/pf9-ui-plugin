@@ -1,10 +1,9 @@
 import React from 'react'
-import { localizeRoles } from 'api-client/ResMgr'
 import { pathStrOr } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pathOr, pipe, pick, path, prop } from 'ramda'
+import { pipe, pick, path, prop } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
@@ -30,7 +29,7 @@ import ResourceUsageTables from '../common/ResourceUsageTables'
 import NodesStatePicklist from './nodes-state-picklist'
 import NodeAuthDialog from './NodeAuthDialog'
 import { NodeState } from './model'
-import { orderInterfaces, hasClockDrift, nodeApiServerHealthStatusFields } from './helper'
+import { orderInterfaces, hasClockDrift, nodeApiServerHealthStatusFields } from './helpers'
 import { renderErrorStatus } from '../clusters/ClusterStatus'
 import NodeRolesPicklist from './node-roles-picklist'
 
@@ -115,8 +114,7 @@ const ListPage = ({ ListContainer }) => {
 }
 
 const renderRoles = (_, node) => {
-  const roles = pathOr([], ['combined', 'roles'], node)
-  return localizeRoles(roles).join(', ')
+  return node?.combined?.localizedRoles || []
 }
 
 export const UsageBar = ({ stat }) => {

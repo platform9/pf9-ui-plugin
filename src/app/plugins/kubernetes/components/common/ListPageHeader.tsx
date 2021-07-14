@@ -8,7 +8,7 @@ import ListPageHeaderCard from './ListPageHeaderCard'
 import UsageWidget from 'core/components/widgets/UsageWidget'
 
 // Types
-import { IStatusCardWithFilterProps } from '../dashboard/DashboardPage'
+import { IStatusCardWithFilterProps } from '../dashboard/card-templates'
 import Theme from 'core/themes/model'
 import PollingData from 'core/components/PollingData'
 import { IUseDataLoader } from '../infrastructure/nodes/model'

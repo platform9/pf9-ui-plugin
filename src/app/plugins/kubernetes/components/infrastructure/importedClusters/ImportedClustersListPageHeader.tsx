@@ -5,7 +5,7 @@ import { importedClusterActions } from './actions'
 import ListPageHeader from 'k8s/components/common/ListPageHeader'
 
 // Types
-import { importedClusterStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
+import { importedClusterStatusCardProps } from 'k8s/components/dashboard/card-templates'
 import DocumentMeta from 'core/components/DocumentMeta'
 
 export const ImportedClusterListHeader = () => {

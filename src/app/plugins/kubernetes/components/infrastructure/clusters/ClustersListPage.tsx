@@ -35,7 +35,7 @@ import {
   isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
-import { clockDriftDetectedInNodes } from '../nodes/helper'
+import { clockDriftDetectedInNodes } from '../nodes/helpers'
 
 const useStyles = makeStyles((theme) => ({
   links: {

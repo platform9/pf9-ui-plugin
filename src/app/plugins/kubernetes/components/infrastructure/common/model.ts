@@ -1,6 +1,10 @@
 import { Host, RoleStatus, Netmask } from 'api-client/resmgr.model'
 import { Node } from 'api-client/qbert.model'
 
+export enum HostTypes {
+  Qbert = 'qbert',
+  Resmgr = 'resmgr',
+}
 export type HostType = 'qbert' | 'resmgr'
 export type HostByService = { [key in HostType]: key extends 'qbert' ? Node : Host }
 

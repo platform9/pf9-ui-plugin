@@ -16,7 +16,7 @@ import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
 import { routes } from 'core/utils/routes'
-import { clockDriftDetectedInNodes } from '../nodes/helper'
+import { clockDriftDetectedInNodes } from '../nodes/helpers'
 import { ApiServerHealthStatus } from '../nodes/model'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>

@@ -1,6 +1,5 @@
-import { condLiteral, pathStrOrNull } from 'utils/fp'
-import { __, both, includes, T, pipe } from 'ramda'
-import { localizeRoles } from 'api-client/ResMgr'
+import { emptyArr, pathStrOrNull } from 'utils/fp'
+import { pipe } from 'ramda'
 import moment from 'moment'
 import {
   HostByService,
@@ -9,39 +8,81 @@ import {
   IAnnotateCloudStack,
   ICombinedHost,
 } from './model'
-import { ExtensionsClass } from 'api-client/resmgr.model'
 
-const openstackRoles = [
-  'Block Storage',
-  'Contrail Forwarder',
-  'Image Library',
-  'VMware Glance',
-  'VMware Cluster',
-  'Hypervisor',
-  'MidoNet Node',
-  'Network Node',
-  'Designate',
-  'Telemetry',
-]
+enum CloudStack {
+  Both = 'both',
+  Openstack = 'openstack',
+  Kubernetes = 'k8s',
+  Unknown = 'unknown',
+}
+const getCloudStack = (stackSet) => {
+  if (stackSet.size === 2) {
+    return CloudStack.Both
+  }
+  if (stackSet.size === 1) {
+    return stackSet.values().next().value
+  }
+  return CloudStack.Unknown
+}
+const formattedRoleMapping = {
+  'pf9-ostackhost-neutron': { name: 'Hypervisor', stack: CloudStack.Openstack },
+  'pf9-ostackhost': { name: 'Hypervisor', stack: CloudStack.Openstack },
+  'pf9-ostackhost-neutron-vmw': { name: 'VMware Cluster', stack: CloudStack.Openstack },
+  'pf9-ostackhost-vmw': { name: 'VMware Cluster', stack: CloudStack.Openstack },
+  'pf9-ceilometer': { name: 'Telemetry', stack: CloudStack.Openstack },
+  'pf9-ceilometer-vmw': { name: 'Telemetry', stack: CloudStack.Openstack },
+  'pf9-cindervolume-base': { name: 'Block Storage', stack: CloudStack.Openstack },
+  'pf9-designate': { name: 'Designate', stack: CloudStack.Openstack },
+  'pf9-glance-role': { name: 'Image Library', stack: CloudStack.Openstack },
+  'pf9-glance-role-vmw': { name: 'VMware Glance', stack: CloudStack.Openstack },
+  'pf9-kube': { name: 'Containervisor', stack: CloudStack.Kubernetes },
+  'pf9-ostackhost-neutron-ironic': { name: 'Ironic', stack: CloudStack.Openstack },
+  'pf9-contrail-forwarder': { name: 'Contrail Forwarder', stack: CloudStack.Openstack },
+  'pf9-midonet-forwarder': { name: 'MidoNet Node', stack: CloudStack.Openstack },
+}
 
-const k8sRoles = ['Containervisor']
+const neutronComponents = {
+  'pf9-neutron-base': true,
+  'pf9-neutron-ovs-agent': true,
+  'pf9-neutron-l3-agent': true,
+  'pf9-neutron-dhcp-agent': true,
+  'pf9-neutron-metadata-agent': true,
+}
+const neutronComponentsLength = Object.keys(neutronComponents).length
+
+const localizeRole = (role) => {
+  return formattedRoleMapping[role] || { name: role }
+}
+
+const isNeutronRole = (role) => !!neutronComponents[role]
 
 export const annotateCloudStack = (host: IAnnotateUiState) => {
-  const localizedRoles = localizeRoles(host.roles)
-  const isOpenStack = () => localizedRoles.some(includes(__, openstackRoles))
-  const isK8s = () => localizedRoles.some(includes(__, k8sRoles))
-  const cloudStack = condLiteral(
-    [both(isOpenStack, isK8s), 'both'],
-    [isOpenStack, 'openstack'],
-    [isK8s, 'k8s'],
-    [T, 'unknown'],
-  )(host)
-  return { ...host, cloudStack }
+  const roles = host?.roles || emptyArr
+  const neutronRoles = new Set()
+  const normalRoles = new Set()
+  const cloudStack = new Set()
+
+  roles.forEach((role) => {
+    if (isNeutronRole(role)) {
+      neutronRoles.add(role)
+    } else {
+      const { name, stack } = localizeRole(role) || {}
+      if (stack) cloudStack.add(stack)
+      normalRoles.add(name)
+    }
+  })
+
+  const hasAllNetworkRoles = neutronRoles.size === neutronComponentsLength
+  if (hasAllNetworkRoles) {
+    normalRoles.add('Network Node')
+    cloudStack.add(CloudStack.Openstack)
+  }
+  return { ...host, cloudStack: getCloudStack(cloudStack), localizedRoles: Array.from(normalRoles) }
 }
 
 export const annotateResmgrFields = (host: HostByService) => {
   const resmgrRoles = host?.resmgr?.roles || []
-  const extensions = host?.resmgr?.extensions as ExtensionsClass
+  const extensions = host?.resmgr?.extensions
   const message = host?.resmgr?.message as { warn: string }
   return {
     ...host,
@@ -63,6 +104,7 @@ export const annotateResmgrFields = (host: HostByService) => {
 export const annotateUiState = (hosts: IAnnotateResmgrFields) => {
   const host: IAnnotateUiState = hosts as any
   const { resmgr = {} } = host
+  let uiState = ''
   /* TODO:
    * This code is very confusing and has too much complected state.  These
    * rules have been added over the years but nobody really understands
@@ -83,54 +125,40 @@ export const annotateUiState = (hosts: IAnnotateResmgrFields) => {
    */
   const { roles, roleStatus, responding, warnings } = host
   if (roles.length === 0 || (roles.length === 1 && roles.includes('pf9-support'))) {
-    host.uiState = 'unauthorized'
+    uiState = 'unauthorized'
   }
 
   if (responding) {
     if (['converging', 'retrying'].includes(roleStatus)) {
-      host.uiState = 'pending'
+      uiState = 'pending'
     }
     if (roleStatus === 'ok' && roles.length > 0) {
-      host.uiState = 'online'
+      uiState = 'online'
     }
     if (warnings && warnings.length > 0) {
-      host.uiState = 'drifted'
+      uiState = 'drifted'
     }
   }
-
-  if (!host.uiState && !responding) {
-    host.uiState = 'offline'
+  let lastResponse = ''
+  if (!uiState && !responding) {
+    uiState = 'offline'
     const lastResponseTime = pathStrOrNull('info.last_response_time', resmgr)
-    host.lastResponse = moment.utc(lastResponseTime).fromNow(true)
-    host.lastResponseData =
-      lastResponseTime &&
-      lastResponseTime
-        .split(' ')
-        .join('T')
-        .concat('Z')
-    // Even though the host is offline we may or may not have stats for it
-    // depending on if the roles were authorized successfully in the past.
-    host.hasStats = roleStatus === 'ok'
+    lastResponse = moment.utc(lastResponseTime).fromNow(true)
   }
 
   const credentials = pathStrOrNull('extensions.hypervisor_details.data.credentials', resmgr)
   if (credentials === 'invalid') {
-    host.uiState = 'invalid'
+    uiState = 'invalid'
   }
   if (roleStatus === 'failed') {
-    host.uiState = 'error'
+    uiState = 'error'
   }
 
-  return { ...host }
-}
-
-export const annotateNovaFields = (host) => {
-  // TODO: add nova specific logic in here
-  return { ...host }
+  return { ...host, lastResponse, uiState }
 }
 
 export const calcResourceUtilization = (host: IAnnotateCloudStack): ICombinedHost => {
-  const extensions = host?.resmgr?.extensions as ExtensionsClass
+  const extensions = host?.resmgr?.extensions
   const usage = extensions?.resource_usage?.data || null
   if (!usage) return { ...host, usage: null }
   const { cpu, memory, disk } = usage
@@ -170,16 +198,9 @@ export const calcResourceUtilization = (host: IAnnotateCloudStack): ICombinedHos
 }
 
 export const combineHost = pipe<
-  HostByService,
+  Partial<HostByService>,
   IAnnotateResmgrFields,
-  IAnnotateUiState,
   IAnnotateUiState,
   IAnnotateCloudStack,
   ICombinedHost
->(
-  annotateResmgrFields,
-  annotateUiState,
-  annotateNovaFields,
-  annotateCloudStack,
-  calcResourceUtilization,
-)
+>(annotateResmgrFields, annotateUiState, annotateCloudStack, calcResourceUtilization)
