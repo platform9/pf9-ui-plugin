@@ -9,7 +9,7 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import CloudProviderCard from '../common/CloudProviderCard'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import { noop } from 'utils/fp'
-import {terraformGitubLink} frim  
+ 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
     color: theme.palette.primary.main,
