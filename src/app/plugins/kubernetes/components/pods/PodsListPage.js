@@ -17,6 +17,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
 import { pathStrOr } from 'utils/fp'
 import Text from 'core/elements/text'
+import Bugsnag from '@bugsnag/js'
 
 const useStyles = makeStyles((theme) => ({
   containerLogs: {
@@ -38,6 +39,7 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(podActions.list, params)
+
     const updateClusterId = useCallback((clusterId) => {
       updateParams({
         clusterId,
@@ -73,6 +75,7 @@ const ListPage = ({ ListContainer }) => {
   }
 }
 const openLogsWindow = (log, pod) => () => {
+  Bugsnag.leaveBreadcrumb('Attempting to view pod logs', { log, pod })
   const { name, id, clusterName, clusterId } = pod
   const containerName = log.containerName
   trackEvent('View Pod Logs', { name, id, clusterName, clusterId, containerName })

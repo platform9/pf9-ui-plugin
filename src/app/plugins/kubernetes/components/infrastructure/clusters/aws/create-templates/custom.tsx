@@ -1,11 +1,11 @@
-import React, { FC } from 'react'
-import { defaultEtcBackupPath } from 'app/constants'
+import React, { FC, useCallback, useMemo } from 'react'
+import { defaultEtcBackupPath, UserPreferences } from 'app/constants'
 import WizardStep from 'core/components/wizard/WizardStep'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import { awsPrerequisitesLink } from 'k8s/links'
-import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { CloudDefaults, CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import ClusterNameField from '../../form-components/name'
 import CloudProviderField from '../../form-components/cloud-provider'
 import CloudProviderRegionField from '../../form-components/cloud-provider-region'
@@ -42,6 +42,9 @@ import WorkerNodeInstanceTypeField from '../../form-components/worker-node-insta
 import { ClusterCreateTypes } from '../../model'
 import { awsClusterTracking } from '../../tracking'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import CustomApiFlags from '../../form-components/custom-api-flag'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { isEmpty } from 'ramda'
 
 export const initialContext = {
   template: 'small',
@@ -69,6 +72,9 @@ export const initialContext = {
   privileged: true,
   allowWorkloadsOnMaster: false,
   useRoute53: false,
+  domainId: '',
+  azs: [],
+  enableProfileAgent: false,
 }
 
 const columns = [
@@ -131,7 +137,7 @@ const templateOptions = [
 // small (single dev) - 1 node master + worker - select instance type (default t2.small)
 // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
 // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-const handleTemplateChoice = ({ setFieldValue }) => (option) => {
+const handleTemplateChoice = ({ setFieldValue, setWizardContext }) => (option) => {
   const options = {
     small: {
       numMasters: 1,
@@ -169,6 +175,7 @@ const handleTemplateChoice = ({ setFieldValue }) => (option) => {
       setFieldValue(key)(value)
     })
   })
+  setWizardContext(options[option])
 }
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -182,6 +189,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
+const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileAgent']
+
 interface Props {
   wizardContext: any
   setWizardContext: any
@@ -190,6 +199,53 @@ interface Props {
 
 const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
+  const { prefs } = useScopedPreferences('defaults')
+  const cloudDefaults = useMemo(() => prefs[UserPreferences.Aws] || {}, [prefs])
+
+  const updateFqdns = (values) => (value, label) => {
+    setWizardContext({ domainId: value })
+
+    const name = values.name || wizardContext.name
+
+    const api = `${name}-api.${label}`
+    setWizardContext({ externalDnsName: api })
+
+    const service = `${name}-service.${label}`
+    setWizardContext({ serviceFqdn: service })
+  }
+
+  const handleCloudProviderChange = (values) => (value) => {
+    setWizardContext({
+      cloudProviderId: value,
+    })
+
+    // Populate the form with default values from the pref store AFTER the user chooses the
+    // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
+    // for the rest of the fields
+
+    setCloudDefaults(values)
+  }
+
+  const setCloudDefaults = useCallback(
+    (values) => {
+      // if (isEmpty(cloudDefaults)) return
+      // setWizardContext({ ...cloudDefaults })
+      if (isEmpty(cloudDefaults)) return
+      setWizardContext({ ...cloudDefaults, domainId: cloudDefaults[CloudDefaults.DomainLabel] })
+      updateFqdns(values)(
+        cloudDefaults[CloudDefaults.Domain],
+        cloudDefaults[CloudDefaults.DomainLabel],
+      )
+    },
+    [cloudDefaults],
+  )
+
+  const handleStepOneSubmit = (values) => {
+    setWizardContext(values)
+    if (!values.useRoute53) {
+      setWizardContext({ domainId: '', externalDnsName: '', serviceFqdn: '' })
+    }
+  }
 
   return (
     <>
@@ -203,7 +259,8 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
           fullWidth
           classes={{ root: classes.validatedFormContainer }}
           initialValues={wizardContext}
-          onSubmit={setWizardContext}
+          // onSubmit={setWizardContext}
+          onSubmit={handleStepOneSubmit}
           triggerSubmit={onNext}
           withAddonManager
           elevated={false}
@@ -222,13 +279,20 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 <ClusterNameField setWizardContext={setWizardContext} />
 
                 {/* Cloud Provider */}
-                <CloudProviderField cloudProviderType={CloudProviders.Aws} />
+                <CloudProviderField
+                  cloudProviderType={CloudProviders.Aws}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onChange={handleCloudProviderChange(values)}
+                />
 
                 {/* AWS Region */}
                 <CloudProviderRegionField
                   cloudProviderType={CloudProviders.Aws}
                   values={values}
+                  wizardContext={wizardContext}
                   onChange={(region) => setWizardContext({ azs: [] })}
+                  disabled={!values.cloudProviderId && !values.region}
                 />
 
                 {/* AWS Availability Zone */}
@@ -242,13 +306,21 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 )}
 
                 {/* SSH Key */}
-                <SshKeyField dropdownComponent={AwsClusterSshKeyPicklist} values={values} />
+                <SshKeyField
+                  dropdownComponent={AwsClusterSshKeyPicklist}
+                  values={values}
+                  // value={wizardContext.sshKey}
+                  // onChange={(value) => setWizardContext({ sshKey: value })}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 {/* Template Chooser */}
                 <ClusterTemplatesField
                   options={templateOptions}
                   onChange={handleTemplateChoice({
                     setFieldValue,
+                    setWizardContext,
                   })}
                 />
 
@@ -280,7 +352,10 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
 
               <FormFieldCard title="Cluster Settings">
                 {/* Kubernetes Version */}
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <CheckboxField
                   id="useRoute53"
@@ -308,9 +383,9 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 {/* Managed Add-Ons */}
                 <Text variant="caption1">Managed Add-Ons</Text>
                 <AddonTogglers
+                  addons={configStepAddOns}
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
                 />
               </FormFieldCard>
             </>
@@ -394,7 +469,9 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                     - MTU Size Field
                     
                 */}
-                {values.networkPlugin === 'calico' && <CalicoNetworkFields values={values} />}
+                {values.networkPlugin === 'calico' && (
+                  <CalicoNetworkFields values={wizardContext} setValues={setWizardContext} />
+                )}
               </FormFieldCard>
             </>
           )}
@@ -408,11 +485,12 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
         onNext={awsClusterTracking.wZStepThree(trackingFields)}
       >
         <ValidatedForm
-          classes={{ root: classes.validatedFormContainer }}
           fullWidth
+          classes={{ root: classes.validatedFormContainer }}
           initialValues={wizardContext}
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
+          withAddonManager
           elevated={false}
         >
           {({ values }) => (
@@ -433,7 +511,14 @@ const AdvancedAwsCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext
                 <CustomAmiField />
 
                 {/* Tags */}
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
+
                 <TagsField />
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={['enableTopologyManager']}
+                />
               </FormFieldCard>
             </>
           )}

@@ -9,6 +9,7 @@ export interface SessionState {
   userDetails: { [key: string]: any }
   features: { [key: string]: any }
   isSsoToken: boolean
+  onboardingRedirectToUrl: string
 }
 
 export const initialState: SessionState = {
@@ -19,6 +20,7 @@ export const initialState: SessionState = {
   userDetails: {},
   features: {},
   isSsoToken: false,
+  onboardingRedirectToUrl: null,
 }
 
 const { name: sessionStoreKey, reducer: sessionReducers, actions: sessionActions } = createSlice({

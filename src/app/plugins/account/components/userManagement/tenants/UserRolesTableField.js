@@ -106,7 +106,7 @@ const UserRolesTableField = withFormContext(
             <SystemUsersToggle checked={showingSystemUsers} toggle={toggleSystemUsers} />
           }
           onSortChange={noop}
-          searchTarget="username"
+          searchTargets={['username']}
           columns={columns}
           data={filteredRows}
           rowsPerPage={10}

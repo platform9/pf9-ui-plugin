@@ -2,10 +2,11 @@ import ApiClient from 'api-client/ApiClient'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { isAdminRole } from 'k8s/util/helpers'
-import { compose, path, pick, prop, propEq, propSatisfies } from 'ramda'
+import { pathEq, pick, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
-import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
+import { sanitizeUrl } from 'utils/misc'
 import { CloudProviders } from '../cloudProviders/model'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 import { hasConvergingNodes } from './ClusterStatusUtils'
 import { NetworkStackTypes } from './constants'
 import { CalicoDetectionTypes } from './form-components/calico-network-fields'
@@ -30,7 +31,8 @@ export const canScaleMasters = ([cluster]) =>
 export const canScaleWorkers = ([cluster]) =>
   clusterNotBusy(cluster) && !isAzureAutoscalingCluster(cluster)
 
-export const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
+export const canUpgradeCluster = ([cluster]) =>
+  !!cluster && cluster.canUpgrade && !clockDriftDetectedInNodes(cluster.nodes)
 
 export const canDeleteCluster = ([cluster]) =>
   !['creating', 'deleting'].includes(cluster.taskStatus)
@@ -67,6 +69,11 @@ export const getKubernetesVersion = async (clusterId) => {
     return null
   }
 }
+export const getScopedQbertEndpoint = (qbertEndpoint) =>
+  `${qbertEndpoint}/${qbert.scopedEnpointPath()}`
+export const getScopedClusterProxyEndpoint = (qbertEndpoint, cluster) =>
+  `${getScopedQbertEndpoint(qbertEndpoint)}/clusters/${cluster.uuid}/k8sapi/api/v1`
+
 export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
   const matches = /(?<major>\d+).(?<minor>\d+).(?<patch>\d+)/.exec(version)
   if (!version || !matches) {
@@ -74,9 +81,7 @@ export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) 
   }
   const { major, minor } = matches.groups || {}
   const isNewDashboardUrl = parseInt(major) >= 1 && parseInt(minor) >= 16
-  return `${qbertEndpoint}/${qbert.scopedEnpointPath()}/clusters/${
-    cluster.uuid
-  }/k8sapi/api/v1/namespaces/${
+  return `${getScopedClusterProxyEndpoint(qbertEndpoint, cluster)}/namespaces/${
     isNewDashboardUrl ? 'kubernetes-dashboard' : 'kube-system'
   }/services/https:kubernetes-dashboard:443/proxy/`
 }
@@ -110,7 +115,12 @@ export const hasHealthyMasterNodes = propSatisfies(
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
-export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+export const hasPrometheusTag = pathEq(['tags', 'pf9-system:monitoring'], 'true')
+export const importedHasPrometheusTag = pathEq(
+  ['metadata', 'labels', 'pf9-system_monitoring'],
+  'true',
+)
+export const prometheusCluster = propSatisfies(isTruthy, 'hasPrometheus')
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 export const createAwsCluster = async (data) => {
@@ -234,7 +244,9 @@ export const createBareOSCluster = async (data) => {
     'appCatalogEnabled',
     'deployKubevirt',
     'deployLuigiOperator',
+    'useHostname',
   ]
+
   const body = pick(keysToPluck, data)
 
   if (data.enableMetallb) {
@@ -259,7 +271,7 @@ export const createBareOSCluster = async (data) => {
     ...workerNodes.map((uuid) => ({ isMaster: false, uuid })),
   ]
 
-  await qbert.attach(cluster.uuid, nodes)
+  await qbert.attachNodes(cluster.uuid, nodes)
 
   return cluster
 }
@@ -274,6 +286,10 @@ const createGenericCluster = async (body, data) => {
     body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
   }
 
+  if (data.enableProfileAgent) {
+    body.enableProfileAgent = data.enableProfileAgent
+  }
+
   if (data.httpProxy) {
     body.httpProxy = data.httpProxy
   }
@@ -282,6 +298,28 @@ const createGenericCluster = async (body, data) => {
     body.kubeRoleVersion = data.kubeRoleVersion
   }
 
+  if (data.apiServerFlags) {
+    body.apiServerFlags = data.apiServerFlags?.split(',')
+  }
+
+  if (data.controllerManagerFlags) {
+    body.controllerManagerFlags = data.controllerManagerFlags?.split(',')
+  }
+
+  if (data.schedulerFlags) {
+    body.schedulerFlags = data.schedulerFlags?.split(',')
+  }
+
+  if (data.cpuManagerPolicy) {
+    body.cpuManagerPolicy = data.cpuManagerPolicy
+  }
+
+  if (data.topologyManagerPolicy) {
+    body.topologyManagerPolicy = data.topologyManagerPolicy
+  }
+  if (data.reservedCPUs) {
+    body.reservedCPUs = data.reservedCPUs
+  }
   // Calico is required when ipv6 is selected
   if (data.networkStack === NetworkStackTypes.IPv6) {
     body.calicoIPv6PoolCidr = body.containersCidr

@@ -9,12 +9,11 @@ import ScaleMastersPage from './components/infrastructure/clusters/ScaleMastersP
 import ScaleWorkersPage from './components/infrastructure/clusters/ScaleWorkersPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
-import AppsIndexPage from './components/apps/apps-index-page'
+import AppsIndexPage from './components/app-catalog/apps-index-page'
 import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
-import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
 import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
-import OnboardingPage from './components/onboarding/OnboardingPage'
+import OnboardingPage from './components/onboarding/onboarding-page'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
@@ -43,14 +42,25 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import OnboardingBanner from './components/onboarding/OnboardingBanner'
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
+import ApiServicesPage from './components/apiAccess/ApiServicesPage'
 import OnboardNewNodePage from './components/infrastructure/nodes/onboard-new-node-page'
-import AddRepoPage from './components/repositories/add-repo-page'
-import DeployAppPage from './components/apps/deploy-app-page'
-import EditRepoPage from './components/repositories/edit-repo-page'
-import EditAppDeploymentPage from './components/apps/edit-app-deployment-page'
+import AddRepositoryPage from './components/app-catalog/repositories/add-repository-page'
+import DeployAppPage from './components/app-catalog/deployed-apps/deploy-app-page'
+import EditRepositoryPage from './components/app-catalog/repositories/edit-repository-page'
+import EditAppDeploymentPage from './components/app-catalog/deployed-apps/edit-app-deployment-page'
 import ImportClusterPage from './components/infrastructure/clusters/import/ImportClusterPage'
 import ImportEKSClusterPage from './components/infrastructure/clusters/import/ImportEKSClusterPage'
 import ImportedClusterDetailsPage from './components/infrastructure/importedClusters/imported-cluster-details'
+import VirtualMachinesPage from './components/virtual-machines'
+import VirtualMachineDetailPage from './components/virtual-machines/details'
+import AddVirtualMachinePage from './components/virtual-machines/add'
+import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
+import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
+import CreateRbacProfile from 'k8s/components/rbac/profiles/create'
+import RbacProfilesIndexPage from './components/rbac/profiles/rbac-profiles-index-page'
+import { isDecco } from 'core/utils/helpers'
+import DeployRbacProfilePage from './components/rbac/profiles/deploy/deploy-rbac-profile-page'
+import DeleteProfileBindingsPage from './components/rbac/profiles/delete-profile-bindings'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -117,6 +127,18 @@ Kubernetes.registerPlugin = (pluginManager) => {
       component: ImportEKSClusterPage,
     },
     {
+      name: 'Import AKS Cluster',
+      link: { path: '/infrastructure/clusters/import/aks', exact: true },
+      requiredRoles: 'admin',
+      component: ImportAKSClusterPage,
+    },
+    {
+      name: 'Import GKE Cluster',
+      link: { path: '/infrastructure/clusters/import/gke', exact: true },
+      requiredRoles: 'admin',
+      component: ImportGKEClusterPage,
+    },
+    {
       name: 'Imported Cluster Details',
       link: { path: '/infrastructure/clusters/imported/:id', exact: true },
       requiredRoles: 'admin',
@@ -167,8 +189,46 @@ Kubernetes.registerPlugin = (pluginManager) => {
       component: UpdateCloudProviderPage,
     },
     {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      link: { path: '/virtual-machines', exact: true },
+      requiredRoles: 'admin',
+      component: VirtualMachinesPage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/add/new', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/import/url', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/import/disk', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Add Virtual Machine',
+      link: { path: '/virtual-machines/clone/pvc', exact: true },
+      requiredRoles: 'admin',
+      component: AddVirtualMachinePage,
+    },
+    {
+      name: 'Virtual Machine Details',
+      link: { path: '/virtual-machines/:clusterId/:namespace/:name', exact: true },
+      requiredRoles: 'admin',
+      component: VirtualMachineDetailPage,
+    },
+    {
       name: 'App Catalog',
       link: { path: '/apps', exact: true },
+      requiredFeatures: isDecco,
       component: AppsIndexPage,
     },
     {
@@ -184,12 +244,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
     {
       name: 'Add Repository',
       link: { path: '/apps/repositories/add', exact: true },
-      component: AddRepoPage,
+      component: AddRepositoryPage,
     },
     {
       name: 'Edit Repository',
       link: { path: '/apps/repositories/edit/:id' },
-      component: EditRepoPage,
+      component: EditRepositoryPage,
     },
     {
       name: 'Workloads',
@@ -248,7 +308,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     {
       name: 'API Access',
-      link: { path: '/api_access', exact: true },
+      link: { path: '/api-access', exact: true },
       component: ApiAccessPage,
     },
     {
@@ -286,6 +346,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac', exact: true },
       component: RbacIndexPage,
+    },
+    {
+      name: 'Add RBAC Profile',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/add', exact: true },
+      component: CreateRbacProfile,
     },
     {
       name: 'Add Role',
@@ -334,6 +400,24 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Alarms',
       link: { path: '/alarms', exact: true },
       component: MonitoringPage,
+    },
+    {
+      name: 'RBAC Profiles',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles', exact: true },
+      component: RbacProfilesIndexPage,
+    },
+    {
+      name: 'Deploy RBAC Profile',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/deploy/:name', exact: true },
+      component: DeployRbacProfilePage,
+    },
+    {
+      name: 'Delete RBAC Profile Bindings',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles/delete_bindings/:name', exact: true },
+      component: DeleteProfileBindingsPage,
     },
   ])
 
@@ -387,9 +471,16 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
     {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      icon: 'window',
+      ...clarityLink('/kubernetes/virtual-machines'),
+    },
+    {
       name: 'Apps',
       ...clarityLink('/kubernetes/apps'),
       icon: 'th',
+      requiredFeatures: isDecco,
       nestedLinks: [
         { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
         { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
@@ -402,7 +493,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
-    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
+    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api-access') },
   ]
 
   // These nav items are in active development but not shown in production.
@@ -439,9 +530,16 @@ Kubernetes.registerPlugin = (pluginManager) => {
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
     {
+      name: 'Virtual Machines',
+      flag: 'Early Access',
+      icon: 'window',
+      link: { path: '/virtual-machines' },
+    },
+    {
       name: 'Apps',
       link: { path: '/apps' },
       icon: 'th',
+      requiredFeatures: isDecco,
       nestedLinks: [
         { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
         { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
@@ -450,6 +548,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
           link: { path: '/apps#repositories', requiredRoles: ['admin'] },
         },
       ],
+    },
+    {
+      name: 'Cluster Profiles',
+      icon: 'users-cog',
+      requiredRoles: 'admin',
+      link: { path: '/rbac_profiles' },
     },
     // TODO: Disabled till all CRUD operations are implemented
     // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
@@ -461,7 +565,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
       requiredRoles: 'admin',
       link: { path: '/rbac' },
     },
-    { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
+    { name: 'API Access', icon: 'key', link: { path: '/api-access' } },
   ]
 
   const navItems = useClarityLinks ? clarityNavItems : devNavItems

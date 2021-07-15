@@ -1,5 +1,5 @@
 import { head, pipe, pluck, values } from 'ramda'
-import { getHighestRole } from './helpers'
+import { getHighestRole, trackApiMethodMetadata } from './helpers'
 import { capitalizeString, pathJoin } from 'utils/misc'
 import { pathStr } from 'utils/fp'
 import ApiService from 'api-client/ApiService'
@@ -145,6 +145,8 @@ class Keystone extends ApiService {
     return 'keystone'
   }
 
+  static apiMethodsMetadata = []
+
   protected async getEndpoint() {
     return Promise.resolve(this.client.options.keystoneEndpoint)
   }
@@ -217,6 +219,7 @@ class Keystone extends ApiService {
     return `${this.v3}/roles`
   }
 
+  @trackApiMethodMetadata({ url: '/v3/projects/:projectId', type: 'GET', params: ['projectId'] })
   getProject = async (id) => {
     const data = await this.client.basicGet<any>({
       url: `${this.projectsUrl}/${id}`,
@@ -228,6 +231,7 @@ class Keystone extends ApiService {
     return data.project
   }
 
+  @trackApiMethodMetadata({ url: '/v3/auth/projects', type: 'GET' })
   getProjectsAuth = async () => {
     const response = await this.client.rawGet<GetProjectsAuth>({
       url: this.projectsAuthUrl,
@@ -240,6 +244,7 @@ class Keystone extends ApiService {
     return response.data.projects
   }
 
+  @trackApiMethodMetadata({ url: '/v3/projects', type: 'GET' })
   getProjects = async (scoped = false) => {
     const response = await this.client.rawGet<any>({
       url: this.projectsUrl,
@@ -252,6 +257,7 @@ class Keystone extends ApiService {
     return response.data.projects
   }
 
+  @trackApiMethodMetadata({ url: '/v3/PF9-KSADM/all_tenants_all_users', type: 'GET' })
   getAllTenantsAllUsers = async () => {
     const data = await this.client.basicGet<GetAllTenantsAllUsers>({
       url: this.allTenantsAllUsersUrl,
@@ -263,6 +269,11 @@ class Keystone extends ApiService {
     return data.tenants
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/role_assignments?scope.project.id=:tenantId',
+    type: 'GET',
+    params: ['tenantId'],
+  })
   getTenantRoleAssignments = async (tenantId) => {
     const data = await this.client.basicGet<GetUserRoleAssignments>({
       url: this.roleAssignments,
@@ -278,6 +289,11 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/role_assignments',
+    type: 'GET',
+    params: ['user.id', 'include_names'],
+  })
   getUserRoleAssignments = async (userId) => {
     const data = await this.client.basicGet<GetUserRoleAssignments>({
       url: this.roleAssignments,
@@ -293,6 +309,11 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/role_assignments',
+    type: 'GET',
+    params: ['group.id', 'include_names'],
+  })
   getGroupRoleAssignments = async (groupId) => {
     // Todo: typings for this API
     const data = await this.client.basicGet<any>({
@@ -309,6 +330,11 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/:tenantId/users/:userId/roles/:roleId',
+    type: 'PUT',
+    params: ['tenantId', 'userId', 'roleId'],
+  })
   addUserRole = async ({ tenantId, userId, roleId }) => {
     await this.client.basicPut<string>({
       url: pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
@@ -321,6 +347,11 @@ class Keystone extends ApiService {
     return { tenantId, userId, roleId }
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/:tenantId/users/:userId/roles/:roleId',
+    type: 'DELETE',
+    params: ['tenantId', 'userId', 'roleId'],
+  })
   deleteUserRole = async ({ tenantId, userId, roleId }) => {
     try {
       await this.client.basicDelete<any>({
@@ -336,6 +367,25 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/OS-FEDERATION/identity_providers/IDP1/protocols',
+    type: 'GET',
+  })
+  getIdpProtocols = async () => {
+    const data = await this.client.basicGet<any>({
+      url: `${this.identityProvidersUrl}/IDP1/protocols`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getIdpProtocols',
+      },
+    })
+    return data.protocols
+  }
+
+  @trackApiMethodMetadata({
+    url: '/v3/OS-FEDERATION/identity_providers/IDP1/protocols/saml2',
+    type: 'PUT',
+  })
   addIdpProtocol = async (mappingId) => {
     const body = {
       protocol: {
@@ -354,6 +404,7 @@ class Keystone extends ApiService {
     return data.protocol
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups', type: 'GET' })
   getGroups = async () => {
     const data = await this.client.basicGet<any>({
       url: this.groupsUrl,
@@ -365,6 +416,7 @@ class Keystone extends ApiService {
     return data.groups
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups', type: 'POST' })
   createGroup = async (params) => {
     const body = { group: params }
     const data = await this.client.basicPost<any>({
@@ -378,6 +430,7 @@ class Keystone extends ApiService {
     return data.group
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups/:id', type: 'PATCH', params: ['id'] })
   updateGroup = async (id, params) => {
     const body = { group: params }
     const url = `${this.groupsUrl}/${id}`
@@ -392,6 +445,7 @@ class Keystone extends ApiService {
     return data.group
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups/:groupId', type: 'DELETE', params: ['groupId'] })
   deleteGroup = async (groupId) => {
     try {
       await this.client.basicDelete<any>({
@@ -407,6 +461,11 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/:tenantId/groups/:groupId/roles/:roleId',
+    type: 'PUT',
+    params: ['tenantId', 'groupId', 'roleId'],
+  })
   addGroupRole = async ({ tenantId, groupId, roleId }) => {
     await this.client.basicPut<string>({
       url: pathJoin(this.projectsUrl, `${tenantId}/groups/${groupId}/roles/${roleId}`),
@@ -418,6 +477,11 @@ class Keystone extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/:tenantId/groups/:groupId/roles/:roleId',
+    type: 'DELETE',
+    params: ['tenantId', 'groupId', 'roleId'],
+  })
   deleteGroupRole = async ({ tenantId, groupId, roleId }) => {
     try {
       await this.client.basicDelete<any>({
@@ -433,6 +497,7 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({ url: '/v3/OS-FEDERATION/mappings', type: 'GET' })
   getGroupMappings = async () => {
     const data = await this.client.basicGet<any>({
       url: this.groupMappingsUrl,
@@ -444,6 +509,7 @@ class Keystone extends ApiService {
     return data.mappings
   }
 
+  @trackApiMethodMetadata({ url: '/v3/OS-FEDERATION/mappings/:id', type: 'PUT', params: ['id'] })
   createGroupMapping = async (id, params) => {
     const body = { mapping: params }
     const data = await this.client.basicPut<any>({
@@ -457,6 +523,7 @@ class Keystone extends ApiService {
     return data.mapping
   }
 
+  @trackApiMethodMetadata({ url: '/v3/OS-FEDERATION/mappings/:id', type: 'PATCH', params: ['id'] })
   updateGroupMapping = async (id, params) => {
     const body = { mapping: params }
     const url = `${this.groupMappingsUrl}/${id}`
@@ -471,6 +538,11 @@ class Keystone extends ApiService {
     return data.mapping
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/OS-FEDERATION/mappings/:id',
+    type: 'DELETE',
+    params: ['id'],
+  })
   deleteGroupMapping = async (mappingId) => {
     try {
       await this.client.basicDelete<any>({
@@ -486,6 +558,7 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({ url: '/v3/roles', type: 'GET' })
   getRoles = async () => {
     const data = await this.client.basicGet<GetRoles>({
       url: this.rolesUrl,
@@ -497,6 +570,7 @@ class Keystone extends ApiService {
     return data.roles
   }
 
+  @trackApiMethodMetadata({ url: '/v3/projects', type: 'POST' })
   createProject = async (params) => {
     const body = { project: params }
     const data = await this.client.basicPost<any>({
@@ -510,6 +584,7 @@ class Keystone extends ApiService {
     return data.project
   }
 
+  @trackApiMethodMetadata({ url: '/v3/projects/:projectId', type: 'PATCH', params: ['projectId'] })
   updateProject = async (id, params) => {
     const body = { project: params }
     const url = `${this.projectsUrl}/${id}`
@@ -524,6 +599,11 @@ class Keystone extends ApiService {
     return data.project
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/:projectId',
+    type: 'DELETE',
+    params: ['projectId'],
+  })
   deleteProject = async (projectId) => {
     try {
       await this.client.basicDelete<any>({
@@ -791,6 +871,7 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({ url: '/v3/regions', type: 'GET' })
   getRegions = async () => {
     const data = await this.client.basicGet<GetRegions>({
       url: this.regionsUrl,
@@ -809,6 +890,7 @@ class Keystone extends ApiService {
     },
   }
 
+  @trackApiMethodMetadata({ url: '/v3/auth/catalog', type: 'GET' })
   getServiceCatalog = async () => {
     const data = await this.client.basicGet<GetServiceCatalog>({
       url: this.catalogUrl,
@@ -821,6 +903,7 @@ class Keystone extends ApiService {
     return data.catalog
   }
 
+  @trackApiMethodMetadata({ url: '/v3/endpoints', type: 'GET' })
   getEndpoints = async () => {
     const data = await this.client.basicGet<any>({
       url: this.endpointsUrl,
@@ -857,6 +940,7 @@ class Keystone extends ApiService {
     return endpoint
   }
 
+  @trackApiMethodMetadata({ url: '/v3/credentials', type: 'GET' })
   getCredentials = async () => {
     const data = await this.client.basicGet<GetCredentials>({
       url: this.credentialsUrl,
@@ -868,6 +952,7 @@ class Keystone extends ApiService {
     return data.credentials
   }
 
+  @trackApiMethodMetadata({ url: '/v3/credentials', type: 'POST' })
   addCredential = async (params) => {
     const body = {
       credential: params,
@@ -883,6 +968,11 @@ class Keystone extends ApiService {
     return data.credential
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/credentials/:credentialId',
+    type: 'DELETE',
+    params: ['credentialId'],
+  })
   deleteCredential = async (credentialId) => {
     try {
       await this.client.basicDelete<any>({
@@ -898,6 +988,7 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users/:userId', type: 'GET', params: ['userId'] })
   getUser = async (id) => {
     const data = await this.client.basicGet<any>({
       url: `${this.usersUrl}/${id}`,
@@ -909,6 +1000,7 @@ class Keystone extends ApiService {
     return data.user
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users', type: 'GET' })
   getUsers = async () => {
     const data = await this.client.basicGet<GetUsers>({
       url: this.usersUrl,
@@ -920,6 +1012,7 @@ class Keystone extends ApiService {
     return data.users
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users', type: 'POST' })
   createUser = async (params) => {
     const body = { user: params }
     const data = await this.client.basicPost<any>({
@@ -933,6 +1026,7 @@ class Keystone extends ApiService {
     return data.user
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users/:userId', type: 'PATCH', params: ['userId'] })
   updateUser = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}`
@@ -947,6 +1041,7 @@ class Keystone extends ApiService {
     return data.user
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users/:userId/password', type: 'POST', params: ['userId'] })
   updateUserPassword = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}/password`
@@ -961,6 +1056,7 @@ class Keystone extends ApiService {
     return data.user
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users/:userId', type: 'DELETE', params: ['userId'] })
   deleteUser = async (userId) => {
     try {
       await this.client.basicDelete<any>({

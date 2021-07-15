@@ -15,6 +15,7 @@ interface Props extends ValidatedFormProps {
   extraToolbarContent?: JSX.Element
   checkboxCond?: any
   loading: boolean
+  uniqueIdentifier?: string
 }
 
 // TODO: is forwardRef actually needed here?
@@ -31,6 +32,7 @@ const ListTableField: React.ComponentType<Props> = forwardRef<HTMLElement, Props
     extraToolbarContent,
     checkboxCond,
     loading,
+    uniqueIdentifier,
   } = props
 
   return (
@@ -46,6 +48,7 @@ const ListTableField: React.ComponentType<Props> = forwardRef<HTMLElement, Props
         extraToolbarContent={extraToolbarContent}
         checkboxCond={checkboxCond}
         loading={loading}
+        uniqueIdentifier={uniqueIdentifier}
       />
       {hasError && <div>{errorMessage}</div>}
     </>

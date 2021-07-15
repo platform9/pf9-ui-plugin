@@ -7,6 +7,7 @@ import { getContextUpdater } from 'core/helpers/createContextUpdater'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { pick } from 'ramda'
 import { listTablePrefs } from 'app/constants'
+import PollingData from 'core/components/PollingData'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -59,7 +60,7 @@ const createCRUDComponents = (options) => {
     debug,
     name,
     nameProp,
-    searchTarget = 'name',
+    searchTargets = ['name'],
     multiSelection = true,
     showCheckboxes,
     headlessTable,
@@ -68,6 +69,8 @@ const createCRUDComponents = (options) => {
     onSelect,
     extraToolbarContent,
     hideDelete,
+    pollingInterval,
+    pollingCondition,
   } = options
 
   // List
@@ -87,6 +90,7 @@ const createCRUDComponents = (options) => {
     orderDirection,
     getParamsUpdater,
     filters,
+    alternativeTableContent,
     ...rest
   }) => {
     return (
@@ -101,7 +105,7 @@ const createCRUDComponents = (options) => {
         editCond={editCond}
         editDisabledInfo={editDisabledInfo}
         multiSelection={multiSelection}
-        searchTarget={searchTarget}
+        searchTargets={searchTargets}
         uniqueIdentifier={uniqueIdentifier}
         showCheckboxes={showCheckboxes}
         compactTable={compactTable}
@@ -127,6 +131,7 @@ const createCRUDComponents = (options) => {
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
         extraToolbarContent={extraToolbarContent}
         hideDelete={hideDelete}
+        alternativeTableContent={alternativeTableContent}
       />
     )
   }
@@ -177,6 +182,15 @@ const createCRUDComponents = (options) => {
       const [data, loading, reload] = useDataLoader(loaderFn, params)
       return (
         <>
+          {!!pollingInterval && (
+            <PollingData
+              loading={loading}
+              onReload={reload}
+              refreshDuration={pollingInterval}
+              pollingCondition={pollingCondition ? () => pollingCondition(data) : undefined}
+              hidden
+            />
+          )}
           <ListContainer
             getParamsUpdater={getParamsUpdater}
             data={data}

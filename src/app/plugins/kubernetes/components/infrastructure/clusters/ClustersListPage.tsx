@@ -12,14 +12,14 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { routes } from 'core/utils/routes'
 import {
+  ClusterApiServerHealthStatus,
   ClusterConnectionStatus,
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
-import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { both, omit, prop } from 'ramda'
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import { cloudProviderTypes } from '../cloudProviders/selectors'
@@ -32,10 +32,10 @@ import {
   canScaleMasters,
   canScaleWorkers,
   canUpgradeCluster,
-  notBusy,
   isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
+import { clockDriftDetectedInNodes } from '../nodes/helper'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -70,9 +70,13 @@ const renderConnectionStatus = (_, cluster) => (
     cluster={cluster}
   />
 )
-const renderHealthStatus = (_, cluster) => (
-  <ClusterHealthStatus iconStatus={cluster.connectionStatus === 'converging'} cluster={cluster} />
-)
+const renderPlatform9ComponentsStatus = (_, cluster) => {
+  const showIconStatus = cluster.connectionStatus === 'converging' || cluster.status === 'pending'
+  return <ClusterHealthStatus iconStatus={showIconStatus} cluster={cluster} />
+}
+
+const renderApiServerHealth = (_, cluster) => <ClusterApiServerHealthStatus cluster={cluster} />
+
 const renderClusterLink = (links, { usage }) => <ClusterLinks links={links} usage={usage} />
 
 const ClusterLinks = ({
@@ -127,6 +131,29 @@ const renderNodeLink = (_, { uuid, nodes }) => {
 
 const renderStats = (_, { usage }) => <ResourceUsageTables usage={usage} />
 
+const renderK8sVersion = (_, cluster) => <K8sVersion cluster={cluster} />
+
+const upgradeClusterHelpText =
+  'An upgrade to newer version of Kubernetes is now available for this cluster. Click here or select the upgrade action for the cluster to see more details.'
+
+const K8sVersion = ({ cluster }) => {
+  const { version, canUpgrade } = cluster
+  const [showDialog, setShowDialog] = useState(false)
+  return (
+    <div>
+      <Text variant="body2">{version}</Text>
+      {canUpgrade && (
+        <Tooltip title={upgradeClusterHelpText}>
+          <SimpleLink src="" onClick={() => setShowDialog(true)}>
+            Upgrade Available
+          </SimpleLink>
+        </Tooltip>
+      )}
+      {showDialog && <ClusterUpgradeDialog rows={[cluster]} onClose={() => setShowDialog(false)} />}
+    </div>
+  )
+}
+
 const renderClusterDetailLink = (name, cluster) => (
   <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>{name}</SimpleLink>
 )
@@ -178,6 +205,7 @@ export const options = {
       },
     },
   ],
+  addText: 'Add Cluster',
   columns: [
     { id: 'uuid', label: 'UUID', render: renderUUID, display: false },
     { id: 'name', label: 'Name', render: renderClusterDetailLink },
@@ -188,10 +216,15 @@ export const options = {
       tooltip: 'Whether the cluster is connected to the PMK management plane',
     },
     {
-      id: 'healthStatus',
-      label: 'Health status',
-      render: renderHealthStatus,
-      tooltip: 'Cluster health',
+      id: 'platform9Components',
+      label: 'Platform9 Components',
+      render: renderPlatform9ComponentsStatus,
+      tooltip: 'Platform9 Components  Status',
+    },
+    {
+      id: 'apiServerHealth',
+      label: 'API Server Health',
+      render: renderApiServerHealth,
     },
     {
       id: 'links',
@@ -204,7 +237,7 @@ export const options = {
       render: (type) => cloudProviderTypes[type] || capitalizeString(type),
     },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
-    { id: 'version', label: 'K8 Version' },
+    { id: 'version', label: 'K8 Version', render: renderK8sVersion },
     {
       id: 'created_at',
       label: 'Created at',
@@ -261,6 +294,7 @@ export const options = {
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
+  searchTargets: ['name', 'uuid'],
   multiSelection: false,
   deleteCond: both(isAdmin, canDeleteCluster),
   DeleteDialog: ClusterDeleteDialog,
@@ -291,12 +325,10 @@ export const options = {
       icon: 'level-up',
       label: 'Upgrade Cluster',
       dialog: ClusterUpgradeDialog,
-    },
-    {
-      cond: both(isAdmin, notBusy),
-      icon: 'chart-bar',
-      label: 'Monitoring',
-      dialog: PrometheusAddonDialog,
+      disabledInfo: ([cluster]) =>
+        !!cluster && clockDriftDetectedInNodes(cluster.nodes)
+          ? 'Cannot upgrade cluster: clock drift detected in at least one node'
+          : 'Cannot upgrade cluster',
     },
     // Disable logging till all CRUD features for log datastores are implemented.
     /* {

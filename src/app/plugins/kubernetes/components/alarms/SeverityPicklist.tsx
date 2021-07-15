@@ -11,8 +11,8 @@ const options = [
 ]
 
 interface Props {
-  name: string
-  label: string
+  name?: string
+  label?: string
   value: string
   selectFirst: boolean
   onChange: (value: string) => void
@@ -22,13 +22,7 @@ interface Props {
 const SeverityPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
   // ( name = 'severity', label = 'Severity', onChange, selectFirst = true, ...rest }, ref) => {
   (props, ref) => {
-    const {
-      onChange,
-      value,
-      name = 'severity',
-      label = 'Severity',
-      selectFirst = false,
-    } = props
+    const { onChange, value, name = 'severity', label = 'Severity', selectFirst = false } = props
 
     // Select the first item as soon as data is loaded
     useEffect(() => {

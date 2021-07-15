@@ -135,10 +135,7 @@ const styles = (theme) => ({
     color: ({ stack = 'kubernetes' }) => [theme.components.sidebar[stack].activeText, '!important'],
 
     '&:hover *': {
-      color: ({ stack = 'kubernetes' }) => [
-        theme.components.sidebar[stack].hoverText,
-        '!important',
-      ],
+      color: ({ stack = 'kubernetes' }) => [theme.components.sidebar[stack].hoverText],
     },
   },
   navHeading: {
@@ -175,6 +172,7 @@ const styles = (theme) => ({
     flex: 1,
   },
   navMenuItem: {
+    overflow: 'inherit',
     display: 'grid',
     gridTemplateColumns: '50px 1fr',
     padding: 0,
@@ -293,6 +291,17 @@ const styles = (theme) => ({
   heavyWeight: {
     '& i': {
       fontWeight: 500,
+    },
+  },
+  linkFlag: {
+    position: 'absolute',
+    right: 0,
+    top: -4,
+    padding: '0px 3px 1px',
+    borderRadius: 4,
+    backgroundColor: theme.palette.pink.main,
+    '& > p': {
+      color: [theme.palette.grey['000'], '!important'],
     },
   },
 })
@@ -459,7 +468,7 @@ class Navbar extends PureComponent {
     ]
   }
 
-  renderNavLink = ({ nestedLinks, link, name, icon }, idx) => {
+  renderNavLink = ({ nestedLinks, link, name, flag = undefined, icon }, idx) => {
     const {
       open,
       classes,
@@ -509,6 +518,11 @@ class Navbar extends PureComponent {
             }}
             primary={name}
           />
+        )}
+        {flag && (
+          <div className={classes.linkFlag}>
+            <Text variant="caption4">{flag}</Text>
+          </div>
         )}
       </MenuItem>
     )

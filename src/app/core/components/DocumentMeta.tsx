@@ -77,13 +77,29 @@ export interface IDocumentMetaProps {
   bodyClasses?: any[]
 }
 
+interface AddScriptElementToDomBodyProps {
+  id: string
+  textContent?: string
+  src?: string
+  onload?: (event) => void
+}
+
 export class DocumentMetaCls extends React.Component<IDocumentMetaProps, {}> {
-  static addScriptElementToDomBody(id, content) {
+  static addScriptElementToDomBody({
+    id,
+    textContent,
+    src,
+    onload,
+  }: AddScriptElementToDomBodyProps) {
     const existingScript = document.getElementById(id)
     if (existingScript) return
     const script = document.createElement('script')
     script.id = id
-    script.textContent = content
+    script.textContent = textContent
+    if (src) {
+      script.src = src
+    }
+    script.onload = onload
     document.body.appendChild(script)
   }
 

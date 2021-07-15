@@ -20,7 +20,12 @@ export const handleNetworkBackendChange = (option, stack, wizardContext) => {
     privileged: option === 'calico' ? true : wizardContext.privileged,
     calicoIpIpMode: option === 'calico' ? 'Always' : undefined,
     calicoNatOutgoing: option === 'calico' ? true : undefined,
-    calicoBlockSize: option === 'calico' && stack === NetworkStackTypes.IPv6 ? '122' : option === 'calico' ? '26' : undefined,
+    calicoBlockSize:
+      option === 'calico' && stack === NetworkStackTypes.IPv6
+        ? '122'
+        : option === 'calico'
+        ? '26'
+        : undefined,
     calicoDetectionMethod: option === 'calico' ? CalicoDetectionTypes.FirstFound : undefined,
   }
 }
@@ -33,12 +38,15 @@ const NetworkBackendField = ({
   <PicklistField
     id="networkPlugin"
     label="Network backend"
-    onChange={(value) => setWizardContext(handleNetworkBackendChange(value, wizardContext.networkStack, wizardContext))}
+    onChange={(value) =>
+      setWizardContext(handleNetworkBackendChange(value, wizardContext.networkStack, wizardContext))
+    }
     options={options}
+    value={wizardContext.networkPlugin}
     info={
       wizardContext.networkStack !== NetworkStackTypes.IPv6 ? 'IPV6 only supports Calico CNI' : ''
     }
-    disabled={wizardContext.networkStack !== NetworkStackTypes.IPv4}
+    disabled={wizardContext.deployKubevirt || wizardContext.networkStack !== NetworkStackTypes.IPv4}
     required
   />
 )

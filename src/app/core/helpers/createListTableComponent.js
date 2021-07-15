@@ -11,7 +11,7 @@ const createListTableComponent = ({
   displayName = name,
   columns,
   uniqueIdentifier = 'id',
-  searchTarget = 'name',
+  searchTargets = ['name'],
   paginate = true,
   showCheckboxes = true,
   multiSelection = true,
@@ -19,6 +19,8 @@ const createListTableComponent = ({
   onRefresh = undefined,
   compactTable = false,
   batchActions = emptyArr,
+  filters = undefined,
+  showEmptyTableText = true,
 }) => {
   const CustomListTable = ({
     data,
@@ -28,10 +30,12 @@ const createListTableComponent = ({
     rowActions = undefined,
     loading = false,
     onSortChange = undefined,
+    listTableParams = undefined,
   }) => {
-    const [{ visibleColumns, columnsOrder, rowsPerPage }, updatePrefs] = useScopedPreferences(name)
+    const { prefs, updatePrefs } = useScopedPreferences(name)
+    const { visibleColumns, columnsOrder, rowsPerPage } = prefs
 
-    return !data || data.length === 0 ? (
+    return (!data || data.length === 0) && showEmptyTableText ? (
       typeof emptyText === 'string' ? (
         <NoContentMessage message={emptyText} />
       ) : (
@@ -49,7 +53,7 @@ const createListTableComponent = ({
         paginate={paginate}
         showCheckboxes={showCheckboxes}
         multiSelection={multiSelection}
-        searchTarget={searchTarget}
+        searchTargets={searchTargets}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
@@ -62,6 +66,8 @@ const createListTableComponent = ({
         loading={loading}
         compactTable={compactTable}
         batchActions={batchActions}
+        listTableParams={listTableParams}
+        filters={filters}
       />
     )
   }

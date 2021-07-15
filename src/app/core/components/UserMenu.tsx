@@ -15,10 +15,14 @@ import { routes } from 'core/utils/routes'
 import { isAdminRole } from 'k8s/util/helpers'
 import { pathOr } from 'ramda'
 import Theme from 'core/themes/model'
+import { showAndOpenZendeskWidget } from 'utils/zendesk-widget'
+import { showZendeskChatOption } from 'core/utils/helpers'
+import { preferencesStoreKey } from 'core/session/preferencesReducers'
 
 const styles = (theme: Theme) => ({
   userMenuContainer: {
     backgroundColor: theme.palette.blue[100],
+    marginTop: 4,
   },
   avatar: {
     position: 'relative',
@@ -96,7 +100,7 @@ class MenuListItem extends React.PureComponent<any> {
 @withStyles(styles)
 @withRouter
 // @ts-ignore
-@connect((store) => ({ session: store[sessionStoreKey] }))
+@connect((store) => ({ session: store[sessionStoreKey], preferences: store[preferencesStoreKey] }))
 class UserMenu extends React.PureComponent<any> {
   state = { anchorEl: null, showChangePasswordModal: false }
   handleClick = (event) => this.setState({ anchorEl: event.currentTarget })
@@ -108,7 +112,7 @@ class UserMenu extends React.PureComponent<any> {
   handleCancelChangePassword = () => this.setState({ showChangePasswordModal: false })
 
   render() {
-    const { classes, className, session } = this.props
+    const { classes, className, session, preferences } = this.props
     const { anchorEl, showChangePasswordModal } = this.state
     const {
       username,
@@ -117,9 +121,15 @@ class UserMenu extends React.PureComponent<any> {
     } = session
 
     const customerTier = pathOr<CustomerTiers>(CustomerTiers.Freedom, ['customer_tier'], features)
+    const lastStack = pathOr(null, [username, 'root', 'lastStack'], preferences)
 
     if (showChangePasswordModal) {
       return <ChangePasswordModal onCancel={this.handleCancelChangePassword} />
+    }
+
+    const handleChatOnClick = () => {
+      this.handleClose()
+      showAndOpenZendeskWidget()
     }
 
     return (
@@ -173,9 +183,16 @@ class UserMenu extends React.PureComponent<any> {
             </div>
             <hr className={classes.divider} />
             <div className={classes.dropdownSection}>
-              <SimpleLink src={helpUrl} className={classes.link} onClick={this.handleClose}>
-                <MenuListItem icon="question-circle">Support</MenuListItem>
-              </SimpleLink>
+              <div className={classes.dropdownLinks}>
+                <SimpleLink src={helpUrl} className={classes.link} onClick={this.handleClose}>
+                  <MenuListItem icon="question-circle">Support</MenuListItem>
+                </SimpleLink>
+                {showZendeskChatOption(lastStack, customerTier) && (
+                  <SimpleLink src={''} className={classes.link} onClick={handleChatOnClick}>
+                    <MenuListItem icon="comments-alt">Chat</MenuListItem>
+                  </SimpleLink>
+                )}
+              </div>
             </div>
           </div>
         </Menu>

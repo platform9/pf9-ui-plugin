@@ -37,8 +37,8 @@ class Wizard extends PureComponent {
     }
   }
 
-  setActiveStep = (stepId) => {
-    this.setState({ activeStepId: stepId })
+  setActiveStep = (stepId, stepNum) => {
+    this.setState({ activeStepId: stepId, activeStep: stepNum })
   }
 
   getActiveStepId = ({ steps }, activeStep) =>
@@ -70,7 +70,6 @@ class Wizard extends PureComponent {
   handleNext = async () => {
     const { onComplete, singleStep } = this.props
     const { steps, activeStep, wizardContext } = this.state
-
     // This is triggerSubmit in the ValidatedForm
     if (this.nextCb[activeStep]) {
       const ok = await this.nextCb[activeStep]()
@@ -160,13 +159,16 @@ class Wizard extends PureComponent {
       onCancel,
       showFinishAndReviewButton,
       hideAllButtons,
+      buttonCalloutMargin,
     } = this.props
     const shouldShowFinishAndReview =
       typeof showFinishAndReviewButton === 'function'
         ? showFinishAndReviewButton(wizardContext)
         : showFinishAndReviewButton
     const renderStepsContent = ensureFunction(children)
-
+    const currentStep = steps[activeStep]
+    const nextBtnDisabled =
+      currentStep && currentStep.validateFields && !currentStep.validateFields(wizardContext)
     return (
       <WizardContext.Provider value={this.state}>
         {showSteps && steps.length > 1 && <WizardStepper steps={steps} activeStep={activeStep} />}
@@ -175,13 +177,22 @@ class Wizard extends PureComponent {
           setWizardContext,
           onNext: this.onNext,
           handleNext: this.handleNext,
+          handleBack: this.handleBack,
+          setActiveStep: this.setActiveStep,
         })}
         {!hideAllButtons && (
-          <WizardButtons hasCalloutFields={this.state.calloutFields}>
+          <WizardButtons
+            calloutMargin={buttonCalloutMargin}
+            hasCalloutFields={this.state.calloutFields}
+          >
             {onCancel && <CancelButton onClick={onCancel} />}
             {this.hasBack() && <PrevButton onClick={this.handleBack} />}
             {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
-            {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
+            {this.hasNext() && (
+              <NextButton disabled={nextBtnDisabled} onClick={this.handleNext}>
+                Next
+              </NextButton>
+            )}
             {this.isLastStep() && (
               <NextButton onClick={this.handleNext} showForward={false}>
                 {submitLabel}

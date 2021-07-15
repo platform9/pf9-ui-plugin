@@ -1,5 +1,7 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
+import store from 'app/store'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
@@ -11,6 +13,7 @@ import {
   getEtcdBackupPayload,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
+  allClustersSelector,
   clustersSelector,
   makeParamsClustersSelector,
 } from 'k8s/components/infrastructure/clusters/selectors'
@@ -19,25 +22,29 @@ import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { mergeLeft, pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
-import { adjustWith, updateWith } from 'utils/fp'
+import { adjustWith, emptyObj, isNilOrEmpty, updateWith } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 import { importedClusterActions } from '../importedClusters/actions'
+import { importedClustersSelector } from '../importedClusters/selectors'
 
 const { appbert, qbert } = ApiClient.getInstance()
 
 export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get cluster tags')
     return appbert.getClusterTags()
   },
   updateFn: async ({ clusterId, pkg, on }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to toggle addon', { clusterId, pkg, on })
     return appbert.toggleAddon(clusterId, pkg, on)
   },
   uniqueIdentifier: 'uuid',
 })
 
-const getCsiDrivers = async (clusterUiid) => {
+const getCsiDrivers = async (clusterUuid) => {
+  Bugsnag.leaveBreadcrumb('Attempting to get cluster CSI drivers', { clusterId: clusterUuid })
   try {
-    return await qbert.getClusterCsiDrivers(clusterUiid)
+    return await qbert.getClusterCsiDrivers(clusterUuid)
   } catch (e) {
     console.warn(e)
     return null
@@ -46,14 +53,18 @@ const getCsiDrivers = async (clusterUiid) => {
 
 export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   listFn: async () => {
-    const [rawClusters] = await Promise.all([
+    Bugsnag.leaveBreadcrumb('Attempting to get clusters')
+    // update to use allSettled as appbert sometimes is in a failed state.
+    const [settledClusters] = await Promise.allSettled([
       qbert.getClusters(),
       // Fetch dependent caches
       clusterTagActions.list(),
-      loadNodes(),
+      loadNodes(emptyObj, true),
       loadResMgrHosts(),
     ])
-
+    if (settledClusters.status !== 'fulfilled') {
+      return []
+    }
     return mapAsync(async (cluster) => {
       const progressPercent =
         cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
@@ -68,9 +79,10 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         version,
         baseUrl,
       }
-    }, rawClusters)
+    }, settledClusters.value)
   },
   createFn: (params) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create cluster', params)
     if (params.clusterType === 'aws') {
       return createAwsCluster(params)
     }
@@ -89,6 +101,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
     }
 
+    Bugsnag.leaveBreadcrumb('Attempting to update cluster', { clusterId: uuid, ...body })
     await qbert.updateCluster(uuid, body)
     trackEvent('Update Cluster', { uuid })
 
@@ -99,6 +112,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     return body
   },
   deleteFn: async ({ uuid }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete cluster', { clusterId: uuid })
     await qbert.deleteCluster(uuid)
     // Delete cluster Segment tracking is done in ClusterDeleteDialog.tsx because that code
     // has more context about the cluster name, etc.
@@ -115,6 +129,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         spotPrice: spotPrice || 0.001,
         spotWorkerFlavor: cluster.cloudProperties.workerFlavor,
       }
+      Bugsnag.leaveBreadcrumb('Attempting to scale cluster', { clusterId: cluster.uuid, ...body })
       await qbert.updateCluster(cluster.uuid, body)
       trackEvent('Scale Cluster', { clusterUuid: cluster.uuid, numSpotWorkers, numWorkers })
 
@@ -129,6 +144,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       )
     },
     upgradeCluster: async ({ cluster, upgradeType }, prevItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster', { clusterId: cluster.uuid })
       await qbert.upgradeCluster(cluster.uuid, upgradeType)
       trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
 
@@ -141,9 +157,12 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       const body = {
         tags: { ...(cluster.tags || {}), [key]: val },
       }
-
+      Bugsnag.leaveBreadcrumb('Attempting to update cluster tag', {
+        clusterId: cluster.uuid,
+        ...body,
+      })
       await qbert.updateCluster(cluster.uuid, body)
-
+      trackEvent('Cluster Tag Update', { clusterId: cluster.uuid })
       return updateWith(
         propEq('uuid', cluster.uuid),
         {
@@ -154,7 +173,11 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       )
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
-      await qbert.attach(cluster.uuid, nodes)
+      Bugsnag.leaveBreadcrumb('Attempting to attach nodes to cluster', {
+        clusterId: cluster.uuid,
+        numNodes: (nodes || []).length,
+      })
+      await qbert.attachNodes(cluster.uuid, nodes)
       trackEvent('Cluster Attach Nodes', {
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,
@@ -163,7 +186,11 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       return prevItems
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
-      await qbert.detach(cluster.uuid, nodes)
+      Bugsnag.leaveBreadcrumb('Attempting to detach nodes from cluster', {
+        clusterId: cluster.uuid,
+        numNodes: (nodes || []).length,
+      })
+      await qbert.detachNodes(cluster.uuid, nodes)
       trackEvent('Cluster Detach Nodes', {
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,
@@ -181,11 +208,10 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 // and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params) => {
-  const clusters = await clusterActions.list(params)
-  const importedClusters = await importedClusterActions.list()
-  const collectiveClusters = [...clusters, ...importedClusters]
-  const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
-  return [clusterId, collectiveClusters]
+  // Maybe todo: change these to use the params selector instead to enable filtering?
+  const allClusters = await getAllClusters()
+  const { clusterId = pathOr(allKey, [0, 'uuid'], allClusters) } = params
+  return [clusterId, allClusters]
 }
 
 export const loadSupportedRoleVersions = createContextLoader(
@@ -199,3 +225,24 @@ export const loadSupportedRoleVersions = createContextLoader(
     cache: false,
   },
 )
+
+const allSelector = allClustersSelector()
+
+export const getAllClusters = async (reload = false) => {
+  if (reload) {
+    await clusterActions.list()
+    await importedClusterActions.list()
+  } else {
+    // Match useDataLoader method of checking for nil/empty on cache
+    const normalClusters = clustersSelector(store.getState())
+    const importedClusters = importedClustersSelector(store.getState())
+    if (isNilOrEmpty(normalClusters)) {
+      await clusterActions.list()
+    }
+    if (isNilOrEmpty(importedClusters)) {
+      await importedClusterActions.list()
+    }
+  }
+  const allClusters = allSelector(store.getState())
+  return allClusters
+}

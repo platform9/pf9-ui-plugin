@@ -1,6 +1,6 @@
 // libs
 import React from 'react'
-import { prop } from 'ramda'
+import { pathOr, prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/styles'
 // Constants
@@ -71,6 +71,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
   pod: {
     gridArea: 'pod',
   },
+  modal: {
+    position: 'fixed',
+    left: 0,
+    top: '55px',
+    width: '100vw',
+    height: 'calc(100vh - 55px)', // 55px is the toolbar height
+    overflow: 'auto',
+    zIndex: 5000,
+    backgroundColor: theme.palette.grey['100'],
+    padding: theme.spacing(2, 4),
+    boxSizing: 'border-box',
+  },
 }))
 
 export const clusterStatusCardProps: IStatusCardWithFilterProps = {
@@ -88,21 +100,25 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
         name: 'healthy',
         value: clusters.filter((cluster) => isHealthyStatus(cluster.healthStatus)).length,
         color: 'green.main',
+        info: 'Platform9 components & K8s API are responding',
       },
       {
         name: 'partially_healthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
         color: 'yellow.main',
+        info: 'Platform9 components or K8s API are not responding',
       },
       {
         name: 'converging',
         value: clusters.filter((cluster) => isTransientStatus(cluster.healthStatus)).length,
         color: 'orange.main',
+        info: 'Platform9 components are upgrading or installing',
       },
       {
         name: 'unhealthy',
         value: clusters.filter((cluster) => isUnhealthyStatus(cluster.healthStatus)).length,
         color: 'red.main',
+        info: 'Platform9 components are offline and not responding',
       },
     ],
     piePrimary: 'healthy',
@@ -201,6 +217,11 @@ export const cloudStatusCardProps: IStatusCardWithFilterProps = {
         name: 'Azure',
         value: clouds.filter((cloud) => cloud.type === CloudProviders.Azure).length,
         color: 'azure.main',
+      },
+      {
+        name: 'Google',
+        value: clouds.filter((cloud) => cloud.type === CloudProviders.Gcp).length,
+        color: 'googleYellow.main',
       },
     ],
     graphType: 'donut',
@@ -324,17 +345,28 @@ const DashboardPage = () => {
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-  const displayName = session?.userDetails?.displayName
+  const {
+    userDetails: { displayName },
+    features,
+  } = session
+  // To avoid missing API errors for ironic region UX-751
+  const kubeRegion = pathOr(false, ['experimental', 'containervisor'], features)
 
   return (
-    <section className={classes.cardColumn}>
-      <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
-      <div className={classes.dashboardMosaic}>
-        {reportsWithPerms(reports, session.userDetails.role).map((report) => (
-          <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-        ))}
-      </div>
-    </section>
+    <>
+      <section className={classes.cardColumn} id={`dashboard-page`}>
+        <Text id="dashboard-title" variant="h5">
+          Welcome{displayName ? ` ${displayName}` : ''}!
+        </Text>
+        {kubeRegion && (
+          <div className={classes.dashboardMosaic}>
+            {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+              <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+            ))}
+          </div>
+        )}
+      </section>
+    </>
   )
 }
 

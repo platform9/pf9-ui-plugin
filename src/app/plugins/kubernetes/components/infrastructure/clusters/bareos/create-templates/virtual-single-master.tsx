@@ -3,7 +3,7 @@ import React, { FC } from 'react'
 // import { allPass } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 
-import { pmkCliOverviewLink } from 'k8s/links'
+import { bareOSSingleMasterSetupDocsLink } from 'k8s/links'
 import { defaultEtcBackupPath } from 'app/constants'
 // import { capitalizeString, castBoolToStr } from 'utils/misc'
 
@@ -26,11 +26,7 @@ import PrivilegedContainers from '../../form-components/privileged'
 import AllowWorkloadsOnMaster from '../../form-components/allow-workloads-on-master'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
-import ClusterHostChooser, {
-  isConnected,
-  isUnassignedNode,
-  excludeNodes,
-} from '../ClusterHostChooser'
+import { isConnected, isUnassignedNode, excludeNodes } from '../ClusterHostChooser'
 import { allPass } from 'ramda'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import ApiFQDNField from '../../form-components/external-dns-name'
@@ -46,6 +42,9 @@ import BareOsClusterReviewTable from '../BareOsClusterReviewTable'
 import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { bareOSClusterTracking } from '../../tracking'
+import AddNodeStep from '../../AddNodeStep'
+import CustomApiFlags from '../../form-components/custom-api-flag'
+import NodeRegistrationChooser from '../../form-components/node-registration-chooser'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -68,6 +67,9 @@ export const initialContext = {
   calicoIPv4: 'autodetect',
   calicoIPv6: 'none',
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
+  useHostname: false,
+  nodeRegistrationType: 'ipAddress',
+  enableProfileAgent: false,
 }
 
 interface Props {
@@ -76,18 +78,23 @@ interface Props {
   onNext: any
 }
 
-const clusterAddons = ['etcdBackup', 'enableMetallbLayer2', 'prometheusMonitoringEnabled', 'networkPluginOperator', 'kubevirtPluginOperator']
+const clusterAddons = [
+  'etcdBackup',
+  'enableMetallbLayer2',
+  'prometheusMonitoringEnabled',
+  'networkPluginOperator',
+  'kubevirtPluginOperator',
+  'profileAgent',
+]
 const trackingFields = {
   platform: CloudProviders.VirtualMachine,
   target: ClusterCreateTypes.SingleMaster,
 }
 
-const VirtualSingleMasterCluster: FC<Props> = ({
-  onNext,
-  ...props
-}) => {
+const VirtualSingleMasterCluster: FC<Props> = ({ onNext, ...props }) => {
   const { wizardContext, setWizardContext } = props
   const classes = useStyles({})
+
   return (
     <>
       <WizardStep
@@ -104,98 +111,101 @@ const VirtualSingleMasterCluster: FC<Props> = ({
           withAddonManager
           elevated={false}
         >
-          {/* <PollingData loading={loading} onReload={reload} hidden /> */}
-          {/* Cluster Name */}
-          <FormFieldCard
-            title={`Name your ${ClusterCreateTypeNames[ClusterCreateTypes.SingleMaster]} Cluster`}
-            link={
-              <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
-                BareOS Cluster Help
-              </ExternalLink>
-            }
-          >
-            <ClusterNameField setWizardContext={setWizardContext} />
-          </FormFieldCard>
+          {({ setFieldValue, values }) => (
+            <>
+              {/* <PollingData loading={loading} onReload={reload} hidden /> */}
+              {/* Cluster Name */}
+              <FormFieldCard
+                title={`Name your ${
+                  ClusterCreateTypeNames[ClusterCreateTypes.SingleMaster]
+                } Cluster`}
+                link={
+                  <ExternalLink textVariant="caption2" url={bareOSSingleMasterSetupDocsLink}>
+                    BareOS Cluster Help
+                  </ExternalLink>
+                }
+              >
+                <ClusterNameField setWizardContext={setWizardContext} />
+              </FormFieldCard>
 
-          {/* Cluster Settings */}
-          <FormFieldCard title="Cluster Settings">
-            <KubernetesVersion />
-            
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Network Stack</Text>
-            <NetworkStack {...props} />
+              {/* Cluster Settings */}
+              <FormFieldCard title="Cluster Settings">
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Application & Container Settings</Text>
-            <PrivilegedContainers {...props} />
-            <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Network Stack</Text>
+                <NetworkStack {...props} />
 
-            <Divider className={classes.divider} />
-            <Text variant="caption1">Cluster Add-Ons</Text>
-            <AddonTogglers
-              addons={clusterAddons}
-              wizardContext={wizardContext}
-              setWizardContext={setWizardContext}
-            />
-          </FormFieldCard>
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Node Registration</Text>
+                <NodeRegistrationChooser
+                  values={values}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
+
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Application & Container Settings</Text>
+                <PrivilegedContainers {...props} />
+                <AllowWorkloadsOnMaster setWizardContext={setWizardContext} />
+
+                <Divider className={classes.divider} />
+                <Text variant="caption1">Cluster Add-Ons</Text>
+                <AddonTogglers
+                  addons={clusterAddons}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
+              </FormFieldCard>
+            </>
+          )}
         </ValidatedForm>
       </WizardStep>
       <WizardStep
         stepId="masters"
         label="Master Node"
         onNext={bareOSClusterTracking.wZStepTwo(trackingFields)}
+        keepContentMounted={false}
       >
-        <ValidatedForm
-          fullWidth
-          initialValues={wizardContext}
-          onSubmit={setWizardContext}
-          triggerSubmit={onNext}
-          title="Select a node to add as a Master Node"
-          link={
-            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
-              Not Seeing Any Nodes?
-            </ExternalLink>
-          }
-        >
-          <ClusterHostChooser
-            selection="single"
-            id="masterNodes"
-            filterFn={allPass([isConnected, isUnassignedNode])}
-            validations={[masterNodeLengthValidator]}
-            pollForNodes
-            required
-          />
-        </ValidatedForm>
+        <AddNodeStep
+          wizardContext={wizardContext}
+          setWizardContext={setWizardContext}
+          onNext={onNext}
+          title={'Select a node to add as a Master Node'}
+          nodeFieldId={'masterNodes'}
+          nodeSelection={'single'}
+          nodeFilterFn={allPass([isConnected, isUnassignedNode])}
+          nodeValidations={[masterNodeLengthValidator]}
+          isSingleNodeCluster={false}
+          pollForNodes={true}
+          required={true}
+        />
       </WizardStep>
       <WizardStep
         stepId="workers"
         label="Worker Nodes"
         onNext={bareOSClusterTracking.wZStepThree(trackingFields)}
+        keepContentMounted={false}
       >
-        <ValidatedForm
-          fullWidth
-          initialValues={wizardContext}
-          onSubmit={setWizardContext}
-          triggerSubmit={onNext}
-          title="Select nodes to add as Worker Nodes"
-          link={
-            <ExternalLink textVariant="caption2" url={pmkCliOverviewLink}>
-              Not Seeing Any Nodes?
-            </ExternalLink>
-          }
-        >
-          <ClusterHostChooser
-            selection="multiple"
-            id="workerNodes"
-            filterFn={allPass([
-              isUnassignedNode,
-              isConnected,
-              excludeNodes(wizardContext.masterNodes),
-            ])}
-            pollForNodes
-            validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
-          />
-        </ValidatedForm>
+        <AddNodeStep
+          wizardContext={wizardContext}
+          setWizardContext={setWizardContext}
+          onNext={onNext}
+          title={'Select nodes to add as Worker Nodes'}
+          nodeFieldId={'workerNodes'}
+          nodeSelection={'multiple'}
+          nodeFilterFn={allPass([
+            isUnassignedNode,
+            isConnected,
+            excludeNodes(wizardContext.masterNodes),
+          ])}
+          nodeValidations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
+          isSingleNodeCluster={false}
+          pollForNodes={true}
+        />
       </WizardStep>
       <WizardStep
         stepId="network"
@@ -226,7 +236,7 @@ const VirtualSingleMasterCluster: FC<Props> = ({
                   setWizardContext={setWizardContext}
                 />
                 {values.networkPlugin === NetworkBackendTypes.Calico && (
-                  <CalicoNetworkFields values={values} />
+                  <CalicoNetworkFields values={wizardContext} setValues={setWizardContext} />
                 )}
               </FormFieldCard>
             </>
@@ -239,22 +249,33 @@ const VirtualSingleMasterCluster: FC<Props> = ({
         onNext={bareOSClusterTracking.wZStepFive(trackingFields)}
       >
         <ValidatedForm
+          fullWidth
+          classes={{ root: classes.validatedFormContainer }}
           initialValues={wizardContext}
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
-          title="Advanced Configuration"
+          elevated={false}
+          withAddonManager
         >
           {({ values }) => (
             <>
-              <AdvancedApiConfigFields values={values} />
-              {/* Enable Application Catalog */}
-              {/* <CheckboxField
+              <FormFieldCard title="Advanced Configuration">
+                <AdvancedApiConfigFields values={values} />
+                {/* Enable Application Catalog */}
+                {/* <CheckboxField
               id="appCatalogEnabled"
               label="Enable Application Catalog"
               info="Enable the Helm Application Catalog on this cluster"
             /> */}
 
-              <TagsField />
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
+                <TagsField />
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={['enableTopologyManager']}
+                />
+              </FormFieldCard>
             </>
           )}
         </ValidatedForm>

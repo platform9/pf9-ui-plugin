@@ -16,6 +16,9 @@ export interface ImportedClusterSelector extends ImportedCluster {
   containerCidr: ImportedCluster['spec']['eks']['network']['containerCidr']
   servicesCidr: ImportedCluster['spec']['eks']['network']['servicesCidr']
   nodeGroups: ImportedCluster['spec']['eks']['nodegroups']
+  agentPools: ImportedCluster['spec']['aks']['agentPools']
+  providerType: string
+  hasPrometheus: boolean
 }
 
 export interface ImportedCluster {
@@ -42,7 +45,8 @@ export interface MetadataLabels {
   id: string
   projectID: string
   provider: string
-  region: string
+  region?: string
+  location?: string
 }
 
 export interface ManagedField {
@@ -150,7 +154,9 @@ export interface Spec {
   pf9: EmptyObj
   displayName: string
   external: boolean
-  eks: Eks
+  eks?: Eks
+  aks?: Aks
+  gke?: Gke
 }
 
 export interface Addons {
@@ -309,4 +315,150 @@ export interface Status {
 export interface ImportedClusterMetadata {
   selfLink: string
   resourceVersion: string
+}
+
+export interface Aks {
+  location: string
+  kubernetesVersion: string
+  type: string
+  provisioningState: string
+  powerState: string
+  enableRBAC: boolean
+  maxAgentPools: number
+  nodeResourceGroup: string
+  network: Network
+  agentPools: AgentPool[]
+  instances: AksInstance[]
+  servicePrincipalClientID: string
+  dnsPrefix: string
+  tags: AksTags
+  fqdn: string
+  enablePrivateCluster?: boolean
+}
+
+export interface AgentPool {
+  name: string
+  count: number
+  vmSize: string
+  osDiskSizeGB: number
+  osDiskType: string
+  maxPods: number
+  type: string
+  availabilityZones: string[]
+  provisioningState: string
+  powerState: string
+  kubernetesVersion: string
+  mode: string
+  osType: string
+  nodeImageVersion: string
+  vnetSubnetID: string
+}
+
+export interface AksInstance {
+  name: string
+  location: string
+  instanceId: string
+  vmId: string
+  zones: string[]
+  sku: Sku
+  virtualMachineScaleSetName: string
+  agentPoolName: string
+  tags: InstanceTags
+  networkInterfaces: string[]
+  osProfile: OSProfile
+}
+
+export interface OSProfile {
+  computerName: string
+  adminUsername: string
+  linuxConfiguration: LinuxConfiguration
+}
+
+export interface LinuxConfiguration {
+  sshKeys: SSHKey[]
+  disablePasswordAuthentication: boolean
+  provisionVMAgent: boolean
+}
+
+export interface SSHKey {
+  keyData: string
+  path: string
+}
+
+export interface Sku {
+  name: string
+  tier: string
+}
+
+export interface InstanceTags {
+  aksEngineVersion?: string
+  creationSource: string
+  orchestrator: string
+  poolName: string
+  resourceNameSuffix: string
+  createOperationID?: string
+}
+
+export interface Network {
+  plugin: string
+  policy: string
+  serviceCIDR: string
+  containerCIDR: string
+  dnsServiceIP: string
+  outboundType: string
+  loadBalancerSKU: string
+  loadBalancerProfile: LoadBalancerProfile
+}
+
+export interface LoadBalancerProfile {
+  managedOutboundIPs: number
+  effectiveOutboundIPs: string[]
+}
+
+export interface AksTags {
+  [key: string]: string
+}
+
+export interface Gke {
+  locations: string[]
+  id: string
+  clusterCaCertificate: string
+  initialClusterVersion: string
+  releaseChannel: string
+  databaseEncryption: string
+  network: GkeNetwork
+  nodePools: NodePool[]
+  privateCluster: boolean
+}
+
+export interface GkeNetwork {
+  useIpAliases: boolean
+  network: string
+  subnetwork: string
+  podIpv4CIDR: string
+  servicesIpv4CIDR: string
+  networkPolicyConfig: boolean
+}
+
+export interface NodePool {
+  name: string
+  diskSizeGb: number
+  machineType: string
+  imageType: string
+  diskType: string
+  nodeCount: number
+  maxPodsPerNode: string
+  status: string
+  k8sVersion: string
+  locations: string[]
+  instances: GkeInstance[]
+}
+
+export interface GkeInstance {
+  name: string
+  status: string
+  id: string
+  location: string
+  instanceTemplate: string
+  instanceGroupName: string
 }

@@ -3,7 +3,9 @@ import ApiClient from 'api-client/ApiClient'
 import { CustomWindow } from 'app/polyfills/window'
 import {
   activateUserUrl,
+  CustomerTiers,
   forgotPasswordUrl,
+  GlobalPreferences,
   loginUrl,
   loginWithCookieUrl,
   loginWithSsoUrl,
@@ -40,8 +42,15 @@ import { updateClarityStore } from 'utils/clarityHelper'
 import { DocumentMetaCls } from 'core/components/DocumentMeta'
 import { updateSession } from 'app/plugins/account/components/userManagement/users/actions'
 import Theme from 'core/themes/model'
+import Bugsnag from '@bugsnag/js'
+import Watchdog from 'core/watchdog'
+import systemHealthCheck from 'core/watchdog/system-health'
+import { isDecco } from 'core/utils/helpers'
+import config from '../../../../config'
 
-const { setActiveRegion } = ApiClient.getInstance()
+const { setActiveRegion, preferenceStore } = ApiClient.getInstance()
+
+const urlBase = process.env.NODE_ENV !== 'production' ? config.apiHost : ''
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -104,22 +113,38 @@ const restoreSession = async (
 }
 
 const getUserDetails = async (user) => {
+  if (typeof window.analytics === 'undefined') return
+
   // Need this here again bc not able to use AppContainer state and ensure
   // that sandbox state would be set on time for both users logging in for
   // first time and for users who are already logged in
-  const features = await axios.get('/clarity/features.json').catch(() => null)
+  const features = await axios.get(`${urlBase}/clarity/features.json`).catch(() => null)
   const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
+  const customerTier = pathStrOr(CustomerTiers.Freedom, 'customer_tier', features)
 
   // Identify the user in Segment using Keystone ID
-  if (typeof window.analytics !== 'undefined') {
-    if (sandbox) {
-      window.analytics.identify()
-    } else {
-      window.analytics.identify(user.id, {
-        email: user.email,
-      })
-    }
+  if (sandbox) {
+    return window.analytics.identify()
   }
+
+  const payload: any = {
+    email: user.email,
+  }
+  if (
+    isDecco(features) &&
+    (customerTier === CustomerTiers.Growth || customerTier === CustomerTiers.Enterprise)
+  ) {
+    try {
+      const externalId = await preferenceStore.getGlobalPreference(
+        GlobalPreferences.CustomerExternalId,
+      )
+      if (externalId) {
+        payload.accountExternalId = externalId
+        payload.contactExternalId = user.email
+      }
+    } catch (err) {}
+  }
+  window.analytics.identify(user.id, payload)
 }
 
 /**
@@ -135,9 +160,10 @@ const AppContainer = () => {
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const { features, isSsoToken } = session
-  const [, , getUserPrefs] = useScopedPreferences()
+  const { getUserPrefs } = useScopedPreferences()
   const dispatch = useDispatch()
   const [loginFeatures, setLoginFeatures] = useState({ loaded: false, sso: false })
+  const [customerTier, setCustomerTier] = useState(null)
 
   useEffect(() => {
     const unlisten = history.listen((location) => {
@@ -160,30 +186,46 @@ const AppContainer = () => {
       // Features are requested again later for the specific logged-in region,
       // whereas this one is done on the master DU from which the UI is served.
       // Ignore exception if features.json not found (for local development)
-
-      const initialFeatures = await axios.get('/clarity/features.json').catch(() => null)
+      const initialFeatures = await axios.get(`${urlBase}/clarity/features.json`).catch(() => null)
+      const customerTier = pathStrOr(CustomerTiers.Freedom, 'data.customer_tier', initialFeatures)
+      setCustomerTier(customerTier)
       const sandboxFlag = pathStrOr(false, 'data.experimental.sandbox', initialFeatures)
       const analyticsOff = pathStrOr(false, 'data.experimental.analyticsOff', initialFeatures)
+      const airgapped = pathStrOr(false, 'data.experimental.airgapped', initialFeatures)
+      const duVersion = pathStrOr('', 'data.releaseVersion', initialFeatures)
+
+      Bugsnag.addMetadata('App', {
+        customerTier,
+        duVersion,
+      })
 
       // Segment tracking
-      if (!analyticsOff) {
-        DocumentMetaCls.addScriptElementToDomBody('segmentCode', segmentScriptContent)
+      if (!analyticsOff && !airgapped) {
+        DocumentMetaCls.addScriptElementToDomBody({
+          id: 'segmentCode',
+          textContent: segmentScriptContent,
+        })
       }
 
       // Drift tracking code for live demo
       if (sandboxFlag) {
-        DocumentMetaCls.addScriptElementToDomBody('driftCode', driftScriptContent)
+        DocumentMetaCls.addScriptElementToDomBody({
+          id: 'driftCode',
+          textContent: driftScriptContent,
+        })
       }
 
       // Legacy DU & DDU have different conditions
       setLoginFeatures({
         loaded: true,
         sso:
-          (initialFeatures?.data?.experimental?.kplane &&
-            ssoEnabledTiers.includes(initialFeatures?.data?.customer_tier)) ||
+          (initialFeatures?.data?.experimental?.kplane && ssoEnabledTiers.includes(customerTier)) ||
           (!initialFeatures?.data?.experimental?.kplane &&
             pathStrOr(false, 'data.experimental.sso', initialFeatures)),
       })
+      if (isDecco(initialFeatures?.data)) {
+        Watchdog.register({ handler: systemHealthCheck, frequency: 1000 * 60 * 10 })
+      }
     }
 
     const validateSession = async () => {
@@ -282,7 +324,11 @@ const AppContainer = () => {
         <Route path={activateUserUrl} component={ActivateUserPage} />
         <Route path={loginUrl}>
           {loginFeatures.loaded && (
-            <LoginPage onAuthSuccess={setupSession} ssoEnabled={loginFeatures.sso} />
+            <LoginPage
+              onAuthSuccess={setupSession}
+              ssoEnabled={loginFeatures.sso}
+              customerTier={customerTier}
+            />
           )}
         </Route>
         <Route>

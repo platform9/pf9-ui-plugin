@@ -46,7 +46,7 @@ const ListPage = ({ ListContainer }) => {
     ) as any
     const cluster = clusters.find((x) => x.uuid === match.params.id)
 
-    const { nodeGroups } = cluster
+    const { nodeGroups = [] } = cluster
     const nodes = pipe<Nodegroup[], FlattenedInstances[][], FlattenedInstances[]>(
       map((nodeGroup) =>
         nodeGroup?.instances?.map((instance) => ({

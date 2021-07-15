@@ -4,7 +4,10 @@ enum DataKeys {
   Nodes = 'Nodes',
   Clusters = 'Clusters',
   ImportedClusters = 'ImportedClusters',
+  AllClusters = 'AllClusters',
   Pods = 'Pods',
+  VirtualMachines = 'VirtualMachines',
+  VirtualMachineDetails = 'VirtualMachineDetails',
   ResMgrHosts = 'ResMgrHosts',
   CombinedHosts = 'CombinedHosts',
   CoreApiResources = 'CoreApiResources',
@@ -36,6 +39,7 @@ enum DataKeys {
   Alerts = 'Alerts',
   AlertRules = 'AlertRules',
   AlertsTimeSeries = 'AlertsTimeSeries',
+  Silences = 'Silences',
   ApiEndpoints = 'ApiAccess-endpoints',
   Ssh = 'Ssh',
   ServiceCatalog = 'ServiceCatalog',
@@ -55,6 +59,8 @@ enum DataKeys {
   Tenants = 'Tenants',
   Users = 'Users',
   UserTenants = 'UserTenants',
+  RbacProfiles = 'RbacProfiles',
+  RbacProfileBindings = 'RbacProfileBindings',
 }
 
 export default DataKeys
@@ -65,7 +71,10 @@ export const ActionDataKeys = {
   Nodes: 'Nodes',
   Clusters: 'Clusters',
   ImportedClusters: 'ImportedClusters',
+  AllClusters: 'AllClusters',
   Pods: 'Pods',
+  VirtualMachines: 'VirtualMachines',
+  VirtualMachineDetails: 'VirtualMachineDetails',
   ResMgrHosts: 'ResMgrHosts',
   CombinedHosts: 'CombinedHosts',
   CoreApiResources: 'CoreApiResources',
@@ -97,6 +106,7 @@ export const ActionDataKeys = {
   Alerts: 'Alerts',
   AlertRules: 'AlertRules',
   AlertsTimeSeries: 'AlertsTimeSeries',
+  Silences: 'Silences',
   ApiEndpoints: 'ApiAccess-endpoints',
   Ssh: 'Ssh',
   ServiceCatalog: 'ServiceCatalog',
@@ -117,4 +127,6 @@ export const ActionDataKeys = {
   Tenants: 'Tenants',
   Users: 'Users',
   UserTenants: 'UserTenants',
+  RbacProfiles: 'RbacProfiles',
+  RbacProfileBindings: 'RbacProfileBindings',
 }

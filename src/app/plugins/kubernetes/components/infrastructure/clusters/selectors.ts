@@ -15,17 +15,19 @@ import { IClusterSelector } from './model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import {
   getK8sDashboardLinkFromVersion,
+  getScopedClusterProxyEndpoint,
   hasAppCatalogEnabled,
   hasHealthyMasterNodes,
   hasMasterNode,
-  hasPrometheusTag,
   masterlessCluster,
+  prometheusCluster,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import { nodesSelector } from 'k8s/components/infrastructure/nodes/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import { hasPrometheusEnabled } from 'k8s/components/prometheus/helpers'
 import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
 import { calculateNodeUsages } from '../common/helpers'
+import { importedClustersSelector } from '../importedClusters/selectors'
 
 export const clustersSelector = createSelector(
   [
@@ -47,10 +49,11 @@ export const clustersSelector = createSelector(
       const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x?.resmgr?.id))
-      const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
-      const grafanaLink =
-        `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/` +
-        `namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+      const proxyEndpoint = getScopedClusterProxyEndpoint(
+        qbertEndpoint.replace(/\/qbert\//, '/k8s/'),
+        cluster,
+      )
+      const grafanaLink = `${proxyEndpoint}/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
       const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
       const _usage = calculateNodeUsages(combinedNodes)
       const usage = {
@@ -68,7 +71,6 @@ export const clustersSelector = createSelector(
         connectionStatus,
         masterNodesHealthStatus,
         workerNodesHealthStatus,
-        cluster.canUpgrade,
       )
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
@@ -101,7 +103,7 @@ export const clustersSelector = createSelector(
           // Rendering happens in <DownloadKubeConfigLink />
           kubeconfig: clusterOk ? { cluster } : null,
           // Rendering happens in <ClusterCLI />
-          cli: clusterOk ? { host, cluster } : null,
+          cli: clusterOk ? { host: qbertEndpoint.match(/(.*?)\/qbert/)[1], cluster } : null,
         },
         ...fuzzyBools,
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
@@ -111,6 +113,8 @@ export const clustersSelector = createSelector(
         etcdBackupEnabled: castFuzzyBool(
           pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster),
         ),
+        hasPrometheus: isPrometheusEnabled,
+        clusterType: 'normal',
       }
     })
   },
@@ -147,12 +151,60 @@ export const makeParamsClustersSelector = (
       >(
         filterIf(masterNodeClusters, hasMasterNode),
         filterIf(masterlessClusters, masterlessCluster),
-        filterIf(prometheusClusters, hasPrometheusTag),
+        filterIf(prometheusClusters, prometheusCluster),
         filterIf(appCatalogClusters, hasAppCatalogEnabled),
         filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
         filterIf(healthyClusters, hasHealthyMasterNodes),
         createSorter({ orderBy, orderDirection }),
       )(clusters)
+    },
+  )
+}
+
+export const allClustersSelector = (
+  defaultParams: SortConfig = {
+    orderBy: 'name',
+    orderDirection: 'asc',
+  },
+) => {
+  return createSelector(
+    [clustersSelector, importedClustersSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (clusters, importedClusters, params) => {
+      const {
+        masterNodeClusters,
+        masterlessClusters,
+        hasControlPanel,
+        healthyClusters,
+        appCatalogClusters,
+        prometheusClusters,
+        orderBy,
+        orderDirection,
+      } = params
+      // I want to reuse the makeParamsClusterSelector etc. here instead of code
+      // repetition but I don't know how to do so
+      const filteredClusters = pipe<
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[]
+      >(
+        filterIf(masterNodeClusters, hasMasterNode),
+        filterIf(masterlessClusters, masterlessCluster),
+        filterIf(prometheusClusters, prometheusCluster),
+        filterIf(appCatalogClusters, hasAppCatalogEnabled),
+        filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
+        filterIf(healthyClusters, hasHealthyMasterNodes),
+      )(clusters)
+
+      const filteredImportedClusters = pipe<any, any>(
+        filterIf(prometheusClusters, prometheusCluster),
+      )(importedClusters)
+
+      const allClusters = [...filteredClusters, ...filteredImportedClusters]
+      return createSorter({ orderBy, orderDirection })(allClusters)
     },
   )
 }

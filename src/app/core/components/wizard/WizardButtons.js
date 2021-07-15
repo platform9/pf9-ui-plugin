@@ -9,7 +9,7 @@ const styles = (theme) => ({
     flexDirection: 'row',
   },
   callout: {
-    marginLeft: 264,
+    marginLeft: ({ calloutMargin }) => calloutMargin || 264,
   },
 })
 

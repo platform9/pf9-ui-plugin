@@ -7,7 +7,7 @@ import AwsCloudProviderVerification from './AwsCloudProviderVerification'
 import AzureCloudProviderVerification from './AzureCloudProviderVerification'
 import { objSwitchCase, onlyDefinedValues } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
-import { Theme } from '@material-ui/core'
+import Theme from 'core/themes/model'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
@@ -20,6 +20,11 @@ import DocumentMeta from 'core/components/DocumentMeta'
 import WizardMeta from 'core/components/wizard/WizardMeta'
 import { pick } from 'ramda'
 import { routes } from 'core/utils/routes'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { cloudVerificationCalloutFields, renderVerificationCalloutFields } from './helpers'
+import { UserPreferences } from 'app/constants'
+import GoogleCloudProviderVerification from './GoogleCloudProviderVerification'
+import GoogleCloudProviderFields from './GoogleCloudProviderFields'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -63,6 +68,16 @@ const formCpBody = (data) => {
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
+  const { prefs, updateUserDefaults } = useScopedPreferences('defaults')
+
+  const cloudDefaults = useMemo(() => {
+    return (
+      objSwitchCaseAny({
+        [CloudProviders.Aws]: prefs[UserPreferences.Aws],
+        [CloudProviders.Azure]: prefs[UserPreferences.Azure],
+      })(initialValues.type) || {}
+    )
+  }, [initialValues.type, prefs])
 
   const updatedInitialValues: ICloudProvidersSelector = useMemo(() => {
     return {
@@ -80,6 +95,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderVerification,
       [CloudProviders.Azure]: AzureCloudProviderVerification,
+      [CloudProviders.Gcp]: GoogleCloudProviderVerification,
     })(initialValues.type)
   }, [initialValues.type])
 
@@ -87,6 +103,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     return objSwitchCaseAny({
       [CloudProviders.Aws]: AwsCloudProviderFields,
       [CloudProviders.Azure]: AzureCloudProviderFields,
+      [CloudProviders.Gcp]: GoogleCloudProviderFields,
     })(initialValues.type)
   }, [initialValues.type])
 
@@ -106,8 +123,11 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
             return (
               <WizardMeta
                 className={classes.updateCloudProvider}
-                fields={wizardContext}
+                fields={{ ...wizardContext, ...cloudDefaults }}
+                calloutFields={cloudVerificationCalloutFields(wizardContext.type)}
+                renderLabels={renderVerificationCalloutFields()}
                 icon={<CloudProviderCard active type={wizardContext.type} />}
+                showUndefinedFields
               >
                 <WizardStep stepId="step1" label="Update Cloud Provider">
                   <div className={classes.form}>
@@ -125,14 +145,25 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                         <UpdateForm
                           wizardContext={wizardContext}
                           setWizardContext={setWizardContext}
+                          showInfo={wizardContext.type === CloudProviders.Aws}
                           toggleIamPolicy
                           showSubmitInCard
                           updateWizard
+                          setInitialValue
                         />
                       </FormFieldCard>
+                    </ValidatedForm>
+                    <ValidatedForm
+                      classes={{ root: classes.validatedFormContainer }}
+                      initialValues={wizardContext}
+                      elevated={false}
+                      maxWidth={800}
+                    >
                       <VerificationFields
                         wizardContext={wizardContext}
                         setWizardContext={setWizardContext}
+                        updateUserDefaults={updateUserDefaults}
+                        cloudDefaults={cloudDefaults}
                       />
                     </ValidatedForm>
                   </div>

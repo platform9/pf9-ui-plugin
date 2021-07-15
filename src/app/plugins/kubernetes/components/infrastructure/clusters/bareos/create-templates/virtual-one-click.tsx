@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { allPass } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 
@@ -22,6 +22,13 @@ import { ClusterCreateTypeNames, ClusterCreateTypes } from '../../model'
 import { CalicoDetectionTypes } from '../../form-components/calico-network-fields'
 import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { bareOSClusterTracking } from '../../tracking'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
+import {
+  checkNodesForClockDrift,
+  clockDriftErrorMessage,
+} from 'k8s/components/infrastructure/nodes/helper'
 
 export const initialContext = {
   containersCidr: '10.20.0.0/22',
@@ -44,6 +51,7 @@ export const initialContext = {
   calicoIPv4: 'autodetect',
   calicoIPv6: 'none',
   calicoDetectionMethod: CalicoDetectionTypes.FirstFound,
+  useHostname: false,
 }
 
 const columns = [
@@ -58,7 +66,7 @@ const columns = [
   { id: 'calicoIpIpMode', label: 'IP in IP Encapsulation Mode' },
   { id: 'calicoNatOutgoing', label: 'NAT Outgoing', render: (value) => castBoolToStr()(value) },
   { id: 'calicoBlockSize', label: 'Block Size' },
-  { id: 'mtuSize', label: 'Block Size' },
+  { id: 'mtuSize', label: 'MTU Size' },
   {
     id: 'privileged',
     label: 'Privileged',
@@ -87,6 +95,32 @@ const trackingFields = {
 
 const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles({})
+  const [errorMessage, setErrorMessage] = useState('')
+  const [allNodes] = useDataLoader(loadNodes)
+  const validatorRef = useRef(null)
+
+  const setupValidator = (validate) => {
+    validatorRef.current = { validate }
+  }
+  const submitStep = useCallback(() => {
+    const isValid = validatorRef.current.validate()
+    if (!isValid) {
+      return false
+    }
+
+    const selectedNodeUuids = wizardContext.masterNodes
+    const hasClockDrift = checkNodesForClockDrift(selectedNodeUuids, allNodes)
+    if (hasClockDrift) {
+      setErrorMessage(clockDriftErrorMessage)
+      return false
+    }
+    return true
+  }, [wizardContext])
+
+  useEffect(() => {
+    onNext(submitStep)
+  }, [submitStep])
+
   return (
     <WizardStep stepId="virtual-one-click" onNext={bareOSClusterTracking.oneClick(trackingFields)}>
       <ValidatedForm
@@ -94,7 +128,7 @@ const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext
         fullWidth
         initialValues={wizardContext}
         onSubmit={setWizardContext}
-        triggerSubmit={onNext}
+        triggerSubmit={setupValidator}
         elevated={false}
       >
         {/* <PollingData loading={loading} onReload={reload} hidden /> */}
@@ -108,7 +142,7 @@ const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext
           }
         >
           <ClusterNameField setWizardContext={setWizardContext} />
-          <KubernetesVersion />
+          <KubernetesVersion wizardContext={wizardContext} setWizardContext={setWizardContext} />
         </FormFieldCard>
 
         <FormFieldCard
@@ -125,8 +159,10 @@ const OneClickVirtualMachineCluster = ({ wizardContext, setWizardContext, onNext
             filterFn={allPass([isConnected, isUnassignedNode])}
             onChange={(value) => setWizardContext({ masterNodes: value })}
             validations={[masterNodeLengthValidator]}
+            isSingleNodeCluster={true}
             required
           />
+          {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         </FormFieldCard>
 
         <FormFieldCard title="Default Settings for New Cluster">

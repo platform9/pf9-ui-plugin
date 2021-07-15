@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useCallback, useState } from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import FormWrapper from 'core/components/FormWrapper'
@@ -24,6 +24,9 @@ import ClusterHostChooser, {
 } from './bareos/ClusterHostChooser'
 import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
+import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
+import { loadNodes } from '../nodes/actions'
+import { checkNodesForClockDrift, clockDriftErrorMessage } from '../nodes/helper'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
@@ -48,6 +51,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   workerCount: {
     margin: theme.spacing(4, 0),
+  },
+  errorMessage: {
+    padding: theme.spacing(1),
   },
 }))
 
@@ -77,6 +83,8 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
 }) => {
   const classes = useStyles({})
   const { params, getParamsUpdater } = useParams()
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [allNodes] = useDataLoader(loadNodes)
   const { name, cloudProviderType } = cluster
   const isLocal = cloudProviderType === 'local'
   const isCloud = ['aws', 'azure'].includes(cloudProviderType)
@@ -87,6 +95,24 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
 
   const calcMax = (value: number): number =>
     params.scaleType === 'add' ? value + MAX_SCALE_AT_A_TIME : value
+
+  const handleSubmit = useCallback(
+    (data) => {
+      if (params.scaleType === 'add') {
+        const uuids = data.workersToAdd
+        const hasClockDrift = checkNodesForClockDrift(uuids, allNodes)
+        if (hasClockDrift) {
+          setErrorMessage(clockDriftErrorMessage)
+          return
+        }
+        setErrorMessage(null)
+        onAttach(data)
+      } else {
+        onDetach(data)
+      }
+    },
+    [params.scaleType, onAttach, onDetach],
+  )
 
   const chooseScaleNum = (
     <ValidatedForm initialValues={cluster} onSubmit={onSubmit} elevated={false}>
@@ -133,25 +159,29 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
   )
 
   const addBareOsWorkerNodes = (
-    <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
+    <ValidatedForm onSubmit={handleSubmit}>
       <ClusterHostChooser
-        selection="single"
+        selection="multiple"
         id="workersToAdd"
         filterFn={allPass([isUnassignedNode, isConnected])}
         validations={[minScaleValidator, maxScaleValidator]}
+        isSingleNodeCluster={false}
         required
       />
+      {errorMessage && <ErrorMessage className={classes.errorMessage}>{errorMessage}</ErrorMessage>}
       <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>
     </ValidatedForm>
   )
 
   const removeBareOsWorkerNodes = (
-    <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
+    <ValidatedForm onSubmit={handleSubmit}>
       <ClusterHostChooser
-        selection="single"
+        selection="multiple"
         id="workersToRemove"
         filterFn={allPass([isNotMaster, inCluster(cluster.uuid)])}
         validations={[minScaleValidator, maxScaleValidator]}
+        isSingleNodeCluster={false}
+        showResourceRequirements={false}
         required
       />
       <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>

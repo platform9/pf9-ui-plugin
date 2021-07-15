@@ -14,6 +14,7 @@ import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
 import ImportedClustersListPage from './importedClusters/ImportedClustersListPage'
+import { isDecco } from 'core/utils/helpers'
 
 const tabTogglerSpacing = {
   [InfrastructureTabs.Clusters]: 185,
@@ -64,6 +65,7 @@ const InfrastructurePage = () => {
   const session = useSelector(selectSessionState)
   const {
     userDetails: { role },
+    features,
   } = session
 
   const hash = window.location.hash.substr(1) as InfrastructureTabs
@@ -89,10 +91,12 @@ const InfrastructurePage = () => {
           {header}
           <ClustersListPage header={header} />
         </Tab>
-        <Tab value={InfrastructureTabs.ImportedClusters} label="Imported Clusters">
-          {header}
-          <ImportedClustersListPage />
-        </Tab>
+        {isDecco(features) && (
+          <Tab value={InfrastructureTabs.ImportedClusters} label="Imported Clusters">
+            {header}
+            <ImportedClustersListPage />
+          </Tab>
+        )}
         {role === 'admin' && (
           <Tab value={InfrastructureTabs.Nodes} label="Nodes">
             {header}

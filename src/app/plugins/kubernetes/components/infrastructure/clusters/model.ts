@@ -22,12 +22,7 @@ export enum BareOsRequiredNodes {
   'multi-master' = 2,
 }
 
-export type HealthStatus =
-  | 'healthy'
-  | 'partially_healthy'
-  | 'unhealthy'
-  | 'unknown'
-  | 'needs_upgrade'
+export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 
 interface IClusterAsyncAction {
   progressPercent: any
@@ -39,6 +34,8 @@ export interface IClusterAction extends ClusterElement, INormalizedCluster, IClu
 export type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
 
 export type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
+
+export type ApiServerStatus = 'online' | 'offline' | 'degraded'
 
 // progressPercent,
 //         version,

@@ -28,6 +28,8 @@ const MetalLbAddonLayer2Field = React.lazy(async () =>
   })),
 )
 
+const ProfileAgentField = React.lazy(async () => import('./profile-agent'))
+
 const EtcdBackupFields = React.lazy(async () => import('./etcd-backup'))
 const EdcdBackupAddonFields = React.lazy(async () =>
   import('./etcd-backup').then((module) => ({ default: module.EdcdBackupAddonFields })),
@@ -39,6 +41,12 @@ const AutoScalingAddonFields = React.lazy(async () =>
     default: module.AutoScalingAddonFields,
   })),
 )
+const TopologyManagerField = React.lazy(async () => import('./topology-manager'))
+const TopologyManagerAddonFields = React.lazy(async () =>
+  import('./topology-manager').then((module) => ({
+    default: module.TopologyManagerAddonFields,
+  })),
+)
 
 const addonMap = {
   networkPluginOperator: {
@@ -47,6 +55,10 @@ const addonMap = {
   },
   kubevirtPluginOperator: {
     toggler: KubevirtPluginOperator,
+    details: { component: null },
+  },
+  profileAgent: {
+    toggler: ProfileAgentField,
     details: { component: null },
   },
   etcdBackup: {
@@ -69,6 +81,10 @@ const addonMap = {
   enableCAS: {
     toggler: AutoScalingField,
     details: { component: AutoScalingAddonFields },
+  },
+  enableTopologyManager: {
+    toggler: TopologyManagerField,
+    details: { component: TopologyManagerAddonFields },
   },
 }
 
@@ -100,7 +116,7 @@ export const AddonTogglers = ({ addons, wizardContext, setWizardContext }) => {
   )
 }
 
-export const AddonDetailCards = ({ values }) => {
+export const AddonDetailCards = ({ wizardContext, setWizardContext, values }) => {
   const { addons } = useContext(AddonContext)
 
   return (

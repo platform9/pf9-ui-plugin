@@ -5,6 +5,7 @@ import { prop } from 'ramda'
 import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
 import { cacheActions } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
+import Bugsnag from '@bugsnag/js'
 
 // We are abusing the React component system a little bit here.  This is really
 // nothing but an action but I didn't want to clutter the Navbar component with
@@ -15,10 +16,12 @@ const LogoutPage = () => {
   const { username } = session
 
   useEffect(() => {
-    trackEvent('PF9 Logged Out', {
+    const metadata = {
       username,
       du_domain: window.location.origin,
-    })
+    }
+    Bugsnag.leaveBreadcrumb('PF9 Logged Out', metadata)
+    trackEvent('PF9 Logged Out', metadata)
 
     dispatch(sessionActions.destroySession())
     dispatch(cacheActions.clearCache())

@@ -318,7 +318,7 @@ class ListTable extends PureComponent {
   }
 
   handleSearch = (value) => {
-    if (this.props.searchTarget) {
+    if (this.props.searchTargets) {
       this.setState({
         searchTerm: value,
       })
@@ -404,9 +404,11 @@ class ListTable extends PureComponent {
     }, data)
   }
 
-  filterBySearch = (data, target) => {
+  filterBySearch = (data, targets) => {
     const { searchTerm } = this.state
-    return data.filter((ele) => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter((ele) =>
+      targets.some((target) => ele[target].match(new RegExp(searchTerm, 'i')) !== null),
+    )
   }
 
   pluckDataIds = (rows) => rows.map(this.getRowId)
@@ -428,14 +430,14 @@ class ListTable extends PureComponent {
   }
 
   getFilteredRows = () => {
-    const { searchTarget, data, filters, onSortChange } = this.props
+    const { searchTargets, data, filters, onSortChange } = this.props
     const { searchTerm } = this.state
 
     const sortedData = onSortChange ? data : this.sortData(data)
     const searchData =
       !searchTerm || searchTerm.length < minSearchLength
         ? sortedData
-        : this.filterBySearch(sortedData, searchTarget)
+        : this.filterBySearch(sortedData, searchTargets)
     return filters ? this.applyFilters(searchData) : searchData
   }
 
@@ -594,6 +596,9 @@ class ListTable extends PureComponent {
       multiSelection,
       headless,
       hideDelete,
+      alternativeTableContent,
+      listTableParams,
+      showPagination,
     } = this.props
 
     if (!data) {
@@ -669,10 +674,16 @@ class ListTable extends PureComponent {
                   onChangeRowsPerPage={this.handleChangeRowsPerPage}
                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
                   hideDelete={hideDelete}
+                  listTableParams={listTableParams}
                 />
               )}
-              <div className={classes.tableWrapper}>{tableContent}</div>
-              {!compactTable && this.renderPaginationControls(filteredData.length)}
+              {alternativeTableContent || (
+                <div className={classes.tableWrapper}>{tableContent}</div>
+              )}
+              {!alternativeTableContent &&
+                !compactTable &&
+                showPagination &&
+                this.renderPaginationControls(filteredData.length)}
             </div>
           </Grid>
         </Grid>
@@ -709,6 +720,7 @@ ListTable.propTypes = {
   onRefresh: PropTypes.func,
   onActionComplete: PropTypes.func,
   paginate: PropTypes.bool,
+  showPagination: PropTypes.bool,
   orderBy: PropTypes.string,
   orderDirection: PropTypes.oneOf(['asc', 'desc']),
   onSortChange: PropTypes.func,
@@ -749,7 +761,7 @@ ListTable.propTypes = {
   onColumnsChange: PropTypes.func,
 
   showCheckboxes: PropTypes.bool,
-  searchTarget: PropTypes.string,
+  searchTargets: PropTypes.arrayOf(PropTypes.string),
 
   canEditColumns: PropTypes.bool,
   canDragColumns: PropTypes.bool,
@@ -773,6 +785,7 @@ ListTable.propTypes = {
 
 ListTable.defaultProps = {
   paginate: true,
+  showPagination: true,
   showCheckboxes: true,
   multiSelection: true,
   uniqueIdentifier: 'id',

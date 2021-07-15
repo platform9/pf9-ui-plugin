@@ -211,9 +211,8 @@ export const NodeHealthWithTasksToggler: FC = () => {
     [reloadClusters, reloadNodes],
   )
 
-  const selectedNode = useMemo(() => nodes.find((node) => selectedNodeUuid === node.uuid), [
-    selectedNodeUuid,
-  ])
+  // Node stats change on every render cycle so need to not memoize this
+  const selectedNode = nodes.find((node) => selectedNodeUuid === node.uuid)
 
   const classes = useStyles({})
   const kubeStatusData: Pf9KubeStatusData =

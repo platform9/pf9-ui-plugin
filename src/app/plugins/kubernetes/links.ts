@@ -23,9 +23,10 @@ export const slackLink = 'https://slack.platform9.io'
 export const forumHelpLink = `${communityBaseUrl}/`
 export const pf9PmkArchitectureDigLink = `${k8sBaseUrl}/multimaster-architecture-platform9-managed-kubernetes/`
 export const pmkDocumentationLink = `${k8sBaseUrl}/introduction/overview`
+export const requestFormLink = `${pf9SupportBaseUrl}/hc/en-us/requests/new?ticket_form_id=360000924873`
 
 // Aws
-export const awsPrerequisitesLink = `${k8sBaseUrl}/aws/`
+export const awsPrerequisitesLink = `${k8sBaseUrl}/aws-prerequisites`
 export const awsNetworkingConfigurationsLink = `${k8sBaseUrl}/networking/configurations-supported-aws-cloud-provider/`
 export const awsAccessHelpLink = `${amazonDocBaseUrl}/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys`
 export const iamPolicyLink = `${pf9GitHubRepoUrl}/support-locker/master/pmk/aws-policy.json`
@@ -33,24 +34,27 @@ export const awsRoute53HelpLink = `${amazonDocBaseUrl}/Route53/latest/DeveloperG
 export const eksHelpLink = `${k8sBaseUrl}/eks-cluster-management`
 
 // Azure
-export const azurePrerequisitesLink = `${k8sBaseUrl}/public-cloud/azure-prerequisites`
+export const azurePrerequisitesLink = `${k8sBaseUrl}/azure-prerequisites`
 export const azureServicePrincipalPortalLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal`
 export const azureGetValuesForSigninginLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in`
 export const azureCreateANewApplicationSecretLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret`
+
+// Google
+export const googlePrerequisitesLink = `${k8sBaseUrl}/google-cloud-prerequisites`
 
 // BareOS
 export const gettingStartedLink = `${k8sBaseUrl}/quickstart/`
 export const whatIsBareOSLink = `${k8sBaseUrl}/on-premise-kubernetes/what-is-bareos`
 export const bareOSSetupDocumentationLink = `${k8sBaseUrl}/create-multimaster-bareos-cluster/`
-
+export const bareOSSingleMasterSetupDocsLink = `${k8sBaseUrl}/bareos-create-singlemaster-multinode-cluster/`
 // Clusters
 export const remoteMonitoringDocsLink = `${k8sBaseUrl}/enable-remote-monitoring/`
 export const kubectlInstallationDocumentationLink = `${pf9DocOrigin}/kubernetes/kubectl/`
 
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
-export const nodePrerequisitesDocumentationLink =
-  'https://platform9.com/blog/support/managed-container-cloud-requirements-checklist'
+export const nodePrerequisitesDocumentationLink = `${k8sBaseUrl}/on-premise-kubernetes-pre-requisites#setting-up-the-platform9-free-tier-cluster`
+export const ovaDocumentationLink = `${k8sBaseUrl}/pmk-vm-ova`
 
 // CLI
 export const pmkCliOverviewLink = `${k8sBaseUrl}/PMK-CLI/`
@@ -72,6 +76,7 @@ export const persistVolumesStorageClassesLink = `${k8sDocBaselUrl}/concepts/stor
 // Api Access
 export const kubeconfigFileLink = `${k8sBaseUrl}/kubeconfig-and-clients-introduction-to-kubeconfig`
 export const kubectlOverviewLink = `${k8sDocBaselUrl}/user-guide/kubectl-overview/`
+export const konformGithubLink = `${pf9GitHubRepoUrl}/konform`
 
 // Misc
 export const runtimePrivilegedLink = `${dockerDocBaseUrl}/engine/reference/run/#runtime-privilege-and-linux-capabilities`

@@ -1,4 +1,5 @@
 import { AppPlugins, appUrlRoot, pluginRoutePrefix } from 'app/constants'
+import { VirtualMachineCreateTypes } from 'k8s/components/virtual-machines/model'
 import URLPattern from 'url-pattern'
 
 interface GenericKVP {
@@ -48,8 +49,8 @@ export class Route<T extends OptionalGenericKVP = null> {
    * Register a route for this application
    * @param route route to register
    */
-  static register(routeOptions: IRouteOptions): Route {
-    const route = new Route(routeOptions)
+  static register<T extends OptionalGenericKVP = null>(routeOptions: IRouteOptions): Route<T> {
+    const route = new Route<T>(routeOptions)
     Route.routes.push(route)
     return route
   }
@@ -258,6 +259,20 @@ export const routes = {
         },
         name: 'Infrastructure:Clusters:Import:EKS',
       }),
+      aks: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/import/aks`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:Clusters:Import:AKS',
+      }),
+      gke: Route.register({
+        url: `${pluginRoutePrefix}/infrastructure/clusters/import/gke`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'Infrastructure:Clusters:Import:GKE',
+      }),
     },
     imported: {
       list: Route.register({
@@ -297,13 +312,36 @@ export const routes = {
       plugin: AppPlugins.Kubernetes,
     },
   }),
-  apiAccess: Route.register({
-    url: `${pluginRoutePrefix}/api_access`,
-    name: 'APIAccess',
-    defaultParams: {
-      plugin: AppPlugins.Kubernetes,
-    },
-  }),
+  apiAccess: {
+    api: Route.register({
+      url: `${pluginRoutePrefix}/api-access`,
+      name: 'ApiAccess:API',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    apiServices: Route.register({
+      url: `${pluginRoutePrefix}/api-access#api-services`,
+      name: 'ApiAccess:APIServices',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    kubeConfig: Route.register({
+      url: `${pluginRoutePrefix}/api-access#kubeconfig`,
+      name: 'ApiAccess:KubeConfig',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+    terraform: Route.register({
+      url: `${pluginRoutePrefix}/api-access#terraform`,
+      name: 'ApiAccess:Terraform',
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+    }),
+  },
   notifications: Route.register({
     url: `${pluginRoutePrefix}/notifications`,
     name: 'Notifications',
@@ -357,6 +395,65 @@ export const routes = {
       name: 'CloudProviders:Add',
     }),
   },
+  virtualMachines: {
+    list: Route.register({
+      url: `${pluginRoutePrefix}/virtual-machines`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'VirtualMachines:List',
+    }),
+    detail: Route.register<{ clusterId: string; namespace: string; name: string }>({
+      url: `${pluginRoutePrefix}/virtual-machines/:clusterId/:namespace/:name`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'VirtualMachines:Detail',
+    }),
+    add: Route.register({
+      url: `${pluginRoutePrefix}/virtual-machines/add/new`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+        createType: VirtualMachineCreateTypes.AddNew,
+      },
+      name: 'VirtualMachines:Add:NewVM',
+    }),
+    import: {
+      url: Route.register({
+        url: `${pluginRoutePrefix}/virtual-machines/import/url`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+          createType: VirtualMachineCreateTypes.ImportURL,
+        },
+        name: 'VirtualMachines:Import:URL',
+      }),
+      disk: Route.register({
+        url: `${pluginRoutePrefix}/virtual-machines/import/disk`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+          createType: VirtualMachineCreateTypes.ImportDisk,
+        },
+        name: 'VirtualMachines:Import:Disk',
+      }),
+    },
+    clone: {
+      pvc: Route.register({
+        url: `${pluginRoutePrefix}/virtual-machines/clone/pvc`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+          createType: VirtualMachineCreateTypes.ClonePVC,
+        },
+        name: 'VirtualMachines:Clone:PVC',
+      }),
+    },
+  },
+  workloads: Route.register({
+    url: `${pluginRoutePrefix}/workloads`,
+    defaultParams: {
+      plugin: AppPlugins.Kubernetes,
+    },
+    name: 'Workloads:Pods:List',
+  }),
   apps: {
     list: Route.register({
       url: `${pluginRoutePrefix}/apps`,
@@ -435,13 +532,6 @@ export const routes = {
       name: 'Pods:Add',
     }),
   },
-  workloads: Route.register({
-    url: `${pluginRoutePrefix}/workloads`,
-    defaultParams: {
-      plugin: AppPlugins.Kubernetes,
-    },
-    name: 'Workloads:Pods:List',
-  }),
   services: {
     list: Route.register({
       url: `${pluginRoutePrefix}/workloads#services`,
@@ -534,6 +624,15 @@ export const routes = {
       defaultParams: {
         plugin: AppPlugins.Kubernetes,
       },
+    }),
+  },
+  accountStatus: {
+    root: Route.register({
+      url: `${pluginRoutePrefix}/status`,
+      defaultParams: {
+        plugin: AppPlugins.MyAccount,
+      },
+      name: 'AccountStatus:Root',
     }),
   },
   userSettings: {
@@ -633,6 +732,13 @@ export const routes = {
       name: 'SsoManagement:Group:Edit',
     }),
   },
+  customTheme: Route.register({
+    url: `${pluginRoutePrefix}/theme`,
+    defaultParams: {
+      plugin: AppPlugins.MyAccount,
+    },
+    name: 'CustomTheme',
+  }),
   prometheus: {
     list: Route.register({
       url: `${pluginRoutePrefix}/prometheus`,
@@ -684,6 +790,13 @@ export const routes = {
         plugin: AppPlugins.Kubernetes,
       },
       name: 'Monitoring:Alarms:List',
+    }),
+    overview: Route.register({
+      url: `${pluginRoutePrefix}/alarms#overview`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Monitoring:Overview',
     }),
     alarms: Route.register({
       url: `${pluginRoutePrefix}/alarms#alarms`,
@@ -792,6 +905,57 @@ export const routes = {
       },
       name: 'RBAC:ClusterRoleBindings:Edit',
     }),
+    profiles: {
+      list: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      add: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/add`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Add',
+      }),
+      deploy: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/deploy/:name`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Deploy',
+      }),
+      profiles: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles#profiles`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      drift: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles#drift`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:List',
+      }),
+      edit: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/edit/:id`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:Edit',
+      }),
+      deleteBindings: Route.register({
+        url: `${pluginRoutePrefix}/rbac_profiles/delete_bindings/:name`,
+        defaultParams: {
+          plugin: AppPlugins.Kubernetes,
+        },
+        name: 'RBAC:RbacProfiles:DeleteBindings',
+      }),
+    },
   },
   password: {
     reset: Route.register({ url: `${appUrlRoot}/reset/password`, name: 'Password:Reset' }),

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 import { defaultAxiosConfig } from 'app/constants'
-
+import config from '../../config'
 import Appbert from './Appbert'
 import Cinder from './Cinder'
 import Glance from './Glance'
@@ -18,11 +18,12 @@ import { ID } from './keystone.model'
 
 import { normalizeResponse } from 'api-client/helpers'
 import { hasPathStr, pathStr } from 'utils/fp'
-import { prop, has, cond, T, identity, when } from 'ramda'
+import { prop, has, cond, T, identity, when, mergeDeepLeft } from 'ramda'
 import { isPlainObject, pathJoin } from 'utils/misc'
 // import { IApiClient } from './model'
 // import ApiCache from './cache-client'
 import {
+  DDUHealth,
   IRawRequestGetParams,
   IRawRequestPostParams,
   IBasicRequestGetParams,
@@ -33,6 +34,7 @@ import ApiService from 'api-client/ApiService'
 import Bugsnag from '@bugsnag/js'
 import { someAsync } from 'utils/async'
 import ApiError from 'core/errors/ApiError'
+import PreferenceStore from './PreferenceStore'
 
 interface ApiClientOptions {
   [key: string]: any
@@ -54,6 +56,7 @@ class ApiClient {
   public clemency: Clemency
   public helm: Helm
   public hagrid: Hagrid
+  public preferenceStore: PreferenceStore
   public catalog = {}
   public activeRegion: ID = null
   unscopedToken = null
@@ -104,6 +107,7 @@ class ApiClient {
       instance.clemency.initialize(),
       instance.helm.initialize(),
       instance.hagrid.initialize(),
+      instance.preferenceStore.initialize(),
     ])
   }
 
@@ -128,6 +132,15 @@ class ApiClient {
         const url = error?.response?.config
         const data = error?.response?.data
 
+        // If data contains user password, remove it
+        if (url?.data?.includes('{"methods":["password"]')) {
+          const dataObj = JSON.parse(url.data)
+          if (dataObj?.auth?.identity?.password?.user?.password) {
+            dataObj.auth.identity.password.user.password = 'SENSITIVE_DATA_REMOVED'
+            url.data = JSON.stringify(dataObj)
+          }
+        }
+
         Bugsnag.addMetadata('Api Url', url)
         Bugsnag.addMetadata('Api Response', data)
         Bugsnag.notify(error)
@@ -149,6 +162,7 @@ class ApiClient {
     this.clemency = this.addApiService(new Clemency(this))
     this.helm = this.addApiService(new Helm(this))
     this.hagrid = this.addApiService(new Hagrid(this))
+    this.preferenceStore = this.addApiService(new PreferenceStore(this))
   }
 
   addApiService = <T extends ApiService>(apiClientInstance: T) => {
@@ -168,6 +182,18 @@ class ApiClient {
 
   setActiveRegion = (regionId) => {
     this.activeRegion = regionId
+  }
+
+  getSystemHealth = async () => {
+    const data = await this.basicGet<DDUHealth>({
+      url: '/regionstatus',
+      endpoint: config.apiHost,
+      options: {
+        clsName: 'ApiClient',
+        mthdName: 'getClusterTags',
+      },
+    })
+    return data
   }
 
   getAuthHeaders = (scoped = true) => {
@@ -194,7 +220,7 @@ class ApiClient {
       endpoint = endpoint.replace(/\/v3$/, `/${version}`).replace(/\/v3\//, `/${version}/`)
     }
     // eslint-disable-next-line no-extra-boolean-cast
-    if (!!this.apiServices[clsName].scopedEnpointPath) {
+    if (!!this.apiServices[clsName]?.scopedEnpointPath) {
       return `${endpoint}/${this.apiServices[clsName].scopedEnpointPath()}`
     }
     return endpoint
@@ -307,13 +333,13 @@ class ApiClient {
     version,
     endpoint = undefined,
     body = undefined,
-    options: { clsName, mthdName },
+    options: { clsName, mthdName, config },
   }: IBasicRequestPostParams) => {
     endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.patch<T>(
       pathJoin(endpoint, url),
       body,
-      this.getAuthHeaders(),
+      mergeDeepLeft(this.getAuthHeaders(), config),
     )
     // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)

@@ -15,6 +15,7 @@ export const resetPasswordApiUrl = '/clemency/reset/password'
 export const forgotPasswordApiUrl = '/clemency/request'
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const ironicWizardUrl = `${appUrlRoot}/metalstack/setup`
+export const profilesHelpUrl = `${appUrlRoot}/help`
 export const allKey = '__all__'
 export const noneKey = '__none__'
 export const listTablePrefs = [
@@ -55,6 +56,7 @@ export enum CustomerTiers {
 }
 
 export const ssoEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
+export const themeEnabledTiers = [CustomerTiers.Enterprise, CustomerTiers.OEM]
 
 export enum ClusterCloudPlatforms {
   EKS = 'eks',
@@ -83,6 +85,9 @@ export const notFoundErr = 'ERR_NOT_FOUND'
 
 // Documentation
 export const pf9DocOrigin = 'https://docs.platform9.com'
+
+// Ideas
+export const pf9IdeasLink = 'https://ideas.platform9.com'
 
 // Clarity
 export const clarityUrlRoot = '/clarity/index.html#'
@@ -135,3 +140,14 @@ export const defaultAxiosConfig = Object.freeze({
 export const publicSlackLink = 'https://kplane.slack.com'
 export const supportEmail = 'support-ft@platform9.com'
 export const pmkftSignupLink = 'https://platform9.com/signup-flow/?sandbox=kubernetes'
+
+export enum UserPreferences {
+  Aws = 'aws',
+  Azure = 'azure',
+  FeatureFlags = 'featureFlags',
+}
+
+export enum GlobalPreferences {
+  Theme = 'theme',
+  CustomerExternalId = 'customer_external_uuid',
+}

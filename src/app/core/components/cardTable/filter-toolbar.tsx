@@ -4,7 +4,7 @@ import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
 import SearchBar from '../SearchBar'
 import RefreshButton from '../buttons/refresh-button'
-import SortByPicklist from 'k8s/components/apps/sort-by-picklist'
+import SortByPicklist from 'k8s/components/app-catalog/sort-by-picklist'
 
 const useStyles = makeStyles((theme: Theme) => ({
   toolbar: {
@@ -53,7 +53,7 @@ interface Props {
   sortBy?: string
   searchTerm: string
   onSearchChange: (value) => any
-  onRefresh?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
+  onRefresh: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
 }
 
 const FilterToolbar = ({

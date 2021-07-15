@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useReactRouter from 'use-react-router'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
@@ -15,7 +15,7 @@ import { requiredValidator } from 'core/utils/fieldValidators'
 import { mngmTenantActions } from '../../userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
-import { groupFormSubmission, mngmGroupMappingActions } from './actions'
+import { groupFormSubmission, loadIdpProtocols, mngmGroupMappingActions } from './actions'
 import GroupSettingsFields from './GroupSettingsFields'
 import GroupCustomMappingsFields from './GroupCustomMappingsFields'
 import GroupsTips from './GroupsTips'
@@ -39,17 +39,32 @@ const AddGroupPage = () => {
   const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
   const [groupMappings, loadingGroupMappings] = useDataLoader(mngmGroupMappingActions.list)
   const [submitting, updateSubmitting] = useState(false)
+  const [protocolExists, setProtocolExists] = useState(false)
   const existingMapping = groupMappings[0]
 
   const submitForm = async (params) => {
     updateSubmitting(true)
-    const success = await groupFormSubmission({ params, existingMapping, operation: 'create' })
+    const success = await groupFormSubmission({
+      params,
+      existingMapping,
+      operation: 'create',
+      protocolExists,
+    })
     if (!success) {
       updateSubmitting(false)
       return
     }
     history.push(routes.sso.groups.path())
   }
+
+  // Check for existence of saml2 protocol
+  useEffect(() => {
+    const checkForProtocol = async () => {
+      const protocols = await loadIdpProtocols()
+      setProtocolExists(!!protocols.find((p) => p.id === 'saml2' && p.idp_id === 'IDP1'))
+    }
+    checkForProtocol()
+  }, [])
 
   return (
     <>

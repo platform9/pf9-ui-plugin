@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/js'
 import ApiClient from 'api-client/ApiClient'
 import { defaultGroupMappingId } from 'app/constants'
 // import createContextLoader from 'core/helpers/createContextLoader'
@@ -6,12 +7,14 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import { always, isNil, keys, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, pathStr } from 'utils/fp'
+import { trackEvent } from 'utils/tracking'
 import { formMappingRule } from './helpers'
 import { makeGroupsSelector } from './selectors'
 
 const { keystone } = ApiClient.getInstance()
 export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroups, {
   listFn: async () => {
+    Bugsnag.leaveBreadcrumb('Attempting to get SSO groups')
     const [groups] = await Promise.all([
       keystone.getGroups(),
       // Fetch dependent caches
@@ -20,6 +23,7 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
     return groups
   },
   createFn: async ({ roleAssignments, ...params }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to create SSO group', { ...params })
     const createdGroup = await keystone.createGroup(params)
 
     await tryCatchAsync(
@@ -34,10 +38,11 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
         return emptyArr
       },
     )(null)
-
+    trackEvent('Create SSO Group', { groupId: createdGroup.id })
     return createdGroup
   },
   updateFn: async ({ groupId, roleAssignments, prevRoleAssignmentsArr, ...params }, prevItems) => {
+    Bugsnag.leaveBreadcrumb('Attempting to update SSO group', { groupId, ...params })
     // Not using this loader atm
     // const prevRoleAssignmentsArr = await mngmGroupRoleAssignmentsLoader({
     //   groupId,
@@ -84,9 +89,11 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
         },
       )(null),
     ])
+    trackEvent('Update SSO Group', { groupId: groupId })
     return updatedGroup
   },
   deleteFn: async ({ id }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete SSO group', { groupId: id })
     const groupMappings = await mngmGroupMappingActions.list()
     const mapping = await groupMappings[0]
     const updatedMappingRules = mapping.rules.filter((rule) => id !== rule.local[0]?.group?.id)
@@ -99,7 +106,9 @@ export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroup
       console.log('failed to update mapping')
       return
     }
-    return await keystone.deleteGroup(id)
+    const result = await keystone.deleteGroup(id)
+    trackEvent('Delete SSO Group', { groupId: id })
+    return result
   },
   entityName: 'Group',
   uniqueIdentifier: 'id',
@@ -117,6 +126,8 @@ export const mngmGroupMappingActions = createCRUDActions(ActionDataKeys.Manageme
 
 export const loadGroupRoleAssignments = async (groupId) => keystone.getGroupRoleAssignments(groupId)
 
+export const loadIdpProtocols = async () => keystone.getIdpProtocols()
+
 // Not using below at the moment, this loads once and is stored in cache,
 // and is never updated again. Setting cache to false or invalidating cache doesn't work
 // export const mngmGroupRoleAssignmentsLoader = createContextLoader(
@@ -132,7 +143,12 @@ export const loadGroupRoleAssignments = async (groupId) => keystone.getGroupRole
 //   },
 // )
 
-export const groupFormSubmission = async ({ params, existingMapping, operation }) => {
+export const groupFormSubmission = async ({
+  params,
+  existingMapping,
+  operation,
+  protocolExists,
+}) => {
   // Create/update the group and get the group id
   const groupBody = {
     name: params.name,
@@ -187,7 +203,7 @@ export const groupFormSubmission = async ({ params, existingMapping, operation }
   }
 
   // Link the IDP with the newly created mapping
-  if (!existingMapping) {
+  if (!protocolExists) {
     await keystone.addIdpProtocol(defaultGroupMappingId)
   }
 

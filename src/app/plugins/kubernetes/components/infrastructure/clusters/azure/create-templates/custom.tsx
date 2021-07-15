@@ -1,5 +1,5 @@
 import { Divider, makeStyles, Theme } from '@material-ui/core'
-import { defaultEtcBackupPath } from 'app/constants'
+import { defaultEtcBackupPath, UserPreferences } from 'app/constants'
 import Alert from 'core/components/Alert'
 import ExternalLink from 'core/components/ExternalLink'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -8,9 +8,9 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import WizardStep from 'core/components/wizard/WizardStep'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
-import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import { CloudDefaults, CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { azurePrerequisitesLink } from 'k8s/links'
-import React, { FC } from 'react'
+import React, { FC, useCallback, useMemo } from 'react'
 import { pathStrOr } from 'utils/fp'
 import { castBoolToStr } from 'utils/misc'
 import AdvancedApiConfigFields from '../../form-components/advanced-api-config'
@@ -45,6 +45,9 @@ import Text from 'core/elements/text'
 import { AddonTogglers } from '../../form-components/cluster-addon-manager'
 import { azureClusterTracking } from '../../tracking'
 import { ClusterCreateTypes } from '../../model'
+import CustomApiFlags from '../../form-components/custom-api-flag'
+import useScopedPreferences from 'core/session/useScopedPreferences'
+import { isEmpty } from 'ramda'
 
 export const initialContext = {
   template: 'small',
@@ -69,6 +72,7 @@ export const initialContext = {
   networkStack: 'ipv4',
   privileged: true,
   allowWorkloadsOnMaster: false,
+  enableProfileAgent: false,
 }
 
 const columns = [
@@ -119,9 +123,9 @@ const networkOptions = [
 ]
 
 const templateOptions = [
-  { label: 'Sm - Single Node Master & Worker (Standard_A1_v2)', value: 'small' },
-  { label: 'Md - 1 Master + 3 Workers (Standard_A2_v2)', value: 'medium' },
-  { label: 'Lg - 3 Masters + 5 Workers (Standard_A4_v2)', value: 'large' },
+  { label: 'Sm - Single Node Master & Worker', value: 'small' },
+  { label: 'Md - 1 Master + 3 Workers', value: 'medium' },
+  { label: 'Lg - 3 Masters + 5 Workers', value: 'large' },
   { label: 'custom', value: 'custom' },
 ]
 
@@ -137,15 +141,15 @@ const handleTemplateChoice = ({ setFieldValue }) => (option) => {
       numMasters: 1,
       numWorkers: 0,
       allowWorkloadsOnMaster: true,
-      masterSku: 'Standard_A1_v2',
-      workerSku: 'Standard_A1_v2',
+      masterSku: 'Standard_A4_v2',
+      workerSku: 'Standard_A4_v2',
     },
     medium: {
       numMasters: 1,
       numWorkers: 3,
       allowWorkloadsOnMaster: false,
-      masterSku: 'Standard_A2_v2',
-      workerSku: 'Standard_A2_v2',
+      masterSku: 'Standard_A4_v2',
+      workerSku: 'Standard_A4_v2',
     },
     large: {
       numMasters: 3,
@@ -181,6 +185,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
+const configStepAddOns = ['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS', 'profileAgent']
+
 interface Props {
   wizardContext: any
   setWizardContext: any
@@ -189,6 +195,8 @@ interface Props {
 
 const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNext }) => {
   const classes = useStyles()
+  const { prefs } = useScopedPreferences('defaults')
+  const cloudDefaults = useMemo(() => prefs[UserPreferences.Azure] || {}, [prefs])
 
   const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: wizardContext.cloudProviderId,
@@ -196,7 +204,24 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
   })
   const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
-  const handleRegionChange = (regionName) => setWizardContext({ location: regionName })
+  const handleRegionChange = (regionName) =>
+    setWizardContext({ region: regionName, location: regionName })
+
+  const handleCloudProviderChange = (value) => {
+    setWizardContext({
+      cloudProviderId: value,
+    })
+
+    // Populate the form with default values from the pref store AFTER the user chooses the
+    // cloud provider. This is to maintain form order. Cloud provider ID is needed to populate the options
+    // for the rest of the fields
+    setCloudDefaults()
+  }
+
+  const setCloudDefaults = useCallback(() => {
+    if (isEmpty(cloudDefaults)) return
+    setWizardContext({ ...cloudDefaults, location: cloudDefaults[CloudDefaults.Region] })
+  }, [cloudDefaults])
 
   return (
     <>
@@ -229,17 +254,27 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <ClusterNameField setWizardContext={setWizardContext} />
 
                 {/* Cloud Provider */}
-                <CloudProviderField cloudProviderType={CloudProviders.Azure} />
+                <CloudProviderField
+                  cloudProviderType={CloudProviders.Azure}
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onChange={handleCloudProviderChange}
+                />
 
                 {/* Cloud Provider Region */}
                 <CloudProviderRegionField
                   cloudProviderType={CloudProviders.Azure}
                   values={values}
+                  wizardContext={wizardContext}
                   onChange={handleRegionChange}
+                  disabled={!values.cloudProviderId && !values.region}
                 />
 
                 {/* SSH Key */}
-                <SshKeyTextField />
+                <SshKeyTextField
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 {/* Template Chooser */}
                 <ClusterTemplatesField
@@ -274,7 +309,10 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
 
               <FormFieldCard title="Cluster Settings">
                 {/* Kubernetes Version */}
-                <KubernetesVersion />
+                <KubernetesVersion
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                />
 
                 <Divider className={classes.divider} />
 
@@ -296,7 +334,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                 <AddonTogglers
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
-                  addons={['etcdBackup', 'prometheusMonitoringEnabled', 'enableCAS']}
+                  addons={configStepAddOns}
                 />
               </FormFieldCard>
             </>
@@ -309,6 +347,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
         stepId="network"
         label="Network Info"
         onNext={azureClusterTracking.wZStepTwo(trackingFields)}
+        keepContentMounted={false}
       >
         <ValidatedForm
           classes={{ root: classes.validatedFormContainer }}
@@ -391,6 +430,7 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
           elevated={false}
+          withAddonManager
         >
           {({ values }) => (
             <>
@@ -406,7 +446,13 @@ const AdvancedAzureCluster: FC<Props> = ({ wizardContext, setWizardContext, onNe
                /> */}
 
                 {/* Tags */}
+                <CustomApiFlags wizardContext={wizardContext} setWizardContext={setWizardContext} />
                 <TagsField />
+                <AddonTogglers
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  addons={['enableTopologyManager']}
+                />
               </FormFieldCard>
             </>
           )}

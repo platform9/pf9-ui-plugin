@@ -7,9 +7,9 @@ import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { forgotPasswordUrl } from 'app/constants'
+import { CustomerTiers, forgotPasswordUrl, imageUrlRoot, dashboardUrl } from 'app/constants'
 import { pathJoin } from 'utils/misc'
-import { imageUrlRoot, dashboardUrl } from 'app/constants'
+
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
@@ -19,6 +19,7 @@ import Input from 'core/elements/input'
 import Button from 'core/elements/button'
 import { LoginMethodTypes } from 'app/plugins/account/components/userManagement/users/helpers'
 import { authenticateUser } from 'app/plugins/account/components/userManagement/users/actions'
+import Bugsnag from '@bugsnag/js'
 
 const styles = (theme) => ({
   page: {
@@ -157,6 +158,7 @@ interface Props {
   history: any
   classes: any
   ssoEnabled: boolean
+  customerTier: string
 }
 
 @(connect() as any)
@@ -191,6 +193,12 @@ class LoginPage extends React.PureComponent<Props> {
     const { onAuthSuccess } = this.props
     const { username: loginUsername, password, loginMethod, MFAcheckbox, mfa } = this.state
     this.setState({ loginFailed: false, loading: true })
+    Bugsnag.leaveBreadcrumb('Attempting PF9 Sign In', {
+      loginUsername,
+      loginMethod,
+      MFAcheckbox,
+      mfa,
+    })
 
     const { username, unscopedToken, expiresAt, issuedAt, isSsoToken } = await authenticateUser({
       loginUsername,
@@ -294,8 +302,8 @@ class LoginPage extends React.PureComponent<Props> {
   }
 
   renderFooter = () => {
-    const { classes } = this.props
-    return (
+    const { classes, customerTier } = this.props
+    return customerTier !== CustomerTiers.OEM ? (
       <Fragment>
         <Text className={classes.paragraph} variant="caption" color="textSecondary">
           By signing in, you agree to our{' '}
@@ -305,7 +313,7 @@ class LoginPage extends React.PureComponent<Props> {
           . © 2014-{moment().year()} Platform9 Systems, Inc.
         </Text>
       </Fragment>
-    )
+    ) : null
   }
 
   render() {
@@ -313,7 +321,7 @@ class LoginPage extends React.PureComponent<Props> {
     const { loginFailed, loading, loginMethod } = this.state
 
     return (
-      <section className={clsx('login-page', classes.page)}>
+      <section id={`login-page`} className={clsx('login-page', classes.page)}>
         <img
           alt="Platform9"
           src={pathJoin(imageUrlRoot, 'primary-logo.svg')}
@@ -371,8 +379,11 @@ class LoginPage extends React.PureComponent<Props> {
                     </div>
                   </>
                 )}
-                {loginFailed && <Alert small variant="error" message="Login failed" />}
+                {loginFailed && (
+                  <Alert small id="login-failed" variant="error" message="Login failed" />
+                )}
                 <Button
+                  id="login-submit"
                   type="submit"
                   disabled={loading}
                   className={classes.signinButton}

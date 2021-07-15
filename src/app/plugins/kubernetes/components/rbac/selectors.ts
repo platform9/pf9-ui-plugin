@@ -2,10 +2,11 @@ import { createSelector } from 'reselect'
 import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { whereEq, pipe, mergeLeft, propSatisfies, complement, isNil } from 'ramda'
+import { whereEq, pipe, mergeLeft, propSatisfies, complement, isNil, propEq } from 'ramda'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { findClusterName } from 'k8s/util/helpers'
 import { importedClustersSelector } from '../infrastructure/importedClusters/selectors'
+import { allKey } from 'app/constants'
 
 // Can be either 'User' or 'Group'
 const getSubjectsOfKind = (subjects, kind) =>
@@ -88,8 +89,10 @@ export const makeRolesSelector = (
   return createSelector(
     [rolesSelector, (_, params) => mergeLeft(params, defaultParams)],
     (items, params) => {
-      const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(items)
+      const { namespace, orderBy, orderDirection } = params
+      const filteredItems =
+        namespace && namespace !== allKey ? items.filter(propEq('namespace', namespace)) : items
+      return createSorter({ orderBy, orderDirection })(filteredItems)
     },
   )
 }
@@ -162,8 +165,10 @@ export const makeRoleBindingsSelector = (
   return createSelector(
     [roleBindingsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (items, params) => {
-      const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(items)
+      const { namespace, orderBy, orderDirection } = params
+      const filteredItems =
+        namespace && namespace !== allKey ? items.filter(propEq('namespace', namespace)) : items
+      return createSorter({ orderBy, orderDirection })(filteredItems)
     },
   )
 }

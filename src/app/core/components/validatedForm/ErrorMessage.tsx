@@ -2,6 +2,7 @@ import React from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from '../FontAwesomeIcon'
+import clsx from 'clsx'
 
 const useStyles = makeStyles((theme: Theme) => ({
   errorMessage: {
@@ -15,11 +16,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-export const ErrorMessage = ({ children }) => {
+export const ErrorMessage = ({ className = undefined, children }) => {
   const classes = useStyles({})
 
   return children ? (
-    <div className={classes.errorMessage}>
+    <div className={clsx(classes.errorMessage, className)}>
       <FontAwesomeIcon className={classes.errorIcon}>exclamation-circle</FontAwesomeIcon>
       <div>{children}</div>
     </div>

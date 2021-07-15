@@ -42,7 +42,8 @@ export OS_PROJECT_DOMAIN_ID=\${OS_PROJECT_DOMAIN_ID:-“default”}`
 const OpenStackRcStep = (): JSX.Element => {
   const { text, bold, paper } = useStyles({})
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
-  const [{ currentTenant, currentRegion: region }] = useScopedPreferences()
+  const { prefs } = useScopedPreferences()
+  const { currentTenant, currentRegion: region } = prefs
   const [tenants] = useDataLoader(mngmTenantActions.list)
   const [regions] = useDataLoader(regionActions.list)
   const projectName = tenants.find((tenant) => tenant.id === currentTenant)?.name
