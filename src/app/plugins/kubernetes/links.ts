@@ -77,7 +77,7 @@ export const persistVolumesStorageClassesLink = `${k8sDocBaselUrl}/concepts/stor
 export const kubeconfigFileLink = `${k8sBaseUrl}/kubeconfig-and-clients-introduction-to-kubeconfig`
 export const kubectlOverviewLink = `${k8sDocBaselUrl}/user-guide/kubectl-overview/`
 export const konformGithubLink = `${pf9GitHubRepoUrl}/konform`
-
+export const terraformGitubLink = 'https://github.com/platform9/terraform-provider-pf9'
 // Misc
 export const runtimePrivilegedLink = `${dockerDocBaseUrl}/engine/reference/run/#runtime-privilege-and-linux-capabilities`
 export const applicationLoadBalancer = `${k8sBaseUrl}/pmk-load-balancing-with-metallb/`
