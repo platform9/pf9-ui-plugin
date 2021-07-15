@@ -2,14 +2,14 @@ import React from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { makeStyles } from '@material-ui/core/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { konformGithubLink } from 'k8s/links'
+import { konformGithubLink,terraformGitubLink } from 'k8s/links'
 import Text from 'core/elements/text'
 import BulletList from 'core/components/BulletList'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import CloudProviderCard from '../common/CloudProviderCard'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import { noop } from 'utils/fp'
-
+ 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
     color: theme.palette.primary.main,
@@ -76,8 +76,8 @@ const TerraformListPage = () => {
       <Text variant="body1" className={classes.text}>
         Access Konform and the commands for building a cluster on the Github repository
       </Text>
-      <ExternalLink className={classes.link} url={konformGithubLink} underline="always">
-        https://github.com/platform9/konform
+      <ExternalLink className={classes.link} url={terraformGitubLink} underline="always">
+         https://github.com/platform9/terraform-provider-pf9
       </ExternalLink>
       <div className={classes.cloudContainer}>
         <Text className={classes.text}>
@@ -89,8 +89,8 @@ const TerraformListPage = () => {
         </div>
       </div>
       <div className={classes.buttonContainer}>
-        <ExternalLink url={konformGithubLink}>
-          <SubmitButton href={konformGithubLink}>
+        <ExternalLink url={terraformGitubLink}>
+          <SubmitButton href={terraformGitubLink}>
             <Text>+ Get Konform on GitHub</Text>
           </SubmitButton>
         </ExternalLink>
