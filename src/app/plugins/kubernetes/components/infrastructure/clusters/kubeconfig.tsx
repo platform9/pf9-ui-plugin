@@ -1,4 +1,3 @@
-// @ts-nocheck
 import ApiClient from 'api-client/ApiClient'
 
 type AuthMethod = 'token' | 'password'

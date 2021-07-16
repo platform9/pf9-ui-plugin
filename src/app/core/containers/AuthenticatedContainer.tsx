@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { makeStyles } from '@material-ui/styles'
 import { Button } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'

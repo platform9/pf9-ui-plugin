@@ -1,4 +1,3 @@
-// @ts-nocheck
 import ApiClient from 'api-client/ApiClient'
 import { preferencesActions } from 'core/session/preferencesReducers'
 import { themeActions } from 'core/session/themeReducers'

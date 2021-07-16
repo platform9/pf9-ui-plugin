@@ -1,4 +1,3 @@
-// @ts-nocheck
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'

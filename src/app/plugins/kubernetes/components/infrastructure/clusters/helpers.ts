@@ -1,4 +1,3 @@
-// @ts-nocheck
 import ApiClient from 'api-client/ApiClient'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
