@@ -301,17 +301,13 @@ class ApiClient {
     endpoint = undefined,
     params = undefined,
     options: { clsName, mthdName },
-    normalize = true,
   }: IBasicRequestGetParams) => {
     endpoint = await this.getEndpoint({ endpoint, version, clsName })
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), {
       params,
       ...this.getAuthHeaders(),
     })
-    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
-    if (!normalize) {
-      return response
-    }
+
     return normalizeResponse<T>(response)
   }
 

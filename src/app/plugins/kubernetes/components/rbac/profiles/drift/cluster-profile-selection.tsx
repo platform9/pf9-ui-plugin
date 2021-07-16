@@ -12,6 +12,8 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import DryRunDialog from '../deploy/dry-run-dialog'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { TypesTableCell } from '../rbac-profiles-list-page'
+import { customValidator, requiredValidator } from 'core/utils/fieldValidators'
+import { indexBy, path } from 'ramda'
 
 const useStyles = makeStyles((theme: Theme) => ({
   validatedFormContainer: {
@@ -38,13 +40,20 @@ const profileColumns = [
   { id: 'roles', label: 'Types', render: renderTypes },
 ]
 
-const columns = [
+const renderActiveProfile = (hasBinding) => <span>{hasBinding ? 'Yes' : 'No'}</span>
+
+const clusterColumns = [
   { id: 'name', label: 'Name' },
   { id: 'kubeRoleVersion', label: 'Version' },
   {
     id: 'cloudProviderType',
     label: 'Cloud Provider',
     render: (type) => cloudProviderTypes[type] || capitalizeString(type),
+  },
+  {
+    id: 'hasBinding',
+    label: 'Active Profile',
+    render: renderActiveProfile,
   },
   {
     id: 'enableProfileAgent',
@@ -54,6 +63,17 @@ const columns = [
 ]
 
 const profileAgentInstalled = (cluster) => !!cluster.enableProfileAgent
+
+const clusterValidations = [
+  requiredValidator,
+  customValidator((clusters) => {
+    if (!clusters.length) {
+      return false
+    }
+    const cluster = clusters[0]
+    return !cluster.hasBinding
+  }, 'Selected cluster may not have an active profile binding. You can delete the profile binding by managing bindings on the RBAC profiles view.'),
+]
 
 const ClusterProfileSelection = ({
   wizardContext,
@@ -72,6 +92,24 @@ const ClusterProfileSelection = ({
     () => profiles.filter((profile) => profile.status.phase === 'published'),
     [profiles],
   )
+  const mappedClusters = useMemo(() => {
+    if (clusters.length && profiles.length) {
+      const allBindings = profiles
+        .map((profile) => {
+          return profile.bindings
+        })
+        .flat()
+      // @ts-ignore path complaining about typing, remove ignore after models attached
+      const bindingsByClusterId = indexBy(path(['spec', 'clusterRef']), allBindings)
+      return clusters.map((cluster) => {
+        return {
+          ...cluster,
+          hasBinding: !!bindingsByClusterId[cluster.uuid],
+        }
+      })
+    }
+    return clusters
+  }, [clusters, profiles])
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
   }
@@ -144,14 +182,14 @@ const ClusterProfileSelection = ({
           </Text>
           <ListTableField
             id="cluster"
-            data={clusters}
+            data={mappedClusters}
             loading={clustersLoading}
-            columns={columns}
+            columns={clusterColumns}
             onChange={(value) => setWizardContext({ cluster: value })}
             value={wizardContext.cluster}
             checkboxCond={profileAgentInstalled}
             uniqueIdentifier="uuid"
-            required
+            validations={clusterValidations}
           />
         </FormFieldCard>
         {showDialog && bindingName && (

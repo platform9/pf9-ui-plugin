@@ -47,6 +47,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'grid',
     gridGap: theme.spacing(1),
   },
+  error: {
+    width: 300,
+    color: theme.palette.red[500],
+  },
 }))
 
 const profileCalloutFields = [
@@ -95,10 +99,15 @@ const renderProfileCalloutFields = (cluster) => (fields) => {
 }
 
 const DeployNowButton = ({ wizardContext }) => {
+  const classes = useStyles({})
   const [showDialog, setShowDialog] = useState(false)
+  const [showError, setShowError] = useState(false)
   const clickedButton = () => {
     if (!!wizardContext?.cluster?.[0] && !wizardContext.cluster[0].hasBinding) {
       setShowDialog(true)
+      setShowError(false)
+    } else {
+      setShowError(true)
     }
   }
   return (
@@ -107,6 +116,11 @@ const DeployNowButton = ({ wizardContext }) => {
         <SkipDryRunDialog wizardContext={wizardContext} handleClose={() => setShowDialog(false)} />
       )}
       <SubmitButton onClick={clickedButton}>Deploy</SubmitButton>
+      {showError && (
+        <Text className={classes.error} variant="body2">
+          Selected cluster may not have an active profile and must have profile agent installed.
+        </Text>
+      )}
     </>
   )
 }

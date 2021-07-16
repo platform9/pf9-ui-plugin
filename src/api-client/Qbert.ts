@@ -1414,14 +1414,14 @@ class Qbert extends ApiService {
 
   getRbacProfileBindingDetails = async (bindingName) => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings/${bindingName}/details`
-    const response = await this.client.basicGet<any>({
+    const response = await this.client.rawGet<any>({
       url,
       version: 'v4',
       options: {
         clsName: this.getClassName(),
         mthdName: 'getRbacProfileBindingDetails',
       },
-      normalize: false,
+      config: this.client.getAuthHeaders(),
     })
     // Response body has a data.data property, set normalize false
     return response.data
