@@ -21,6 +21,7 @@ import { compareVersions } from 'k8s/util/helpers'
 import { sessionActions } from 'core/session/sessionReducers'
 import { useDispatch } from 'react-redux'
 import { routes } from 'core/utils/routes'
+import { onboardClusterTracking } from './tracking'
 
 const CreateCloudClusterPage = ({
   wizardContext,
@@ -62,6 +63,7 @@ const CreateCloudClusterPage = ({
   )
 
   const handleSubmit = useCallback(async () => {
+    onboardClusterTracking.wzCreateClusterOnCloud(wizardContext.name, wizardContext.provider)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false

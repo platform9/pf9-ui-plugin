@@ -23,7 +23,7 @@ import { compareVersions } from 'k8s/util/helpers'
 import { sessionActions } from 'core/session/sessionReducers'
 import { useDispatch } from 'react-redux'
 import { routes } from 'core/utils/routes'
-
+import { onboardClusterTracking } from './tracking.js'
 const useStyles = makeStyles((theme: Theme) => ({
   connectNodesContainer: {
     width: '800px',
@@ -99,6 +99,7 @@ const CreateBareOsClusterPage = ({
   }, [])
 
   const handleSubmit = useCallback(async () => {
+    onboardClusterTracking.wZCreateClusterOnInfrastructure(option)
     const isValid = validatorRef.current.validate()
     if (!isValid) {
       return false
@@ -115,7 +116,7 @@ const CreateBareOsClusterPage = ({
     await createCluster(data)
     setSubmitting(false)
     return true
-  }, [validatorRef.current, setSubmitting, defaultKubernetesVersion, wizardContext])
+  }, [validatorRef.current, setSubmitting, defaultKubernetesVersion, wizardContext, option])
 
   useEffect(() => {
     onNext(handleSubmit)
