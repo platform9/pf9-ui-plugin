@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { propOr, map, pipe, mergeLeft } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
@@ -1399,9 +1400,37 @@ class Qbert extends ApiService {
     return response
   }
 
+  getRbacProfileBinding = async (bindingName) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings/${bindingName}`
+    const response = await this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRbacProfileBinding',
+      },
+    })
+    return response
+  }
+
+  getRbacProfileBindingDetails = async (bindingName) => {
+    const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings/${bindingName}/details`
+    const response = await this.client.basicGet<any>({
+      url,
+      version: 'v4',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRbacProfileBindingDetails',
+      },
+      normalize: false,
+    })
+    // Response body has a data.data property, set normalize false
+    return response.data
+  }
+
   deleteRbacProfileBinding = async (name) => {
     const url = `/sunpike/apis/sunpike.platform9.com/v1alpha2/namespaces/default/clusterprofilebindings/${name}`
-    return await this.client.basicDelete({
+    await this.client.basicDelete({
       url,
       version: 'v4',
       options: {

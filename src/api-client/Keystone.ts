@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { head, pipe, pluck, values } from 'ramda'
 import { getHighestRole, trackApiMethodMetadata } from './helpers'
 import { capitalizeString, pathJoin } from 'utils/misc'

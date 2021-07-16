@@ -130,16 +130,11 @@ export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
     trackEvent('Update Kube Role', body)
     return qbert.updateClusterRole(data.clusterId, data.namespace, data.name, body)
   },
-  deleteFn: async ({ id }, currentItems) => {
-    Bugsnag.leaveBreadcrumb('Attempting to delete kube role', { id })
+  deleteFn: async ({ clusterId, name, namespace }) => {
+    Bugsnag.leaveBreadcrumb('Attempting to delete kube role', { clusterId, name, namespace })
     const { qbert } = ApiClient.getInstance()
-    const item = currentItems.find(propEq('id', id))
-    if (!item) {
-      throw new Error(`Unable to find role with id: ${id}`)
-    }
-    const { clusterId, namespace, name } = item
-    await qbert.deleteClusterRole(clusterId, namespace, name)
-    trackEvent('Delete Kube Role', { id })
+    trackEvent('Delete Kube Role', { clusterId, name, namespace })
+    return await qbert.deleteClusterRole(clusterId, namespace, name)
   },
   uniqueIdentifier,
   entityName: 'Role',

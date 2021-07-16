@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'

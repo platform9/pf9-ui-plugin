@@ -52,6 +52,7 @@ export interface IBasicRequestGetParams {
   endpoint?: string
   config?: AxiosRequestConfig
   options: IRequestOptions
+  normalize?: boolean
 }
 
 export interface IBasicRequestPostParams {

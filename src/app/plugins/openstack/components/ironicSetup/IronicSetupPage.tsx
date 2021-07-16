@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'

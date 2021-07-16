@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'core/utils/routes'
 import useReactRouter from 'use-react-router'
 import { rbacProfileBindingsActions, rbacProfileActions } from '../actions'
-import { indexBy, path, propEq } from 'ramda'
+import { propEq } from 'ramda'
 import DocumentMeta from 'core/components/DocumentMeta'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardMeta from 'core/components/wizard/WizardMeta'
@@ -12,14 +12,12 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import Text from 'core/elements/text'
-import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import clsx from 'clsx'
-import ListTableField from 'core/components/validatedForm/ListTableField'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { cloudProviderTypes } from 'k8s/components/infrastructure/cloudProviders/selectors'
-import { capitalizeString } from 'utils/misc'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { customValidator, requiredValidator } from 'core/utils/fieldValidators'
+import SelectClusterStep from './select-cluster-step'
+import DriftAnalysis from '../drift/drift-analysis'
+import SubmitButton from 'core/components/buttons/SubmitButton'
+import SkipDryRunDialog from './skip-dry-run-dialog'
 
 const useStyles = makeStyles((theme: Theme) => ({
   wizardMeta: {
@@ -49,13 +47,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'grid',
     gridGap: theme.spacing(1),
   },
-  card: {
-    background: theme.palette.grey['000'],
-    padding: 40,
-  },
-  cardTitle: {
-    marginBottom: theme.spacing(2),
-  },
 }))
 
 const profileCalloutFields = [
@@ -66,31 +57,7 @@ const profileCalloutFields = [
   'clusterRoleBindings',
 ]
 
-const renderActiveProfile = (hasBinding) => <span>{hasBinding ? 'Yes' : 'No'}</span>
-
-const columns = [
-  { id: 'name', label: 'Name' },
-  { id: 'kubeRoleVersion', label: 'Version' },
-  {
-    id: 'cloudProviderType',
-    label: 'Cloud Provider',
-    render: (type) => cloudProviderTypes[type] || capitalizeString(type),
-  },
-  {
-    id: 'hasBinding',
-    label: 'Active Profile',
-    render: renderActiveProfile,
-  },
-  {
-    id: 'enableProfileAgent',
-    label: 'Profile Agent',
-    render: (enabled) => (enabled ? 'Yes' : 'No'),
-  },
-]
-
-const profileAgentInstalled = (cluster) => !!cluster.enableProfileAgent
-
-const renderProfileCalloutFields = () => (fields) => {
+const renderProfileCalloutFields = (cluster) => (fields) => {
   const classes = useStyles({})
   return (
     <div className={classes.wizardMetaContainer}>
@@ -99,6 +66,12 @@ const renderProfileCalloutFields = () => (fields) => {
         <Text variant="body2">Profile Name:</Text>
         <Text variant="caption1">{fields.name}</Text>
       </div>
+      {cluster?.length && cluster[0] && (
+        <div className={classes.calloutField}>
+          <Text variant="body2">Cluster Name:</Text>
+          <Text variant="caption1">{cluster[0].name}</Text>
+        </div>
+      )}
       <div className={clsx(classes.roleCounts, classes.largeTopMargin)}>
         <div className={classes.calloutField}>
           <Text variant="body2">Total Roles:</Text>
@@ -121,16 +94,29 @@ const renderProfileCalloutFields = () => (fields) => {
   )
 }
 
-const clusterValidations = [
-  requiredValidator,
-  customValidator((clusters) => {
-    if (!clusters.length) {
-      return false
+const DeployNowButton = ({ wizardContext }) => {
+  const [showDialog, setShowDialog] = useState(false)
+  const clickedButton = () => {
+    if (!!wizardContext?.cluster?.[0] && !wizardContext.cluster[0].hasBinding) {
+      setShowDialog(true)
     }
-    const cluster = clusters[0]
-    return !cluster.hasBinding
-  }, 'Selected cluster may not have an active profile binding. You can delete the profile binding by managing bindings on the RBAC profiles view.'),
-]
+  }
+  return (
+    <>
+      {showDialog && (
+        <SkipDryRunDialog wizardContext={wizardContext} handleClose={() => setShowDialog(false)} />
+      )}
+      <SubmitButton onClick={clickedButton}>Deploy</SubmitButton>
+    </>
+  )
+}
+
+const renderAdditionalActions = (wizardContext, activeStep) => {
+  if (activeStep !== 0) {
+    return []
+  }
+  return [<DeployNowButton wizardContext={wizardContext} />]
+}
 
 const DeployRbacProfilePage = () => {
   const classes = useStyles({})
@@ -139,31 +125,14 @@ const DeployRbacProfilePage = () => {
   const [profiles, profilesLoading] = useDataLoader(rbacProfileActions.list)
   // When wireframes are finalized for how to manage active profiles,
   // add below back in and display that info in the clusters list
-  const [clusters, clustersLoading] = useDataLoader(clusterActions.list)
-  const mappedClusters = useMemo(() => {
-    if (clusters.length && profiles.length) {
-      const allBindings = profiles
-        .map((profile) => {
-          return profile.bindings
-        })
-        .flat()
-      // @ts-ignore path complaining about typing, remove ignore after models attached
-      const bindingsByClusterId = indexBy(path(['spec', 'clusterRef']), allBindings)
-      return clusters.map((cluster) => {
-        return {
-          ...cluster,
-          hasBinding: !!bindingsByClusterId[cluster.uuid],
-        }
-      })
-    }
-    return clusters
-  }, [clusters, profiles])
   const profile = useMemo(() => profiles.find(propEq('name', profileName)), [profiles, profileName])
+  const [submittingStep, setSubmittingStep] = useState(false)
 
   const initialContext = useMemo(() => {
     return {
       profileName,
       cluster: undefined,
+      analysis: '',
     }
   }, [profileName])
 
@@ -181,7 +150,7 @@ const DeployRbacProfilePage = () => {
     <FormWrapper
       title="Deploy a Profile to a Cluster"
       backUrl={routes.rbac.profiles.list.path()}
-      loading={profilesLoading || creating}
+      loading={profilesLoading || creating || submittingStep}
     >
       <DocumentMeta title="Deploy Profile" bodyClasses={['form-view']} />
       {profile && (
@@ -189,55 +158,28 @@ const DeployRbacProfilePage = () => {
           buttonCalloutMargin={396}
           onComplete={updateProfileBindingAction}
           context={initialContext}
+          additionalActions={renderAdditionalActions}
+          submitLabel="Deploy"
+          hideBack
         >
-          {({ wizardContext, setWizardContext, onNext }) => (
+          {({ wizardContext, setWizardContext, onNext, handleNext }) => (
             <WizardMeta
               className={classes.wizardMeta}
               fields={profile}
               calloutFields={profileCalloutFields}
-              renderLabels={renderProfileCalloutFields()}
+              renderLabels={renderProfileCalloutFields(wizardContext.cluster)}
             >
               <WizardStep stepId="step1" label="Select a Cluster">
-                <ValidatedForm
-                  classes={{ root: classes.validatedFormContainer }}
-                  initialValues={wizardContext}
-                  onSubmit={setWizardContext}
-                  triggerSubmit={onNext}
-                  title="Select a Cluster to Deploy to"
-                >
-                  <Text variant="body2">
-                    Choose a cluster to deploy this RBAC profile to. The cluster will use the RBAC
-                    permissions that currently belong to the RBAC profile. If you make changes to a
-                    profile, you will need to redeploy the profile to any clusters you wish to use
-                    the updated permissions.
-                  </Text>
-                  <Text variant="body2" className={classes.largeTopMargin}>
-                    RBAC profiles may only be deployed onto clusters with Kubernetes version 1.2+
-                    that have Profile Agent installed.
-                  </Text>
-                  <ListTableField
-                    id="cluster"
-                    data={mappedClusters}
-                    loading={clustersLoading}
-                    columns={columns}
-                    onChange={(value) => setWizardContext({ cluster: value })}
-                    value={wizardContext.cluster}
-                    checkboxCond={profileAgentInstalled}
-                    uniqueIdentifier="uuid"
-                    validations={clusterValidations}
-                  />
-                </ValidatedForm>
+                <SelectClusterStep
+                  wizardContext={wizardContext}
+                  setWizardContext={setWizardContext}
+                  onNext={onNext}
+                  handleNext={handleNext}
+                  setSubmitting={setSubmittingStep}
+                />
               </WizardStep>
               <WizardStep stepId="step2" label="Impact Analysis">
-                <div className={classes.card}>
-                  <Text variant="subtitle1" className={classes.cardTitle}>
-                    Impact Analysis is coming soon.
-                  </Text>
-                  <Text variant="body1">
-                    Impact Analysis will make it possible to see the impacted changes in RBAC
-                    permissions on a cluster before deploying an RBAC profile to that cluster.
-                  </Text>
-                </div>
+                <DriftAnalysis analysisString={wizardContext.analysis} />
               </WizardStep>
             </WizardMeta>
           )}
