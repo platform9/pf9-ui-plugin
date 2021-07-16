@@ -65,10 +65,8 @@ interface Props {
 }
 
 const renderGroupResources = (group, rbac) => {
-  console.log(rbac)
   const classes = useStyles({})
   const resources = keys(rbac[group])
-  console.log(resources)
   return (
     <div className={classes.resourcesList}>
       {resources.map((resource: string) => (

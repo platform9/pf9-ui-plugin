@@ -76,7 +76,6 @@ const columns = [
 
 const RoleBindingAnalysisDialog = ({ roleBinding, onClose }: Props) => {
   const classes = useStyles({})
-  console.log(roleBinding)
 
   return (
     <Dialog open fullWidth maxWidth="md" onClose={onClose} className={classes.dialog}>

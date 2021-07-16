@@ -53,7 +53,6 @@ const columns = [
 
 const ClusterRoleBindingAnalysisDialog = ({ clusterRoleBinding, onClose }: Props) => {
   const classes = useStyles({})
-  console.log(clusterRoleBinding)
 
   return (
     <Dialog open fullWidth maxWidth="md" onClose={onClose} className={classes.dialog}>
