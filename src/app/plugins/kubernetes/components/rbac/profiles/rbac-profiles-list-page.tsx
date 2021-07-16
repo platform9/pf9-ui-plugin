@@ -50,7 +50,7 @@ const renderStatus = (status) => {
   )
 }
 
-const TypesTableCell = ({ profile }) => {
+export const TypesTableCell = ({ profile }) => {
   return (
     <>
       {!!profile.roles.length && (

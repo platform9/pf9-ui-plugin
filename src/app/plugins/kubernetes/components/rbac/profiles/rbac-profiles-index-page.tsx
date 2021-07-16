@@ -3,7 +3,8 @@ import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import RbacProfilesListPage from './rbac-profiles-list-page'
 import PageContainer from 'core/components/pageContainer/PageContainer'
-import DriftAnalyticsPage from './drift-analytics-page'
+import DriftAnalysisPage from './drift/drift-analysis-page'
+// import DriftAnalyticsPage from './drift-analytics-page'
 
 const RbacProfilesIndexPage = () => (
   <PageContainer>
@@ -12,7 +13,7 @@ const RbacProfilesIndexPage = () => (
         <RbacProfilesListPage />
       </Tab>
       <Tab value="drift" label="Drift Analytics">
-        <DriftAnalyticsPage />
+        <DriftAnalysisPage />
       </Tab>
     </Tabs>
   </PageContainer>

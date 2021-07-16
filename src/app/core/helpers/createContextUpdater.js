@@ -149,6 +149,7 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
         onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
       } = additionalOptions
       const loader = contextLoader || getContextLoader(cacheKey)
+
       if (!loader) {
         throw new Error(`Context Loader with key ${cacheKey} not found`)
       }

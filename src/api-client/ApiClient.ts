@@ -307,7 +307,7 @@ class ApiClient {
       params,
       ...this.getAuthHeaders(),
     })
-    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+
     return normalizeResponse<T>(response)
   }
 

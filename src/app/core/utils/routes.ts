@@ -907,7 +907,7 @@ export const routes = {
     }),
     profiles: {
       list: Route.register({
-        url: `${pluginRoutePrefix}/rbac_profiles`,
+        url: `${pluginRoutePrefix}/rbac_profiles#profiles`,
         defaultParams: {
           plugin: AppPlugins.Kubernetes,
         },

@@ -92,7 +92,7 @@ export const makeRbacProfilesSelector = (
     [rbacProfilesSelector, (_, params) => mergeLeft(params, defaultParams)],
     (rbacProfiles, params) => {
       const { orderBy, orderDirection } = params
-      return pipe(createSorter({ orderBy, orderDirection }))(rbacProfiles)
+      return pipe(createSorter({ orderBy, orderDirection }), arrayIfEmpty)(rbacProfiles)
     },
   )
 }

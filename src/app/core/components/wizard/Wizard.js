@@ -160,11 +160,16 @@ class Wizard extends PureComponent {
       showFinishAndReviewButton,
       hideAllButtons,
       buttonCalloutMargin,
+      additionalActions,
     } = this.props
     const shouldShowFinishAndReview =
       typeof showFinishAndReviewButton === 'function'
         ? showFinishAndReviewButton(wizardContext)
         : showFinishAndReviewButton
+    const shouldHideButtons =
+      typeof hideAllButtons === 'function'
+        ? hideAllButtons(wizardContext, activeStep)
+        : hideAllButtons
     const renderStepsContent = ensureFunction(children)
     const currentStep = steps[activeStep]
     const nextBtnDisabled =
@@ -180,7 +185,7 @@ class Wizard extends PureComponent {
           handleBack: this.handleBack,
           setActiveStep: this.setActiveStep,
         })}
-        {!hideAllButtons && (
+        {!shouldHideButtons && (
           <WizardButtons
             calloutMargin={buttonCalloutMargin}
             hasCalloutFields={this.state.calloutFields}
@@ -203,6 +208,7 @@ class Wizard extends PureComponent {
                 {finishAndReviewLabel}
               </NextButton>
             )}
+            {!!additionalActions && <>{additionalActions(wizardContext, activeStep)}</>}
           </WizardButtons>
         )}
       </WizardContext.Provider>
@@ -223,7 +229,7 @@ Wizard.propTypes = {
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   startingStep: PropTypes.number,
   hideBack: PropTypes.bool,
-  hideAllButtons: PropTypes.bool,
+  hideAllButtons: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
   singleStep: PropTypes.bool,
 }
 

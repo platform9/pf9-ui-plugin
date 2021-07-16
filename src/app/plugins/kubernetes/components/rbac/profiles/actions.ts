@@ -101,7 +101,7 @@ export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacP
   updateFn: async (data) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile binding')
   },
-  deleteFn: async ({ name }, currentItems) => {
+  deleteFn: async ({ name }) => {
     Bugsnag.leaveBreadcrumb('Attempting to update rbac profile binding')
     return await qbert.deleteRbacProfileBinding(name)
   },
@@ -114,4 +114,37 @@ export const rbacProfileBindingsActions = createCRUDActions(ActionDataKeys.RbacP
 export const patchRbacProfile = async (name, body) => {
   const response = await qbert.patchRbacProfile(name, body)
   return response
+}
+
+export const getDriftAnalysis = async ({ cluster, profileName }) => {
+  const clusterId = cluster[0].uuid
+  const body = {
+    apiVersion: 'sunpike.platform9.com/v1alpha2',
+    kind: 'ClusterProfileBinding',
+    metadata: {
+      name: `${profileName}-${clusterId}-${uuid.v4()}`,
+    },
+    spec: {
+      clusterRef: clusterId,
+      profileRef: `default/${profileName}`,
+      dryRun: true,
+    },
+  }
+  Bugsnag.leaveBreadcrumb('Attempting to get drift analysis', { clusterId, profileName })
+  trackEvent('Get drift analysis', {
+    clusterId,
+    profileName,
+  })
+  const driftAnalysis = await qbert.createRbacProfileBinding(body)
+  return driftAnalysis
+}
+
+export const getProfileBinding = async (profileName) => {
+  const details = await qbert.getRbacProfileBinding(profileName)
+  return details
+}
+
+export const getProfileBindingDetails = async (profileName) => {
+  const details = await qbert.getRbacProfileBindingDetails(profileName)
+  return details
 }

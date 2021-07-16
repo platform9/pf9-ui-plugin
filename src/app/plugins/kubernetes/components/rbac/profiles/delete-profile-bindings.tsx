@@ -65,8 +65,9 @@ const DeleteProfileBindingsPage = () => {
   const handleSubmit = useCallback(
     async (params) => {
       await Promise.all(params.selectedProfileBindings.map(handleRemove))
-      // The dataUpdater for delete doesn't update the cache
-      // Need to call reload manually
+      // the dataUpdater for delete doesn't update the cache
+      // This needs to be fixed so that the GET call doesn't
+      // have to be called twice
       reloadBindings(true)
       onComplete(true)
     },
