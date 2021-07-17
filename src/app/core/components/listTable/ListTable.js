@@ -52,6 +52,15 @@ const styles = (theme) => ({
   },
   tableWrapper: {
     overflowX: 'auto',
+    '& .MuiTableRow-root': {
+      '& .MuiTableCell-body': {
+        '& > span': {
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+        },
+      },
+    },
   },
   tableRow: {
     transition: 'background .2s ease',
@@ -64,8 +73,14 @@ const styles = (theme) => ({
     '& .MuiTableCell-body': {
       whiteSpace: 'nowrap',
       textOverflow: 'ellipsis',
-      maxWidth: '120px',
+      maxWidth: '200px',
       overflow: 'hidden',
+      '& .MuiTypography-body2': {
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        justifySelf: 'stretch',
+      },
     },
     '&.Mui-selected:hover': {
       backgroundColor: [theme.palette.blue[100], '!important'],
