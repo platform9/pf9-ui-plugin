@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 600,
       whiteSpace: 'nowrap',
     },
+    '& a': {
+      display: 'block',
+    },
   },
 }))
 
