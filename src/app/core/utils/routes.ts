@@ -143,6 +143,13 @@ export const routes = {
       },
       name: 'Infrastructure:Clusters:Details',
     }),
+    upgrade: Route.register({
+      url: `${pluginRoutePrefix}/infrastructure/clusters/:id/upgrade`,
+      defaultParams: {
+        plugin: AppPlugins.Kubernetes,
+      },
+      name: 'Infrastructure:Clusters:Upgrade',
+    }),
     nodes: Route.register({
       url: `${pluginRoutePrefix}/infrastructure/clusters/:id#nodes`,
       defaultParams: {

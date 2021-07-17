@@ -42,7 +42,6 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import OnboardingBanner from './components/onboarding/OnboardingBanner'
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
-import ApiServicesPage from './components/apiAccess/ApiServicesPage'
 import OnboardNewNodePage from './components/infrastructure/nodes/onboard-new-node-page'
 import AddRepositoryPage from './components/app-catalog/repositories/add-repository-page'
 import DeployAppPage from './components/app-catalog/deployed-apps/deploy-app-page'
@@ -56,9 +55,10 @@ import VirtualMachineDetailPage from './components/virtual-machines/details'
 import AddVirtualMachinePage from './components/virtual-machines/add'
 import ImportAKSClusterPage from './components/infrastructure/clusters/import/ImportAKSClusterPage'
 import ImportGKEClusterPage from './components/infrastructure/clusters/import/ImportGKEClusterPage'
+import UpgradeClusterPage from './components/infrastructure/clusters/UpgradeClusterPage'
+import { isDecco } from 'core/utils/helpers'
 import CreateRbacProfile from 'k8s/components/rbac/profiles/create'
 import RbacProfilesIndexPage from './components/rbac/profiles/rbac-profiles-index-page'
-import { isDecco } from 'core/utils/helpers'
 import DeployRbacProfilePage from './components/rbac/profiles/deploy/deploy-rbac-profile-page'
 import DeleteProfileBindingsPage from './components/rbac/profiles/delete-profile-bindings'
 
@@ -160,6 +160,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       link: { path: '/infrastructure/clusters/scaleWorkers/:id', exact: true },
       requiredRoles: 'admin',
       component: ScaleWorkersPage,
+    },
+    {
+      name: 'Upgrade Cluster',
+      link: { path: '/infrastructure/clusters/:id/upgrade', exact: true },
+      requiredRoles: 'admin',
+      component: UpgradeClusterPage,
     },
     {
       name: 'Cluster Details',

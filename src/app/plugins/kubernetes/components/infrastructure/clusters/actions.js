@@ -11,6 +11,7 @@ import {
   getKubernetesVersion,
   getProgressPercent,
   getEtcdBackupPayload,
+  upgradeNodesCluster,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
   allClustersSelector,
@@ -143,15 +144,12 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         prevItems,
       )
     },
-    upgradeCluster: async ({ cluster, upgradeType }, prevItems) => {
-      Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster', { clusterId: cluster.uuid })
-      await qbert.upgradeCluster(cluster.uuid, upgradeType)
-      trackEvent('Upgrade Cluster', { clusterUuid: cluster.uuid })
-
-      // Multiple fields change on cluster upgrade, best to reload the entity to get updated values
-      // Ideally the upgrade cluster call would return the updated entity
-      const updatedCluster = await qbert.getClusterDetails(cluster.uuid)
-      return adjustWith(propEq('uuid', cluster.uuid), mergeLeft(updatedCluster), prevItems)
+    upgradeClusterNodes: async (formData, prevItems) => {
+      Bugsnag.leaveBreadcrumb('Attempting to upgrade cluster', {
+        clusterId: formData.uuid,
+      })
+      const updatedCluster = await upgradeNodesCluster(formData)
+      return adjustWith(propEq('uuid', formData.uuid), mergeLeft(updatedCluster), prevItems)
     },
     updateTag: async ({ cluster, key, val }, prevItems) => {
       const body = {

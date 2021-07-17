@@ -35,6 +35,7 @@ import {
   isAzureAutoscalingCluster,
 } from './helpers'
 import { IClusterSelector } from './model'
+import { isTransientStatus } from './ClusterStatusUtils'
 import { clockDriftDetectedInNodes } from '../nodes/helper'
 
 const useStyles = makeStyles((theme) => ({
@@ -137,15 +138,22 @@ const upgradeClusterHelpText =
   'An upgrade to newer version of Kubernetes is now available for this cluster. Click here or select the upgrade action for the cluster to see more details.'
 
 const K8sVersion = ({ cluster }) => {
-  const { version, canUpgrade } = cluster
+  const { version, canUpgrade, upgradingTo, taskStatus } = cluster
   const [showDialog, setShowDialog] = useState(false)
   return (
     <div>
       <Text variant="body2">{version}</Text>
-      {canUpgrade && (
+      {canUpgrade && !upgradingTo && (
         <Tooltip title={upgradeClusterHelpText}>
-          <SimpleLink src="" onClick={() => setShowDialog(true)}>
+          <SimpleLink src={routes.cluster.upgrade.path({ id: cluster.uuid })}>
             Upgrade Available
+          </SimpleLink>
+        </Tooltip>
+      )}
+      {!isTransientStatus(taskStatus) && upgradingTo && (
+        <Tooltip title={upgradeClusterHelpText}>
+          <SimpleLink src={routes.cluster.upgrade.path({ id: cluster.uuid })}>
+            Continue Upgrade
           </SimpleLink>
         </Tooltip>
       )}
@@ -323,8 +331,8 @@ export const options = {
     {
       cond: both(isAdmin, canUpgradeCluster),
       icon: 'level-up',
-      label: 'Upgrade Cluster',
-      dialog: ClusterUpgradeDialog,
+      label: 'Upgrade Clusters',
+      routeTo: (rows) => routes.cluster.upgrade.path({ id: rows[0].uuid }),
       disabledInfo: ([cluster]) =>
         !!cluster && clockDriftDetectedInNodes(cluster.nodes)
           ? 'Cannot upgrade cluster: clock drift detected in at least one node'

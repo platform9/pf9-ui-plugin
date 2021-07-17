@@ -1,8 +1,9 @@
+import { trackEvent } from 'utils/tracking'
 import ApiClient from 'api-client/ApiClient'
 import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import { isAdminRole } from 'k8s/util/helpers'
-import { pathEq, pick, prop, propEq, propSatisfies } from 'ramda'
+import { pathEq, pick, pluck, prop, propEq, propSatisfies } from 'ramda'
 import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { sanitizeUrl } from 'utils/misc'
 import { CloudProviders } from '../cloudProviders/model'
@@ -363,4 +364,18 @@ const createGenericCluster = async (body, data) => {
   // The POST call only returns the `uuid` and that's it.
   // We need to perform a GET afterwards and return that to add to the cache.
   return qbert.getClusterDetails(uuid)
+}
+
+export const upgradeNodesCluster = async (data) => {
+  const keysToPluck = ['batchUpgradeNodes', 'batchUpgradePercent']
+  const body = pick(keysToPluck, data)
+  if (data?.batchUpgradeNodes)
+    body.batchUpgradeNodes = pluck('uuid' as any, data?.batchUpgradeNodes)
+
+  if (data.batchUpgradePercent) body.batchUpgradePercent = data.batchUpgradePercent
+
+  const upgradedCluster = await qbert.upgradeClusterNodes(data.uuid, data.upgradeType, body)
+  trackEvent('Upgrade Cluster', { clusterUuid: data.uuid })
+
+  return upgradedCluster
 }
