@@ -7,9 +7,7 @@ import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { CustomerTiers, forgotPasswordUrl, imageUrlRoot, dashboardUrl } from 'app/constants'
-import { pathJoin } from 'utils/misc'
-
+import { CustomerTiers, forgotPasswordUrl, dashboardUrl } from 'app/constants'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
@@ -20,44 +18,9 @@ import Button from 'core/elements/button'
 import { LoginMethodTypes } from 'app/plugins/account/components/userManagement/users/helpers'
 import { authenticateUser } from 'app/plugins/account/components/userManagement/users/actions'
 import Bugsnag from '@bugsnag/js'
+import FormPageContainer from 'core/containers/form-page-container'
 
 const styles = (theme) => ({
-  page: {
-    position: 'fixed',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.palette.grey[900],
-    display: 'flex',
-    flexFlow: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  container: {
-    width: 1120,
-    height: 600,
-    borderRadius: 16,
-    border: `solid 1px ${theme.palette.grey[500]}`,
-    display: 'grid',
-    gridTemplateColumns: '50% 50%',
-    overflow: 'hidden',
-  },
-  managementPlane: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 80px',
-  },
-  formPane: {
-    padding: '48px 24px 20px',
-    backgroundColor: theme.palette.grey[800],
-    display: 'grid',
-    gridTemplateRows: '1fr 45px',
-    alignItems: 'center',
-    justifyItems: 'center',
-    gridGap: theme.spacing(2),
-  },
   form: {
     width: 420,
     display: 'flex',
@@ -87,13 +50,6 @@ const styles = (theme) => ({
     fontSize: 11,
     color: theme.palette.grey[300],
     textAlign: 'center',
-  },
-  img: {
-    maxWidth: '100%',
-  },
-  logo: {
-    width: 200,
-    marginBottom: theme.spacing(6),
   },
   signinButton: {
     minHeight: 45,
@@ -321,83 +277,69 @@ class LoginPage extends React.PureComponent<Props> {
     const { loginFailed, loading, loginMethod } = this.state
 
     return (
-      <section id={`login-page`} className={clsx('login-page', classes.page)}>
-        <img
-          alt="Platform9"
-          src={pathJoin(imageUrlRoot, 'primary-logo.svg')}
-          className={classes.logo}
-        />
-        <article className={classes.container}>
-          <div className={clsx('left-pane', classes.managementPlane)}>
-            <img
-              alt="Platform9 Management Plane"
-              src={pathJoin(imageUrlRoot, 'management-plane.svg')}
-              className={classes.img}
-            />
-          </div>
-          <div className={clsx('right-pane', classes.formPane)}>
-            <form className={classes.form} onSubmit={this.performLogin}>
-              <Text variant="h3" className={classes.formTitle} align="center">
-                Sign In
-              </Text>
-              {ssoEnabled && (
-                <div className={classes.loginMethods}>
-                  <Text
-                    className={clsx(
-                      classes.loginMethod,
-                      loginMethod === LoginMethodTypes.Local ? 'active' : 'inactive',
-                    )}
-                    onClick={() => this.setState({ loginMethod: LoginMethodTypes.Local })}
-                    variant="subtitle2"
-                  >
-                    Local Credentials
-                  </Text>
-                  <Text
-                    className={clsx(
-                      classes.loginMethod,
-                      loginMethod === LoginMethodTypes.SSO ? 'active' : 'inactive',
-                    )}
-                    onClick={() => this.setState({ loginMethod: LoginMethodTypes.SSO })}
-                    variant="subtitle2"
-                  >
-                    Single Sign On
-                  </Text>
-                </div>
-              )}
-              <div className={classes.fields}>
-                {loginMethod === LoginMethodTypes.Local && (
-                  <>
-                    {this.renderInputfield()}
-                    <Text className={classes.forgotPwd} gutterBottom>
-                      <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
-                        Forgot password?
-                      </SimpleLink>
-                    </Text>
-                    <div className={classes.mfaContainer}>
-                      {this.renderMFACheckbox()}
-                      {this.state.MFAcheckbox && this.renderMFAInput()}
-                    </div>
-                  </>
-                )}
-                {loginFailed && (
-                  <Alert small id="login-failed" variant="error" message="Login failed" />
-                )}
-                <Button
-                  id="login-submit"
-                  type="submit"
-                  disabled={loading}
-                  className={classes.signinButton}
-                  variant="light"
-                  color="primary"
+      <>
+        <FormPageContainer>
+          <form className={classes.form} onSubmit={this.performLogin}>
+            <Text variant="h3" className={classes.formTitle} align="center">
+              Sign In
+            </Text>
+            {ssoEnabled && (
+              <div className={classes.loginMethods}>
+                <Text
+                  className={clsx(
+                    classes.loginMethod,
+                    loginMethod === LoginMethodTypes.Local ? 'active' : 'inactive',
+                  )}
+                  onClick={() => this.setState({ loginMethod: LoginMethodTypes.Local })}
+                  variant="subtitle2"
                 >
-                  {loading ? 'Attempting login...' : 'Sign In'}
-                </Button>
+                  Local Credentials
+                </Text>
+                <Text
+                  className={clsx(
+                    classes.loginMethod,
+                    loginMethod === LoginMethodTypes.SSO ? 'active' : 'inactive',
+                  )}
+                  onClick={() => this.setState({ loginMethod: LoginMethodTypes.SSO })}
+                  variant="subtitle2"
+                >
+                  Single Sign On
+                </Text>
               </div>
-            </form>
-            {this.renderFooter()}
-          </div>
-        </article>
-      </section>
+            )}
+            <div className={classes.fields}>
+              {loginMethod === LoginMethodTypes.Local && (
+                <>
+                  {this.renderInputfield()}
+                  <Text className={classes.forgotPwd} gutterBottom>
+                    <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
+                      Forgot password?
+                    </SimpleLink>
+                  </Text>
+                  <div className={classes.mfaContainer}>
+                    {this.renderMFACheckbox()}
+                    {this.state.MFAcheckbox && this.renderMFAInput()}
+                  </div>
+                </>
+              )}
+              {loginFailed && (
+                <Alert small id="login-failed" variant="error" message="Login failed" />
+              )}
+              <Button
+                id="login-submit"
+                type="submit"
+                disabled={loading}
+                className={classes.signinButton}
+                variant="light"
+                color="primary"
+              >
+                {loading ? 'Attempting login...' : 'Sign In'}
+              </Button>
+            </div>
+          </form>
+        </FormPageContainer>
+        {this.renderFooter()}
+      </>
     )
   }
 }
